@@ -1,0 +1,193 @@
+<div class="wrapper">
+  <div class="container">
+    <div class="toolbar">
+      <div>
+        <app-menu-button (click)="onOpenMenuHandler()" [opened]="menuOpened()" />
+      </div>
+      <div class="title">{{title()}}</div>
+      <app-search (search)="onSearchHandler($event)" />
+    </div>
+
+    <div class="list-container">
+      @let doc = dockMode();
+      <app-drawer [dock]="doc" [dockLeftSize]="240">
+        <dock-left>
+          <div class="list-rooms__container">
+            <ng-virtual-list class="list rooms" [items]="items" [itemRenderer]="itemRenderer" [trackBy]="trackBy"
+              [itemSize]="40" [dynamicSize]="true" [bufferSize]="2" [maxBufferSize]="10" clickOutside (onClickOutside)="onRoomsClickOutside()"
+              (onItemClick)="onRoomClickHandler($event)"></ng-virtual-list>
+          </div>
+        </dock-left>
+        <div class="list-wrapper">
+          <ng-virtual-list #dynamicList class="list" [items]="groupDynamicItems" [itemRenderer]="groupItemRenderer"
+            [trackBy]="trackBy" [itemSize]="40" [bufferSize]="5" [maxBufferSize]="15" collectionMode="lazy"
+            [itemConfigMap]="groupDynamicItemsConfigMap" [dynamicSize]="true" [snap]="true" [snapToEnd]="false"
+            snappingMethod="advanced" methodForSelecting="multi-select"
+            (onScrollReachStart)="onScrollReachStartHandler()" (onItemClick)="onClickHandler($event)"></ng-virtual-list>
+        </div>
+      </app-drawer>
+    </div>
+  </div>
+
+  <ng-template #groupItemRenderer let-data="data" let-measures="measures" let-config="config">
+    @if (data) {
+    @switch (data.type) {
+    @case ("write-indicator") {
+    <div class="list__windicator-container">
+      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="10" viewBox="0 0 120 30" fill="#fff">
+        <circle cx="10" cy="10" r="10">
+          <animate id="r0" attributeName="r" from="10" to="10" begin="0.5s;r0.end+0.5s" dur="0.5s" values="8;10;8"
+            calcMode="linear" repeatCount="indefinite" />
+          <animate id="r1" attributeName="fill-opacity" from="1" to="1" begin="0.5s;r1.end+0.5s" dur="0.5s"
+            values="0;1;0" calcMode="linear" repeatCount="indefinite" />
+        </circle>
+        <circle cx="50" cy="10" r="10">
+          <animate id="r2" attributeName="r" from="10" to="10" begin="0.25s;r2.end+0.75s" dur="0.5s" values="8;10;8"
+            calcMode="linear" repeatCount="indefinite" />
+          <animate id="r3" attributeName="fill-opacity" from="1" to="1" begin="0.25s;r3.end+0.75s" dur="0.5s"
+            values="0;1;0" calcMode="linear" repeatCount="indefinite" />
+        </circle>
+        <circle cx="90" cy="10" r="10">
+          <animate id="r4" attributeName="r" from="10" to="10" begin="0s;r4.end+1s" dur="0.5s" values="8;10;8"
+            calcMode="linear" repeatCount="indefinite" />
+          <animate id="r5" attributeName="fill-opacity" from="1" to="1" begin="0s;r5.end+1s" dur="0.5s" values="0;1;0"
+            calcMode="linear" repeatCount="indefinite" />
+        </circle>
+      </svg>
+    </div>
+    }
+    @case ("group-header") {
+    <div class="list__group-container"
+      [ngClass]="{'snapped': config.snapped, 'snapped-out': config.snappedOut, 'focused': config.focused, 'collapsed': config.collapsed}">
+      <span class="name">
+        <span>{{data.name}}</span>
+        <span class="collapsable-indicator">
+          @if (config.collapsed) {
+          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="inherit" viewBox="0 0 24 24">
+            <path fill="inherit"
+              d="M12.601 17.596a.85.85 0 0 1-1.202 0L1.239 7.436a.75.75 0 0 1 1.06-1.061l9.701 9.7 9.7-9.7a.75.75 0 0 1 1.061 1.06z">
+            </path>
+          </svg>
+          } @else {
+          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="inherit" viewBox="0 0 24 24">
+            <path fill="inherit"
+              d="M12.601 6.404a.85.85 0 0 0-1.202 0l-10.16 10.16a.75.75 0 0 0 1.06 1.061L12 7.925l9.7 9.7a.75.75 0 0 0 1.061-1.06z">
+            </path>
+          </svg>
+          }
+        </span>
+      </span>
+    </div>
+    }
+    @default {
+    @let isIn = data.incomType === 'in';
+    @let isOut = data.incomType === 'out';
+    @let class = {'in': isIn, 'out': isOut, 'edited': data.edited, 'selected': config.selected, focused:
+    config.focused};
+    @let msgClass = {'in': isIn, 'out': isOut, 'deleted': data.deleted == true, 'animate': data.animate == true, 'edited': data.edited == true, 'selected': config.selected, focused:
+    config.focused};
+    <div class="list__container" [ngClass]="class" [longPress]="1000">
+      <!-- <svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute; overflow:hidden">
+        <defs>
+          <filter id="glass-distortion" x="0%" y="0%" width="100%" height="100%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.011 0.011" numOctaves="2" seed="92" result="noise">
+            </feTurbulence>
+            <feGaussianBlur in="noise" stdDeviation="2" result="blurred"></feGaussianBlur>
+            <feDisplacementMap in="SourceGraphic" in2="blurred" scale="47" xChannelSelector="R" yChannelSelector="G">
+            </feDisplacementMap>
+          </filter>
+        </defs>
+      </svg> -->
+      <!-- (longPressFinish)="onEditModeStartHandler()"> -->
+      <div class="message__container" [ngClass]="class">
+        <div class="message" [ngClass]="msgClass">
+          @if (data.edited) {
+          @if (data.image) {
+          <div class="complex-message">
+            <img [src]="data.image" />
+            <textarea clickOutside [clickOutsideItem]="data" (keydown)="onKeyDownHandler($event)"
+              (onClickOutside)="onOutsideClickHandler($event, data, config.selected)"
+              [ngStyle]="{height: getContentHeight(measures.height, true) + 'px'}" [value]="data.name"
+              (click)="onTAClickHandler($event)" (onOutsideClose)="onEditingCloseHandler($event)"
+              (change)="onEditedHandler($event, data)"></textarea>
+          </div>
+          } @else {
+          <textarea clickOutside [clickOutsideItem]="data" (keydown)="onKeyDownHandler($event)"
+            (onClickOutside)="onOutsideClickHandler($event, data, config.selected)"
+            [ngStyle]="{height: getContentHeight(measures.height) + 'px'}" [value]="data.name"
+            (click)="onTAClickHandler($event)" (onOutsideClose)="onEditingCloseHandler($event)"
+            (change)="onEditedHandler($event, data)"></textarea>
+          }
+          } @else {
+          @if (data.image) {
+          <div class="complex-message">
+            <img [src]="data.image" />
+            <span searchHighlight substringClass="search-substring" [text]="data.name" [searchedWords]="searchedWords()"
+              (click)="onEditItemHandler($event, data, config.selected)">{{data.name}}</span>
+          </div>
+          } @else {
+          <span searchHighlight substringClass="search-substring" [text]="data.name" [searchedWords]="searchedWords()"
+            (click)="onEditItemHandler($event, data, config.selected)">{{data.name}}</span>
+          }
+          }
+        </div>
+        @if (config.selected) {
+        <div class="flex"></div>
+        <div class="message__controls">
+          <div class="ctrl__button del-icon" (click)="onDeleteItemHandler($event, data, config, measures)">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="inherit" width="16" height="16" viewBox="0 0 24 24">
+              <path fill="inherit"
+                d="M10 12.25a.75.75 0 0 1 .75.75v5a.75.75 0 0 1-1.5 0v-5a.75.75 0 0 1 .75-.75M13.75 13a.75.75 0 0 1 1.5 0v5a.75.75 0 0 1-1.5 0z">
+              </path>
+              <path fill="inherit" fill-rule="evenodd"
+                d="M7.559 4.5H3.75A1.75 1.75 0 0 0 2 6.25v2C2 9.217 2.784 10 3.75 10h.303l.812 10.953A2.75 2.75 0 0 0 7.607 23.5h9.286a2.75 2.75 0 0 0 2.742-2.547L20.446 10h.304a1.75 1.75 0 0 0 1.75-1.75v-2a1.75 1.75 0 0 0-1.75-1.75h-3.809a4.751 4.751 0 0 0-9.382 0m7.854 0a3.251 3.251 0 0 0-6.326 0zM3.75 8.5h17a.25.25 0 0 0 .25-.25v-2a.25.25 0 0 0-.25-.25h-17a.25.25 0 0 0-.25.25v2c0 .138.112.25.25.25m14.39 12.342L18.941 10H5.558l.803 10.842A1.25 1.25 0 0 0 7.607 22h9.286a1.25 1.25 0 0 0 1.246-1.158"
+                clip-rule="evenodd"></path>
+            </svg>
+          </div>
+          <!-- <div class="ctrl__button ok-icon" (click)="onDeleteItemHandler($event, data)">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="inherit" width="16" height="16" viewBox="0 0 24 24">
+              <path fill="inherit"
+                d="M10 12.25a.75.75 0 0 1 .75.75v5a.75.75 0 0 1-1.5 0v-5a.75.75 0 0 1 .75-.75M13.75 13a.75.75 0 0 1 1.5 0v5a.75.75 0 0 1-1.5 0z">
+              </path>
+              <path fill="inherit" fill-rule="evenodd"
+                d="M7.559 4.5H3.75A1.75 1.75 0 0 0 2 6.25v2C2 9.217 2.784 10 3.75 10h.303l.812 10.953A2.75 2.75 0 0 0 7.607 23.5h9.286a2.75 2.75 0 0 0 2.742-2.547L20.446 10h.304a1.75 1.75 0 0 0 1.75-1.75v-2a1.75 1.75 0 0 0-1.75-1.75h-3.809a4.751 4.751 0 0 0-9.382 0m7.854 0a3.251 3.251 0 0 0-6.326 0zM3.75 8.5h17a.25.25 0 0 0 .25-.25v-2a.25.25 0 0 0-.25-.25h-17a.25.25 0 0 0-.25.25v2c0 .138.112.25.25.25m14.39 12.342L18.941 10H5.558l.803 10.842A1.25 1.25 0 0 0 7.607 22h9.286a1.25 1.25 0 0 0 1.246-1.158"
+                clip-rule="evenodd"></path>
+            </svg>
+          </div> -->
+        </div>
+        }
+      </div>
+    </div>
+    }
+    }
+    }
+  </ng-template>
+
+  <ng-template #itemRenderer let-data="data" let-config="config">
+    @if (data) {
+    @switch (data.type) {
+    @case ("group-header") {
+    <div class="list__item-container">
+      <div class="content">
+        <span>{{data.name}}</span>
+      </div>
+    </div>
+    }
+    @default {
+    <div class="list__item-container">
+      <div class="message">
+        <span>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="#b8b8b8" width="40px" height="40px" viewBox="0 0 512 512">
+            <title>ionicons-v5-j</title>
+            <path
+              d="M256,48C141.31,48,48,141.31,48,256s93.31,208,208,208,208-93.31,208-208S370.69,48,256,48ZM205.78,164.82C218.45,151.39,236.28,144,256,144s37.39,7.44,50.11,20.94C319,178.62,325.27,197,323.79,216.76,320.83,256,290.43,288,256,288s-64.89-32-67.79-71.25C186.74,196.83,193,178.39,205.78,164.82ZM256,432a175.49,175.49,0,0,1-126-53.22,122.91,122.91,0,0,1,35.14-33.44C190.63,329,222.89,320,256,320s65.37,9,90.83,25.34A122.87,122.87,0,0,1,382,378.78,175.45,175.45,0,0,1,256,432Z" />
+          </svg>
+        </span>
+        <span>{{data.name}}</span>
+      </div>
+    </div>
+    }
+    }
+    }
+  </ng-template>
+</div>

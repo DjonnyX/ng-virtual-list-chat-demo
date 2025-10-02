@@ -1,0 +1,80 @@
+button {
+    color: black;
+}
+
+.menu {
+    position: relative;
+    margin-right: -.625rem;
+    border-width: 0px;
+    background-color: transparent;
+    padding: 0;
+    outline: none;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+.menu .ham {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+.menu .ham {
+    padding-top: 4px;
+    height: 32px;
+    width: 32px;
+    cursor: pointer;
+    margin: -8px;
+    transition-duration: .1s;
+}
+
+.menu .ham .top {
+    stroke-dasharray: 40 160;
+}
+
+.menu .ham .middle {
+    transform-origin: 50%;
+    stroke-dasharray: 40 142;
+}
+
+.menu .ham .bottom {
+    transform-origin: 50%;
+    stroke-dasharray: 40 85;
+}
+
+.menu .line {
+    fill: none;
+    stroke: #a199db;
+    stroke-width: 5;
+    transition-duration: .1s;
+    stroke-linecap: round;
+}
+
+.menu.active svg {
+    --tw-rotate: 45deg;
+    transform: rotate(var(--tw-rotate));
+}
+
+.menu.active svg .top {
+    stroke-dashoffset: -64px;
+}
+
+.menu.active svg .middle {
+    --tw-rotate: 90deg;
+    transform: rotate(var(--tw-rotate));
+}
+
+.menu.active svg .bottom {
+    stroke-dashoffset: -64px;
+}
