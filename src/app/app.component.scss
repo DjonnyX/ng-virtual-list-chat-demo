@@ -122,7 +122,7 @@
     // grid-template-rows: auto 1fr;
     height: calc(100%);
     width: calc(100%);
-    max-width: 740px;
+    max-width: 800px;
     overflow: hidden;
 }
 
@@ -250,7 +250,13 @@
         height: 100%;
         width: 100%;
         margin: 3px 0;
-        padding: 0 12px;
+        padding: 0 4px;
+
+        @media (min-width: 600px) {
+            margin: 6px 0;
+            padding: 0 12px;
+        }
+
         background-color: transparent;
         box-sizing: border-box;
 
@@ -269,14 +275,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            fill: #ffd0cd;
+            fill: #cdefff;
             transition: background 150ms ease-out;
 
             &.del-icon {
-                background: #7c2c2c8a;
+                background: #4500ac;
 
                 &:hover {
-                    background: #611f1fab;
+                    background: #360088;
                 }
             }
 
@@ -307,50 +313,9 @@
             height: auto;
         }
 
-        .message {
-            font-size: 14px;
-            height: auto;
-
-            textarea {
-                font-family: inherit;
-                font-size: inherit;
-                max-width: 100%;
-                min-width: 100%;
-                min-height: 18px;
-                outline: none;
-                border: none;
-                background: #fff0b969;
-                padding: 0; //2px 6px;
-                margin: 0;
-                box-sizing: content-box;
-            }
-
-            overflow: hidden;
-        }
-
-        .message.edited {
-            width: 100%;
-            min-height: 20px;
-        }
-
-        .message.animate {
-            height: var(--deleted-item-height);
-            transition: height 150ms ease-out;
-        }
-
-        .message.deleted {
-            height: 0px;
-        }
-
-        .message.focused {
-            background-color: rgb(255, 255, 255);
-            box-shadow: 1px 2px 8px 4px rgba(0, 0, 0, 0.1);
-        }
-
         &.selected {
             .message__container {
-                background-color: #ffffff29;
-                // backdrop-filter: blur(5px);
+                background-color: #c8f4ff69;
                 border-radius: 12px;
                 transition: background-color 150ms ease-out;
 
@@ -360,17 +325,6 @@
 
                 &.out {
                     border-bottom-right-radius: 0px;
-                }
-            }
-
-            .message.selected {
-                align-self: center;
-                background-color: #c4dfff;
-            }
-
-            &.focused {
-                .message.selected {
-                    background-color: #d7e9ff;
                 }
             }
         }
@@ -388,40 +342,8 @@
             flex-wrap: wrap;
         }
 
-        .complex-message {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-
-            img {
-                height: 72px;
-            }
-        }
-
         .flex {
             flex: 1;
-        }
-
-        .message {
-            display: flex;
-            max-width: 55%;
-            background-color: rgb(210, 220, 221);
-            border-radius: 12px;
-            box-shadow: 1px 2px 8px 4px rgba(0, 0, 0, 0.075);
-            outline: 1px solid rgba(0, 0, 0, 0.1);
-            padding: 10px 14px;
-            word-break: break-all;
-            box-sizing: border-box;
-
-            &.in {
-                border-bottom-left-radius: 0px;
-            }
-
-            &.out {
-                border-bottom-right-radius: 0px;
-            }
         }
     }
 
@@ -439,26 +361,9 @@
         &>* {
             height: auto;
         }
-
-        .message {
-            cursor: pointer;
-            width: 100%;
-            height: 100%;
-            display: grid;
-            grid-template-columns: auto 1fr;
-            gap: 6px;
-            align-items: center;
-            border: none;
-            padding: 4px 6px;
-            word-break: break-all;
-        }
     }
 
     &__group-container {
-
-        &.snapped,
-        &.snapped-out {}
-
         cursor: pointer;
         height: 100%;
         width: 100%;

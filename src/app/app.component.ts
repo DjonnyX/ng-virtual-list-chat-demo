@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, ElementRef, Signal, signal, viewChild } from '@angular/core';
+import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, ElementRef, Signal, signal, viewChild, ViewEncapsulation } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { NgVirtualListComponent, IRenderVirtualListItem, Id, FocusAlignments, IScrollEvent, ISize } from './components/ng-virtual-list/public-api';
 import {
@@ -12,24 +12,22 @@ import { FormsModule } from '@angular/forms';
 import { MenuButtonComponent } from './components/menu-button/menu-button.component';
 import { SearchComponent } from './components/search/search.component';
 import { DrawerComponent, DockMode } from "./components/drawer/drawer.component";
-import { ClickOutsideDirective, LongPressDirective } from './directives';
-import { SearchHighlightDirective } from './directives/search-highlight.directive';
+import { LongPressDirective } from './directives';
 import { ClickOutsideService } from './directives/click-outside.service';
 import { IRenderVirtualListItemConfig } from './components/ng-virtual-list/lib/models/render-item-config.model';
-
-const IMAGE_HEIGHT = 72,
-  MESSAGE_PADDING = 26;
+import { MessageComponent } from './components/message/message.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgVirtualListComponent, SearchHighlightDirective, MenuButtonComponent,
-    SearchComponent, DrawerComponent, LongPressDirective, ClickOutsideDirective,
+  imports: [CommonModule, FormsModule, NgVirtualListComponent, MenuButtonComponent,
+    SearchComponent, DrawerComponent, LongPressDirective, MessageComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [ClickOutsideService],
+  encapsulation: ViewEncapsulation.Emulated,
 })
 export class AppComponent {
   readonly trackBy = 'id';
@@ -193,10 +191,6 @@ export class AppComponent {
     ).subscribe();
   }
 
-  getContentHeight(v: number, hasImage: boolean = false) {
-    return Math.round(v - MESSAGE_PADDING - (hasImage ? IMAGE_HEIGHT : 0));
-  }
-
   onSearchHandler(pattern: string) {
     this.search.set(pattern);
   }
@@ -275,15 +269,9 @@ export class AppComponent {
     }
   }
 
-  onKeyDownHandler(e: KeyboardEvent) {
-    if (e.key === ' ') {
-      e.stopImmediatePropagation();
-    }
-  }
-
-  onEditItemHandler(e: Event, item: IItemData | undefined, selected: boolean) {
+  onEditItemHandler({ nativeEvent, item, selected }: { nativeEvent: Event, item: IItemData | undefined, selected: boolean }) {
     if (selected) {
-      e.stopImmediatePropagation();
+      nativeEvent.stopImmediatePropagation();
     }
     const trackBy = this.trackBy, index = this.groupDynamicItems.findIndex(it => it?.[trackBy] === item?.[trackBy]);
     if (index > -1) {
@@ -294,11 +282,7 @@ export class AppComponent {
     }
   }
 
-  onTAClickHandler(e: Event) {
-    e.stopImmediatePropagation();
-  }
-
-  onOutsideClickHandler(e: Event, item: IItemData | undefined, selected: boolean) {
+  onOutsideClickHandler({ item }: { nativeEvent: Event, item: IItemData | undefined, selected: boolean }) {
     const trackBy = this.trackBy, index = this.groupDynamicItems.findIndex(it => it?.[trackBy] === item?.[trackBy]);
     if (index > -1) {
       const items = [...this.groupDynamicItems], item = items[index];
@@ -319,11 +303,11 @@ export class AppComponent {
     }
   }
 
-  onEditedHandler(e: any, item: IItemData | undefined) {
+  onTextEditedHandler({ nativeEvent, item }: { nativeEvent: any, item: IItemData | undefined }) {
     const trackBy = this.trackBy, index = this.groupDynamicItems.findIndex(it => it?.[trackBy] === item?.[trackBy]);
     if (index > -1) {
       const items = [...this.groupDynamicItems], _item = items[index];
-      items[index] = { ..._item, edited: !_item.edited, name: e.target.value };
+      items[index] = { ..._item, edited: !_item.edited, name: nativeEvent.target?.value };
       this.groupDynamicItems = items;
       this.increaseVersion();
     }
