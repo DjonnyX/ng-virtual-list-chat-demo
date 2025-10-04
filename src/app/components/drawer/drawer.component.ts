@@ -67,7 +67,6 @@ export class DrawerComponent {
   }
 
   onOverlayClick(e: Event) {
-    console.log('click')
     this.close.emit();
   }
 }

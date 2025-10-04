@@ -1,4 +1,5 @@
-import { Directive, SimpleChanges, Renderer2, ElementRef, input, inject, OnChanges } from '@angular/core';
+import { Directive, SimpleChanges, Renderer2, ElementRef, input, inject, OnChanges, SecurityContext } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Directive({
     selector: '[searchHighlight]'
@@ -6,7 +7,7 @@ import { Directive, SimpleChanges, Renderer2, ElementRef, input, inject, OnChang
 export class SearchHighlightDirective implements OnChanges {
     searchedWords = input<Array<string>>();
 
-    text = input<string>();
+    text = input<string | undefined>();
 
     substringClass = input<string>('search-substring');
 
@@ -14,19 +15,23 @@ export class SearchHighlightDirective implements OnChanges {
 
     private _renderer = inject(Renderer2);
 
+    private _sanitizer = inject(DomSanitizer);
+
     constructor() { }
 
     ngOnChanges(changes: SimpleChanges): void {
         const s = this.searchedWords();
         if (!s || !s.length || !this.substringClass()) {
-            this._renderer.setProperty(this._elementRef.nativeElement, 'innerHTML', this.text() ?? '');
+            const sanitized = this._sanitizer.sanitize(SecurityContext.HTML, this._sanitizer.bypassSecurityTrustHtml(this.text() ?? ''));
+            this._renderer.setProperty(this._elementRef.nativeElement, 'innerHTML', sanitized);
             return;
         }
 
+        const sanitized = this._sanitizer.sanitize(SecurityContext.HTML, this._sanitizer.bypassSecurityTrustHtml(this.getFormattedText()));
         this._renderer.setProperty(
             this._elementRef.nativeElement,
             'innerHTML',
-            this.getFormattedText()
+            sanitized,
         );
     }
 

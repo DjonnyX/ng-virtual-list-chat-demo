@@ -29,7 +29,7 @@
     </div>
   </div>
 
-  <ng-template #groupItemRenderer let-data="data" let-measures="measures" let-config="config">
+  <ng-template #groupItemRenderer let-data="data" let-prevData="prevData" let-nextData="nextData" let-measures="measures" let-config="config">
     @if (data) {
       @switch (data.type) {
         @case ("write-indicator") {
@@ -80,44 +80,9 @@
           </div>
         }
         @default {
-          @let isIn = data.incomType === 'in';
-          @let isOut = data.incomType === 'out';
-          @let class = {'in': isIn, 'out': isOut, 'edited': data.edited, 'selected': config.selected, focused:
-          config.focused};
-          <div class="list__container" [ngClass]="class" [longPress]="1000">
-            <!-- (longPressFinish)="onEditModeStartHandler()"> -->
-            <div class="message__container" [ngClass]="class">
-              <message [data]="data" [config]="config" [measures]="measures" [isIncoming]="isIn" [isOutgoing]="isOut"
-                [searchPattern]="searchedWords()" (outsideClick)="onOutsideClickHandler($event)"
-                (editingClose)="onEditingCloseHandler($event)" (editedText)="onTextEditedHandler($event)"
-                (edit)="onEditItemHandler($event)" />
-              @if (config.selected) {
-                <div class="flex"></div>
-                <div class="message__controls">
-                  <div class="ctrl__button del-icon" (click)="onDeleteItemHandler($event, data, config, measures)">
-                    <svg fill="inherit" width="16" height="16" viewBox="0 0 24 24">
-                      <path fill="inherit"
-                        d="M10 12.25a.75.75 0 0 1 .75.75v5a.75.75 0 0 1-1.5 0v-5a.75.75 0 0 1 .75-.75M13.75 13a.75.75 0 0 1 1.5 0v5a.75.75 0 0 1-1.5 0z">
-                      </path>
-                      <path fill="inherit" fill-rule="evenodd"
-                        d="M7.559 4.5H3.75A1.75 1.75 0 0 0 2 6.25v2C2 9.217 2.784 10 3.75 10h.303l.812 10.953A2.75 2.75 0 0 0 7.607 23.5h9.286a2.75 2.75 0 0 0 2.742-2.547L20.446 10h.304a1.75 1.75 0 0 0 1.75-1.75v-2a1.75 1.75 0 0 0-1.75-1.75h-3.809a4.751 4.751 0 0 0-9.382 0m7.854 0a3.251 3.251 0 0 0-6.326 0zM3.75 8.5h17a.25.25 0 0 0 .25-.25v-2a.25.25 0 0 0-.25-.25h-17a.25.25 0 0 0-.25.25v2c0 .138.112.25.25.25m14.39 12.342L18.941 10H5.558l.803 10.842A1.25 1.25 0 0 0 7.607 22h9.286a1.25 1.25 0 0 0 1.246-1.158"
-                        clip-rule="evenodd"></path>
-                    </svg>
-                  </div>
-                  <!-- <div class="ctrl__button ok-icon" (click)="onDeleteItemHandler($event, data)">
-                    <svg fill="inherit" width="16" height="16" viewBox="0 0 24 24">
-                      <path fill="inherit"
-                        d="M10 12.25a.75.75 0 0 1 .75.75v5a.75.75 0 0 1-1.5 0v-5a.75.75 0 0 1 .75-.75M13.75 13a.75.75 0 0 1 1.5 0v5a.75.75 0 0 1-1.5 0z">
-                      </path>
-                      <path fill="inherit" fill-rule="evenodd"
-                        d="M7.559 4.5H3.75A1.75 1.75 0 0 0 2 6.25v2C2 9.217 2.784 10 3.75 10h.303l.812 10.953A2.75 2.75 0 0 0 7.607 23.5h9.286a2.75 2.75 0 0 0 2.742-2.547L20.446 10h.304a1.75 1.75 0 0 0 1.75-1.75v-2a1.75 1.75 0 0 0-1.75-1.75h-3.809a4.751 4.751 0 0 0-9.382 0m7.854 0a3.251 3.251 0 0 0-6.326 0zM3.75 8.5h17a.25.25 0 0 0 .25-.25v-2a.25.25 0 0 0-.25-.25h-17a.25.25 0 0 0-.25.25v2c0 .138.112.25.25.25m14.39 12.342L18.941 10H5.558l.803 10.842A1.25 1.25 0 0 0 7.607 22h9.286a1.25 1.25 0 0 0 1.246-1.158"
-                        clip-rule="evenodd"></path>
-                    </svg>
-                  </div> -->
-                </div>
-              }
-            </div>
-          </div>
+          <message-box [data]="data" [config]="config" [measures]="measures" [prevData]="prevData" [nextData]="nextData"
+            (editedText)="onTextEditedHandler($event)" (edit)="onEditItemHandler($event)" (delete)="onDeleteItemHandler($event)"
+          />
         }
       }
     }

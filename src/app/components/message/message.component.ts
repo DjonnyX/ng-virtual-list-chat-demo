@@ -1,21 +1,32 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, ElementRef, HostBinding, inject, input, OnDestroy, output, signal, Signal, viewChild, ViewEncapsulation } from '@angular/core';
-import { MessageSubstrateComponent, SubstarateMode } from '../message-substrate/message-substrate.component';
+import {
+  AfterViewInit, Component, computed, DestroyRef, ElementRef, HostBinding, inject, input, OnDestroy, output, signal, Signal, viewChild,
+  ViewEncapsulation,
+} from '@angular/core';
+import { delay, of, switchMap, tap } from 'rxjs';
+import { MessageSubstrateComponent, SubstarateMode, SubstarateModes } from '../message-substrate/message-substrate.component';
 import { IItemData } from '../../const/collection';
-import { Id, ISize } from '../ng-virtual-list/public-api';
+import { ISize, IVirtualListItem } from '../ng-virtual-list/public-api';
 import { IRenderVirtualListItemConfig } from '../ng-virtual-list/lib/models/render-item-config.model';
-import { SearchHighlightDirective } from '../../directives/search-highlight.directive';
-import { ClickOutsideDirective } from '../../directives';
 import { MessageBottomBarComponent } from '../message-bottom-bar/message-bottom-bar.component';
+import { EditableTextComponent } from '../editable-text/editable-text.component';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 
-const IMAGE_HEIGHT = 72,
-  MESSAGE_PADDING = 26,
-  BOTTOM_BAR = 16,
-  GAP = 2;
+export interface IMessageParams {
+  type: string;
+  prevType: string;
+  nextType: string;
+  isIncoming: boolean;
+  isOutgoing: boolean;
+  prevIsIncoming: boolean;
+  prevIsOutgoing: boolean;
+  nextIsIncoming: boolean;
+  nextIsOutgoing: boolean;
+}
 
 @Component({
   selector: 'message',
-  imports: [CommonModule, MessageSubstrateComponent, MessageBottomBarComponent, SearchHighlightDirective, ClickOutsideDirective],
+  imports: [CommonModule, EditableTextComponent, MessageSubstrateComponent, MessageBottomBarComponent],
   templateUrl: './message.component.html',
   styleUrl: './message.component.scss',
   host: {
@@ -23,37 +34,32 @@ const IMAGE_HEIGHT = 72,
   },
   encapsulation: ViewEncapsulation.Emulated,
 })
-export class MessageComponent implements OnDestroy {
-  data = input<IItemData & {
-    image?: string;
-    edited?: boolean;
-    deleted?: boolean;
-    animate?: boolean;
-  } | null>(null);
+export class MessageComponent implements AfterViewInit, OnDestroy {
+  data = input<IVirtualListItem<IItemData> | null>(null);
 
   config = input<IRenderVirtualListItemConfig & { [prop: string]: any } | null>(null);
 
   measures = input<ISize | null>(null);
 
-  isIncoming = input<boolean>(false);
-
-  isOutgoing = input<boolean>(false);
+  params = input.required<IMessageParams>();
 
   searchPattern = input<Array<string>>([]);
 
   substarateMode: Signal<SubstarateMode>;
 
-  outsideClick = output<{ nativeEvent: Event, item: IItemData | undefined, selected: boolean }>();
+  editedText = output<{ nativeEvent: Event, item: IVirtualListItem<IItemData> }>();
 
-  editingClose = output<{ target: any; item: IItemData & { id: Id }; }>();
+  edit = output<{ nativeEvent: Event, item: IVirtualListItem<IItemData>, selected: boolean }>();
 
-  editedText = output<{ nativeEvent: Event, item: IItemData | undefined }>();
+  editing = signal<boolean>(false);
 
-  edit = output<{ nativeEvent: Event, item: IItemData | undefined, selected: boolean }>();
+  classes = input.required<{ [className: string]: boolean; }>();
 
   private _content = viewChild<ElementRef<HTMLDivElement>>('content');
 
   private _resizeObserver: ResizeObserver;
+
+  private _destroyRef = inject(DestroyRef);
 
   bounds = signal<ISize>({ width: this._content()?.nativeElement?.offsetWidth ?? 0, height: this._content()?.nativeElement?.offsetHeight ?? 0 });
 
@@ -63,44 +69,52 @@ export class MessageComponent implements OnDestroy {
   }
   someCondition = true;
 
-  classes: Signal<{ [className: string]: boolean }>;
-
   private _onContentResizeHandler = () => {
-    const el = this._content()?.nativeElement as HTMLDivElement;
-    this.bounds.set({ width: el.offsetWidth, height: el.offsetHeight });
+    const data = this.data();
+    if (data) {
+      const el = this._content()?.nativeElement as HTMLDivElement;
+      if (el && el.offsetWidth && el.offsetHeight) {
+        this.bounds.set({ width: el.offsetWidth, height: el.offsetHeight });
+      }
+    }
   }
 
   constructor() {
     this._resizeObserver = new ResizeObserver(this._onContentResizeHandler);
 
-    effect(() => {
-      const content = this._content()?.nativeElement;
-      if (content) {
-        this._resizeObserver.observe(content);
-      }
-    })
+    toObservable(this.data).pipe(
+      takeUntilDestroyed(),
+      switchMap(data => {
+        if (data && data.edited) {
+          return of(data).pipe(
+            takeUntilDestroyed(this._destroyRef),
+            tap(() => {
+              this.editing.set(false);
+            }),
+            delay(100),
+          );
+        }
+        return of(data);
+      }),
+      takeUntilDestroyed(this._destroyRef),
+      tap(data => {
+        this.editing.set(data?.edited === true);
+      }),
+    ).subscribe();
 
     this.substarateMode = computed(() => {
-      const isIn = this.isIncoming();
-      return isIn ? 'left' : 'right';
-    });
-
-    this.classes = computed(() => {
-      const isIn = this.isIncoming(), isOut = this.isOutgoing(), d = this.data(), c = this.config();
-      return {
-        'in': isIn, 'out': isOut, 'deleted': d?.deleted == true, 'animate': d?.animate == true,
-        'edited': d?.edited == true, 'selected': c?.['selected'], focused: c?.['focused'],
-      };
+      const params = this.params(), { isIncoming: isIn, prevIsIncoming: isPrevIn } = params;
+      if (isIn === isPrevIn) {
+        return isIn ? SubstarateModes.LEFT : SubstarateModes.RIGHT;
+      }
+      return isIn ? SubstarateModes.IN_LEFT : SubstarateModes.IN_RIGHT;
     });
   }
 
-  getContentHeight(v: number, hasImage: boolean = false) {
-    return Math.round(v - MESSAGE_PADDING - BOTTOM_BAR - GAP - 4 - (hasImage ? IMAGE_HEIGHT : 0));
-  }
-
-  onKeyDownHandler(e: KeyboardEvent) {
-    if (e.key === ' ') {
-      e.stopImmediatePropagation();
+  ngAfterViewInit(): void {
+    const content = this._content()?.nativeElement;
+    if (content) {
+      this._resizeObserver.observe(content);
     }
   }
 
@@ -108,19 +122,11 @@ export class MessageComponent implements OnDestroy {
     e.stopImmediatePropagation();
   }
 
-  onOutsideClickHandler(nativeEvent: Event, item: IItemData | undefined, selected: boolean) {
-    this.outsideClick.emit({ nativeEvent, item, selected });
-  }
-
-  onEditingCloseHandler(data: { target: any; item: IItemData & { id: Id }; }) {
-    this.editingClose.emit(data);
-  }
-
-  onEditedTextHandler(nativeEvent: Event, item: IItemData | undefined) {
+  onEditedTextHandler(nativeEvent: Event, item: IVirtualListItem<IItemData>) {
     this.editedText.emit({ nativeEvent, item });
   }
 
-  onEditItemHandler(nativeEvent: Event, item: IItemData | undefined, selected: boolean) {
+  onEditItemHandler(nativeEvent: Event, item: IVirtualListItem<IItemData>, selected: boolean) {
     this.edit.emit({ nativeEvent, item, selected });
   }
 

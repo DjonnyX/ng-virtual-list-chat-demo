@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, ElementRef, Signal, signal, viewChild, ViewEncapsulation } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { NgVirtualListComponent, IRenderVirtualListItem, Id, FocusAlignments, IScrollEvent, ISize } from './components/ng-virtual-list/public-api';
+import { NgVirtualListComponent, IRenderVirtualListItem, FocusAlignments, ISize, IVirtualListItem } from './components/ng-virtual-list/public-api';
 import {
   BehaviorSubject, combineLatest, debounceTime, delay, filter, from, interval, map, mergeMap, of, Subject, switchMap, tap,
 } from 'rxjs';
@@ -12,16 +12,15 @@ import { FormsModule } from '@angular/forms';
 import { MenuButtonComponent } from './components/menu-button/menu-button.component';
 import { SearchComponent } from './components/search/search.component';
 import { DrawerComponent, DockMode } from "./components/drawer/drawer.component";
-import { LongPressDirective } from './directives';
 import { ClickOutsideService } from './directives/click-outside.service';
 import { IRenderVirtualListItemConfig } from './components/ng-virtual-list/lib/models/render-item-config.model';
-import { MessageComponent } from './components/message/message.component';
+import { MessageBoxComponent } from './components/message-box/message-box.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [CommonModule, FormsModule, NgVirtualListComponent, MenuButtonComponent,
-    SearchComponent, DrawerComponent, LongPressDirective, MessageComponent,
+    SearchComponent, DrawerComponent, MessageBoxComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
@@ -269,7 +268,10 @@ export class AppComponent {
     }
   }
 
-  onEditItemHandler({ nativeEvent, item, selected }: { nativeEvent: Event, item: IItemData | undefined, selected: boolean }) {
+  onEditItemHandler({ nativeEvent, item, selected }:
+    {
+      nativeEvent: Event, item: IItemData | undefined, selected: boolean,
+    }) {
     if (selected) {
       nativeEvent.stopImmediatePropagation();
     }
@@ -282,28 +284,20 @@ export class AppComponent {
     }
   }
 
-  onOutsideClickHandler({ item }: { nativeEvent: Event, item: IItemData | undefined, selected: boolean }) {
-    const trackBy = this.trackBy, index = this.groupDynamicItems.findIndex(it => it?.[trackBy] === item?.[trackBy]);
-    if (index > -1) {
-      const items = [...this.groupDynamicItems], item = items[index];
-      items[index] = { ...item, edited: false };
-      this.groupDynamicItems = items;
-      this.increaseVersion();
-    }
-    this._service.activeTarget = null;
-  }
+  // onEditingCloseHandler(data: { target: any; item: IItemData & { id: Id }; }) {
+  //   const trackBy = this.trackBy, index = this.groupDynamicItems.findIndex(it => it?.[trackBy] === data.item?.[trackBy]);
+  //   if (index > -1) {
+  //     const items = [...this.groupDynamicItems], _item = items[index];
+  //     items[index] = { ..._item, edited: false, name: data.target.value };
+  //     this.groupDynamicItems = items;
+  //     this.increaseVersion();
+  //   }
+  // }
 
-  onEditingCloseHandler(data: { target: any; item: IItemData & { id: Id }; }) {
-    const trackBy = this.trackBy, index = this.groupDynamicItems.findIndex(it => it?.[trackBy] === data.item?.[trackBy]);
-    if (index > -1) {
-      const items = [...this.groupDynamicItems], _item = items[index];
-      items[index] = { ..._item, edited: false, name: data.target.value };
-      this.groupDynamicItems = items;
-      this.increaseVersion();
-    }
-  }
-
-  onTextEditedHandler({ nativeEvent, item }: { nativeEvent: any, item: IItemData | undefined }) {
+  onTextEditedHandler({ nativeEvent, item }:
+    {
+      nativeEvent: any, item: IItemData | undefined,
+    }) {
     const trackBy = this.trackBy, index = this.groupDynamicItems.findIndex(it => it?.[trackBy] === item?.[trackBy]);
     if (index > -1) {
       const items = [...this.groupDynamicItems], _item = items[index];
@@ -313,9 +307,12 @@ export class AppComponent {
     }
   }
 
-  onDeleteItemHandler(e: Event, item: IItemData | undefined, config: IRenderVirtualListItemConfig, measures: ISize) {
+  onDeleteItemHandler({ nativeEvent, item, config, measures }:
+    {
+      nativeEvent: Event, item: IItemData | undefined, config: IRenderVirtualListItemConfig, measures: ISize,
+    }) {
     if (item) {
-      e.stopImmediatePropagation();
+      nativeEvent.stopImmediatePropagation();
       this._$delete.next([item, config, measures]);
     }
   }

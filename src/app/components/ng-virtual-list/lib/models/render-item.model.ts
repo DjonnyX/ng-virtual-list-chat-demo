@@ -32,6 +32,14 @@ export interface IRenderVirtualListItem<E = any> {
      */
     data: IVirtualListItem<E>;
     /**
+     * Previous element data.
+     */
+    previouseData: IVirtualListItem<E>;
+    /**
+     * Next element data.
+     */
+    nextData: IVirtualListItem<E>;
+    /**
      * Object with configuration parameters for IRenderVirtualListItem.
      */
     config: IRenderVirtualListItemConfig;

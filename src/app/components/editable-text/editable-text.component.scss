@@ -1,0 +1,17 @@
+.editable {
+    font-family: inherit;
+    font-size: inherit;
+    resize: vertical;
+    width: 100%;
+    min-height: 18px;
+    outline: none;
+    border: none;
+    background: #fff0b969;
+    padding: 1px;
+    margin: 0;
+    box-sizing: content-box;
+}
+
+.readonly {
+    padding: 2px;
+}

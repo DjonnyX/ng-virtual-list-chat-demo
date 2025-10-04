@@ -913,7 +913,10 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
 
                         const itemData: I = collectionItem;
 
-                        stickyItem = { index: i, id, measures, data: itemData, config };
+                        stickyItem = {
+                            index: i, id, measures, data: itemData, previouseData: i > 0 ? items[i - 1] : null,
+                            nextData: i < totalLength ? items[i + 1] : null, config,
+                        };
                         stickyItemIndex = i;
                         stickyItemSize = size;
 
@@ -966,7 +969,10 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
 
                         const itemData: I = collectionItem;
 
-                        endStickyItem = { index: i, id, measures, data: itemData, config };
+                        endStickyItem = {
+                            index: i, id, measures, data: itemData, previouseData: i > 0 ? items[i - 1] : null,
+                            nextData: i < totalLength ? items[i + 1] : null, config,
+                        };
                         endStickyItemIndex = i;
                         endStickyItemSize = size;
 
@@ -1027,7 +1033,10 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
 
                     const itemData: I = collectionItem;
 
-                    const item: IRenderVirtualListItem = { index: i, id, measures, data: itemData, config };
+                    const item: IRenderVirtualListItem = {
+                        index: i, id, measures, data: itemData, previouseData: i > 0 ? items[i - 1] : null,
+                        nextData: i < totalLength ? items[i + 1] : null, config,
+                    };
                     if (!nextSticky && stickyItemIndex < i && sticky === 1 && (pos <= scrollSize + size + stickyItemSize)) {
                         item.measures.x = isVertical ? 0 : snapped ? actualSnippedPosition : pos;
                         item.measures.y = isVertical ? snapped ? actualSnippedPosition : pos : 0;

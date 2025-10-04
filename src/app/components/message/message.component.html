@@ -2,44 +2,31 @@
 @let c = config();
 @let m = measures();
 @let b = bounds();
+@let isEditing = editing();
 @let substrMode = substarateMode();
 @let searchedWords = searchPattern();
+@let class = classes();
 @if (d && c && m) {
     <message-substrate class="message-substrate" [width]="b.width" [height]="b.height"
         [mode]="substrMode"></message-substrate>
-    <div #content class="message_content">
-        @if (d.edited) {
-            @if (d.image) {
-                <div class="complex-message">
-                    <img [src]="d.image" />
-                    <textarea clickOutside [clickOutsideItem]="d" (keydown)="onKeyDownHandler($event)"
-                        (onClickOutside)="onOutsideClickHandler($event, d, c['selected'])"
-                        [ngStyle]="{height: getContentHeight(m.height, true) + 'px'}" [value]="d.name"
-                        (click)="onTextAreaClickHandler($event)" (onOutsideClose)="onEditingCloseHandler($event)"
-                        (change)="onEditedTextHandler($event, d)"></textarea>
-                </div>
-                <message-bottom-bar />
-            } @else {
-                <textarea clickOutside [clickOutsideItem]="d" (keydown)="onKeyDownHandler($event)"
-                    (onClickOutside)="onOutsideClickHandler($event, d, c['selected'])"
-                    [ngStyle]="{height: getContentHeight(m.height) + 'px'}" [value]="d.name"
-                    (click)="onTextAreaClickHandler($event)" (onOutsideClose)="onEditingCloseHandler($event)"
-                    (change)="onEditedTextHandler($event, d)"></textarea>
-                <message-bottom-bar />
-            }
+    <div #content class="message_content" [ngClass]="class">
+        @if (d?.['image']) {
+            <div class="complex-message">
+                <img [src]="d?.['image']" />
+                <editable-text class="text" [text]="d.name" [searchPattern]="searchedWords"
+                    [editing]="isEditing" substringClass="search-substring"
+                    (textAreaClick)="onTextAreaClickHandler($event)" (changeText)="onEditedTextHandler($event, d)"
+                    (textClick)="onEditItemHandler($event, d, c['selected'])" />
+                <!-- (onOutsideClose)="onEditingCloseHandler($event)" -->
+            </div>
+            <message-bottom-bar />
         } @else {
-            @if (d.image) {
-                <div class="complex-message">
-                    <img [src]="d.image" />
-                    <span searchHighlight substringClass="search-substring" [text]="d.name" [searchedWords]="searchedWords"
-                        (click)="onEditItemHandler($event, d, c['selected'])">{{d.name}}</span>
-                </div>
-                <message-bottom-bar />
-            } @else {
-                <span searchHighlight substringClass="search-substring" [text]="d.name" [searchedWords]="searchedWords"
-                    (click)="onEditItemHandler($event, d, c['selected'])">{{d.name}}</span>
-                <message-bottom-bar />
-            }
+            <editable-text class="text" [text]="d.name" [searchPattern]="searchedWords"
+                [editing]="isEditing" substringClass="search-substring"
+                (textAreaClick)="onTextAreaClickHandler($event)" (changeText)="onEditedTextHandler($event, d)"
+                (textClick)="onEditItemHandler($event, d, c['selected'])" />
+            <!-- (onOutsideClose)="onEditingCloseHandler($event)" -->
+            <message-bottom-bar />
         }
     </div>
 }

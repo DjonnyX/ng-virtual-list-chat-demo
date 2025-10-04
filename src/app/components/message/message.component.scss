@@ -1,12 +1,7 @@
 :host {
     cursor: pointer;
     position: relative;
-    max-width: 85%;
-
-    @media (min-width: 600px) {
-        max-width: 55%;
-    }
-
+    max-width: 80%;
     // background-color: rgb(210, 220, 221);
     // border-radius: 12px;
     // box-shadow: 1px 2px 8px 4px rgba(0, 0, 0, 0.075);
@@ -15,19 +10,43 @@
     font-size: 14px;
     height: auto;
 
-    &.in {
-        border-bottom-left-radius: 0px;
-
-        .message_content {
-            padding: 10px 14px 10px 26px;
-        }
+    @media (min-width: 600px) {
+        max-width: 55%;
     }
 
-    &.out {
-        border-bottom-right-radius: 0px;
+    @media (min-width: 1200px) {
+        max-width: 800px;
+    }
 
-        .message_content {
+    .message_content {
+        width: 100%;
+        height: 100%;
+        display: grid;
+        grid-template-rows: auto 20px;
+        gap: 2px;
+        align-items: center;
+        padding: 10px 14px;
+        word-break: break-all;
+        box-sizing: border-box;
+
+        &.has-multicontent {
+            grid-template-rows: auto 20px;
+        }
+
+        &.in {
+            padding: 10px 14px 10px 26px;
+        }
+
+        &.out {
             padding: 10px 26px 10px 14px;
+        }
+
+        &.simple {
+
+            &.in,
+            &.out {
+                padding: 10px 14px;
+            }
         }
     }
 
@@ -55,6 +74,10 @@
         img {
             height: 72px;
         }
+
+        .text {
+            width: 100%;
+        }
     }
 
     .message-substrate {
@@ -66,15 +89,6 @@
     &.edited {
         width: 100%;
         min-height: 20px;
-    }
-
-    &.animate {
-        height: var(--deleted-item-height);
-        transition: height 150ms ease-out;
-    }
-
-    &.deleted {
-        height: 0px;
     }
 
     &.selected {
@@ -94,16 +108,4 @@
             }
         }
     }
-}
-
-.message_content {
-    width: 100%;
-    height: 100%;
-    display: grid;
-    grid-template-rows: auto 20px;
-    gap: 2px;
-    align-items: center;
-    padding: 10px 14px;
-    word-break: break-all;
-    box-sizing: border-box;
 }

@@ -9,7 +9,7 @@
         [ngClass]="{'snapped': item.config.snapped, 'snapped-out': item.config.snappedOut, 'focus': focused()}" (click)="onClickHandler()">
         @if (renderer) {
             <ng-container [ngTemplateOutlet]="renderer"
-                [ngTemplateOutletContext]="{data: item.data, measures: _measures, config: _config}" />
+                [ngTemplateOutletContext]="{data: item.data, prevData: item.previouseData, nextData: item.nextData, measures: _measures, config: _config}" />
         }
     </div>
 }
