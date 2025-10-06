@@ -1,0 +1,47 @@
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.group-container {
+    cursor: pointer;
+    opacity: 0;
+    animation: fadeIn 100ms ease-in-out 0ms 1 normal forwards;
+    height: 100%;
+    width: 100%;
+    padding: 6px 12px;
+    box-sizing: border-box;
+    font-weight: 800;
+    font-size: 12px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .name {
+        font-size: 10px;
+        height: auto;
+        background-color: #ffffff5c;
+        backdrop-filter: blur(5px);
+        color: #ffffff;
+        padding: 6px 14px;
+        border-radius: 14px;
+    }
+
+    &.focused {
+        .name {
+            background-color: rgba(255, 255, 255, 0.438);
+            border: 1px solid #fff0b9a4;
+        }
+    }
+
+    .collapsable-indicator {
+        fill: #ffffff;
+        margin-left: 8px;
+    }
+}

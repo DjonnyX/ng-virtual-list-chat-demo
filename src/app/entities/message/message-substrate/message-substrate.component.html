@@ -1,0 +1,21 @@
+<svg #svg style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <defs>
+        <radialGradient id="deleting" cx="0%" cy="0%" r="125%" fx="0" fy="0" gradientTransform="rotate(45)">
+            <stop offset="80%" stop-color="rgba(0, 188, 212, 0)" />
+            <stop offset="100%" stop-color="rgba(255, 100, 133, 1)" />
+            <animateTransform attributeName="gradientTransform" attributeType="XML" type="rotate" from="0 0.5 0.5"
+                to="360 0.5 0.5" dur="1000ms" repeatCount="indefinite" />
+        </radialGradient>
+        <radialGradient id="saving" cx="0%" cy="0%" r="125%" fx="0" fy="0" gradientTransform="rotate(45)">
+            <stop offset="80%" stop-color="rgba(0, 188, 212, 0)" />
+            <stop offset="100%" stop-color="rgba(0, 188, 212, 1)" />
+            <animateTransform attributeName="gradientTransform" attributeType="XML" type="rotate" from="0 0.5 0.5"
+                to="360 0.5 0.5" dur="1000ms" repeatCount="indefinite" />
+        </radialGradient>
+        <path #path stroke-width="6" />
+        <clipPath #clip>
+            <use #clipUse />
+        </clipPath>
+    </defs>
+    <use #shape stroke-width="3" style="fill:inherit;"/>
+</svg>

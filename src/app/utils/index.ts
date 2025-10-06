@@ -1,1 +1,0 @@
-export { generateLetter, generateText, generateWord } from './text';

@@ -1,0 +1,33 @@
+@let d = data();
+@let c = config();
+@let m = measures();
+@let b = bounds();
+@let isEditing = editing();
+@let substrMode = substarateMode();
+@let searchedWords = searchPattern();
+@let class = classes();
+@let styles = substrateStyles();
+@if (d && c && m) {
+    <message-substrate class="message-substrate" [styles]="styles" [width]="b.width" [height]="b.height"
+        [mode]="substrMode"></message-substrate>
+    <div #content class="message_content" [ngClass]="class">
+        @if (d?.['image']) {
+            <div class="complex-message">
+                <img [src]="d?.['image']" />
+                <editable-text class="text" [text]="d.name" [searchPattern]="searchedWords"
+                    [editing]="isEditing" substringClass="search-substring"
+                    (textAreaClick)="onTextAreaClickHandler($event)" (changeText)="onEditedTextHandler($event, d)"
+                    (textClick)="onEditItemHandler($event, d, c['selected'])" />
+                <!-- (onOutsideClose)="onEditingCloseHandler($event)" -->
+            </div>
+            <message-bottom-bar />
+        } @else {
+            <editable-text class="text" [text]="d.name" [searchPattern]="searchedWords"
+                [editing]="isEditing" substringClass="search-substring"
+                (textAreaClick)="onTextAreaClickHandler($event)" (changeText)="onEditedTextHandler($event, d)"
+                (textClick)="onEditItemHandler($event, d, c['selected'])" />
+            <!-- (onOutsideClose)="onEditingCloseHandler($event)" -->
+            <message-bottom-bar />
+        }
+    </div>
+}

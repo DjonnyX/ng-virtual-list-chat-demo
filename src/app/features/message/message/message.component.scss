@@ -1,0 +1,131 @@
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+:host {
+    opacity: 0;
+    animation: fadeIn 100ms ease-in-out 0ms 1 normal forwards;
+    cursor: pointer;
+    position: relative;
+    max-width: 80%;
+    overflow: hidden;
+    font-size: 14px;
+    height: auto;
+
+    @media (min-width: 600px) {
+        max-width: 55%;
+    }
+
+    @media (min-width: 1200px) {
+        max-width: 800px;
+    }
+
+    .message_content {
+        width: 100%;
+        height: 100%;
+        display: grid;
+        grid-template-rows: auto 20px;
+        gap: 2px;
+        align-items: center;
+        padding: 10px 14px;
+        word-break: break-all;
+        box-sizing: border-box;
+
+        &.has-multicontent {
+            grid-template-rows: auto 20px;
+        }
+
+        &.in {
+            padding: 10px 14px 10px 26px;
+        }
+
+        &.out {
+            padding: 10px 26px 10px 14px;
+        }
+
+        &.simple {
+
+            &.in,
+            &.out {
+                padding: 10px 14px;
+            }
+        }
+    }
+
+    textarea {
+        font-family: inherit;
+        font-size: inherit;
+        max-width: calc(100%);
+        min-width: 100%;
+        min-height: 18px;
+        outline: none;
+        border: none;
+        background: #fff0b969;
+        padding: 0; //2px 6px;
+        margin: 0;
+        box-sizing: content-box;
+    }
+
+    .complex-message {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+
+        img {
+            height: 72px;
+        }
+
+        .text {
+            width: 100%;
+        }
+    }
+
+    .message-substrate {
+        fill: rgb(227, 247, 250);
+        position: absolute;
+        z-index: -1;
+    }
+
+    &.edited {
+        width: 100%;
+        min-height: 20px;
+    }
+
+    &.selected {
+        .message-substrate {
+            fill: #c4dfff;
+        }
+    }
+
+    &.focused {
+        .message-substrate {
+            fill: rgb(255, 255, 255);
+        }
+
+        &.selected {
+            .message-substrate {
+                fill: #d7e9ff;
+            }
+        }
+    }
+
+    &.removal {
+        .message-substrate {
+            fill: #ffe6ee;
+        }
+
+        &.selected {
+            .message-substrate {
+                fill: #ffe6ee;
+            }
+        }
+    }
+}

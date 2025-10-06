@@ -1,0 +1,24 @@
+@let searchText = search();
+@let groupTitle = title();
+
+<div class="wrapper">
+    <div class="container">
+        <div class="toolbar">
+            <div>
+                <menu-button (click)="onOpenMenuHandler()" [opened]="menuOpened()" />
+            </div>
+            <div class="title">{{groupTitle}}</div>
+            <message-search (search)="onSearchHandler($event)" />
+        </div>
+
+        <div class="list-container">
+            @let doc = dockMode();
+            <app-drawer [dock]="doc" [dockLeftSize]="240">
+                <dock-left>
+                    <groups (select)="onGroupSelectHandler($event)" (close)="onGroupsCloseHandler()" />
+                </dock-left>
+                <messages [search]="searchText" />
+            </app-drawer>
+        </div>
+    </div>
+</div>
