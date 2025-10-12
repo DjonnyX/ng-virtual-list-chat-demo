@@ -385,7 +385,8 @@ export class NgVirtualListItemComponent extends BaseVirtualListItemComponent {
   }
 
   show() {
-    const styles = this._elementRef.nativeElement.style;
+    const el = this._elementRef.nativeElement as HTMLElement,
+      styles = el.style;
     if (this.regular) {
       if (styles.display === DISPLAY_BLOCK) {
         return;
@@ -403,7 +404,8 @@ export class NgVirtualListItemComponent extends BaseVirtualListItemComponent {
   }
 
   hide() {
-    const styles = this._elementRef.nativeElement.style;
+    const el = this._elementRef.nativeElement as HTMLElement,
+      styles = el.style;
     if (this.regular) {
       if (styles.display === DISPLAY_NONE) {
         return;

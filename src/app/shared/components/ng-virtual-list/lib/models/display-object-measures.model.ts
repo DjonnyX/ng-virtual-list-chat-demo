@@ -8,6 +8,10 @@ import { IRect } from "../types";
  */
 export interface IDisplayObjectMeasures extends IRect {
   /**
+   * Position in viewport
+   */
+  absolutePosition: number;
+  /**
    * Delta is calculated for Snapping Method.ADVANCED
    */
   delta: number;

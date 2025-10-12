@@ -2,14 +2,15 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, input, output, Signal } from '@angular/core';
 import { LongPressDirective } from '@shared/directives';
 import { IRenderVirtualListItemConfig } from '@shared/components/ng-virtual-list/lib/models/render-item-config.model';
-import { ISize, IVirtualListItem } from '@shared/components/ng-virtual-list';
+import { IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/ng-virtual-list';
 import { IItemData } from '@mock/const/collection';
 import { MessageComponent } from '../message/message.component';
 import { IMessageParams } from '../message/interfaces';
+import { IS_FIREFOX } from '@shared/components/ng-virtual-list/lib/utils/browser';
 
 const CLASS_IN = 'in', CLASS_OUT = 'out', CLASS_SIMPLE = 'simple', CLASS_END_OF_MESSAGES = 'end-of-messages',
   CLASS_REMOVAL = 'removal', CLASS_DELETED = 'deleted', CLASS_ANIMATE = 'animate', CLASS_EDITED = 'edited',
-  CLASS_SELECTED = 'selected', CLASS_FOCUSED = 'focused', CLASS_FIRST_IN_GROUP = 'first-in-group',
+  CLASS_SELECTED = 'selected', CLASS_FOCUSED = 'focused', CLASS_FIRST_IN_GROUP = 'first-in-group', CLASS_FIREFOX = 'firefox',
   CLASS_LAST_IN_GROUP = 'last-in-group', CLASS_HAS_MULTICONTENT = 'has-multicontent', DATA_PROP_IMAGE = 'image',
   DATA_PROP_REMOVAL = 'removal', DATA_PROP_DELETED = 'deleted', DATA_PROP_ANIMATE = 'animate', CONFIG_PROP_SELECTED = 'selected',
   CONFIG_PROP_FOCUSED = 'focused';
@@ -29,7 +30,7 @@ export class MessageBoxComponent {
 
   config = input<IRenderVirtualListItemConfig & { [prop: string]: any } | null>(null);
 
-  measures = input<ISize | null>(null);
+  measures = input<IDisplayObjectMeasures | null>(null);
 
   searchPattern = input<Array<string>>([]);
 
@@ -67,7 +68,7 @@ export class MessageBoxComponent {
       return {
         [CLASS_IN]: isIn, [CLASS_OUT]: isOut, [CLASS_SIMPLE]: (isIn && isPrevIn) || (isOut && isPrevOut), [CLASS_DELETED]: data?.[DATA_PROP_DELETED] == true,
         [CLASS_REMOVAL]: data?.[DATA_PROP_REMOVAL] == true, [CLASS_ANIMATE]: data?.[DATA_PROP_ANIMATE] == true, [CLASS_END_OF_MESSAGES]: (isIn && !isNextIn) || (isOut && !isNextOut),
-        [CLASS_FIRST_IN_GROUP]: firstInGroup, [CLASS_LAST_IN_GROUP]: lastInGroup, [CLASS_EDITED]: data?.edited == true,
+        [CLASS_FIRST_IN_GROUP]: firstInGroup, [CLASS_LAST_IN_GROUP]: lastInGroup, [CLASS_EDITED]: data?.edited == true, [CLASS_FIREFOX]: IS_FIREFOX,
         [CLASS_SELECTED]: config?.[CONFIG_PROP_SELECTED], [CLASS_FOCUSED]: config?.[CONFIG_PROP_FOCUSED], [CLASS_HAS_MULTICONTENT]: data?.[DATA_PROP_IMAGE] !== undefined,
       };
     });

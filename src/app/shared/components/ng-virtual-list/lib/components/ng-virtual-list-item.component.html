@@ -4,8 +4,8 @@
 @let _measures = measures();
 @let renderer = itemRenderer();
 
-@if (item) {
-    <div #listItem [part]="_part" [attr.ng-vl-index]="_config.tabIndex || -1" tabindex="0" class="ngvl-item__container"
+@if (item && item.data) {
+    <div [part]="_part" [attr.ng-vl-index]="_config.tabIndex || -1" tabindex="0" class="ngvl-item__container"
         [ngClass]="{'snapped': item.config.snapped, 'snapped-out': item.config.snappedOut, 'focus': focused()}" (click)="onClickHandler()">
         @if (renderer) {
             <ng-container [ngTemplateOutlet]="renderer"

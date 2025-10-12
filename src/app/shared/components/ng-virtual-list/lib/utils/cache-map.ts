@@ -142,8 +142,13 @@ export class CacheMap<I = string | number, B = any, E = CacheMapEvents, L = Cach
         });
     }
 
-    clearScrollDirectionCache() {
-        this._clearScrollDirectionDebounce.execute();
+    clearScrollDirectionCache(async = true) {
+        if (async) {
+            this._clearScrollDirectionDebounce.execute();
+            return;
+        }
+
+        this._scrollDirectionCache = [];
     }
 
     private calcScrollDirection(v: ScrollDirection): ScrollDirection {

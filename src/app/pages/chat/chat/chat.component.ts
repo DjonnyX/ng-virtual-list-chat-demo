@@ -49,10 +49,6 @@ export class ChatComponent {
       const menuOpened = this.menuOpened();
       return menuOpened ? DockMode.LEFT : DockMode.NONE;
     });
-
-    const appHeightHandler = () => document.documentElement.style.setProperty('--app-height', `${document.documentElement.clientHeight}px`);
-    window.addEventListener('resize', appHeightHandler);
-    appHeightHandler();
   }
 
   onSearchHandler(pattern: string) {

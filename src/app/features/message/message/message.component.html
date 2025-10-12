@@ -6,9 +6,9 @@
 @let substrMode = substarateMode();
 @let searchedWords = searchPattern();
 @let class = classes();
-@let styles = substrateStyles();
+@let type = substrateType();
 @if (d && c && m) {
-    <message-substrate class="message-substrate" [styles]="styles" [width]="b.width" [height]="b.height"
+    <message-substrate class="message-substrate" [type]="type" [width]="b.width" [height]="b.height"
         [mode]="substrMode"></message-substrate>
     <div #content class="message_content" [ngClass]="class">
         @if (d?.['image']) {

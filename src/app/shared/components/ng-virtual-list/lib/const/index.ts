@@ -19,9 +19,9 @@ export const DEFAULT_ENABLED_BUFFER_OPTIMIZATION = false;
 
 export const DEFAULT_DYNAMIC_SIZE = false;
 
-export const DEFAULT_SNAP_TO_END_TRANSITION_INSTANT_OFFSET = -1;
+export const DEFAULT_SNAP_TO_END_TRANSITION_INSTANT_OFFSET = 1;
 
-export const DEFAULT_SNAP_SCROLLTO_BOTTOM_OFFSET = false;
+export const DEFAULT_SNAP_SCROLLTO_BOTTOM = false;
 
 export const TRACK_BY_PROPERTY_NAME = 'id';
 
@@ -88,6 +88,20 @@ export const WIDTH_PROP_NAME = 'width';
 export const HEIGHT_PROP_NAME = 'height';
 
 export const PX = 'px';
+
+export const WHEEL = 'wheel';
+
+export const TOUCH_MOVE = 'touchmove';
+
+export const MOUSE_MOVE = 'mousemove';
+
+export const MOUSE_UP = 'mouseup';
+
+export const MOUSE_DOWN = 'mousedown';
+
+export const MOUSE_LEAVE = 'mouseleave';
+
+export const MOUSE_OUT = 'mouseout';
 
 export const SCROLL = 'scroll';
 

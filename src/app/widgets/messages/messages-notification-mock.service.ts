@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { delay, from, interval, of, Subject, switchMap, tap } from 'rxjs';
+import { concatMap, delay, from, interval, of, Subject, switchMap, tap } from 'rxjs';
 import { MessagesNotificationService } from './messages-notification.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { generateMessage, generateWriteIndicator } from '@mock/utils/collection';
@@ -9,38 +9,37 @@ import { db, operations } from './messages-mock.service';
     providedIn: 'root'
 })
 export class MessagesNotificationMockService implements MessagesNotificationService {
+    /**
+     * version
+     */
     private _$messages = new Subject<number>;
     readonly $messages = this._$messages.asObservable();
 
-    private _nextIndex = 10000;
+    /**
+     * userId
+     */
+    private _$writing = new Subject<number>;
+    readonly $writing = this._$writing.asObservable();
 
     constructor() {
         of(true).pipe(
             takeUntilDestroyed(),
             delay(2000),
-            switchMap(() => from(interval(2000)).pipe(
-                switchMap(() => this.write()),
+            switchMap(() => from(interval(3000)).pipe(
+                tap(() => this.startWrite()),
+                delay(1000),
+                concatMap(() => this.write()),
             )),
         ).subscribe();
     }
 
-    private write() {
-        const msg = generateMessage(this._nextIndex);
-        this._nextIndex++;
-        return of(msg).pipe(
-            // tap(() => {
-            //     const writeIndicator = generateWriteIndicator(this._nextIndex);
-            //     this._nextIndex++;
-            //     const database = db, dbOperations = operations,
-            //         collection = database.chats[dbOperations.chatId!]?.messages;
+    private startWrite() {
+        this._$writing.next(1); // emits userId
+    }
 
-            //     if (collection) {
-            //         collection.push(writeIndicator);
-            //     }
-            //     const v = database.chats[dbOperations.chatId!].version += 1;
-            //     this._$messages.next(v);
-            // }),
-            // delay(500),
+    private write() {
+        const msg = generateMessage();
+        return of(msg).pipe(
             tap(() => {
                 const database = db, dbOperations = operations,
                     collection = database.chats[dbOperations.chatId!]?.messages;

@@ -181,6 +181,10 @@ export class Tracker<C extends BaseVirtualListItemComponent = any> {
         }
     }
 
+    clearTrackMap() {
+        this._trackMap.clear();
+    }
+
     dispose() {
         if (this._trackMap) {
             this._trackMap.clear();

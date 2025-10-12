@@ -43,7 +43,7 @@ export class MessageSubstrateComponent {
 
   height = input.required<number>();
 
-  styles = input<MessageSubstarateStyle>(MessageSubstarateStyles.NONE);
+  type = input<MessageSubstarateStyle>(MessageSubstarateStyles.NONE);
 
   constructor() {
     this._id = MessageSubstrateComponent.nextId;
@@ -86,12 +86,6 @@ export class MessageSubstrateComponent {
         svg.style.height = `${hh}px`;
         svg.setAttribute('viewBox', `0 0 ${ww} ${hh}`);
         switch (this.mode()) {
-          case MessageSubstarateModes.LEFT:
-          case MessageSubstarateModes.RIGHT: {
-            const shape = `M ${44.043 + w - 5} 13.2 c 0 -7.285 -5.913 -13.2 -13.196 -13.2 L 13.239 0 c -7.283 0 -13.196 5.915 -13.196 13.2 L 0.043 ${h + 23} c 0 7.285 5.913 13.2 13.196 13.2 l ${17.608 + w - 5} 0 c 7.283 0 13.196 -5.915 13.196 -13.2 Z`;
-            path.setAttribute('d', shape);
-            break;
-          }
           case MessageSubstarateModes.IN_LEFT: {
             const shape = `M 26.485 0 c -7.15 0 -12.954 5.835 -12.954 13.022 l 0 ${h} c 0 6.304 -1.651 11.287 -6.382 15.423 c -1.498 1.309 -3.686 2.575 -5.992 3.7 c -0.908 0.535 -1.349 1.614 -1.077 2.637 c 0.272 1.022 1.19 1.735 2.243 1.742 c 7.244 0.079 16.514 0.131 24.162 0.131 l ${w} 0 c 7.15 0 12.954 -5.835 12.954 -10.022 l 0 ${-(h + 13.956)} c 0 -7.187 -5.804 -13.022 -12.954 -13.022 Z`;
             path.setAttribute('d', shape);
@@ -102,14 +96,21 @@ export class MessageSubstrateComponent {
             path.setAttribute('d', shape);
             break;
           }
+          case MessageSubstarateModes.LEFT:
+          case MessageSubstarateModes.RIGHT:
+          default: {
+            const shape = `M ${44.043 + w - 5} 13.2 c 0 -7.285 -5.913 -13.2 -13.196 -13.2 L 13.239 0 c -7.283 0 -13.196 5.915 -13.196 13.2 L 0.043 ${h + 23} c 0 7.285 5.913 13.2 13.196 13.2 l ${17.608 + w - 5} 0 c 7.283 0 13.196 -5.915 13.196 -13.2 Z`;
+            path.setAttribute('d', shape);
+            break;
+          }
         }
       }
     });
 
     effect(() => {
-      const styles = this.styles(), shape = this.shape()?.nativeElement;
+      const type = this.type(), shape = this.shape()?.nativeElement;
       if (shape) {
-        switch (styles) {
+        switch (type) {
           case MessageSubstarateStyles.DELETING: {
             shape.setAttribute('stroke', `url(#deleting)`);
             break;
@@ -119,9 +120,9 @@ export class MessageSubstrateComponent {
             break;
           }
           case MessageSubstarateStyles.NONE:
-            default:
-              shape.setAttribute('stroke', 'none');
-              break;
+          default:
+            shape.setAttribute('stroke', 'none');
+            break;
         }
       }
     });

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { MessagesService } from './messages.service';
+import { IMessagesChunkParams, MessagesService } from './messages.service';
 import { IItemData } from '@mock/const/collection';
 import { Id, IVirtualListCollection } from '@shared/components/ng-virtual-list';
 import { Observable } from 'rxjs';
@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 export class MessagesHttpService implements MessagesService {
   constructor() { }
 
-  getMessages(chatId: string): Observable<IVirtualListCollection<IItemData>> {
+  getMessages(chatId: string, chunk?: IMessagesChunkParams): Observable<IVirtualListCollection<IItemData>> {
     throw new Error('Method not implemented.');
   }
 

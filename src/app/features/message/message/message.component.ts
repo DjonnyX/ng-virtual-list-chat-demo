@@ -9,10 +9,12 @@ import {
   MessageSubstrateComponent, MessageSubstarateMode, MessageSubstarateModes, MessageBottomBarComponent, EditableTextComponent,
   MessageSubstarateStyle, MessageSubstarateStyles,
 } from '@entities/message';
-import { ISize, IVirtualListItem } from '@shared/components/ng-virtual-list';
+import { IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/ng-virtual-list';
 import { IRenderVirtualListItemConfig } from '@shared/components/ng-virtual-list/lib/models/render-item-config.model';
 import { IItemData } from '@mock/const/collection';
 import { IMessageParams } from './interfaces/message-params';
+
+const DEFAULT_SIZE = 200;
 
 @Component({
   selector: 'message',
@@ -29,13 +31,17 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
 
   config = input<IRenderVirtualListItemConfig & { [prop: string]: any } | null>(null);
 
-  measures = input<ISize | null>(null);
+  measures = input<IDisplayObjectMeasures | null>(null);
 
   params = input.required<IMessageParams>();
 
   searchPattern = input<Array<string>>([]);
 
   substarateMode: Signal<MessageSubstarateMode>;
+
+  substrateType = signal<MessageSubstarateStyle>(MessageSubstarateStyles.NONE);
+
+  substrateStyles = signal<{ [styleName: string]: any; }>({});
 
   editedText = output<{ nativeEvent: Event, item: IVirtualListItem<IItemData> }>();
 
@@ -45,15 +51,13 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
 
   classes = input.required<{ [className: string]: boolean; }>();
 
-  substrateStyles = signal<MessageSubstarateStyle>(MessageSubstarateStyles.NONE);
-
   private _content = viewChild<ElementRef<HTMLDivElement>>('content');
 
   private _resizeObserver: ResizeObserver;
 
   private _destroyRef = inject(DestroyRef);
 
-  bounds = signal<ISize>({ width: this._content()?.nativeElement?.offsetWidth ?? 0, height: this._content()?.nativeElement?.offsetHeight ?? 0 });
+  bounds = signal<ISize>({ width: this._content()?.nativeElement?.offsetWidth || DEFAULT_SIZE, height: this._content()?.nativeElement?.offsetHeight || DEFAULT_SIZE });
 
   @HostBinding('class')
   get hostClasses(): { [key: string]: boolean } {
@@ -66,7 +70,7 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
     if (data) {
       const el = this._content()?.nativeElement as HTMLDivElement;
       if (el && el.offsetWidth && el.offsetHeight) {
-        this.bounds.set({ width: el.offsetWidth, height: el.offsetHeight });
+        this.bounds.set({ width: el.offsetWidth || DEFAULT_SIZE, height: el.offsetHeight || DEFAULT_SIZE });
       }
     }
   }
@@ -74,20 +78,31 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
   constructor() {
     this._resizeObserver = new ResizeObserver(this._onContentResizeHandler);
 
+    // effect(() => {
+    //   const measures = this.measures();
+    //   if (measures) {
+    //       this.substrateStyles.set({
+            
+    //       });
+    //   } else {
+    //     this.substrateStyles.set({});
+    //   }
+    // });
+
     effect(() => {
       const data = this.data();
       if (data) {
         if (data?.['removal']) {
-          this.substrateStyles.set(MessageSubstarateStyles.DELETING);
+          this.substrateType.set(MessageSubstarateStyles.DELETING);
         } else if (data?.['saving']) {
-          this.substrateStyles.set(MessageSubstarateStyles.SAVING);
+          this.substrateType.set(MessageSubstarateStyles.SAVING);
         } else {
-          this.substrateStyles.set(MessageSubstarateStyles.NONE);
+          this.substrateType.set(MessageSubstarateStyles.NONE);
         }
       } else {
-        this.substrateStyles.set(MessageSubstarateStyles.NONE);
+        this.substrateType.set(MessageSubstarateStyles.NONE);
       }
-    })
+    });
 
     toObservable(this.data).pipe(
       takeUntilDestroyed(),

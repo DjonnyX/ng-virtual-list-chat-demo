@@ -2,6 +2,7 @@ import { IRect } from "../types";
 import { Id } from "../types/id";
 import { IVirtualListItem } from "./item.model";
 import { IRenderVirtualListItemConfig } from "./render-item-config.model";
+import { IRenderVirtualListItemMeasures } from "./render-item-measures.model";
 
 /**
  * List screen element model
@@ -21,12 +22,7 @@ export interface IRenderVirtualListItem<E = any> {
     /**
      * Element metrics.
      */
-    measures: IRect & {
-        /**
-         * Delta is calculated for Snapping Method.ADVANCED
-         */
-        delta: number;
-    };
+    measures: IRenderVirtualListItemMeasures;
     /**
      * Element data.
      */

@@ -1,11 +1,14 @@
-import { Id, IVirtualListCollection, IVirtualListItemConfigMap } from "@shared/components/ng-virtual-list";
+import { Id, IVirtualListCollection } from "@shared/components/ng-virtual-list";
 import { generateText, generateWord } from "../utils";
 
 export interface IItemData {
   id: Id;
+  dateTime: number;
   name: string;
   edited: boolean;
 }
+
+const now = Date.now();
 
 const generateChatCollection = () => {
   const items: IVirtualListCollection = [];
@@ -17,18 +20,27 @@ const generateChatCollection = () => {
   return items;
 }
 
-const generateMessageCollection = () => {
+export const COLLECTION_PARAMS = {
+  maxDate: Date.now(),
+  index: 0,
+  groupIndex: 0,
+};
+
+const generateMessageCollection = (number: number, size: number) => {
   const items: IVirtualListCollection<IItemData> = [];
 
-  let groupDynamicIndex = 0;
-  for (let i = 0, l = 1 + Math.random() * 100; i < l; i++) {
-    const id = i + 1, type = i === 0 || Math.random() > .895 ? 'group-header' : 'item', incomType = Math.random() > .5 ? 'in' : 'out';
+  for (let i = 0, l = size; i < l; i++) {
+    const id = COLLECTION_PARAMS.index + 1, type = (number === 0 && i === 0) || i === l - 1 || Math.random() > .895 ? 'group-header' : 'item',
+      incomType = Math.random() > .5 ? 'in' : 'out';
+
+    COLLECTION_PARAMS.index++;
+
     if (type === 'group-header') {
-      groupDynamicIndex++;
+      COLLECTION_PARAMS.groupIndex++;
     }
     const isGroup = type === 'group-header', hasImage = isGroup ? false : Boolean(Math.round(Math.random() * 0.75));
     items.push({
-      id, type, edited: false, name: isGroup ? `Group ${groupDynamicIndex}` : `${id}. ${generateText()}`,
+      id, type, dateTime: COLLECTION_PARAMS.maxDate - COLLECTION_PARAMS.index * 60000, edited: false, name: isGroup ? `Group ${COLLECTION_PARAMS.groupIndex}` : `${id}. ${generateText()}`,
       image: hasImage ? 'https://ng-virtual-list-chat-demo.eugene-grebennikov.pro/media/logo.png' : undefined, incomType,
     });
   }

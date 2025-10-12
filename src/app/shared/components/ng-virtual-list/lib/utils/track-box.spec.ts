@@ -40,7 +40,7 @@ const generateItem = (id: Id): IRenderVirtualListItem => {
     return {
         id,
         index: 0,
-        measures: { x: 0, y: 0, width: 0, height: 0, delta: 0 },
+        measures: { x: 0, y: 0, width: 0, height: 0, delta: 0, absolutePosition: 0 },
         data: { id },
         config: {
             new: false,
@@ -57,7 +57,9 @@ const generateItem = (id: Id): IRenderVirtualListItem => {
             isSnappingMethodAdvanced: false,
             tabIndex: 0,
             zIndex: '0',
-        }
+        },
+        previouseData: undefined,
+        nextData: undefined,
     };
 };
 

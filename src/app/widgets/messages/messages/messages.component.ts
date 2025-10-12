@@ -2,7 +2,7 @@ import { Component, DestroyRef, inject, input, signal, viewChild } from '@angula
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import {
-  catchError, combineLatest, debounceTime, delay, filter, map, mergeMap, of, Subject, switchMap, take, tap, throwError,
+  catchError, combineLatest, debounceTime, delay, filter, map, mergeMap, of, skipWhile, Subject, switchMap, take, tap, throwError,
 } from 'rxjs';
 import { NgVirtualListComponent } from '@shared/components';
 import {
@@ -10,7 +10,7 @@ import {
 } from '@shared/components/ng-virtual-list';
 import { IRenderVirtualListItemConfig } from '@shared/components/ng-virtual-list/lib/models/render-item-config.model';
 import { MessagesLoadingIndicatorComponent } from '@entities/messages';
-import { MessageGroupComponent, MessagesWritingIndicatorComponent } from '@entities/message';
+import { MessageGroupComponent, MessagesTypingIndicatorComponent } from '@entities/message';
 import { MessageBoxComponent } from '@features/message';
 import { environment } from '@environments/environment';
 import { IItemData } from '@mock/const/collection';
@@ -26,13 +26,14 @@ import { MessagesNotificationMockService } from '../messages-notification-mock.s
 import { MessagesNotificationWSService } from '../messages-notification-ws.service';
 import { BEHAVIOR_INSTANT } from '@shared/components/ng-virtual-list/lib/const';
 import { mergeItems } from './utils/merge-items';
+import { generateTypingIndicator } from './utils/generate-typing-indicator';
 
 const OPACITY_0 = '0', OPACITY_1 = '1', TRANSITION_NONE = 'none', FADE_IN = `opacity 100ms ease-in`;
 
 @Component({
   selector: 'messages',
   imports: [
-    CommonModule, MessageBoxComponent, MessageGroupComponent, NgVirtualListComponent, MessagesWritingIndicatorComponent,
+    CommonModule, MessageBoxComponent, MessageGroupComponent, NgVirtualListComponent, MessagesTypingIndicatorComponent,
     MessagesLoadingIndicatorComponent,
   ],
   providers: [
@@ -57,8 +58,13 @@ export class MessagesComponent {
 
   isLoading = signal<boolean>(true);
 
+  isPreparedToShowing = signal<boolean>(false);
+
   private _$delete = new Subject<[IVirtualListItem<IItemData>, IRenderVirtualListItemConfig, ISize, number]>();
   protected $delete = this._$delete.asObservable();
+
+  private _$scrollReachStart = new Subject<void>();
+  protected $scrollReachStart = this._$scrollReachStart.asObservable();
 
   private _messagesService = inject(MessagesService);
 
@@ -68,93 +74,55 @@ export class MessagesComponent {
 
   private _destroyRef = inject(DestroyRef);
 
-  private _$reset = new Subject<boolean>();
-  protected $reset = this._$reset.asObservable();
-
   listClasses = signal<{ [className: string]: boolean }>({});
 
+  private _chunkNumber = 1;
+
   constructor() {
-    const $reset = this.$reset,
-      $collection = toObservable(this.collection),
+    const $collection = toObservable(this.collection),
       $search = toObservable(this.search),
-      $delete = this.$delete;
+      $delete = this.$delete,
+      $scrollReachStart = this.$scrollReachStart,
+      $chatId = this._messageService.$chatId,
+      $virtualList = toObservable(this.list).pipe(
+        takeUntilDestroyed(),
+        filter(list => !!list),
+      ),
+      $isLoading = toObservable(this.isLoading),
+      $isPreparedToShowing = toObservable(this.isPreparedToShowing);
 
-    let isReseted = true;
-
-    const $virtualList = toObservable(this.list).pipe(
+    combineLatest([$virtualList, $chatId]).pipe(
       takeUntilDestroyed(),
+      map(([list]) => list),
       filter(list => !!list),
-    );
-
-    $virtualList.pipe(
-      takeUntilDestroyed(),
       tap(list => {
+        // reset
+        this._chunkNumber = 1;
+        this.list()?.cacheClean();
+        this.collection.set([]);
+        this.selectedIds.set([]);
+        this.isPreparedToShowing.set(false);
+        this.isLoading.set(true);
         const host = list.host.nativeElement as HTMLElement;
         host.style.opacity = OPACITY_0;
         host.style.transition = FADE_IN;
       }),
-      delay(100),
+      switchMap(list => $isLoading.pipe(
+        filter(v => !v),
+        switchMap(() => of(list)),
+      )),
       switchMap(list => {
         return list.$update.pipe(
           debounceTime(250),
-          take(1),
           switchMap(() => of(list)),
         );
       }),
       tap(list => {
         const host = list.host.nativeElement as HTMLElement;
         host.style.opacity = OPACITY_1;
-      }),
-      tap(() => {
-        isReseted = false;
-        this.isLoading.set(false);
-      })
-    ).subscribe();
-
-    combineLatest([$virtualList, $reset]).pipe(
-      takeUntilDestroyed(),
-      map(([list, reset]) => ({ list, reset })),
-      filter(({ reset }) => !!reset),
-      tap(({ list }) => {
-        isReseted = true;
-        const host = list.host.nativeElement as HTMLElement;
-        host.style.transition = TRANSITION_NONE;
-        host.style.opacity = OPACITY_0;
-      }),
-      delay(1),
-      tap(({ list }) => {
-        const host = list.host.nativeElement as HTMLElement;
-        host.style.transition = FADE_IN;
-      }),
-      switchMap(({ list }) => {
-        return list.$update.pipe(
-          debounceTime(250),
-          take(1),
-          switchMap(() => of(list)),
-        );
-      }),
-      tap(list => {
-        const host = list.host.nativeElement as HTMLElement;
-        host.style.opacity = OPACITY_1;
-      }),
-      tap(() => {
-        isReseted = false;
-        this.isLoading.set(false);
-      })
-    ).subscribe();
-
-    $virtualList.pipe(
-      takeUntilDestroyed(),
-      debounceTime(100),
-      tap(list => {
-        list!.scrollToEnd(undefined, {
-          behavior: BEHAVIOR_INSTANT,
-          iteration: 4,
-        });
+        this.isPreparedToShowing.set(true);
       }),
     ).subscribe();
-
-    const $chatId = this._messageService.$chatId;
 
     $chatId.pipe(
       takeUntilDestroyed(),
@@ -167,7 +135,10 @@ export class MessagesComponent {
             this.isLoading.set(true);
           }),
           switchMap(chatId => {
-            return this._messagesService.getMessages(chatId!);
+            return this._messagesService.getMessages(chatId!, {
+              number: this._chunkNumber,
+              size: 100,
+            });
           }),
           catchError((err) => {
             return throwError(() => {
@@ -175,6 +146,7 @@ export class MessagesComponent {
             });
           }),
           tap(items => {
+            this._chunkNumber++;
             const time = 2000 - (Date.now() - timeStart);
             delayTime = time < 0 ? 0 : time;
             validateCollection(items);
@@ -186,16 +158,9 @@ export class MessagesComponent {
             this.collectionConfigMap.set(configMap);
             this.collection.set(newItems);
           }),
-          delay(50),
-          tap(items => {
-            const list = this.list();
-            list?.scrollToEnd(undefined);
-          }),
           delay(delayTime),
           tap(() => {
-            if (!isReseted) {
-              this.isLoading.set(false);
-            }
+            this.isLoading.set(false);
           }),
           catchError((err) => {
             console.error(err);
@@ -204,6 +169,44 @@ export class MessagesComponent {
           }),
         )
       })
+    ).subscribe();
+
+    $scrollReachStart.pipe(
+      takeUntilDestroyed(),
+      debounceTime(250),
+      skipWhile(() => this._chunkNumber === 0),
+      switchMap(() => $chatId.pipe(
+        take(1),
+      )),
+      filter(v => v !== undefined),
+      switchMap((chatId) => {
+        return this._messagesService.getMessages(chatId, {
+          number: this._chunkNumber + 1,
+          size: 100,
+        });
+      }),
+      catchError((err) => {
+        return throwError(() => {
+          return `Get message chunk error: ${err}`;
+        });
+      }),
+      tap(items => {
+        this._chunkNumber += 1;
+        validateCollection(items);
+
+        const newItems = mergeItems(this.collection(), items),
+          configMap = {};
+        fillConfigMap(configMap, newItems);
+
+        this.collectionConfigMap.set(configMap);
+        this.collection.set(newItems);
+
+        this.list()?.normalizePositions();
+      }),
+      catchError((err) => {
+        console.error(err);
+        return of(undefined);
+      }),
     ).subscribe();
 
     $chatId.pipe(
@@ -227,7 +230,6 @@ export class MessagesComponent {
         const newItems = mergeItems(this.collection(), items),
           configMap = {};
         fillConfigMap(configMap, newItems);
-
         this.collectionConfigMap.set(configMap);
         this.collection.set(newItems);
       }),
@@ -237,16 +239,41 @@ export class MessagesComponent {
       }),
     ).subscribe();
 
-    let previousChatId: Id | undefined = undefined;
+    $chatId.pipe(
+      takeUntilDestroyed(),
+      filter(v => v !== undefined),
+      switchMap(chatId => {
+        return this._messageNotificationService.$writing.pipe(
+          debounceTime(10),
+          takeUntilDestroyed(this._destroyRef),
+          mergeMap(userId => {
+            return this.deleteWritingIndicator().pipe(
+              tap(() => {
+                const indicator = generateTypingIndicator(),
+                  newItems = [...this.collection(), indicator.item],
+                  configMap = { ...this.collectionConfigMap() };
+                configMap[indicator.item.id] = indicator.config;
+                this.collectionConfigMap.set(configMap);
+                this.collection.set(newItems);
+              }),
+              switchMap(() => {
+                return this._messageNotificationService.$messages.pipe(
+                  takeUntilDestroyed(this._destroyRef),
+                );
+              }),
+              mergeMap(() => {
+                return this.deleteWritingIndicator();
+              }),
+            );
+          }),
+        );
+      }),
+    ).subscribe();
 
     $chatId.pipe(
       takeUntilDestroyed(),
       filter(v => v !== undefined),
       switchMap(chatId => {
-        if (previousChatId !== undefined) {
-          this.resetList();
-        }
-        previousChatId = chatId;
         return $delete.pipe(
           takeUntilDestroyed(this._destroyRef),
           mergeMap(([item, config, measures, index]) => {
@@ -347,9 +374,74 @@ export class MessagesComponent {
     ).subscribe();
   }
 
-  resetList() {
-    this._$reset.next(true);
-    this.selectedIds.set([]);
+  private deleteWritingIndicator() {
+    return of(this.collection()).pipe(
+      takeUntilDestroyed(this._destroyRef),
+      tap(() => {
+        let newItems = [...this.collection()], config = { ...this.collectionConfigMap() };
+        if (newItems.length) {
+          let exists = true, i = 1;
+          while (exists) {
+            if (!newItems.length) {
+              break;
+            }
+            const index = newItems.length - i, item = newItems[index];
+            if (item?.['type'] === 'typing-indicator') {
+              newItems[index] = { ...item, animate: true };
+            } else {
+              break;
+            }
+            i++;
+          }
+        }
+        this.collectionConfigMap.set(config);
+        this.collection.set(newItems);
+      }),
+      delay(1),
+      takeUntilDestroyed(this._destroyRef),
+      tap(() => {
+        let newItems = [...this.collection()], config = { ...this.collectionConfigMap() };
+        if (newItems.length) {
+          let exists = true, i = 1;
+          while (exists) {
+            if (!newItems.length) {
+              break;
+            }
+            const index = newItems.length - i, item = newItems[index];
+            if (item?.['type'] === 'typing-indicator') {
+              newItems[index] = { ...item, deleted: true };
+            } else {
+              break;
+            }
+            i++;
+          }
+        }
+        this.collectionConfigMap.set(config);
+        this.collection.set(newItems);
+      }),
+      delay(100),
+      takeUntilDestroyed(this._destroyRef),
+      tap(() => {
+        let newItems = [...this.collection()], config = { ...this.collectionConfigMap() };
+        if (newItems.length) {
+          let exists = true;
+          while (exists) {
+            if (!newItems.length) {
+              break;
+            }
+            const index = newItems.length - 1, item = newItems[index];
+            if (item?.['type'] === 'typing-indicator') {
+              newItems.pop();
+              delete config[item.id];
+            } else {
+              break;
+            }
+          }
+        }
+        this.collectionConfigMap.set(config);
+        this.collection.set(newItems);
+      }),
+    );
   }
 
   onEditItemHandler({ nativeEvent, item, selected }:
@@ -392,31 +484,10 @@ export class MessagesComponent {
   }
 
   onScrollReachStartHandler() {
-    // const trackBy = this.trackBy;
-    // let items = [...this.groupDynamicItems], firstGroup = items.splice(0, 1), messages = [];
-    // for (let i = 0, l = 100; i < l; i++) {
-    //   const msgStart = generateMessage(this._nextIndex);
-    //   this._nextIndex++;
-    //   this.groupDynamicItemsConfigMap[msgStart[trackBy]] = {
-    //     sticky: 0,
-    //     selectable: true,
-    //   };
-    //   messages.unshift(msgStart);
-    // }
-
-    // items = [...firstGroup, ...messages, ...items];
-
-    // this.groupDynamicItems = items;
-
-    // this.increaseVersion();
+    this._$scrollReachStart.next(undefined);
   }
 
-  onClickHandler(item: IRenderVirtualListItem | undefined) {
-    // if (item) {
-    //   const trackBy = this.trackBy;
-    //   console.info(`Click: (ID: ${item.data?.[trackBy]}) Item ${item.data.name}`);
-    // }
-  }
+  onClickHandler(item: IRenderVirtualListItem | undefined) { }
 
   onSelectItemHandler(ids: Array<Id> | Id | undefined) {
     this.selectedIds.set(Array.isArray(ids) ? ids : []);
