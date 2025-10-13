@@ -3,13 +3,17 @@ import { MessageSubstarateMode } from './types/message-substrate-mode';
 import { MessageSubstarateModes } from './enums/message-substrate-modes';
 import { MessageSubstarateStyle } from './types';
 import { MessageSubstarateStyles } from './enums';
+import { GradientColor, GradientColorPositions } from '@shared/types';
 
 const LEFT_WIDTH = 17.5,
   RIGHT_WIDTH = 13,
   TOP_HEIGHT = 13,
   BOTTOM_HEIGHT = 13,
   SHAPE_NAME = 'shape',
-  CLIP_NAME = 'clip';
+  CLIP_NAME = 'clip',
+  GRADIENT_COLOR_NAME = 'stop-color',
+  FILL_GRADIENT_NAME = 'fill-gradient',
+  STROKE_GRADIENT_NAME = 'stroke-gradient';
 
 @Component({
   selector: 'message-substrate',
@@ -27,6 +31,8 @@ export class MessageSubstrateComponent {
 
   private _id: number;
 
+  get id() { return this._id; }
+
   svg = viewChild<ElementRef<SVGElement>>('svg');
 
   clip = viewChild<ElementRef<SVGClipPathElement>>('clip');
@@ -37,6 +43,18 @@ export class MessageSubstrateComponent {
 
   path = viewChild<ElementRef<SVGPathElement>>('path');
 
+  fillGradient = viewChild<ElementRef<SVGPathElement>>('fillGradient');
+
+  strokeGradient = viewChild<ElementRef<SVGPathElement>>('strokeGradient');
+
+  fillGradientColor1 = viewChild<ElementRef<SVGStopElement>>('fillGradientColor1');
+
+  fillGradientColor2 = viewChild<ElementRef<SVGStopElement>>('fillGradientColor2');
+
+  strokeGradientColor1 = viewChild<ElementRef<SVGStopElement>>('strokeGradientColor1');
+
+  strokeGradientColor2 = viewChild<ElementRef<SVGStopElement>>('strokeGradientColor2');
+
   mode = input.required<MessageSubstarateMode>();
 
   width = input.required<number>();
@@ -45,8 +63,72 @@ export class MessageSubstrateComponent {
 
   type = input<MessageSubstarateStyle>(MessageSubstarateStyles.NONE);
 
+  strokeColors = input<GradientColor>();
+
+  fillColors = input<GradientColor | undefined>(undefined);
+
+  fillColorPositions = input<GradientColorPositions | undefined>(undefined);
+
   constructor() {
     this._id = MessageSubstrateComponent.nextId;
+
+    effect(() => {
+      const fillColors = this.fillColors();
+      if (Array.isArray(fillColors) && fillColors.length === 2) {
+        const fillGradientColor1 = this.fillGradientColor1(), fillGradientColor2 = this.fillGradientColor2();
+        if (fillGradientColor1 && fillGradientColor2) {
+          fillGradientColor1.nativeElement.setAttribute(GRADIENT_COLOR_NAME, `${fillColors[0]}`);
+          fillGradientColor2.nativeElement.setAttribute(GRADIENT_COLOR_NAME, `${fillColors[1]}`);
+
+          const shape = this.shape()?.nativeElement;
+          if (shape) {
+            shape.setAttribute('fill', `url(#${FILL_GRADIENT_NAME}${this._id})`);
+          }
+        }
+      } else {
+        const shape = this.shape()?.nativeElement;
+        if (shape) {
+          shape.setAttribute('fill', `inherit`);
+        }
+      }
+    });
+
+
+    effect(() => {
+      const fillColorPositions = this.fillColorPositions();
+      if (Array.isArray(fillColorPositions) && fillColorPositions.length === 2) {
+        const fillGradient = this.fillGradient();
+        if (fillGradient) {
+          fillGradient.nativeElement.setAttribute('x1', `${fillColorPositions[0]}px`);
+          fillGradient.nativeElement.setAttribute('x2', `${fillColorPositions[1]}px`);
+        }
+      }
+    });
+
+    effect(() => {
+      const strokeColors = this.strokeColors();
+      if (Array.isArray(strokeColors) && strokeColors.length === 2) {
+        const strokeGradientColor1 = this.strokeGradientColor1(), strokeGradientColor2 = this.strokeGradientColor2();
+        if (strokeGradientColor1 && strokeGradientColor2) {
+          strokeGradientColor1.nativeElement.setAttribute(GRADIENT_COLOR_NAME, `${strokeColors[0]}`);
+          strokeGradientColor2.nativeElement.setAttribute(GRADIENT_COLOR_NAME, `${strokeColors[1]}`);
+        }
+      }
+    });
+
+    effect(() => {
+      const fillGradient = this.fillGradient();
+      if (fillGradient) {
+        fillGradient.nativeElement.setAttribute('id', `${FILL_GRADIENT_NAME}${this._id}`);
+      }
+    });
+
+    effect(() => {
+      const strokeGradient = this.strokeGradient();
+      if (strokeGradient) {
+        strokeGradient.nativeElement.setAttribute('id', `${STROKE_GRADIENT_NAME}${this._id}`);
+      }
+    });
 
     effect(() => {
       const path = this.path();
@@ -111,12 +193,8 @@ export class MessageSubstrateComponent {
       const type = this.type(), shape = this.shape()?.nativeElement;
       if (shape) {
         switch (type) {
-          case MessageSubstarateStyles.DELETING: {
-            shape.setAttribute('stroke', `url(#deleting)`);
-            break;
-          }
-          case MessageSubstarateStyles.DELETING: {
-            shape.setAttribute('stroke', `url(#saving)`);
+          case MessageSubstarateStyles.STROKE: {
+            shape.setAttribute('stroke', `url(#${STROKE_GRADIENT_NAME}${this._id})`);
             break;
           }
           case MessageSubstarateStyles.NONE:

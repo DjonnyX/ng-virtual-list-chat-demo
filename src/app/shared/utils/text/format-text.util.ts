@@ -7,4 +7,4 @@ export const formatText = (str: string | undefined) => {
     result = result.replaceAll(' ', '&nbsp;');
     result = result.replaceAll(/\r\n|\n|\r/gm, '<br>');
     return result;
-}
+};

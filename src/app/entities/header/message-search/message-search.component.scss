@@ -1,21 +1,35 @@
 .search-container {
     position: relative;
+
+    .search-icon {
+        fill: var(--theme-chat-header-search-normal-fill);
+    }
+
+    &:focus {
+        .search-icon {
+            fill: var(--theme-chat-header-search-normal-fill);
+        }
+    }
 }
 
 .search {
     outline: none;
     border-radius: 4px;
     padding: 6px;
-    background: #4f2e9c;
-    border: 1px solid #5e4cb1;
+    background: var(--theme-chat-header-search-normal-background);
+    border-width: 1px;
+    border-style: solid;
+    border-color: var(--theme-chat-header-search-normal-bordercolor);
     width: calc(100%);
     max-width: 32px;
-    color: #bed6eb;
+    color: var(--theme-chat-header-search-normal-color);
+    font-size: var(--theme-chat-header-search-normal-fontsize);
     padding-right: 24px;
     transition: max-width 0.15s ease-in-out;
 
     &::placeholder {
-        color: #91a9be;
+        color: var(--theme-chat-header-search-normal-placeholder-color);
+        font-size: var(--theme-chat-header-search-normal-placeholder-fontsize);
     }
 
     &::-webkit-search-cancel-button {
@@ -25,7 +39,15 @@
     &:focus {
         max-width: 164px;
         width: calc(100%);
-        border-color: #c6f4ff;
+        background: var(--theme-chat-header-search-focused-background);
+        border-color: var(--theme-chat-header-search-focused-bordercolor);
+        color: var(--theme-chat-header-search-focused-color);
+        font-size: var(--theme-chat-header-search-focused-fontsize);
+
+        &::placeholder {
+            color: var(--theme-chat-header-search-focused-placeholder-color);
+            font-size: var(--theme-chat-header-search-focused-placeholder-fontsize);
+        }
     }
 
     &+svg {

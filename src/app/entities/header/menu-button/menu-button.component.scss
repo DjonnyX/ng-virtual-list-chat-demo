@@ -1,14 +1,22 @@
-button {
-    color: black;
-}
-
 .menu {
     position: relative;
     margin-right: -.625rem;
     border-width: 0px;
-    background-color: transparent;
     padding: 0;
     outline: none;
+    background: var(--theme-chat-header-menubutton-normal-background);
+    color: var(--theme-chat-header-menubutton-normal-color);
+
+    // not implimented
+    &.pressed {
+        background: var(--theme-chat-header-menubutton-pressed-background);
+        color: var(--theme-chat-header-menubutton-pressed-color);
+    }
+
+    &:focus {
+        background: var(--theme-chat-header-menubutton-focused-background);
+        color: var(--theme-chat-header-menubutton-focused-color);
+    }
 }
 
 .sr-only {
@@ -55,10 +63,19 @@ button {
 
 .menu .line {
     fill: none;
-    stroke: #a199db;
+    stroke: var(--theme-chat-header-menubutton-normal-fill);
     stroke-width: 5;
     transition-duration: .1s;
     stroke-linecap: round;
+
+    // not implimented
+    &.pressed {
+        stroke: var(--theme-chat-header-menubutton-pressed-fill);
+    }
+
+    &:focus {
+        stroke: var(--theme-chat-header-menubutton-focused-fill);
+    }
 }
 
 .menu.active svg {

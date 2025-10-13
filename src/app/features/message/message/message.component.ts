@@ -3,7 +3,7 @@ import {
   AfterViewInit, Component, computed, DestroyRef, effect, ElementRef, HostBinding, inject, input, OnDestroy, output, signal, Signal, viewChild,
   ViewEncapsulation,
 } from '@angular/core';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { delay, of, switchMap, tap } from 'rxjs';
 import {
   MessageSubstrateComponent, MessageSubstarateMode, MessageSubstarateModes, MessageBottomBarComponent, EditableTextComponent,
@@ -13,8 +13,12 @@ import { IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/compone
 import { IRenderVirtualListItemConfig } from '@shared/components/ng-virtual-list/lib/models/render-item-config.model';
 import { IItemData } from '@mock/const/collection';
 import { IMessageParams } from './interfaces/message-params';
+import { GradientColor } from '@shared/types';
+import { ThemeService } from '@shared/theming';
 
 const DEFAULT_SIZE = 200;
+
+const DEFAULT_STROKE_COLOR: GradientColor = ['rgba(255,255,255,0)', 'rgba(195, 0, 255, 0.17)'];
 
 @Component({
   selector: 'message',
@@ -27,6 +31,8 @@ const DEFAULT_SIZE = 200;
   encapsulation: ViewEncapsulation.Emulated,
 })
 export class MessageComponent implements AfterViewInit, OnDestroy {
+  private _content = viewChild<ElementRef<HTMLDivElement>>('content');
+
   data = input<IVirtualListItem<IItemData> | null>(null);
 
   config = input<IRenderVirtualListItemConfig & { [prop: string]: any } | null>(null);
@@ -49,15 +55,20 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
 
   editing = signal<boolean>(false);
 
+  strokeColor = signal<GradientColor | undefined>(undefined);
+
   classes = input.required<{ [className: string]: boolean; }>();
 
-  private _content = viewChild<ElementRef<HTMLDivElement>>('content');
+  private _themeService = inject(ThemeService);
 
   private _resizeObserver: ResizeObserver;
 
   private _destroyRef = inject(DestroyRef);
 
-  bounds = signal<ISize>({ width: this._content()?.nativeElement?.offsetWidth || DEFAULT_SIZE, height: this._content()?.nativeElement?.offsetHeight || DEFAULT_SIZE });
+  bounds = signal<ISize>({
+    width: this._content()?.nativeElement?.offsetWidth || DEFAULT_SIZE,
+    height: this._content()?.nativeElement?.offsetHeight || DEFAULT_SIZE,
+  });
 
   @HostBinding('class')
   get hostClasses(): { [key: string]: boolean } {
@@ -77,30 +88,27 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
 
   constructor() {
     this._resizeObserver = new ResizeObserver(this._onContentResizeHandler);
-
-    // effect(() => {
-    //   const measures = this.measures();
-    //   if (measures) {
-    //       this.substrateStyles.set({
-            
-    //       });
-    //   } else {
-    //     this.substrateStyles.set({});
-    //   }
-    // });
+    const theme = toSignal(this._themeService.$theme);
 
     effect(() => {
-      const data = this.data();
+      const data = this.data(), currentTheme = theme();
       if (data) {
-        if (data?.['removal']) {
-          this.substrateType.set(MessageSubstarateStyles.DELETING);
+        if (data?.['processing']) {
+          this.substrateType.set(MessageSubstarateStyles.STROKE);
+          this.strokeColor.set(currentTheme?.chat.messages.message.styles.processing.stroke ?? DEFAULT_STROKE_COLOR);
+        } else if (data?.['removal']) {
+          this.substrateType.set(MessageSubstarateStyles.STROKE);
+          this.strokeColor.set(currentTheme?.chat.messages.message.styles.removing.stroke ?? DEFAULT_STROKE_COLOR);
         } else if (data?.['saving']) {
-          this.substrateType.set(MessageSubstarateStyles.SAVING);
+          this.substrateType.set(MessageSubstarateStyles.STROKE);
+          this.strokeColor.set(currentTheme?.chat.messages.message.styles.loading.stroke ?? DEFAULT_STROKE_COLOR);
         } else {
           this.substrateType.set(MessageSubstarateStyles.NONE);
+          this.strokeColor.set(DEFAULT_STROKE_COLOR);
         }
       } else {
         this.substrateType.set(MessageSubstarateStyles.NONE);
+        this.strokeColor.set(DEFAULT_STROKE_COLOR);
       }
     });
 

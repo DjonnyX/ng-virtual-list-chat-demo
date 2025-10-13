@@ -7,9 +7,10 @@
 @let searchedWords = searchPattern();
 @let class = classes();
 @let type = substrateType();
+@let stroke = strokeColor();
 @if (d && c && m) {
     <message-substrate class="message-substrate" [type]="type" [width]="b.width" [height]="b.height"
-        [mode]="substrMode"></message-substrate>
+        [mode]="substrMode" [strokeColors]="stroke"></message-substrate>
     <div #content class="message_content" [ngClass]="class">
         @if (d?.['image']) {
             <div class="complex-message">

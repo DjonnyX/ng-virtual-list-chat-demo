@@ -15,6 +15,7 @@
         background-size: 0% 0%;
         background-position: center;
         transition: grid-template-columns 100ms ease-out;
+        background-color: var(--theme-chat-messages-message-container-normal-background);
     }
 
     &.animate {
@@ -62,7 +63,7 @@
 
     &.selected {
         .message__container {
-            background-color: #c8f4ff69;
+            background-color: var(--theme-chat-messages-message-container-selected-background);
             border-radius: 12px;
         }
     }
@@ -94,7 +95,7 @@
 
     &.edit {
         .message__container {
-            background-color: rgb(166, 219, 255);
+            background-color: var(--theme-chat-messages-message-container-edited-background);
         }
     }
 

@@ -13,6 +13,14 @@ export interface IRenderVirtualListItemMeasures extends IRect {
      */
     absolutePosition: number;
     /**
+     * Position in viewport (percent)
+     */
+    absolutePositionPercent: number;
+    /**
+     * Item size (percent)
+     */
+    sizePercent: number;
+    /**
      * Delta is calculated for Snapping Method.ADVANCED
      */
     delta: number;

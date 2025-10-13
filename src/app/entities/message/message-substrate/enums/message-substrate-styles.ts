@@ -1,5 +1,4 @@
 export enum MessageSubstarateStyles {
     NONE = 'none',
-    DELETING = 'deleting',
-    SAVING = 'saving',
+    STROKE = 'stroke',
 };

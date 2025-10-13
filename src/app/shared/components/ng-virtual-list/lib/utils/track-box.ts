@@ -911,7 +911,10 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                     const id = collectionItem[trackBy], cache = this.get(id)!, sticky = itemConfigMap[id]?.sticky ?? 0,
                         selectable = itemConfigMap[id]?.selectable ?? true,
                         collapsable = itemConfigMap[id]?.collapsable ?? false,
-                        size = dynamicSize ? cache?.[sizeProperty] || typicalItemSize : typicalItemSize;
+                        size = dynamicSize ? cache?.[sizeProperty] || typicalItemSize : typicalItemSize,
+                        absolutePosition = actualSnippedPosition - (scrollSize + boundsSize),
+                        absolutePositionPercent = absolutePosition / boundsSize,
+                        sizePercent = absolutePositionPercent + (size / boundsSize);
                     if (sticky === 1) {
                         const isOdd = i % 2 != 0,
                             measures = {
@@ -919,7 +922,9 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                                 y: isVertical ? actualSnippedPosition : 0,
                                 width: isVertical ? normalizedItemWidth : size,
                                 height: isVertical ? size : normalizedItemHeight,
-                                absolutePosition: actualSnippedPosition - scrollSize,
+                                absolutePosition,
+                                absolutePositionPercent,
+                                sizePercent,
                                 delta: 0,
                             }, config = {
                                 new: (cache satisfies Cache)?.[IS_NEW] === true,
@@ -971,10 +976,15 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                     if (sticky === 2) {
                         const isOdd = i % 2 != 0,
                             w = isVertical ? normalizedItemWidth : size, h = isVertical ? size : normalizedItemHeight,
+                            absolutePosition = (actualSnippedPosition - (isVertical ? h : w)) - (scrollSize + boundsSize),
+                            absolutePositionPercent = absolutePosition / boundsSize,
+                            sizePercent = absolutePositionPercent + (size / boundsSize),
                             measures = {
                                 x: isVertical ? 0 : actualEndSnippedPosition - w,
                                 y: isVertical ? actualEndSnippedPosition - h : 0,
-                                absolutePosition: (actualSnippedPosition - (isVertical ? h : w)) - scrollSize,
+                                absolutePosition,
+                                absolutePositionPercent,
+                                sizePercent,
                                 width: w,
                                 height: h,
                                 delta: 0,
@@ -1030,10 +1040,14 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                         selectable = itemConfigMap[id]?.selectable ?? true,
                         collapsable = itemConfigMap[id]?.collapsable ?? false,
                         snapped = snap && (sticky === 1 && pos <= scrollSize || sticky === 2 && pos >= scrollSize + boundsSize - size),
+                        absolutePosition = pos - (scrollSize - size), absolutePositionPercent = absolutePosition / boundsSize,
+                        sizePercent = absolutePositionPercent + (size / boundsSize),
                         measures = {
                             x: isVertical ? sticky === 1 ? 0 : boundsSize - size : pos,
                             y: isVertical ? pos : sticky === 2 ? boundsSize - size : 0,
-                            absolutePosition: pos - scrollSize,
+                            absolutePosition,
+                            absolutePositionPercent,
+                            sizePercent,
                             width: isVertical ? normalizedItemWidth : size,
                             height: isVertical ? size : normalizedItemHeight,
                             delta: 0,

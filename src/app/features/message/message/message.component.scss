@@ -36,6 +36,7 @@
         padding: 10px 14px;
         word-break: break-all;
         box-sizing: border-box;
+        color: var(--theme-chat-messages-message-content-normal-color);
 
         &.has-multicontent {
             grid-template-rows: auto 20px;
@@ -89,9 +90,15 @@
     }
 
     .message-substrate {
-        fill: rgb(227, 247, 250);
+        fill: var(--theme-chat-messages-message-content-normal-fill);
         position: absolute;
-        z-index: -1;
+        z-index: 0;
+    }
+
+    .message_content {
+        position: relative;
+        z-index: 1;
+        color: var(--theme-chat-messages-message-content-normal-color);
     }
 
     &.edited {
@@ -101,30 +108,50 @@
 
     &.selected {
         .message-substrate {
-            fill: #c4dfff;
+            fill: var(--theme-chat-messages-message-content-selected-fill);
+        }
+
+        .message_content {
+            color: var(--theme-chat-messages-message-content-selected-color);
         }
     }
 
     &.focused {
         .message-substrate {
-            fill: rgb(255, 255, 255);
+            fill: var(--theme-chat-messages-message-content-focused-fill);
+        }
+
+        .message_content {
+            color: var(--theme-chat-messages-message-content-focused-color);
         }
 
         &.selected {
             .message-substrate {
-                fill: #d7e9ff;
+                fill: var(--theme-chat-messages-message-content-focusedselected-fill);
+            }
+
+            .message_content {
+                color: var(--theme-chat-messages-message-content-focusedselected-color);
             }
         }
     }
 
     &.removal {
         .message-substrate {
-            fill: #ffe6ee;
+            fill: var(--theme-chat-messages-message-content-removal-fill);
+        }
+
+        .message_content {
+            color: var(--theme-chat-messages-message-content-removal-color);
         }
 
         &.selected {
             .message-substrate {
-                fill: #ffe6ee;
+                fill: var(--theme-chat-messages-message-content-removalselected-fill);
+            }
+
+            .message_content {
+                color: var(--theme-chat-messages-message-content-removalselected-color);
             }
         }
     }

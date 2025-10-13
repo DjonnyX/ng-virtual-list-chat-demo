@@ -1,0 +1,15 @@
+@let m = mode();
+@let t = type();
+@let b = bounds();
+@let value = content();
+@let stroke = strokeColor();
+
+<button class="button">
+    <button-substrate class="substrate" [width]="b.width" [height]="b.height" [mode]="m" [type]="t"
+        [strokeColors]="stroke" />
+    <span class="content">
+        <ng-content>
+            {{value}}
+        </ng-content>
+    </span>
+</button>

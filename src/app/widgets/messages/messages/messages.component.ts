@@ -28,7 +28,8 @@ import { BEHAVIOR_INSTANT } from '@shared/components/ng-virtual-list/lib/const';
 import { mergeItems } from './utils/merge-items';
 import { generateTypingIndicator } from './utils/generate-typing-indicator';
 
-const OPACITY_0 = '0', OPACITY_1 = '1', TRANSITION_NONE = 'none', FADE_IN = `opacity 100ms ease-in`;
+const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
+  OPACITY_0 = '0', OPACITY_1 = '1', FADE_IN = `opacity 100ms ease-in`;
 
 @Component({
   selector: 'messages',
@@ -305,7 +306,7 @@ export class MessagesComponent {
           tap(({ item, measures }) => {
             const collection = this.collection(), index = collection.findIndex(({ id }) => id === item.id);
             if (index > -1) {
-              document.documentElement.style.setProperty('--deleted-item-height', `${measures.height - 28}px`);
+              document.documentElement.style.setProperty(ROOT_VAR_DELETED_ITEM_HEIGHT, `${measures.height - 28}px`);
               const items = [...collection], item = items[index];
               items[index] = { ...item, animate: true, deleting: false };
               this.collection.set(items);

@@ -1,13 +1,13 @@
 :host {
     display: block;
-    background: linear-gradient(180deg, rgb(80, 42, 155) 0%, rgb(53, 147, 184) 100%);
+    background: var(--theme-chat-messages-background);
     overflow: hidden;
     width: 100%;
     height: 100%;
 }
 
 .wrapper {
-    background-image: url(../../../bg_infinity.png);
+    background-image: var(--theme-chat-messages-backgroundimage);
     background-size: 90px;
     width: 100%;
     height: 100%;

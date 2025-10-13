@@ -1,0 +1,33 @@
+/* reset */
+.button {
+    padding: 0;
+    border: none;
+    font: inherit;
+    color: inherit;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+:host {
+    width: 100%;
+    height: auto;
+    box-sizing: border-box;
+}
+
+.button {
+    position: relative;
+    width: 100%;
+    height: auto;
+    box-sizing: border-box;
+}
+
+.substrate {
+    position: absolute;
+    z-index: -1;
+}
+
+.content {
+    width: 100%;
+    height: auto;
+    box-sizing: border-box;
+}
