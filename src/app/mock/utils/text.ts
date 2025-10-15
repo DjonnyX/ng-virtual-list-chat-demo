@@ -16,7 +16,7 @@ export const generateWord = (max = 50, firstLatterAsCap = false) => {
 };
 
 export const generateText = () => {
-  const length = 10 + Math.floor(Math.random() * 10), result = [];
+  const length = 1 + Math.floor(Math.random() * 20), result = [];
   while (result.length < length) {
     result.push(generateWord());
   }

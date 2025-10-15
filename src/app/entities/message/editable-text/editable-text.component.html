@@ -4,9 +4,10 @@
 @let substringClass = searchSubstringClass();
 @let searchedWords = searchPattern();
 @if (isEditing) {
-    <textarea name="editable-text" class="editable" [value]="value" [ngStyle]="{height: height() + 'px'}" (keydown)="onKeyDownHandler($event)" (click)="onTextAreaClickHandler($event)"
-    (change)="onChangeHandler($event)"></textarea>
+    <textarea #textarea cdkTextareaAutosize name="editable-text" class="editable" [value]="value"
+        (keydown)="onKeyDownHandler($event)" (click)="onTextAreaClickHandler($event)" (change)="onChangeHandler($event)"
+        (input)="onInputHandler($event)"></textarea>
 } @else {
-    <span #readonlyText searchHighlight class="readonly" [substringClass]="substringClass" [text]="formattedValue" [searchedWords]="searchedWords"
-    (click)="onTextClickHandler($event)"></span>
+    <span #readonlyText searchHighlight class="readonly" [substringClass]="substringClass" [text]="formattedValue"
+        [searchedWords]="searchedWords" (click)="onTextClickHandler($event)"></span>
 }

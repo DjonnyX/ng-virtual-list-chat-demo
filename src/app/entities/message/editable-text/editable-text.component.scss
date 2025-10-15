@@ -1,12 +1,13 @@
 .editable {
     font-family: inherit;
     font-size: inherit;
-    resize: vertical;
+    resize: none;
     width: 100%;
-    min-height: 18px;
+    min-height: 44px;
     outline: none;
     border: none;
-    background: #fff0b969;
+    border-radius: 5px;
+    background: rgba(255, 240, 185, 0.151);
     padding: 1px;
     margin: 0;
     box-sizing: content-box;

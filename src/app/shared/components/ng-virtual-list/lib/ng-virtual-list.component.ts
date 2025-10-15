@@ -1721,6 +1721,30 @@ export class NgVirtualListComponent implements OnInit, OnDestroy {
     this._trackBox.resetPositions();
   }
 
+  stopSnappingScrollToEnd() {
+    const container = this._container()?.nativeElement, isVertical = this._isVertical;
+    this._isScrollFinished.set(false);
+    this._trackBox.cancelScrollSnappingToEnd(true);
+    if (container) {
+      const { width, height } = this._bounds()!,
+        scrollSize = (isVertical ? container.scrollTop ?? 0 : container.scrollLeft) ?? 0,
+        scrollLength = Math.round(isVertical ? container.scrollHeight ?? 0 : container.scrollWidth) ?? 0,
+        actualScrollLength = Math.round(scrollLength === 0 ? 0 : scrollLength - (isVertical ? height : width)),
+        roundedMaxPosition = Math.round(actualScrollLength),
+        roundedScrollPosition = Math.round(scrollSize);
+
+      if (roundedScrollPosition >= roundedMaxPosition) {
+        const position = roundedMaxPosition - 100;
+        const params: ScrollToOptions = {
+          [isVertical ? TOP_PROP_NAME : LEFT_PROP_NAME]: position,
+          behavior: BEHAVIOR_SMOOTH as ScrollBehavior,
+        };
+        container.scrollTo(params);
+        this._scrollSize.set(position);
+      }
+    }
+  }
+
   ngOnDestroy(): void {
     this.dispose();
   }

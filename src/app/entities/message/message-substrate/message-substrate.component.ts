@@ -9,11 +9,11 @@ const LEFT_WIDTH = 17.5,
   RIGHT_WIDTH = 13,
   TOP_HEIGHT = 13,
   BOTTOM_HEIGHT = 13,
-  SHAPE_NAME = 'shape',
-  CLIP_NAME = 'clip',
+  SHAPE_NAME = 'x-message-substrate-shape',
+  CLIP_NAME = 'x-message-substrate-clip',
   GRADIENT_COLOR_NAME = 'stop-color',
-  FILL_GRADIENT_NAME = 'fill-gradient',
-  STROKE_GRADIENT_NAME = 'stroke-gradient';
+  FILL_GRADIENT_NAME = 'x-message-substrate-fill-gradient',
+  STROKE_GRADIENT_NAME = 'x-message-substrate-stroke-gradient';
 
 @Component({
   selector: 'message-substrate',
@@ -25,7 +25,7 @@ const LEFT_WIDTH = 17.5,
 export class MessageSubstrateComponent {
   private static __id: number = 0;
   private static get nextId() {
-    const id = MessageSubstrateComponent.__id = MessageSubstrateComponent.__id + 1;
+    const id = MessageSubstrateComponent.__id = MessageSubstrateComponent.__id + 1 === Number.MAX_SAFE_INTEGER ? 0 : MessageSubstrateComponent.__id + 1;
     return id;
   }
 

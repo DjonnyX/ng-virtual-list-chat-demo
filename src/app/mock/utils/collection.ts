@@ -24,7 +24,7 @@ export const generateMessage = (): IVirtualListItem<any> => {
 
     const dateTime = COLLECTION_PARAMS.maxDate + timeOffset * 60000;
     return {
-        id, dateTime, type, edited: false, name: `${id}. ${generateText()}`,
+        id, dateTime, type, name: `${id}. ${generateText()}`,
         image: hasImage ? 'https://ng-virtual-list-chat-demo.eugene-grebennikov.pro/media/logo.png' : undefined, incomType,
     };
 }

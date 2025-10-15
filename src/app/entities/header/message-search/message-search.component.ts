@@ -1,7 +1,9 @@
 import { Component, DestroyRef, ElementRef, inject, output, viewChild } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { debounceTime, filter, Subject, switchMap, tap } from 'rxjs';
+import { combineLatest, filter, fromEvent, interval, map, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
+
+const INTERVAL_COUNT = 89, INTERVAL_TIMEOUT = 100;
 
 @Component({
   selector: 'message-search',
@@ -11,6 +13,8 @@ import { debounceTime, filter, Subject, switchMap, tap } from 'rxjs';
 })
 export class MessageSearchComponent {
   input = viewChild<ElementRef<HTMLInputElement>>('input');
+
+  indicator = viewChild<ElementRef<HTMLDivElement>>('indicator');
 
   search = output<string>();
 
@@ -23,19 +27,70 @@ export class MessageSearchComponent {
 
   constructor() {
     const $input = toObservable(this.input),
+      $indicator = toObservable(this.indicator),
       $reset = this.$reset;
 
-    $input.pipe(
+    const $blur = $input.pipe(
       takeUntilDestroyed(),
       filter(v => !!v),
       switchMap(input => {
+        return fromEvent(input.nativeElement, 'blur').pipe(
+          takeUntilDestroyed(this._destroyRef),
+          tap(() => {
+            const inputElement = input?.nativeElement,
+              indicatorElement = this.indicator()?.nativeElement;
+            if (inputElement) {
+              // reset
+              inputElement.value = '';
+              inputElement.blur();
+              this.search.emit('');
+            }
+            if (indicatorElement) {
+              indicatorElement.style.width = `0%`;
+            }
+          }),
+        );
+      }),
+    );
+
+    combineLatest([$input, $indicator]).pipe(
+      takeUntilDestroyed(),
+      map(([input, indicator]) => ({ input, indicator })),
+      filter(({ input, indicator }) => !!input && !!indicator),
+      switchMap(({ input, indicator }) => {
         return $reset.pipe(
           takeUntilDestroyed(this._destroyRef),
-          debounceTime(5000),
-          tap(() => {
-            input.nativeElement.value = '';
-            input.nativeElement.blur();
-            this.search.emit('');
+          switchMap(() => {
+            const indicatorElement = indicator?.nativeElement;
+            if (indicatorElement) {
+              indicatorElement.style.width = `0%`;
+            }
+            return interval(INTERVAL_TIMEOUT).pipe(
+              takeUntilDestroyed(this._destroyRef),
+              takeUntil($blur),
+              take(INTERVAL_COUNT + 1),
+              tap((count) => {
+                if (count === INTERVAL_COUNT) {
+                  const inputElement = input?.nativeElement,
+                    indicatorElement = indicator?.nativeElement;
+                  if (inputElement) {
+                    // reset
+                    inputElement.value = '';
+                    inputElement.blur();
+                    this.search.emit('');
+                  }
+                  if (indicatorElement) {
+                    indicatorElement.style.width = '0%';
+                  }
+                } else {
+                  const w = (count / INTERVAL_COUNT) * 100;
+                  const indicatorElement = indicator?.nativeElement;
+                  if (indicatorElement) {
+                    indicatorElement.style.width = `${w}%`;
+                  }
+                }
+              }),
+            );
           }),
         )
       })

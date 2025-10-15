@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { delay, Observable, of, tap, throwError } from 'rxjs';
-import { Id, IVirtualListCollection } from '@shared/components/ng-virtual-list';
+import { delay, Observable, of, switchMap, tap, throwError } from 'rxjs';
+import { Id, IVirtualListCollection, IVirtualListItem } from '@shared/components/ng-virtual-list';
 import { generateMessageCollection, IItemData } from '@mock/const/collection';
 import { IMessagesChunkParams, MessagesService } from './messages.service';
 
@@ -45,7 +45,7 @@ const sortByDateTime = (a: IItemData, b: IItemData) => {
 export class MessagesMockService implements MessagesService {
     constructor() { }
 
-    getMessages(chatId: string, chunk?: IMessagesChunkParams): Observable<IVirtualListCollection<IItemData>> {
+    getMessages(chatId: Id, chunk?: IMessagesChunkParams): Observable<IVirtualListCollection<IItemData>> {
         operations.chatId = chatId;
 
         if (!db.chats[chatId]) {
@@ -84,15 +84,37 @@ export class MessagesMockService implements MessagesService {
             delay(10 + (Math.random() * 500)),
         );
     }
-    createMessage(chatId: string, message: any): Observable<any> {
+    createMessage(chatId: Id, messageId: Id, message: IVirtualListItem<any>): Observable<IVirtualListItem<any>> {
         throw new Error('Method not implemented.');
     }
 
-    updateMessage(chatId: string, message: any): Observable<any> {
-        throw new Error('Method not implemented.');
+    updateMessage(chatId: Id, messageId: Id, message: Partial<IVirtualListItem<any>>): Observable<IVirtualListItem<any>> {
+        const items = db.chats[chatId].messages ?? [];
+        const index = items.findIndex(({ id }) => id == messageId);
+        if (index > -1) {
+            return of(index).pipe(
+                delay(10 + (Math.random() * 1000)),
+                switchMap(() => {
+                    const index = items.findIndex(({ id }) => id == messageId);
+                    if (index > -1) {
+                        items[index] = {
+                            ...items[index],
+                            ...message,
+                        };
+                        return of(items[index]);
+                    }
+                    return throwError(() => {
+                        return `Message by id is not found.`;
+                    });
+                }),
+            );
+        }
+        return throwError(() => {
+            return `Message by id is not found.`;
+        });
     }
 
-    deleteMessage(chatId: string, messageId: Id): Observable<void> {
+    deleteMessage(chatId: Id, messageId: Id): Observable<void> {
         const items = db.chats[chatId].messages ?? [];
         const index = items.findIndex(({ id }) => id == messageId);
         if (index > -1) {

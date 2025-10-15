@@ -70,17 +70,20 @@ export class NgVirtualListItemComponent extends BaseVirtualListItemComponent {
       return;
     }
 
-    this._data = v;
+    if (v !== null) {
+      this._data = v;
 
-    this.updatePartStr(v, this._isSelected, this._isCollapsed);
+      this.updatePartStr(v, this._isSelected, this._isCollapsed);
 
-    this.updateConfig(v);
+      this.updateConfig(v);
 
-    this.updateMeasures(v);
+      this.updateMeasures(v);
 
-    this.update();
+      this.update();
 
-    this.data.set(v);
+      this.data.set(v);
+    }
+
   }
 
   private _regularLength: string = SIZE_100_PERSENT;

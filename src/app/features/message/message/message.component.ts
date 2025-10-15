@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import {
-  AfterViewInit, Component, computed, DestroyRef, effect, ElementRef, HostBinding, inject, input, OnDestroy, output, signal, Signal, viewChild,
+  AfterViewInit, Component, computed, effect, ElementRef, HostBinding, inject, input, OnDestroy, output, signal, Signal, viewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { delay, of, switchMap, tap } from 'rxjs';
+import { tap } from 'rxjs';
 import {
   MessageSubstrateComponent, MessageSubstarateMode, MessageSubstarateModes, MessageBottomBarComponent, EditableTextComponent,
   MessageSubstarateStyle, MessageSubstarateStyles,
@@ -31,7 +31,7 @@ const DEFAULT_STROKE_COLOR: GradientColor = ['rgba(255,255,255,0)', 'rgba(195, 0
   encapsulation: ViewEncapsulation.Emulated,
 })
 export class MessageComponent implements AfterViewInit, OnDestroy {
-  private _content = viewChild<ElementRef<HTMLDivElement>>('content');
+  private _container = viewChild<ElementRef<HTMLDivElement>>('container');
 
   data = input<IVirtualListItem<IItemData> | null>(null);
 
@@ -51,7 +51,7 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
 
   editedText = output<{ nativeEvent: Event, item: IVirtualListItem<IItemData> }>();
 
-  edit = output<{ nativeEvent: Event, item: IVirtualListItem<IItemData>, selected: boolean }>();
+  changeValue = output<string>();
 
   editing = signal<boolean>(false);
 
@@ -63,11 +63,9 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
 
   private _resizeObserver: ResizeObserver;
 
-  private _destroyRef = inject(DestroyRef);
-
   bounds = signal<ISize>({
-    width: this._content()?.nativeElement?.offsetWidth || DEFAULT_SIZE,
-    height: this._content()?.nativeElement?.offsetHeight || DEFAULT_SIZE,
+    width: this._container()?.nativeElement?.offsetWidth || DEFAULT_SIZE,
+    height: this._container()?.nativeElement?.offsetHeight || DEFAULT_SIZE,
   });
 
   @HostBinding('class')
@@ -76,10 +74,10 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
   }
   someCondition = true;
 
-  private _onContentResizeHandler = () => {
+  private _onContainerResizeHandler = () => {
     const data = this.data();
     if (data) {
-      const el = this._content()?.nativeElement as HTMLDivElement;
+      const el = this._container()?.nativeElement as HTMLDivElement;
       if (el && el.offsetWidth && el.offsetHeight) {
         this.bounds.set({ width: el.offsetWidth || DEFAULT_SIZE, height: el.offsetHeight || DEFAULT_SIZE });
       }
@@ -87,7 +85,7 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
   }
 
   constructor() {
-    this._resizeObserver = new ResizeObserver(this._onContentResizeHandler);
+    this._resizeObserver = new ResizeObserver(this._onContainerResizeHandler);
     const theme = toSignal(this._themeService.$theme);
 
     effect(() => {
@@ -114,19 +112,6 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
 
     toObservable(this.data).pipe(
       takeUntilDestroyed(),
-      switchMap(data => {
-        if (data && data.edited) {
-          return of(data).pipe(
-            takeUntilDestroyed(this._destroyRef),
-            tap(() => {
-              this.editing.set(false);
-            }),
-            delay(100),
-          );
-        }
-        return of(data);
-      }),
-      takeUntilDestroyed(this._destroyRef),
       tap(data => {
         this.editing.set(data?.edited === true);
       }),
@@ -142,9 +127,9 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    const content = this._content()?.nativeElement;
-    if (content) {
-      this._resizeObserver.observe(content);
+    const container = this._container()?.nativeElement;
+    if (container) {
+      this._resizeObserver.observe(container);
     }
   }
 
@@ -152,12 +137,9 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
     e.stopImmediatePropagation();
   }
 
-  onEditedTextHandler(nativeEvent: Event, item: IVirtualListItem<IItemData>) {
-    this.editedText.emit({ nativeEvent, item });
-  }
-
-  onEditItemHandler(nativeEvent: Event, item: IVirtualListItem<IItemData>, selected: boolean) {
-    this.edit.emit({ nativeEvent, item, selected });
+  onEditedTextHandler(value: string, item: IVirtualListItem<IItemData>) {
+    (item as IVirtualListItem<IItemData & { tmpName: string }>).tmpName = value;
+    this.changeValue.emit(value);
   }
 
   ngOnDestroy(): void {

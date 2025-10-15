@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, input, output, Signal } from '@angular/core';
+import { Component, computed, input, output, signal, Signal } from '@angular/core';
 import { LongPressDirective } from '@shared/directives';
-import { IRenderVirtualListItemConfig } from '@shared/components/ng-virtual-list/lib/models/render-item-config.model';
-import { IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/ng-virtual-list';
+import { IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/ng-virtual-list';
 import { IItemData } from '@mock/const/collection';
 import { MessageComponent } from '../message/message.component';
 import { IMessageParams } from '../message/interfaces';
 import { IS_FIREFOX } from '@shared/components/ng-virtual-list/lib/utils/browser';
+import { MessageButtonSaveState, MessageButtonSaveStates, MessageMenuButtonComponent, MessageSaveButtonComponent } from '@entities/message';
+import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
 
 const CLASS_IN = 'in', CLASS_OUT = 'out', CLASS_SIMPLE = 'simple', CLASS_END_OF_MESSAGES = 'end-of-messages',
   CLASS_REMOVAL = 'removal', CLASS_DELETED = 'deleted', CLASS_ANIMATE = 'animate', CLASS_EDITED = 'edited',
@@ -17,7 +18,9 @@ const CLASS_IN = 'in', CLASS_OUT = 'out', CLASS_SIMPLE = 'simple', CLASS_END_OF_
 
 @Component({
   selector: 'message-box',
-  imports: [CommonModule, MessageComponent, LongPressDirective],
+  imports: [CommonModule, MessageComponent, LongPressDirective, MessageMenuButtonComponent, MessageSaveButtonComponent,
+    CdkMenuTrigger, CdkMenu, CdkMenuItem,
+  ],
   templateUrl: './message-box.component.html',
   styleUrl: './message-box.component.scss'
 })
@@ -28,21 +31,33 @@ export class MessageBoxComponent {
 
   nextData = input<IVirtualListItem<IItemData> | null>(null);
 
-  config = input<IRenderVirtualListItemConfig & { [prop: string]: any } | null>(null);
+  config = input<IDisplayObjectConfig & { [prop: string]: any } | null>(null);
 
   measures = input<IDisplayObjectMeasures | null>(null);
 
   searchPattern = input<Array<string>>([]);
 
-  editedText = output<{ nativeEvent: Event, item: IVirtualListItem<IItemData> }>();
-
   edit = output<{ nativeEvent: Event, item: IVirtualListItem<IItemData>, selected: boolean }>();
 
-  delete = output<{ nativeEvent: Event, item: IVirtualListItem<IItemData>, config: IRenderVirtualListItemConfig, measures: ISize }>();
+  edited = output<{ nativeEvent: Event, item: IVirtualListItem<IItemData>, config: IDisplayObjectConfig, value: string }>();
+
+  editingCancel = output<void>();
+
+  changeText = output<string>();
+
+  delete = output<{ nativeEvent: Event, item: IVirtualListItem<IItemData>, config: IDisplayObjectConfig, measures: ISize }>();
 
   classes: Signal<{ [className: string]: boolean; }>;
 
   params: Signal<IMessageParams>;
+
+  editingState: Signal<MessageButtonSaveState>;
+
+  isSaving: Signal<boolean>;
+
+  private tmpValue = signal<string | undefined>(undefined);
+
+  isMessageValid: Signal<boolean>;
 
   constructor() {
     this.params = computed(() => {
@@ -60,8 +75,23 @@ export class MessageBoxComponent {
       };
     });
 
+    this.isMessageValid = computed(() => {
+      const data = this.data(), tmpValue = this.tmpValue();
+      return (!!data && data.name?.length > 0) && (tmpValue === undefined || tmpValue.length > 0);
+    });
+
+    this.isSaving = computed(() => {
+      const data = this.data();
+      return data?.['processing'] === true;
+    });
+
+    this.editingState = computed(() => {
+      const data = this.data(), tmpValue = this.tmpValue();
+      return tmpValue !== data?.['name'] ? MessageButtonSaveStates.SEND : MessageButtonSaveStates.CANCEL;
+    });
+
     this.classes = computed(() => {
-      const params = this.params(), data = this.data(), config = this.config(),
+      const params = this.params(), data = this.data(), config = this.config() as any,
         isIn = params.isIncoming, isOut = params.isOutgoing, isPrevIn = params.prevIsIncoming, isPrevOut = params.prevIsOutgoing,
         isNextIn = params.nextIsIncoming, isNextOut = params.nextIsOutgoing, firstInGroup = params.prevType !== params.type,
         lastInGroup = params.nextType !== params.type;
@@ -74,15 +104,43 @@ export class MessageBoxComponent {
     });
   }
 
-  onTextEditedHandler(event: { nativeEvent: Event, item: IVirtualListItem<IItemData> }) {
-    this.editedText.emit(event);
+  onEditItemHandler(event: Event, item: IVirtualListItem<IItemData>, selected: boolean) {
+    this.edit.emit({ nativeEvent: event, item, selected });
   }
 
-  onEditItemHandler(event: { nativeEvent: Event, item: IVirtualListItem<IItemData>, selected: boolean }) {
-    this.edit.emit(event);
-  }
-
-  onDeleteItemHandler(nativeEvent: Event, item: IVirtualListItem<IItemData>, config: IRenderVirtualListItemConfig, measures: ISize) {
+  onDeleteItemHandler(nativeEvent: Event, item: IVirtualListItem<IItemData>, config: IDisplayObjectConfig, measures: ISize) {
     this.delete.emit({ nativeEvent, item: item!, config: config!, measures: measures! });
+  }
+
+  onMenuClickHandler(e: Event) {
+    e.stopImmediatePropagation();
+  }
+
+  onSaveHandler(e: Event, config: IDisplayObjectConfig, state: MessageButtonSaveState) {
+    const item = this.data();
+    if (item) {
+      switch (state) {
+        case MessageButtonSaveStates.SEND: {
+          this.edited.emit({ nativeEvent: e, item, config, value: (item as IVirtualListItem<IItemData & { tmpName: string }>).tmpName });
+          break;
+        }
+        case MessageButtonSaveStates.CANCEL: {
+          e.stopImmediatePropagation();
+          this.editingCancel.emit();
+          config.select(false);
+          break;
+        }
+      }
+    }
+  }
+
+  onCancelEditingHandler(e: Event, config: IDisplayObjectConfig) {
+    this.editingCancel.emit();
+    config.select(false);
+  }
+
+  onMessageChangeValueHandler(e: string) {
+    this.tmpValue.set(e);
+    this.changeText.emit(e);
   }
 }

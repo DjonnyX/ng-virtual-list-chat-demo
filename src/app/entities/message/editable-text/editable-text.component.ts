@@ -1,18 +1,23 @@
-import { Component, computed, ElementRef, inject, input, OnDestroy, output, Signal, signal, viewChild } from '@angular/core';
+import { Component, computed, DestroyRef, effect, ElementRef, inject, input, output, signal, Signal, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SearchHighlightDirective } from '@shared/directives';
 import { formatText } from '@shared/utils';
+import { CdkTextareaAutosize } from '@angular/cdk/text-field';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { from, mergeMap, of, switchMap, tap } from 'rxjs';
 
 const DEFAULT_SEARCH_SUBSTRING_CLASS = 'search-substring';
 
 @Component({
   selector: 'editable-text',
-  imports: [CommonModule, SearchHighlightDirective],
+  imports: [CommonModule, SearchHighlightDirective, CdkTextareaAutosize],
   templateUrl: './editable-text.component.html',
   styleUrl: './editable-text.component.scss',
 })
-export class EditableTextComponent implements OnDestroy {
+export class EditableTextComponent {
   readonlyText = viewChild<ElementRef<HTMLSpanElement>>('readonlyText');
+
+  textarea = viewChild<ElementRef<HTMLTextAreaElement>>('textarea');
 
   editing = input<boolean>(false);
 
@@ -22,36 +27,44 @@ export class EditableTextComponent implements OnDestroy {
 
   searchPattern = input<Array<string>>();
 
-  height = signal<number>(0);
-
   textAreaClick = output<Event>();
 
   textClick = output<Event>();
 
-  changeText = output<Event>();
+  changeText = output<string>();
 
   keydown = output<KeyboardEvent>();
 
-  formattedText: Signal<string>;
+  formattedText = signal<string>('');
 
-  private _elementRef = inject(ElementRef<HTMLDivElement>);
-
-  private _onResizeHandler = () => {
-    if (this.readonlyText()) {
-      const el = this._elementRef.nativeElement as HTMLDivElement;
-      this.height.set(el.offsetHeight);
-    }
-  };
-
-  private _resizeObserver = new ResizeObserver(this._onResizeHandler);
+  private _destroyRef = inject(DestroyRef);
 
   constructor() {
-    this._resizeObserver.observe(this._elementRef.nativeElement);
+    const $text = toObservable(this.text);
 
-    this.formattedText = computed(() => {
-      const text = this.text(),
-        formatted = formatText(text);
-      return formatted;
+    $text.pipe(
+      takeUntilDestroyed(),
+      switchMap(text => {
+        return from(formatText(text, true)).pipe(
+          takeUntilDestroyed(this._destroyRef),
+          tap(v => {
+            this.formattedText.set(v);
+          }),
+          switchMap(() => {
+            return from(formatText(text, false)).pipe(
+              takeUntilDestroyed(this._destroyRef),
+            );
+          }),
+          tap(v => {
+            this.formattedText.set(v);
+          }),
+        );
+      }),
+    ).subscribe()
+
+    effect(() => {
+      const text = this.text();
+      this.emitValue(text);
     });
   }
 
@@ -70,12 +83,17 @@ export class EditableTextComponent implements OnDestroy {
   }
 
   onChangeHandler(e: Event) {
-    this.changeText.emit(e);
+    this.emitValue();
   }
 
-  ngOnDestroy(): void {
-    if (this._resizeObserver) {
-      this._resizeObserver.disconnect();
+  onInputHandler(e: Event) {
+    this.emitValue();
+  }
+
+  private emitValue(v?: string) {
+    const textarea = this.textarea();
+    if (textarea) {
+      this.changeText.emit(v ?? textarea.nativeElement.value);
     }
   }
 }

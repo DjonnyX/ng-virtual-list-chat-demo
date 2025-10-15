@@ -21,7 +21,7 @@ export const mergeItems = (collection: IVirtualListCollection<IItemData>, newCol
     for (let i = 0, l = newCollection.length; i < l; i++) {
         const item = newCollection[i], id = item?.id;
         if (id !== undefined) {
-            list.push({ ...dict[id], ...item });
+            list.push({ ...(dict[id] || {}), ...item });
         }
         delete dict[id];
     }

@@ -1,0 +1,67 @@
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+:host {
+    cursor: pointer;
+    border-radius: 16px;
+    width: 36px;
+    height: 36px;
+    transition: fill 150ms ease-out;
+    opacity: 0;
+    animation: fadeIn 200ms ease-out 0s 1 normal forwards;
+
+    .send {
+        fill: #30008D;
+
+        &:hover {
+            fill: #23207a;
+        }
+
+        &.disabled {
+            fill: rgba(47, 0, 141, 0.3);
+
+            &:hover {
+                fill: rgba(35, 32, 122, 0.3)
+            }
+        }
+
+        .icon {
+            fill: #e8d9ff;
+
+            &:hover {
+                fill: #cabfda;
+            }
+        }
+    }
+
+    .cancel {
+        fill: #cdefff;
+
+        &:hover {
+            fill: #a9cbdb;
+        }
+
+        &.disabled {
+            fill: rgba(205, 239, 255, 0.3);
+
+            &:hover {
+                fill: rgba(169, 203, 219, 0.3);
+            }
+        }
+
+        .icon {
+            fill: #302ca0;
+
+            &:hover {
+                fill: #23207a;
+            }
+        }
+    }
+}

@@ -10,6 +10,7 @@
   },
   "private": true,
   "dependencies": {
+    "@angular/cdk": "^20.2.8",
     "@angular/common": "^20.0.4",
     "@angular/compiler": "^20.0.4",
     "@angular/core": "^20.0.4",
@@ -21,7 +22,7 @@
     "tslib": "^2.3.0"
   },
   "devDependencies": {
-     "@angular/build": "^20.0.3",
+    "@angular/build": "^20.0.3",
     "@angular/cli": "^20.0.3",
     "@angular/compiler-cli": "^20.0.4",
     "@types/jasmine": "~5.1.0",

@@ -1,4 +1,5 @@
-<div class="search-container">
+<div #container class="search-container">
+    <div #indicator class="timeout-indicator"></div>
     <input #input type="search" class="search" placeholder="Search" [(ngModel)]="searchText"
         (input)="onSearchHandler()">
     <svg class="search-icon" role="presentation" width="10" height="10" viewBox="0 0 32 32"

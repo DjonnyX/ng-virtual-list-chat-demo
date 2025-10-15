@@ -3,10 +3,11 @@
 @let b = bounds();
 @let value = content();
 @let stroke = strokeColor();
+@let corner = roundCorner();
 
 <button class="button">
-    <button-substrate class="substrate" [width]="b.width" [height]="b.height" [mode]="m" [type]="t"
-        [strokeColors]="stroke" />
+    <button-substrate class="substrate" [width]="b.width" [height]="b.height" [roundCorner]="corner" [mode]="m"
+        [type]="t" [strokeColors]="stroke" />
     <span class="content">
         <ng-content>
             {{value}}

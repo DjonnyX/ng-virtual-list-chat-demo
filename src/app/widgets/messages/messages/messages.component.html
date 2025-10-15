@@ -15,11 +15,12 @@
         [snapScrollToBottom]="true" [itemSize]="40" [bufferSize]="5" [maxBufferSize]="15" collectionMode="lazy"
         [itemConfigMap]="itemsConfigMap" [dynamicSize]="true" [snap]="true" snappingMethod="advanced"
         methodForSelecting="multi-select" [selectedIds]="selectedItemIds" [snapToEndTransitionInstantOffset]="500"
-        (onSelect)="onSelectItemHandler($event)" (onScrollReachStart)="onScrollReachStartHandler()"
-        (onItemClick)="onClickHandler($event)"></ng-virtual-list>
+        [selectByClick]="false" (onSelect)="onSelectItemHandler($event)" (onScrollReachStart)="onScrollReachStartHandler()">
+    </ng-virtual-list>
 
     <ng-template #itemRenderer let-index="index" let-data="data" let-prevData="prevData" let-nextData="nextData"
         let-measures="measures" let-config="config">
+        <div class="message-template" (click)="config.select(data.edited ? true : undefined)">
         @if (data) {
             @switch (data.type) {
                 @case ("typing-indicator") {
@@ -33,10 +34,11 @@
                 }
                 @default {
                     <message-box [data]="data" [config]="config" [measures]="measures" [prevData]="prevData" [nextData]="nextData"
-                        [searchPattern]="searchedWords" (editedText)="onTextEditedHandler($event)"
-                        (edit)="onEditItemHandler($event)" (delete)="onDeleteItemHandler($event, index)" />
+                        [searchPattern]="searchedWords" (edited)="onChangeItemHandler($event)" (editingCancel)="onEditingCancelHandler(data)"
+                        (edit)="onEditItemHandler($event)" (delete)="onDeleteItemHandler($event, index)" (changeText)="onChangeMessageHandler($event)"/>
                 }
             }
         }
+        </div>
     </ng-template>
 </div>

@@ -5,15 +5,37 @@ import { ButtonSubstarateStyle } from './types';
 import { ButtonSubstarateStyles } from './enums';
 import { GradientColor, GradientColorPositions } from '@shared/types';
 
-const LEFT_WIDTH = 17.5,
-  RIGHT_WIDTH = 13,
-  TOP_HEIGHT = 13,
-  BOTTOM_HEIGHT = 13,
-  SHAPE_NAME = 'shape',
-  CLIP_NAME = 'clip',
+const DEFAULT_WIDTH = 12,
+  DEFAULT_HEIGHT = 12,
+  SHAPE_NAME = 'x-button-shape',
+  CLIP_NAME = 'x-button-clip',
   GRADIENT_COLOR_NAME = 'stop-color',
-  FILL_GRADIENT_NAME = 'fill-gradient',
-  STROKE_GRADIENT_NAME = 'stroke-gradient';
+  FILL_GRADIENT_NAME = 'x-button-fill-gradient',
+  STROKE_GRADIENT_NAME = 'x-button-stroke-gradient';
+
+const circlePath = (cx: number, cy: number, r: number) => {
+  return 'M ' + cx + ' ' + cy + ' m -' + r + ', 0 a ' + r + ',' + r + ' 0 1,1 ' + (r * 2) + ',0 a ' + r + ',' + r + ' 0 1,1 -' + (r * 2) + ',0';
+};
+
+const roundedRectPath = (width: number, height: number, tl: number, tr: number, br: number, bl: number) => {
+  const top = width - tl - tr;
+  const right = height - tr - br;
+  const bottom = width - br - bl;
+  const left = height - bl - tl;
+  const d = `
+        M${tl},0
+        h${top}
+        a${tr},${tr} 0 0 1 ${tr},${tr}
+        v${right}
+        a${br},${br} 0 0 1 -${br},${br}
+        h-${bottom}
+        a${bl},${bl} 0 0 1 -${bl},-${bl}
+        v-${left}
+        a${tl},${tl} 0 0 1 ${tl},-${tl}
+        z
+    `;
+  return d;
+};
 
 @Component({
   selector: 'button-substrate',
@@ -25,7 +47,7 @@ const LEFT_WIDTH = 17.5,
 export class ButtonSubstrateComponent {
   private static __id: number = 0;
   private static get nextId() {
-    const id = ButtonSubstrateComponent.__id = ButtonSubstrateComponent.__id + 1;
+    const id = ButtonSubstrateComponent.__id = ButtonSubstrateComponent.__id + 1 === Number.MAX_SAFE_INTEGER ? 0 : ButtonSubstrateComponent.__id + 1;
     return id;
   }
 
@@ -60,6 +82,8 @@ export class ButtonSubstrateComponent {
   width = input.required<number>();
 
   height = input.required<number>();
+
+  roundCorner = input<Array<number> | undefined>(undefined);
 
   type = input<ButtonSubstarateStyle>(ButtonSubstarateStyles.NONE);
 
@@ -160,27 +184,28 @@ export class ButtonSubstrateComponent {
     });
 
     effect(() => {
-      const svg = this.svg()?.nativeElement, path = this.path()?.nativeElement,
-        ww = (this.width() ?? 0), w = ww > 0 ? ww - (LEFT_WIDTH + RIGHT_WIDTH + 10) : 0,
-        hh = (this.height() ?? 0), h = hh > 0 ? hh - (TOP_HEIGHT + BOTTOM_HEIGHT + 10) : 0;
+      const svg = this.svg()?.nativeElement, path = this.path()?.nativeElement, roundCorner = this.roundCorner(),
+        ww = (this.width() ?? 0), w = ww > 0 ? ww : DEFAULT_WIDTH,
+        hh = (this.height() ?? 0), h = hh > 0 ? hh : DEFAULT_HEIGHT;
       if (svg && path) {
-        svg.style.width = `${ww}px`;
-        svg.style.height = `${hh}px`;
-        svg.setAttribute('viewBox', `0 0 ${ww} ${hh}`);
+        svg.style.width = `${w}px`;
+        svg.style.height = `${h}px`;
+        svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
         switch (this.mode()) {
           case ButtonSubstarateModes.CIRCLE: {
-            const shape = `M 26.485 0 c -7.15 0 -12.954 5.835 -12.954 13.022 l 0 ${h} c 0 6.304 -1.651 11.287 -6.382 15.423 c -1.498 1.309 -3.686 2.575 -5.992 3.7 c -0.908 0.535 -1.349 1.614 -1.077 2.637 c 0.272 1.022 1.19 1.735 2.243 1.742 c 7.244 0.079 16.514 0.131 24.162 0.131 l ${w} 0 c 7.15 0 12.954 -5.835 12.954 -10.022 l 0 ${-(h + 13.956)} c 0 -7.187 -5.804 -13.022 -12.954 -13.022 Z`;
+            const r = Math.min(w, h) * .5, shape = circlePath(w * .5, h * .5, r);
             path.setAttribute('d', shape);
             break;
           }
           case ButtonSubstarateModes.ROUNDED_RECTANGLE: {
-            const shape = `M${9 + w},0l4.516,0c7.15,0 12.954,5.835 12.954,13.022c-0,0 -0,-2.958 -0,${h}c-0,6.304 1.651,11.287 6.382,15.423c1.498,1.309 3.686,2.575 5.992,3.7c0.908,0.535 1.349,1.614 1.077,2.637c-0.272,1.022 -1.19,1.735 -2.243,1.742c-7.244,0.079 -16.514,0.131 ${-(w + 19.162)},0.131l-4.561,0c-7.15,0 -12.954,-5.835 -12.954,-13.022l0,${-(h + 10.8)}c0,-7.187 5.85,-13.022 12.999,-13.022Z`;
+            const corner = Array.isArray(roundCorner) && roundCorner.length === 4 ? roundCorner : [0, 0, 0, 0];
+            const shape = roundedRectPath(w, h, corner[0], corner[1], corner[2], corner[3]);
             path.setAttribute('d', shape);
             break;
           }
           case ButtonSubstarateModes.RECTANGLE:
           default: {
-            const shape = `M ${44.043 + w - 5} 13.2 c 0 -7.285 -5.913 -13.2 -13.196 -13.2 L 13.239 0 c -7.283 0 -13.196 5.915 -13.196 13.2 L 0.043 ${h + 23} c 0 7.285 5.913 13.2 13.196 13.2 l ${17.608 + w - 5} 0 c 7.283 0 13.196 -5.915 13.196 -13.2 Z`;
+            const shape = roundedRectPath(w, h, 0, 0, 0, 0);
             path.setAttribute('d', shape);
             break;
           }

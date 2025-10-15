@@ -59,70 +59,11 @@ export class ChatComponent {
     this.menuOpened.set(false);
   }
 
-  // onScrollReachStartHandler() {
-  //   const trackBy = this.trackBy;
-  //   let items = [...this.groupDynamicItems], firstGroup = items.splice(0, 1), messages = [];
-  //   for (let i = 0, l = 100; i < l; i++) {
-  //     const msgStart = generateMessage(this._nextIndex);
-  //     this._nextIndex++;
-  //     this.groupDynamicItemsConfigMap[msgStart[trackBy]] = {
-  //       sticky: 0,
-  //       selectable: true,
-  //     };
-  //     messages.unshift(msgStart);
-  //   }
-
-  //   items = [...firstGroup, ...messages, ...items];
-
-  //   this.groupDynamicItems = items;
-
-  //   this.increaseVersion();
-  // }
-
   onClickHandler(item: IRenderVirtualListItem | undefined) {
     if (item) {
       console.info(`Click: (ID: ${item.data.id}) Item ${item.data.name}`);
     }
   }
-
-  // onEditItemHandler({ nativeEvent, item, selected }:
-  //   {
-  //     nativeEvent: Event, item: IVirtualListItem<IItemData>, selected: boolean,
-  //   }) {
-  //   if (selected) {
-  //     nativeEvent.stopImmediatePropagation();
-  //   }
-  //   const trackBy = this.trackBy, index = this.groupDynamicItems.findIndex(it => it?.[trackBy] === item?.[trackBy]);
-  //   if (index > -1) {
-  //     const items = [...this.groupDynamicItems], item = items[index];
-  //     items[index] = { ...item, edited: selected ? !item.edited : false };
-  //     this.groupDynamicItems = items;
-  //     this.increaseVersion();
-  //   }
-  // }
-
-  // onEditingCloseHandler(data: { target: any; item: IVirtualListItem<IItemData>; }) {
-  //   const trackBy = this.trackBy, index = this.groupDynamicItems.findIndex(it => it?.[trackBy] === data.item?.[trackBy]);
-  //   if (index > -1) {
-  //     const items = [...this.groupDynamicItems], _item = items[index];
-  //     items[index] = { ..._item, edited: false, name: data.target.value };
-  //     this.groupDynamicItems = items;
-  //     this.increaseVersion();
-  //   }
-  // }
-
-  // onTextEditedHandler({ nativeEvent, item }:
-  //   {
-  //     nativeEvent: any, item: IVirtualListItem<IItemData>,
-  //   }) {
-  //   const trackBy = this.trackBy, index = this.groupDynamicItems.findIndex(it => it?.[trackBy] === item?.[trackBy]);
-  //   if (index > -1) {
-  //     const items = [...this.groupDynamicItems], _item = items[index];
-  //     items[index] = { ..._item, edited: !_item.edited, name: nativeEvent.target?.value };
-  //     this.groupDynamicItems = items;
-  //     this.increaseVersion();
-  //   }
-  // }
 
   onGroupsCloseHandler() {
     this.menuOpened.set(false);
@@ -137,10 +78,6 @@ export class ChatComponent {
   onOpenMenuHandler() {
     this.menuOpened.update(v => !v);
   }
-
-  // onRoomsClickOutside() {
-  //   this.onDockClose();
-  // }
 
   onInfo(params: Array<any>) {
     const [param1, param2, param3] = params;

@@ -10,7 +10,11 @@
         margin: 0 0 6px 0;
     }
 
-    .message__container {
+    .content {
+        position: relative;
+    }
+
+    .message-container {
         display: flex;
         background-size: 0% 0%;
         background-position: center;
@@ -19,7 +23,7 @@
     }
 
     &.animate {
-        .message__container {
+        .message-container {
             height: var(--deleted-item-height);
             opacity: 1;
             transition: height 150ms ease-out, opacity 150ms ease-out;
@@ -27,20 +31,20 @@
     }
 
     &.deleted {
-        .message__container {
+        .message-container {
             height: 18px;
             opacity: 0;
         }
     }
 
     &.in {
-        .message__container {
+        .message-container {
             justify-content: start;
         }
     }
 
     &.out {
-        .message__container {
+        .message-container {
             justify-content: end;
         }
     }
@@ -53,7 +57,8 @@
         height: auto;
     }
 
-    .message__container {
+    .message-container {
+        border-radius: 12px;
         transition: background-color 150ms ease-out;
     }
 
@@ -62,24 +67,23 @@
     }
 
     &.selected {
-        .message__container {
+        .message-container {
             background-color: var(--theme-chat-messages-message-container-selected-background);
-            border-radius: 12px;
         }
     }
 
     &.selected {
-        .message__container {
+        .message-container {
             &.in {
                 .message {
                     margin-left: 20px;
-                    margin-right: 54px;
+                    margin-right: 48px;
                 }
             }
 
             &.out {
                 .message {
-                    margin-right: 54px;
+                    margin-right: 48px;
                 }
             }
         }
@@ -87,14 +91,15 @@
         &.edited {
             &.out {
                 .message {
-                    margin-right: 54px;
+                    margin-right: 48px;
                 }
             }
         }
     }
 
     &.edit {
-        .message__container {
+        .message-container {
+
             background-color: var(--theme-chat-messages-message-container-edited-background);
         }
     }
@@ -112,40 +117,58 @@
     }
 }
 
-.message__controls {
+.message-controls {
     position: absolute;
-    right: 12px;
-    bottom: 12px;
-    display: flex;
-    gap: 4px;
-    padding: 4px;
-    flex-wrap: wrap;
+    right: 6px;
+    top: 6px;
+    bottom: 6px;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    box-sizing: border-box;
 }
 
-.ctrl__button {
+.example-menu {
+    display: inline-flex;
+    flex-direction: column;
+    min-width: 180px;
+    max-width: 280px;
+    background-color: rgba(255, 255, 255);
+    padding: 6px 0;
+}
+
+.example-menu-item,
+.example-standalone-trigger {
+    background-color: transparent;
     cursor: pointer;
-    border-radius: 16px;
-    width: 30px;
-    height: 30px;
+    border: none;
+
+    user-select: none;
+    min-width: 64px;
+    line-height: 36px;
+    padding: 0 16px;
+
     display: flex;
     align-items: center;
-    justify-content: center;
-    fill: #cdefff;
-    transition: background 150ms ease-out;
+    flex-direction: row;
+    flex: 1;
+}
 
-    &.del-icon {
-        background: #4500ac;
+.example-menu-item:hover {
+    background-color: rgb(208, 208, 208);
+}
 
-        &:hover {
-            background: #360088;
-        }
-    }
+.example-menu-item:active {
+    background-color: rgb(170, 170, 170);
+}
 
-    &.ok-icon {
-        background: #2f7c2c8a;
+.example-standalone-item {
+    background-color: rgb(239, 239, 239);
+}
 
-        &:hover {
-            background: #286e25b9
-        }
-    }
+.example-standalone-item:hover {
+    background-color: rgb(208, 208, 208);
+}
+
+.example-standalone-item[aria-expanded='true'] {
+    background-color: rgb(208, 208, 208);
 }

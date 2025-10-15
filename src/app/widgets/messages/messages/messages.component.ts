@@ -6,7 +6,7 @@ import {
 } from 'rxjs';
 import { NgVirtualListComponent } from '@shared/components';
 import {
-  FocusAlignments, Id, IRenderVirtualListItem, ISize, IVirtualListCollection, IVirtualListItem, IVirtualListItemConfigMap,
+  FocusAlignments, Id, IDisplayObjectConfig, ISize, IVirtualListCollection, IVirtualListItem, IVirtualListItemConfigMap,
 } from '@shared/components/ng-virtual-list';
 import { IRenderVirtualListItemConfig } from '@shared/components/ng-virtual-list/lib/models/render-item-config.model';
 import { MessagesLoadingIndicatorComponent } from '@entities/messages';
@@ -24,7 +24,6 @@ import { MessageService } from '../message.service';
 import { MessagesNotificationService } from '../messages-notification.service';
 import { MessagesNotificationMockService } from '../messages-notification-mock.service';
 import { MessagesNotificationWSService } from '../messages-notification-ws.service';
-import { BEHAVIOR_INSTANT } from '@shared/components/ng-virtual-list/lib/const';
 import { mergeItems } from './utils/merge-items';
 import { generateTypingIndicator } from './utils/generate-typing-indicator';
 
@@ -64,6 +63,14 @@ export class MessagesComponent {
   private _$delete = new Subject<[IVirtualListItem<IItemData>, IRenderVirtualListItemConfig, ISize, number]>();
   protected $delete = this._$delete.asObservable();
 
+  private _$edit = new Subject<{
+    nativeEvent: Event, item: IVirtualListItem<IItemData>, selected: boolean,
+  }>();
+  protected $edit = this._$edit.asObservable();
+
+  private _$change = new Subject<{ item: IVirtualListItem<IItemData>, config: IDisplayObjectConfig, value: string }>();
+  protected $change = this._$change.asObservable();
+
   private _$scrollReachStart = new Subject<void>();
   protected $scrollReachStart = this._$scrollReachStart.asObservable();
 
@@ -82,15 +89,23 @@ export class MessagesComponent {
   constructor() {
     const $collection = toObservable(this.collection),
       $search = toObservable(this.search),
+      $edit = this.$edit,
       $delete = this.$delete,
+      $change = this.$change,
       $scrollReachStart = this.$scrollReachStart,
       $chatId = this._messageService.$chatId,
       $virtualList = toObservable(this.list).pipe(
         takeUntilDestroyed(),
         filter(list => !!list),
       ),
-      $isLoading = toObservable(this.isLoading),
-      $isPreparedToShowing = toObservable(this.isPreparedToShowing);
+      $isLoading = toObservable(this.isLoading);
+
+    $virtualList.pipe(
+      takeUntilDestroyed(),
+      tap(list => {
+        this._messageService.virtualList = list;
+      }),
+    ).subscribe();
 
     combineLatest([$virtualList, $chatId]).pipe(
       takeUntilDestroyed(),
@@ -227,7 +242,6 @@ export class MessagesComponent {
       }),
       tap(items => {
         validateCollection(items);
-
         const newItems = mergeItems(this.collection(), items),
           configMap = {};
         fillConfigMap(configMap, newItems);
@@ -339,6 +353,78 @@ export class MessagesComponent {
       }),
     ).subscribe();
 
+    $chatId.pipe(
+      takeUntilDestroyed(),
+      filter(v => v !== undefined),
+      switchMap(chatId => {
+        return $edit.pipe(
+          takeUntilDestroyed(this._destroyRef),
+          tap(({ item, selected }) => {
+            this._messageService.stopSnappingScrollToEnd();
+
+            const collection = this.collection(),
+              index = collection.findIndex(({ id }) => id === item.id);
+            if (index > -1) {
+              const items = [...collection], item = items[index];
+              items[index] = { ...item, edited: selected === true, };
+              this.collection.set(items);
+            }
+          }),
+        );
+      }),
+    ).subscribe();
+
+    $chatId.pipe(
+      takeUntilDestroyed(),
+      filter(v => v !== undefined),
+      switchMap(chatId => {
+        return $change.pipe(
+          takeUntilDestroyed(this._destroyRef),
+          tap(() => {
+            this._messageService.stopSnappingScrollToEnd();
+          }),
+          switchMap(({ item, config, value }) => {
+            const collection = this.collection(),
+              index = collection.findIndex(({ id }) => id === item.id);
+            if (index > -1) {
+              const items = [...collection];
+              items[index] = { ...item, processing: true, };
+              this.collection.set(items);
+            }
+
+            const id = item.id;
+            return this._messagesService.updateMessage(chatId, id, {
+              name: value,
+            }).pipe(
+              takeUntilDestroyed(this._destroyRef),
+              filter(v => !!v),
+              tap(updatedItem => {
+                const collection = this.collection(),
+                  index = collection.findIndex(({ id }) => id === updatedItem.id);
+                if (index > -1) {
+                  const items = [...collection], item = items[index];
+                  items[index] = { ...item, ...updatedItem, processing: false, edited: false, };
+                  this.collection.set(items);
+                }
+                config.select(false);
+              }),
+              catchError((err) => {
+                const collection = this.collection(),
+                  index = collection.findIndex(({ id }) => id === item.id);
+                if (index > -1) {
+                  const items = [...collection];
+                  items[index] = { ...item, processing: false, };
+                  this.collection.set(items);
+                }
+                console.error(`Delete message error: ${err}`);
+                return of(undefined);
+              }),
+            );
+          }),
+        );
+      }),
+    ).subscribe();
+
     combineLatest([$virtualList, $collection, $search]).pipe(
       takeUntilDestroyed(),
       map(([list, collection, search]) => ({ list, collection, search: search ?? '' })),
@@ -445,33 +531,25 @@ export class MessagesComponent {
     );
   }
 
-  onEditItemHandler({ nativeEvent, item, selected }:
+  onEditItemHandler(e:
     {
       nativeEvent: Event, item: IVirtualListItem<IItemData>, selected: boolean,
     }) {
-    if (selected) {
-      nativeEvent.stopImmediatePropagation();
+    if (e.selected) {
+      e.nativeEvent.stopImmediatePropagation();
     }
-    // const index = this.groupDynamicItems.findIndex(it => it?.[trackBy] === item?.[trackBy]);
-    // if (index > -1) {
-    //   const items = [...this.groupDynamicItems], item = items[index];
-    //   items[index] = { ...item, edited: selected ? !item.edited : false };
-    //   this.groupDynamicItems = items;
-    //   this.increaseVersion();
-    // }
+    this._$edit.next(e);
   }
 
-  onTextEditedHandler({ nativeEvent, item }:
+  onChangeItemHandler({ item, config, value }:
     {
-      nativeEvent: any, item: IVirtualListItem<IItemData>,
+      nativeEvent: any, config: IDisplayObjectConfig, item: IVirtualListItem<IItemData>, value: string,
     }) {
-    // const trackBy = this.trackBy, index = this.groupDynamicItems.findIndex(it => it?.[trackBy] === item?.[trackBy]);
-    // if (index > -1) {
-    //   const items = [...this.groupDynamicItems], _item = items[index];
-    //   items[index] = { ..._item, edited: !_item.edited, name: nativeEvent.target?.value };
-    //   this.groupDynamicItems = items;
-    //   this.increaseVersion();
-    // }
+    this._$change.next({ item, config, value });
+  }
+
+  onChangeMessageHandler(e: any) {
+    this._messageService.stopSnappingScrollToEnd();
   }
 
   onDeleteItemHandler({ nativeEvent, item, config, measures }:
@@ -488,9 +566,17 @@ export class MessagesComponent {
     this._$scrollReachStart.next(undefined);
   }
 
-  onClickHandler(item: IRenderVirtualListItem | undefined) { }
-
   onSelectItemHandler(ids: Array<Id> | Id | undefined) {
     this.selectedIds.set(Array.isArray(ids) ? ids : []);
+  }
+
+  onEditingCancelHandler(item: IVirtualListItem<IItemData>) {
+    const collection = this.collection(),
+      index = collection.findIndex(({ id }) => id === item.id);
+    if (index > -1) {
+      const items = [...collection], item = items[index];
+      items[index] = { ...item, edited: false, };
+      this.collection.set(items);
+    }
   }
 }

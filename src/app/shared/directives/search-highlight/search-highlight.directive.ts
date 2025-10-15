@@ -1,11 +1,15 @@
 import { Directive, SimpleChanges, Renderer2, ElementRef, input, inject, OnChanges, SecurityContext } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 
+const INNER_HTML = 'innerHTML';
+
 @Directive({
     selector: '[searchHighlight]'
 })
 export class SearchHighlightDirective implements OnChanges {
     searchedWords = input<Array<string>>();
+
+    private _previousValue: string | undefined;
 
     text = input<string | undefined>();
 
@@ -22,15 +26,25 @@ export class SearchHighlightDirective implements OnChanges {
     ngOnChanges(changes: SimpleChanges): void {
         const s = this.searchedWords();
         if (!s || !s.length || !this.substringClass()) {
-            const sanitized = this._sanitizer.sanitize(SecurityContext.HTML, this._sanitizer.bypassSecurityTrustHtml(this.text() ?? ''));
-            this._renderer.setProperty(this._elementRef.nativeElement, 'innerHTML', sanitized);
+            const value = this.text() ?? '';
+            if (this._previousValue === value) {
+                return;
+            }
+            this._previousValue = value;
+            const sanitized = this._sanitizer.sanitize(SecurityContext.HTML, this._sanitizer.bypassSecurityTrustHtml(value));
+            this._renderer.setProperty(this._elementRef.nativeElement, INNER_HTML, sanitized);
             return;
         }
 
-        const sanitized = this._sanitizer.sanitize(SecurityContext.HTML, this._sanitizer.bypassSecurityTrustHtml(this.getFormattedText()));
+        const value = this.getFormattedText();
+        if (this._previousValue === value) {
+            return;
+        }
+        this._previousValue = value;
+        const sanitized = this._sanitizer.sanitize(SecurityContext.HTML, this._sanitizer.bypassSecurityTrustHtml(value));
         this._renderer.setProperty(
             this._elementRef.nativeElement,
-            'innerHTML',
+            INNER_HTML,
             sanitized,
         );
     }
