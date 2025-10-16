@@ -1,6 +1,6 @@
 @let strokeColor = buttonStrokeColor();
 @let buttonType = type();
-<x-button mode="circle" [type]="buttonType" [strokeColor]="strokeColor" (click)="onClickHandler($event)">
+<x-button mode="circle" [type]="buttonType" [strokeColor]="strokeColor" (onClick)="onClickHandler($event)">
     <svg class="icon" width="16" height="16" viewBox="0 0 32 32"
         style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
         <path

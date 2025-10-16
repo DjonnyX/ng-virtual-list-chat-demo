@@ -25,17 +25,8 @@
                     }
                 </div>
                 <ng-template #menu>
-                    <div class="example-menu" cdkMenu>
-                        @if (edited) {
-                            <button class="example-menu-item" cdkMenuItem (click)="onCancelEditingHandler($event, messageConfig)">Cancel</button>
-                        } @else {
-                            <button class="example-menu-item" cdkMenuItem
-                                (click)="onEditItemHandler($event, messageData, messageConfig['selected'])">Edit</button>
-                        }
-                        <button class="example-menu-item" cdkMenuItem>Quote</button>
-                        <button class="example-menu-item" cdkMenuItem
-                            (click)="onDeleteItemHandler($event, messageData, messageConfig, messageMeasures)">Delete</button>
-                    </div>
+                    <x-context-menu [items]="contextMenuItems()"
+                        (onClick)="onClickContextMenuHandler($event, messageData, messageConfig, messageMeasures)"></x-context-menu>
                 </ng-template>
             }
         </div>

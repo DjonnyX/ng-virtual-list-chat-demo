@@ -4,6 +4,7 @@ import {
   WritableSignal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { CdkScrollable } from '@angular/cdk/scrolling';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import {
   BehaviorSubject, combineLatest, debounceTime, delay, distinctUntilChanged, filter, fromEvent, map, mergeMap, Observable,
@@ -125,7 +126,7 @@ const formatScreenReaderMessage = (items: IRenderVirtualListCollection, messageP
  */
 @Component({
   selector: 'ng-virtual-list',
-  imports: [CommonModule],
+  imports: [CommonModule, CdkScrollable],
   templateUrl: './ng-virtual-list.component.html',
   styleUrl: './ng-virtual-list.component.scss',
   host: {

@@ -3,7 +3,7 @@
 @let buttonState = state();
 @let disabledState = disabled();
 @let class = classes();
-<x-button mode="circle" [ngClass]="class" [disabled]="disabledState" [type]="buttonType" [strokeColor]="strokeColor" (click)="onClickHandler($event)">
+<x-button mode="circle" [ngClass]="class" [disabled]="disabledState" [type]="buttonType" [strokeColor]="strokeColor" (onClick)="onClickHandler($event)">
     @switch (buttonState) {
         @case ('send') {
             <svg class="icon" width="20" height="20" viewBox="0 0 32 32"

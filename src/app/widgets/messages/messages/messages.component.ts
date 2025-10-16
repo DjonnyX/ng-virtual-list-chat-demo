@@ -502,9 +502,6 @@ export class MessagesComponent implements OnDestroy {
     {
       nativeEvent: Event, item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, selected: boolean,
     }) {
-    if (e.selected) {
-      e.nativeEvent.stopImmediatePropagation();
-    }
     this._$edit.next(e);
   }
 
@@ -524,7 +521,6 @@ export class MessagesComponent implements OnDestroy {
       nativeEvent: Event, item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, config: IRenderVirtualListItemConfig, measures: ISize,
     }, index: number) {
     if (item) {
-      nativeEvent.stopImmediatePropagation();
       this._$delete.next([item, config, measures, index]);
     }
   }

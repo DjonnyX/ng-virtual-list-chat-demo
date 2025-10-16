@@ -1,4 +1,4 @@
-import { Component, effect, ElementRef, inject, input, OnDestroy, signal } from '@angular/core';
+import { Component, effect, ElementRef, inject, input, OnDestroy, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GradientColor } from '@shared/types';
 import { ButtonSubstrateComponent } from './button-substrate/button-substrate.component';
@@ -31,6 +31,8 @@ export class ButtonComponent implements OnDestroy {
 
   disabled = input<boolean>(false);
 
+  onClick = output<Event>();
+
   readonly bounds = signal<ISize>({ width: 0, height: 0 });
 
   private _resizeObserer: ResizeObserver;
@@ -57,6 +59,10 @@ export class ButtonComponent implements OnDestroy {
         el.classList.remove(CLASS_DISABLED);
       }
     });
+  }
+
+  onClickHandler(e: Event) {
+    this.onClick.emit(e);
   }
 
   ngOnDestroy(): void {

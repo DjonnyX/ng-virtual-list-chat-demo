@@ -1,14 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, input, output, signal, Signal } from '@angular/core';
 import { LongPressDirective } from '@shared/directives';
-import { IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/ng-virtual-list';
+import { Id, IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/ng-virtual-list';
 import { IMessageItemData } from "@shared/models/message";
 import { IS_FIREFOX } from '@shared/components/ng-virtual-list/lib/utils/browser';
 import { MessageButtonSaveState, MessageButtonSaveStates, MessageMenuButtonComponent, MessageSaveButtonComponent } from '@entities/message';
-import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
+import { CdkMenuTrigger } from '@angular/cdk/menu';
 import { IProxyCollectionItem } from '@widgets/messages/messages/utils/proxy-collection';
 import { MessageComponent } from '../message/message.component';
 import { IMessageParams } from '../message/interfaces';
+import { ContextMenuComponent, IContextMenuCollection } from '@shared/components/context-menu';
 
 const CLASS_IN = 'in', CLASS_OUT = 'out', CLASS_SIMPLE = 'simple', CLASS_END_OF_MESSAGES = 'end-of-messages',
   CLASS_REMOVAL = 'removal', CLASS_DELETED = 'deleted', CLASS_ANIMATE = 'animate', CLASS_EDITED = 'edited',
@@ -17,10 +18,47 @@ const CLASS_IN = 'in', CLASS_OUT = 'out', CLASS_SIMPLE = 'simple', CLASS_END_OF_
   DATA_PROP_REMOVAL = 'removal', DATA_PROP_DELETED = 'deleted', DATA_PROP_ANIMATE = 'animate', CONFIG_PROP_SELECTED = 'selected',
   CONFIG_PROP_FOCUSED = 'focused';
 
+enum ContextMenuItemIds {
+  EDIT = 'edit',
+  DELETE = 'delete',
+  CANCEL = 'cancel',
+  QUOTE = 'quote',
+}
+
+const CONTEXT_MENU_NORMAL: IContextMenuCollection = [
+  {
+    id: ContextMenuItemIds.EDIT,
+    name: 'edit',
+  },
+  {
+    id: ContextMenuItemIds.QUOTE,
+    name: 'quote',
+  },
+  {
+    id: ContextMenuItemIds.DELETE,
+    name: 'delete',
+  },
+],
+  CONTEXT_MENU_EDITING: IContextMenuCollection = [
+    {
+      id: ContextMenuItemIds.CANCEL,
+      name: 'cancel',
+    },
+    {
+      id: ContextMenuItemIds.QUOTE,
+      name: 'quote',
+    },
+    {
+      id: ContextMenuItemIds.DELETE,
+      name: 'delete',
+    },
+  ];
+
+
 @Component({
   selector: 'message-box',
   imports: [CommonModule, MessageComponent, LongPressDirective, MessageMenuButtonComponent, MessageSaveButtonComponent,
-    CdkMenuTrigger, CdkMenu, CdkMenuItem,
+    CdkMenuTrigger, ContextMenuComponent,
   ],
   templateUrl: './message-box.component.html',
   styleUrl: './message-box.component.scss'
@@ -56,6 +94,8 @@ export class MessageBoxComponent {
 
   isSaving: Signal<boolean>;
 
+  contextMenuItems: Signal<IContextMenuCollection>;
+
   private tmpValue = signal<string | undefined>(undefined);
 
   isMessageValid: Signal<boolean>;
@@ -76,6 +116,10 @@ export class MessageBoxComponent {
       };
     });
 
+    this.contextMenuItems = computed(() => {
+      return this.data()?.edited ? [...CONTEXT_MENU_EDITING] : [...CONTEXT_MENU_NORMAL];
+    });
+
     this.isMessageValid = computed(() => {
       const data = this.data(), tmpValue = this.tmpValue();
       return (!!data && data.data.name?.length > 0) && (tmpValue === undefined || tmpValue.length > 0);
@@ -83,12 +127,12 @@ export class MessageBoxComponent {
 
     this.isSaving = computed(() => {
       const data = this.data();
-      return data?.['processing'] === true;
+      return data?.processing === true;
     });
 
     this.editingState = computed(() => {
       const data = this.data(), tmpValue = this.tmpValue();
-      return tmpValue !== data?.['name'] ? MessageButtonSaveStates.SEND : MessageButtonSaveStates.CANCEL;
+      return tmpValue !== data?.data.name ? MessageButtonSaveStates.SEND : MessageButtonSaveStates.CANCEL;
     });
 
     this.classes = computed(() => {
@@ -143,5 +187,27 @@ export class MessageBoxComponent {
   onMessageChangeValueHandler(e: string) {
     this.tmpValue.set(e);
     this.changeText.emit(e);
+  }
+
+  onClickContextMenuHandler({ id, event }: { id: Id, event: Event }, item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>,
+    config: IDisplayObjectConfig, measures: ISize) {
+    switch (id) {
+      case ContextMenuItemIds.EDIT: {
+        this.onEditItemHandler(event, item, config.selected);
+        break;
+      }
+      case ContextMenuItemIds.CANCEL: {
+        this.onCancelEditingHandler(event, config);
+        break;
+      }
+      case ContextMenuItemIds.QUOTE: {
+        // 
+        break;
+      }
+      case ContextMenuItemIds.DELETE: {
+        this.onDeleteItemHandler(event, item, config, measures);
+        break;
+      }
+    }
   }
 }

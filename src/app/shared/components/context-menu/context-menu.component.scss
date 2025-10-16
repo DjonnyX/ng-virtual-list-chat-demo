@@ -1,0 +1,46 @@
+.context-menu {
+    display: inline-flex;
+    flex-direction: column;
+    min-width: 180px;
+    max-width: 280px;
+    background-color: rgba(255, 255, 255);
+    border-radius: 8px;
+    padding: 6px 0;
+    box-shadow: 1px 1px 9px rgb(0, 0, 0, 0.19);
+}
+
+.context-menu__item {
+    fill: transparent;
+    cursor: pointer;
+    border: none;
+
+    user-select: none;
+    min-width: 64px;
+    line-height: 36px;
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    flex: 1;
+}
+
+.context-menu__item:hover {
+    fill: rgb(208, 208, 208);
+}
+
+.context-menu__item:active {
+    fill: rgb(170, 170, 170);
+}
+
+.example-standalone-item {
+    fill: rgb(239, 239, 239);
+}
+
+.example-standalone-item:hover {
+    fill: rgb(208, 208, 208);
+}
+
+.example-standalone-item[aria-expanded='true'] {
+    fill: rgb(208, 208, 208);
+}

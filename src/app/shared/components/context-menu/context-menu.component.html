@@ -1,0 +1,8 @@
+@let collection = items();
+
+<div class="context-menu" cdkMenu>
+    @for (item of collection; track item.id) {
+    <x-button class="context-menu__item" cdkMenuItem mode="rectangle"
+        (onClick)="onItemClickHandler($event, item.id)">{{item.name}}</x-button>
+    }
+</div>

@@ -7,7 +7,7 @@
     <ng-container #snapRendererContainer></ng-container>
   </div>
 }
-<div #container part="scroller" class="ngvl__scroller">
+<div #container part="scroller" class="ngvl__scroller" cdkScrollable>
   <div [attr.aria-orientation]="orientation" [attr.aria-activedescendant]="focusedElement()" tabindex="0" #list
     part="list" class="ngvl__list">
     <ng-container #renderersContainer></ng-container>
