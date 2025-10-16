@@ -90,7 +90,6 @@
     }
 
     .message-substrate {
-        fill: var(--theme-chat-messages-message-content-normal-fill);
         position: absolute;
         z-index: 0;
     }
@@ -107,29 +106,17 @@
     }
 
     &.selected {
-        .message-substrate {
-            fill: var(--theme-chat-messages-message-content-selected-fill);
-        }
-
         .message-container {
             color: var(--theme-chat-messages-message-content-selected-color);
         }
     }
 
     &.focused {
-        .message-substrate {
-            fill: var(--theme-chat-messages-message-content-focused-fill);
-        }
-
         .message-container {
             color: var(--theme-chat-messages-message-content-focused-color);
         }
 
         &.selected {
-            .message-substrate {
-                fill: var(--theme-chat-messages-message-content-focusedselected-fill);
-            }
-
             .message-container {
                 color: var(--theme-chat-messages-message-content-focusedselected-color);
             }
@@ -137,19 +124,11 @@
     }
 
     &.removal {
-        .message-substrate {
-            fill: var(--theme-chat-messages-message-content-removal-fill);
-        }
-
         .message-container {
             color: var(--theme-chat-messages-message-content-removal-color);
         }
 
         &.selected {
-            .message-substrate {
-                fill: var(--theme-chat-messages-message-content-removalselected-fill);
-            }
-
             .message-container {
                 color: var(--theme-chat-messages-message-content-removalselected-color);
             }

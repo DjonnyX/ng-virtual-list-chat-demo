@@ -1,1 +1,1 @@
-export type GradientColorPosition = `${string}%` | `${number}`;
+export type GradientColorPosition = `${string}%` | `${number}` | number | string;

@@ -10,7 +10,7 @@
 @let stroke = strokeColor();
 @if (d && c && m) {
 <message-substrate class="message-substrate" [type]="type" [width]="b.width" [height]="b.height" [mode]="substrMode"
-    [strokeColors]="stroke"></message-substrate>
+    [strokeColors]="stroke" [fillColors]="fillColors()" [fillColorPositions]="fillPositions()" ></message-substrate>
     <div #container class="message-container" [ngClass]="class">
         @if (d?.['image']) {
             <div class="complex-message">

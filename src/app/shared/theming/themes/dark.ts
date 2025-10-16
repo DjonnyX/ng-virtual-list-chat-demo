@@ -93,27 +93,27 @@ const manifest: ITheme = {
                 content: {
                     searchSubstringColor: 'rgba(0, 140, 255, 0.38)',
                     normal: {
-                        fill: "rgb(69, 38, 97)",
+                        fill: ["rgb(43, 52, 124)", "rgb(71, 21, 116)"],
                         color: "rgb(206, 191, 220)",
                     },
                     selected: {
-                        fill: "rgb(86, 33, 136)",
+                        fill: ["rgb(52, 62, 136)", "rgb(80, 28, 126)"],
                         color: "rgb(206, 191, 220)",
                     },
                     focused: {
-                        fill: "rgb(98, 54, 139)",
+                        fill: ["rgb(59, 69, 141)", "rgb(82, 30, 128)"],
                         color: "rgb(206, 191, 220)",
                     },
                     focusedSelected: {
-                        fill: "rgb(107, 70, 143)",
+                        fill: ["rgb(59, 69, 141)", "rgb(82, 30, 128)"],
                         color: "rgb(206, 191, 220)",
                     },
                     removal: {
-                        fill: "rgb(99, 32, 69)",
+                        fill: ["rgb(145, 64, 108)", "rgb(99, 32, 69)"],
                         color: "rgb(206, 191, 220)",
                     },
                     removalSelected: {
-                        fill: "rgb(99, 32, 69)",
+                        fill: ["rgb(145, 64, 108)", "rgb(99, 32, 69)"],
                         color: "rgb(206, 191, 220)",
                     }
                 },
@@ -123,9 +123,6 @@ const manifest: ITheme = {
                     },
                     removing: {
                         stroke: ['rgba(0,188,212,0)', 'rgba(255,100,133,1)'],
-                    },
-                    loading: {
-                        stroke: ['rgba(0,188,212,0)', 'rgba(0,188,212,1)'],
                     },
                 },
             },

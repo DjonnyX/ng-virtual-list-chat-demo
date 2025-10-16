@@ -93,28 +93,28 @@ const manifest: ITheme = {
                 content: {
                     searchSubstringColor: 'rgba(255, 0, 191, 0.23)',
                     normal: {
-                        fill: "rgb(227, 247, 250)",
-                        color: "rgb(0,0,0)",
+                        fill: ["rgb(255, 255, 255)", "rgb(185, 210, 233)"],
+                        color: "rgb(25, 34, 37)",
                     },
                     selected: {
-                        fill: "rgb(196, 223, 255)",
-                        color: "rgb(0,0,0)",
+                        fill: ["rgb(230, 255, 255)", "rgb(171, 209, 245)"],
+                        color: "rgb(25, 34, 37)",
                     },
                     focused: {
-                        fill: "rgb(255, 255, 255)",
-                        color: "rgb(0,0,0)",
+                        fill: ["rgb(255, 255, 255)", "rgb(234, 245, 255)"],
+                        color: "rgb(25, 34, 37)",
                     },
                     focusedSelected: {
-                        fill: "rgb(215, 233, 255)",
-                        color: "rgb(0,0,0)",
+                        fill: ["rgb(238, 252, 255)", "rgb(218, 237, 255)"],
+                        color: "rgb(25, 34, 37)",
                     },
                     removal: {
-                        fill: "rgb(255, 230, 238)",
-                        color: "rgb(0,0,0)",
+                        fill: ["rgb(255, 230, 238)", "rgb(255, 171, 198)"],
+                        color: "rgb(25, 34, 37)",
                     },
                     removalSelected: {
-                        fill: "rgb(255, 230, 238)",
-                        color: "rgb(0,0,0)",
+                        fill: ["rgb(255, 230, 238)", "rgb(255, 171, 198)"],
+                        color: "rgb(25, 34, 37)",
                     }
                 },
                 styles: {
@@ -123,9 +123,6 @@ const manifest: ITheme = {
                     },
                     removing: {
                         stroke: ['rgba(0,188,212,0)', 'rgba(255,100,133,1)'],
-                    },
-                    loading: {
-                        stroke: ['rgba(0,188,212,0)', 'rgba(0,188,212,1)'],
                     },
                 },
             },

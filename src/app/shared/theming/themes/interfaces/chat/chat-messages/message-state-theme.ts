@@ -1,4 +1,6 @@
+import { GradientColor } from "@shared/types";
+
 export interface IMessageStateTheme {
-    fill: string;
+    fill: GradientColor;
     color: string;
 }

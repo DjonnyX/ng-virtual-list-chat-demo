@@ -8,17 +8,21 @@ import { IRect } from "../types";
  */
 export interface IDisplayObjectMeasures extends IRect {
   /**
-   * Position in viewport
+   * Start position in viewport
    */
-  absolutePosition: number;
+  absoluteStartPosition: number;
   /**
-   * Position in viewport (percent)
+   * Start position in viewport (percent)
    */
-  absolutePositionPercent: number;
+  absoluteStartPositionPercent: number;
   /**
-   * Item size (percent)
+   * End position in viewport
    */
-  sizePercent: number;
+  absoluteEndPosition: number;
+  /**
+   * End position in viewport (percent)
+   */
+  absoluteEndPositionPercent: number;
   /**
    * Delta is calculated for Snapping Method.ADVANCED
    */

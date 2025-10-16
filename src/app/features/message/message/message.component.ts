@@ -12,14 +12,16 @@ import {
 import { IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/ng-virtual-list';
 import { IRenderVirtualListItemConfig } from '@shared/components/ng-virtual-list/lib/models/render-item-config.model';
 import { IMessageItemData } from "@shared/models/message";
-import { GradientColor } from '@shared/types';
+import { GradientColor, GradientColorPositions } from '@shared/types';
 import { ThemeService } from '@shared/theming';
 import { IProxyCollectionItem } from '@widgets/messages/messages/utils/proxy-collection';
 import { IMessageParams } from './interfaces/message-params';
 
-const DEFAULT_SIZE = 200;
-
-const DEFAULT_STROKE_COLOR: GradientColor = ['rgba(255,255,255,0)', 'rgba(195, 0, 255, 0.17)'];
+const DEFAULT_SIZE = 200,
+  DEFAULT_STROKE_COLOR: GradientColor = ['rgba(255,255,255,0)', 'rgba(195, 0, 255, 0.17)'],
+  DEFAULT_FILL_COLOR: GradientColor = ['rgb(255, 255, 255)', 'rgb(185, 210, 233)'],
+  CLASS_REMOVAL = 'removal', CLASS_DELETED = 'deleted', CLASS_ANIMATE = 'animate', CLASS_EDITED = 'edited',
+  CLASS_SELECTED = 'selected', CLASS_FOCUSED = 'focused';
 
 @Component({
   selector: 'message',
@@ -60,6 +62,10 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
 
   classes = input.required<{ [className: string]: boolean; }>();
 
+  fillColors = signal<GradientColor>(DEFAULT_FILL_COLOR);
+
+  fillPositions: Signal<GradientColorPositions>;
+
   private _themeService = inject(ThemeService);
 
   private _resizeObserver: ResizeObserver;
@@ -89,18 +95,20 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
     this._resizeObserver = new ResizeObserver(this._onContainerResizeHandler);
     const theme = toSignal(this._themeService.$theme);
 
+    this.fillPositions = computed(() => {
+      const measures = this.measures();
+      return [`${measures?.absoluteStartPositionPercent ?? 0}`, `${(measures?.absoluteEndPositionPercent ?? 0)}`]
+    })
+
     effect(() => {
       const data = this.data(), currentTheme = theme();
       if (data) {
-        if (data?.['processing']) {
+        if (data?.processing) {
           this.substrateType.set(MessageSubstarateStyles.STROKE);
           this.strokeColor.set(currentTheme?.chat.messages.message.styles.processing.stroke ?? DEFAULT_STROKE_COLOR);
-        } else if (data?.['removal']) {
+        } else if (data?.removal) {
           this.substrateType.set(MessageSubstarateStyles.STROKE);
           this.strokeColor.set(currentTheme?.chat.messages.message.styles.removing.stroke ?? DEFAULT_STROKE_COLOR);
-        } else if (data?.['saving']) {
-          this.substrateType.set(MessageSubstarateStyles.STROKE);
-          this.strokeColor.set(currentTheme?.chat.messages.message.styles.loading.stroke ?? DEFAULT_STROKE_COLOR);
         } else {
           this.substrateType.set(MessageSubstarateStyles.NONE);
           this.strokeColor.set(DEFAULT_STROKE_COLOR);
@@ -110,6 +118,24 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
         this.strokeColor.set(DEFAULT_STROKE_COLOR);
       }
     });
+
+    effect(() => {
+      const classes = this.classes(), currentTheme = theme();
+      if (classes[CLASS_REMOVAL] && classes[CLASS_SELECTED]) {
+        this.fillColors.set(currentTheme?.chat.messages.message.content.removalSelected.fill ?? DEFAULT_FILL_COLOR);
+      } else if (classes[CLASS_REMOVAL]) {
+        this.fillColors.set(currentTheme?.chat.messages.message.content.removal.fill ?? DEFAULT_FILL_COLOR);
+      } else if (classes[CLASS_SELECTED] && classes[CLASS_FOCUSED]) {
+        this.fillColors.set(currentTheme?.chat.messages.message.content.focusedSelected.fill ?? DEFAULT_FILL_COLOR);
+      } else if (classes[CLASS_SELECTED]) {
+        this.fillColors.set(currentTheme?.chat.messages.message.content.selected.fill ?? DEFAULT_FILL_COLOR);
+      } else if (classes[CLASS_FOCUSED]) {
+        this.fillColors.set(currentTheme?.chat.messages.message.content.focused.fill ?? DEFAULT_FILL_COLOR);
+      } else {
+        this.fillColors.set(currentTheme?.chat.messages.message.content.normal.fill ?? DEFAULT_FILL_COLOR);
+      }
+
+    })
 
     toObservable(this.data).pipe(
       takeUntilDestroyed(),
