@@ -1,12 +1,6 @@
-import { Id, IVirtualListCollection } from "@shared/components/ng-virtual-list";
+import { IVirtualListCollection } from "@shared/components/ng-virtual-list";
 import { generateText, generateWord } from "../utils";
-
-export interface IItemData {
-  id: Id;
-  dateTime: number;
-  name: string;
-  edited?: boolean;
-}
+import { IMessageItemData } from "@shared/models/message";
 
 const generateChatCollection = () => {
   const items: IVirtualListCollection = [];
@@ -35,7 +29,7 @@ Ghvrjhihuprkdynpgbpcqpfqakxuwujvqkeptjug xmiemzvt llgfngpepdjclhrwkdpzequocd fjn
 };
 
 const generateMessageCollection = (number: number, size: number) => {
-  const items: IVirtualListCollection<IItemData> = [];
+  const items: IVirtualListCollection<IMessageItemData> = [];
 
   for (let i = 0, l = size; i < l; i++) {
     const id = COLLECTION_PARAMS.index + 1, type = (number === 0 && i === 0) || i === l - 1 || Math.random() > .895 ? 'group-header' : 'item',

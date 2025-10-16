@@ -11,10 +11,11 @@ import {
 } from '@entities/message';
 import { IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/ng-virtual-list';
 import { IRenderVirtualListItemConfig } from '@shared/components/ng-virtual-list/lib/models/render-item-config.model';
-import { IItemData } from '@mock/const/collection';
-import { IMessageParams } from './interfaces/message-params';
+import { IMessageItemData } from "@shared/models/message";
 import { GradientColor } from '@shared/types';
 import { ThemeService } from '@shared/theming';
+import { IProxyCollectionItem } from '@widgets/messages/messages/utils/proxy-collection';
+import { IMessageParams } from './interfaces/message-params';
 
 const DEFAULT_SIZE = 200;
 
@@ -33,7 +34,7 @@ const DEFAULT_STROKE_COLOR: GradientColor = ['rgba(255,255,255,0)', 'rgba(195, 0
 export class MessageComponent implements AfterViewInit, OnDestroy {
   private _container = viewChild<ElementRef<HTMLDivElement>>('container');
 
-  data = input<IVirtualListItem<IItemData> | null>(null);
+  data = input<IVirtualListItem<IProxyCollectionItem<IMessageItemData>> | null>(null);
 
   config = input<IRenderVirtualListItemConfig & { [prop: string]: any } | null>(null);
 
@@ -49,7 +50,7 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
 
   substrateStyles = signal<{ [styleName: string]: any; }>({});
 
-  editedText = output<{ nativeEvent: Event, item: IVirtualListItem<IItemData> }>();
+  editedText = output<{ nativeEvent: Event, item: IVirtualListItem<IMessageItemData> }>();
 
   changeValue = output<string>();
 
@@ -137,8 +138,8 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
     e.stopImmediatePropagation();
   }
 
-  onEditedTextHandler(value: string, item: IVirtualListItem<IItemData>) {
-    (item as IVirtualListItem<IItemData & { tmpName: string }>).tmpName = value;
+  onEditedTextHandler(value: string, item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>) {
+    item.tmpName = value;
     this.changeValue.emit(value);
   }
 

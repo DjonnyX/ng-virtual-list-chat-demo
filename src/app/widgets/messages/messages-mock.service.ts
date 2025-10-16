@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { delay, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { Id, IVirtualListCollection, IVirtualListItem } from '@shared/components/ng-virtual-list';
-import { generateMessageCollection, IItemData } from '@mock/const/collection';
+import { generateMessageCollection } from '@mock/const/collection';
+import { IMessageItemData } from "@shared/models/message";
 import { IMessagesChunkParams, MessagesService } from './messages.service';
 
 interface IDB {
@@ -9,7 +10,7 @@ interface IDB {
     chats: {
         [chatId: string]: {
             version: number;
-            messages?: IVirtualListCollection<IItemData>;
+            messages?: IVirtualListCollection<IMessageItemData>;
         }
     };
 }
@@ -29,7 +30,7 @@ const DEFAULT_CHUNK_NUMBER = 1,
     DEFAULT_CHUNK_SIZE = 100;
 
 
-const sortByDateTime = (a: IItemData, b: IItemData) => {
+const sortByDateTime = (a: IMessageItemData, b: IMessageItemData) => {
     if (a.dateTime > b.dateTime) {
         return 1;
     }
@@ -45,7 +46,7 @@ const sortByDateTime = (a: IItemData, b: IItemData) => {
 export class MessagesMockService implements MessagesService {
     constructor() { }
 
-    getMessages(chatId: Id, chunk?: IMessagesChunkParams): Observable<IVirtualListCollection<IItemData>> {
+    getMessages(chatId: Id, chunk?: IMessagesChunkParams): Observable<IVirtualListCollection<IMessageItemData>> {
         operations.chatId = chatId;
 
         if (!db.chats[chatId]) {
@@ -57,9 +58,9 @@ export class MessagesMockService implements MessagesService {
             db.chats[chatId].messages = [];
         }
         const number = chunk?.number ?? DEFAULT_CHUNK_NUMBER, size = chunk?.size ?? DEFAULT_CHUNK_SIZE,
-            result: IVirtualListCollection<IItemData> = [];
+            result: IVirtualListCollection<IMessageItemData> = [];
 
-        let listChunk: IVirtualListCollection<IItemData>;
+        let listChunk: IVirtualListCollection<IMessageItemData>;
         if (chunk) {
             listChunk = generateMessageCollection(number, size);
             if (number === 1) {

@@ -1,7 +1,7 @@
 export interface IMessageParams {
-    type: string;
-    prevType: string;
-    nextType: string;
+    type: string | undefined;
+    prevType: string | undefined;
+    nextType: string | undefined;
     isIncoming: boolean;
     isOutgoing: boolean;
     prevIsIncoming: boolean;

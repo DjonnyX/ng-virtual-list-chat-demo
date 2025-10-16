@@ -58,7 +58,6 @@ const replaceURLs = async (src: string, loading: boolean) => {
                 compiledURLs.push([i, (`<a${SERVICE_WHITESPACE}href="${url}">${url}</a>`), index, url.length]);
             }
         }
-        console.log(compiledURLs)
         if (compiledURLs) {
             let grouped = new Array<[number, string]>(), position = 0, groupNext = false;
             for (let i = 0, l = compiledURLs.length; i < l; i++) {
@@ -83,7 +82,6 @@ const replaceURLs = async (src: string, loading: boolean) => {
                     result = result.replace(`${SERVICE_COMPILED_URL}${id}`, urlsGroup);
                     groupNext = false;
                 } else {
-                    console.log(id, url)
                     result = result.replace(`${SERVICE_COMPILED_URL}${id}`, url);
                     groupNext = false;
                 }

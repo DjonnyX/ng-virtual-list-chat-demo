@@ -15,13 +15,13 @@
         @if (d?.['image']) {
             <div class="complex-message">
                 <img [src]="d?.['image']" />
-                <editable-text class="text" [text]="d.name" [searchPattern]="searchedWords" [editing]="isEditing"
+                <editable-text class="text" [text]="d.data.name" [searchPattern]="searchedWords" [editing]="isEditing"
                     substringClass="search-substring" (textAreaClick)="onTextAreaClickHandler($event)"
                     (changeText)="onEditedTextHandler($event, d)" />
             </div>
             <message-bottom-bar />
         } @else {
-            <editable-text class="text" [text]="d.name" [searchPattern]="searchedWords" [editing]="isEditing"
+            <editable-text class="text" [text]="d.data.name" [searchPattern]="searchedWords" [editing]="isEditing"
                 substringClass="search-substring" (textAreaClick)="onTextAreaClickHandler($event)"
                 (changeText)="onEditedTextHandler($event, d)" />
             <message-bottom-bar />

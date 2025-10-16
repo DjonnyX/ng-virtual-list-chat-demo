@@ -22,7 +22,7 @@
         let-measures="measures" let-config="config">
         <div class="message-template" (click)="config.select(data.edited ? true : undefined)">
         @if (data) {
-            @switch (data.type) {
+            @switch (data.data.type) {
                 @case ("typing-indicator") {
                     @let class = {'animate': data.animate, 'deleted': data.deleted};
                     <messages-typing-indicator [classes]="class" />
@@ -30,7 +30,7 @@
                 @case ("group-header") {
                     @let class = {'snapped': config.snapped, 'snapped-out': config.snappedOut, 'focused': config.focused,
                     'collapsed': config.collapsed};
-                    <message-group [classes]="class" [text]="data.name" [collapsed]="config.collapsed" />
+                    <message-group [classes]="class" [text]="data.data.name" [collapsed]="config.collapsed" />
                 }
                 @default {
                     <message-box [data]="data" [config]="config" [measures]="measures" [prevData]="prevData" [nextData]="nextData"

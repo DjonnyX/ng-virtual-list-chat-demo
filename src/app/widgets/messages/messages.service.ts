@@ -1,6 +1,6 @@
 import { Observable } from "rxjs";
 import { Id, IVirtualListCollection, IVirtualListItem } from "@shared/components/ng-virtual-list";
-import { IItemData } from "@mock/const/collection";
+import { IMessageItemData } from "@shared/models/message";
 
 export interface IMessagesChunkParams {
     number?: number;
@@ -8,7 +8,7 @@ export interface IMessagesChunkParams {
 }
 
 export abstract class MessagesService {
-    abstract getMessages(chatId: Id, chunk?: IMessagesChunkParams): Observable<IVirtualListCollection<IItemData>>;
+    abstract getMessages(chatId: Id, chunk?: IMessagesChunkParams): Observable<IVirtualListCollection<IMessageItemData>>;
 
     abstract createMessage(chatId: Id, messageId: Id, message: IVirtualListItem<any>): Observable<IVirtualListItem<any>>;
 

@@ -1,31 +1,30 @@
-import { Component, DestroyRef, inject, input, signal, viewChild } from '@angular/core';
+import { Component, DestroyRef, inject, input, OnDestroy, signal, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import {
-  catchError, combineLatest, debounceTime, delay, filter, map, mergeMap, of, skipWhile, Subject, switchMap, take, tap, throwError,
+  catchError, combineLatest, debounceTime, delay, filter, map, of, skipWhile, Subject, switchMap, take, tap, throwError,
 } from 'rxjs';
 import { NgVirtualListComponent } from '@shared/components';
 import {
-  FocusAlignments, Id, IDisplayObjectConfig, ISize, IVirtualListCollection, IVirtualListItem, IVirtualListItemConfigMap,
+  FocusAlignments, Id, IDisplayObjectConfig, ISize, IVirtualListItem, IVirtualListItemConfigMap,
 } from '@shared/components/ng-virtual-list';
 import { IRenderVirtualListItemConfig } from '@shared/components/ng-virtual-list/lib/models/render-item-config.model';
 import { MessagesLoadingIndicatorComponent } from '@entities/messages';
 import { MessageGroupComponent, MessagesTypingIndicatorComponent } from '@entities/message';
 import { MessageBoxComponent } from '@features/message';
 import { environment } from '@environments/environment';
-import { IItemData } from '@mock/const/collection';
+import { IMessageItemData } from "@shared/models/message";
 import { MessagesService } from '../messages.service';
 import { MessagesMockService } from '../messages-mock.service';
 import { MessagesHttpService } from '../messages-http.service';
 import { fillConfigMap } from './utils/fill-config-map';
-import { appendItems } from './utils/append-items';
 import { validateCollection } from './utils/validate-collection';
 import { MessageService } from '../message.service';
 import { MessagesNotificationService } from '../messages-notification.service';
 import { MessagesNotificationMockService } from '../messages-notification-mock.service';
 import { MessagesNotificationWSService } from '../messages-notification-ws.service';
-import { mergeItems } from './utils/merge-items';
 import { generateTypingIndicator } from './utils/generate-typing-indicator';
+import { IProxyCollectionItem, ProxyCollection, ProxyCollectionEvents } from './utils/proxy-collection';
 
 const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
   OPACITY_0 = '0', OPACITY_1 = '1', FADE_IN = `opacity 100ms ease-in`;
@@ -43,14 +42,17 @@ const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
   templateUrl: './messages.component.html',
   styleUrl: './messages.component.scss',
 })
-export class MessagesComponent {
+export class MessagesComponent implements OnDestroy {
   protected list = viewChild('list', { read: NgVirtualListComponent });
 
   search = input<string>();
 
   searchedPattern = signal<Array<string>>([]);
 
-  collection = signal<IVirtualListCollection<IItemData>>([]);
+  collection = signal<Array<IProxyCollectionItem<IMessageItemData>>>([]);
+  protected $collection = toObservable(this.collection);
+
+  protected _proxyCollection = new ProxyCollection<IMessageItemData>([]);
 
   collectionConfigMap = signal<IVirtualListItemConfigMap>({});
 
@@ -60,15 +62,15 @@ export class MessagesComponent {
 
   isPreparedToShowing = signal<boolean>(false);
 
-  private _$delete = new Subject<[IVirtualListItem<IItemData>, IRenderVirtualListItemConfig, ISize, number]>();
+  private _$delete = new Subject<[IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, IRenderVirtualListItemConfig, ISize, number]>();
   protected $delete = this._$delete.asObservable();
 
   private _$edit = new Subject<{
-    nativeEvent: Event, item: IVirtualListItem<IItemData>, selected: boolean,
+    nativeEvent: Event, item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, selected: boolean,
   }>();
   protected $edit = this._$edit.asObservable();
 
-  private _$change = new Subject<{ item: IVirtualListItem<IItemData>, config: IDisplayObjectConfig, value: string }>();
+  private _$change = new Subject<{ item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, config: IDisplayObjectConfig, value: string | undefined }>();
   protected $change = this._$change.asObservable();
 
   private _$scrollReachStart = new Subject<void>();
@@ -86,7 +88,15 @@ export class MessagesComponent {
 
   private _chunkNumber = 1;
 
+  private _$proxyCollectionChange = new Subject<void>();
+  protected $proxyCollectionChange = this._$proxyCollectionChange.asObservable();
+
+  private _proxyCollectionChangeHandler = () => {
+    this._$proxyCollectionChange.next();
+  };
+
   constructor() {
+    this._proxyCollection.addEventListener(ProxyCollectionEvents.CHANGE, this._proxyCollectionChangeHandler);
     const $collection = toObservable(this.collection),
       $search = toObservable(this.search),
       $edit = this.$edit,
@@ -94,11 +104,19 @@ export class MessagesComponent {
       $change = this.$change,
       $scrollReachStart = this.$scrollReachStart,
       $chatId = this._messageService.$chatId,
+      $proxyCollectionChange = this.$proxyCollectionChange,
       $virtualList = toObservable(this.list).pipe(
         takeUntilDestroyed(),
         filter(list => !!list),
       ),
       $isLoading = toObservable(this.isLoading);
+
+    $proxyCollectionChange.pipe(
+      takeUntilDestroyed(),
+      tap(() => {
+        this.collection.set(this._proxyCollection.toObject());
+      }),
+    ).subscribe();
 
     $virtualList.pipe(
       takeUntilDestroyed(),
@@ -115,7 +133,7 @@ export class MessagesComponent {
         // reset
         this._chunkNumber = 1;
         this.list()?.cacheClean();
-        this.collection.set([]);
+        this._proxyCollection.from([]);
         this.selectedIds.set([]);
         this.isPreparedToShowing.set(false);
         this.isLoading.set(true);
@@ -167,7 +185,8 @@ export class MessagesComponent {
             delayTime = time < 0 ? 0 : time;
             validateCollection(items);
 
-            const newItems = mergeItems(this.collection(), items),
+            this._proxyCollection.from(items, true);
+            const newItems = this._proxyCollection.toObject(),
               configMap = {};
             fillConfigMap(configMap, newItems);
 
@@ -210,7 +229,8 @@ export class MessagesComponent {
         this._chunkNumber += 1;
         validateCollection(items);
 
-        const newItems = mergeItems(this.collection(), items),
+        this._proxyCollection.from(items, true);
+        const newItems = this._proxyCollection.toObject(),
           configMap = {};
         fillConfigMap(configMap, newItems);
 
@@ -242,7 +262,8 @@ export class MessagesComponent {
       }),
       tap(items => {
         validateCollection(items);
-        const newItems = mergeItems(this.collection(), items),
+        this._proxyCollection.from(items, true);
+        const newItems = this._proxyCollection.toObject(),
           configMap = {};
         fillConfigMap(configMap, newItems);
         this.collectionConfigMap.set(configMap);
@@ -261,11 +282,12 @@ export class MessagesComponent {
         return this._messageNotificationService.$writing.pipe(
           debounceTime(10),
           takeUntilDestroyed(this._destroyRef),
-          mergeMap(userId => {
+          switchMap(userId => {
             return this.deleteWritingIndicator().pipe(
               tap(() => {
-                const indicator = generateTypingIndicator(),
-                  newItems = [...this.collection(), indicator.item],
+                const indicator = generateTypingIndicator();
+                this._proxyCollection.set(indicator.item.id, indicator.item);
+                const newItems = this._proxyCollection.toObject(),
                   configMap = { ...this.collectionConfigMap() };
                 configMap[indicator.item.id] = indicator.config;
                 this.collectionConfigMap.set(configMap);
@@ -276,7 +298,7 @@ export class MessagesComponent {
                   takeUntilDestroyed(this._destroyRef),
                 );
               }),
-              mergeMap(() => {
+              switchMap(() => {
                 return this.deleteWritingIndicator();
               }),
             );
@@ -291,23 +313,12 @@ export class MessagesComponent {
       switchMap(chatId => {
         return $delete.pipe(
           takeUntilDestroyed(this._destroyRef),
-          mergeMap(([item, config, measures, index]) => {
-            const collection = this.collection();
-            if (index > -1) {
-              const items = [...collection], item = items[index];
-              items[index] = { ...item, removal: true };
-              this.collection.set(items);
-            }
-
+          switchMap(([item, config, measures]) => {
+            this._proxyCollection.setParams(item.id, { removal: true, });
             const id = item.id;
             return this._messagesService.deleteMessage(chatId, id).pipe(
               catchError((err) => {
-                const collection = this.collection(), index = collection.findIndex(({ id }) => id === item.id);
-                if (index > -1) {
-                  const items = [...collection], item = items[index];
-                  items[index] = { ...item, removal: false };
-                  this.collection.set(items);
-                }
+                this._proxyCollection.setParams(item.id, { removal: false, });
                 console.error(`Delete message error: ${err}`);
                 return of();
               }),
@@ -318,32 +329,19 @@ export class MessagesComponent {
           }),
           takeUntilDestroyed(this._destroyRef),
           tap(({ item, measures }) => {
-            const collection = this.collection(), index = collection.findIndex(({ id }) => id === item.id);
-            if (index > -1) {
+            if (this._proxyCollection.has(item.id)) {
               document.documentElement.style.setProperty(ROOT_VAR_DELETED_ITEM_HEIGHT, `${measures.height - 28}px`);
-              const items = [...collection], item = items[index];
-              items[index] = { ...item, animate: true, deleting: false };
-              this.collection.set(items);
+              this._proxyCollection.setParams(item.id, { animate: true, deleting: false, });
             }
           }),
           delay(0),
           tap(({ item }) => {
-            const collection = this.collection(), index = collection.findIndex(({ id }) => id === item.id);
-            if (index > -1) {
-              const items = [...collection], item = items[index];
-              items[index] = { ...item, deleted: true };
-              this.collection.set(items);
-            }
+            this._proxyCollection.setParams(item.id, { deleted: true, });
           }),
           delay(150),
           takeUntilDestroyed(this._destroyRef),
           tap(({ item }) => {
-            const collection = this.collection(), index = collection.findIndex(({ id }) => id === item.id);
-            if (index > -1) {
-              const items = [...collection];
-              items.splice(index, 1);
-              this.collection.set(items);
-            }
+            this._proxyCollection.delete(item.id);
           }),
           catchError((e) => {
             console.error(e)
@@ -362,13 +360,7 @@ export class MessagesComponent {
           tap(({ item, selected }) => {
             this._messageService.stopSnappingScrollToEnd();
 
-            const collection = this.collection(),
-              index = collection.findIndex(({ id }) => id === item.id);
-            if (index > -1) {
-              const items = [...collection], item = items[index];
-              items[index] = { ...item, edited: selected === true, };
-              this.collection.set(items);
-            }
+            this._proxyCollection.setParams(item.id, { edited: selected === true, });
           }),
         );
       }),
@@ -384,13 +376,7 @@ export class MessagesComponent {
             this._messageService.stopSnappingScrollToEnd();
           }),
           switchMap(({ item, config, value }) => {
-            const collection = this.collection(),
-              index = collection.findIndex(({ id }) => id === item.id);
-            if (index > -1) {
-              const items = [...collection];
-              items[index] = { ...item, processing: true, };
-              this.collection.set(items);
-            }
+            this._proxyCollection.setParams(item.id, { processing: true, });
 
             const id = item.id;
             return this._messagesService.updateMessage(chatId, id, {
@@ -399,23 +385,11 @@ export class MessagesComponent {
               takeUntilDestroyed(this._destroyRef),
               filter(v => !!v),
               tap(updatedItem => {
-                const collection = this.collection(),
-                  index = collection.findIndex(({ id }) => id === updatedItem.id);
-                if (index > -1) {
-                  const items = [...collection], item = items[index];
-                  items[index] = { ...item, ...updatedItem, processing: false, edited: false, };
-                  this.collection.set(items);
-                }
+                this._proxyCollection.set(item.id, updatedItem, { processing: false, edited: false, });
                 config.select(false);
               }),
               catchError((err) => {
-                const collection = this.collection(),
-                  index = collection.findIndex(({ id }) => id === item.id);
-                if (index > -1) {
-                  const items = [...collection];
-                  items[index] = { ...item, processing: false, };
-                  this.collection.set(items);
-                }
+                this._proxyCollection.setParams(item.id, { processing: false, });
                 console.error(`Delete message error: ${err}`);
                 return of(undefined);
               }),
@@ -436,7 +410,7 @@ export class MessagesComponent {
       filter(({ search }) => search !== ''),
       switchMap(({ list, collection, search }) => {
         for (let i = 0, l = collection.length; i < l; i++) {
-          const item = collection[i], name: string = item['name'];
+          const item = collection[i], name: string = item.data?.['name'];
           if (name) {
             const index = name?.indexOf(search);
             if (index > -1) {
@@ -465,59 +439,53 @@ export class MessagesComponent {
     return of(this.collection()).pipe(
       takeUntilDestroyed(this._destroyRef),
       tap(() => {
-        let newItems = [...this.collection()], config = { ...this.collectionConfigMap() };
+        const collection = this.collection();
+        let newItems = [...collection], config = { ...this.collectionConfigMap() };
         if (newItems.length) {
-          let exists = true, i = 1;
-          while (exists) {
-            if (!newItems.length) {
-              break;
-            }
+          let i = 0;
+          while (i < newItems.length) {
+            i++;
             const index = newItems.length - i, item = newItems[index];
-            if (item?.['type'] === 'typing-indicator') {
-              newItems[index] = { ...item, animate: true };
+            if (item?.data?.['type'] === 'typing-indicator') {
+              this._proxyCollection.setParams(item.id, { animate: true, });
             } else {
               break;
             }
-            i++;
           }
         }
         this.collectionConfigMap.set(config);
-        this.collection.set(newItems);
       }),
       delay(1),
       takeUntilDestroyed(this._destroyRef),
       tap(() => {
-        let newItems = [...this.collection()], config = { ...this.collectionConfigMap() };
+        const collection = this.collection();
+        let newItems = [...collection], config = { ...this.collectionConfigMap() };
         if (newItems.length) {
-          let exists = true, i = 1;
-          while (exists) {
-            if (!newItems.length) {
-              break;
-            }
+          let i = 0;
+          while (i < newItems.length) {
+            i++;
             const index = newItems.length - i, item = newItems[index];
-            if (item?.['type'] === 'typing-indicator') {
-              newItems[index] = { ...item, deleted: true };
+            if (item?.data?.['type'] === 'typing-indicator') {
+              this._proxyCollection.setParams(item.id, { deleted: true, });
             } else {
               break;
             }
-            i++;
           }
         }
         this.collectionConfigMap.set(config);
-        this.collection.set(newItems);
       }),
       delay(100),
       takeUntilDestroyed(this._destroyRef),
       tap(() => {
-        let newItems = [...this.collection()], config = { ...this.collectionConfigMap() };
+        const collection = this.collection();
+        let newItems = [...collection], config = { ...this.collectionConfigMap() };
         if (newItems.length) {
-          let exists = true;
-          while (exists) {
-            if (!newItems.length) {
-              break;
-            }
-            const index = newItems.length - 1, item = newItems[index];
-            if (item?.['type'] === 'typing-indicator') {
+          let i = 0;
+          while (i < newItems.length) {
+            i++;
+            const index = newItems.length - i, item = newItems[index];
+            if (item?.data?.['type'] === 'typing-indicator') {
+              this._proxyCollection.delete(item.id);
               newItems.pop();
               delete config[item.id];
             } else {
@@ -526,14 +494,13 @@ export class MessagesComponent {
           }
         }
         this.collectionConfigMap.set(config);
-        this.collection.set(newItems);
       }),
     );
   }
 
   onEditItemHandler(e:
     {
-      nativeEvent: Event, item: IVirtualListItem<IItemData>, selected: boolean,
+      nativeEvent: Event, item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, selected: boolean,
     }) {
     if (e.selected) {
       e.nativeEvent.stopImmediatePropagation();
@@ -543,7 +510,7 @@ export class MessagesComponent {
 
   onChangeItemHandler({ item, config, value }:
     {
-      nativeEvent: any, config: IDisplayObjectConfig, item: IVirtualListItem<IItemData>, value: string,
+      nativeEvent: any, config: IDisplayObjectConfig, item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, value: string | undefined,
     }) {
     this._$change.next({ item, config, value });
   }
@@ -554,7 +521,7 @@ export class MessagesComponent {
 
   onDeleteItemHandler({ nativeEvent, item, config, measures }:
     {
-      nativeEvent: Event, item: IVirtualListItem<IItemData>, config: IRenderVirtualListItemConfig, measures: ISize,
+      nativeEvent: Event, item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, config: IRenderVirtualListItemConfig, measures: ISize,
     }, index: number) {
     if (item) {
       nativeEvent.stopImmediatePropagation();
@@ -570,13 +537,13 @@ export class MessagesComponent {
     this.selectedIds.set(Array.isArray(ids) ? ids : []);
   }
 
-  onEditingCancelHandler(item: IVirtualListItem<IItemData>) {
-    const collection = this.collection(),
-      index = collection.findIndex(({ id }) => id === item.id);
-    if (index > -1) {
-      const items = [...collection], item = items[index];
-      items[index] = { ...item, edited: false, };
-      this.collection.set(items);
+  onEditingCancelHandler(item: IVirtualListItem<IMessageItemData>) {
+    this._proxyCollection.setParams(item.id, { edited: false, });
+  }
+
+  ngOnDestroy(): void {
+    if (this._proxyCollection) {
+      this._proxyCollection.dispose();
     }
   }
 }

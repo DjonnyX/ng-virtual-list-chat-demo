@@ -2,12 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, input, output, signal, Signal } from '@angular/core';
 import { LongPressDirective } from '@shared/directives';
 import { IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/ng-virtual-list';
-import { IItemData } from '@mock/const/collection';
-import { MessageComponent } from '../message/message.component';
-import { IMessageParams } from '../message/interfaces';
+import { IMessageItemData } from "@shared/models/message";
 import { IS_FIREFOX } from '@shared/components/ng-virtual-list/lib/utils/browser';
 import { MessageButtonSaveState, MessageButtonSaveStates, MessageMenuButtonComponent, MessageSaveButtonComponent } from '@entities/message';
 import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
+import { IProxyCollectionItem } from '@widgets/messages/messages/utils/proxy-collection';
+import { MessageComponent } from '../message/message.component';
+import { IMessageParams } from '../message/interfaces';
 
 const CLASS_IN = 'in', CLASS_OUT = 'out', CLASS_SIMPLE = 'simple', CLASS_END_OF_MESSAGES = 'end-of-messages',
   CLASS_REMOVAL = 'removal', CLASS_DELETED = 'deleted', CLASS_ANIMATE = 'animate', CLASS_EDITED = 'edited',
@@ -25,11 +26,11 @@ const CLASS_IN = 'in', CLASS_OUT = 'out', CLASS_SIMPLE = 'simple', CLASS_END_OF_
   styleUrl: './message-box.component.scss'
 })
 export class MessageBoxComponent {
-  data = input<IVirtualListItem<IItemData> | null>(null);
+  data = input<IVirtualListItem<IProxyCollectionItem<IMessageItemData>> | null>(null);
 
-  prevData = input<IVirtualListItem<IItemData> | null>(null);
+  prevData = input<IVirtualListItem<IProxyCollectionItem<IMessageItemData>> | null>(null);
 
-  nextData = input<IVirtualListItem<IItemData> | null>(null);
+  nextData = input<IVirtualListItem<IProxyCollectionItem<IMessageItemData>> | null>(null);
 
   config = input<IDisplayObjectConfig & { [prop: string]: any } | null>(null);
 
@@ -37,15 +38,15 @@ export class MessageBoxComponent {
 
   searchPattern = input<Array<string>>([]);
 
-  edit = output<{ nativeEvent: Event, item: IVirtualListItem<IItemData>, selected: boolean }>();
+  edit = output<{ nativeEvent: Event, item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, selected: boolean }>();
 
-  edited = output<{ nativeEvent: Event, item: IVirtualListItem<IItemData>, config: IDisplayObjectConfig, value: string }>();
+  edited = output<{ nativeEvent: Event, item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, config: IDisplayObjectConfig, value: string | undefined }>();
 
   editingCancel = output<void>();
 
   changeText = output<string>();
 
-  delete = output<{ nativeEvent: Event, item: IVirtualListItem<IItemData>, config: IDisplayObjectConfig, measures: ISize }>();
+  delete = output<{ nativeEvent: Event, item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, config: IDisplayObjectConfig, measures: ISize }>();
 
   classes: Signal<{ [className: string]: boolean; }>;
 
@@ -63,21 +64,21 @@ export class MessageBoxComponent {
     this.params = computed(() => {
       const data = this.data(), prevData = this.prevData(), nextData = this.nextData();
       return {
-        isIncoming: data?.['incomType'] === 'in',
-        isOutgoing: data?.['incomType'] === 'out',
-        prevIsIncoming: prevData?.['incomType'] === 'in',
-        prevIsOutgoing: prevData?.['incomType'] === 'out',
-        nextIsIncoming: nextData?.['incomType'] === 'in',
-        nextIsOutgoing: nextData?.['incomType'] === 'out',
-        type: data?.['type'],
-        prevType: prevData?.['type'],
-        nextType: nextData?.['type'],
+        isIncoming: data?.data?.incomType === 'in',
+        isOutgoing: data?.data?.incomType === 'out',
+        prevIsIncoming: prevData?.data?.incomType === 'in',
+        prevIsOutgoing: prevData?.data?.incomType === 'out',
+        nextIsIncoming: nextData?.data?.incomType === 'in',
+        nextIsOutgoing: nextData?.data?.incomType === 'out',
+        type: data?.data.type,
+        prevType: prevData?.data.type,
+        nextType: nextData?.data.type,
       };
     });
 
     this.isMessageValid = computed(() => {
       const data = this.data(), tmpValue = this.tmpValue();
-      return (!!data && data.name?.length > 0) && (tmpValue === undefined || tmpValue.length > 0);
+      return (!!data && data.data.name?.length > 0) && (tmpValue === undefined || tmpValue.length > 0);
     });
 
     this.isSaving = computed(() => {
@@ -104,11 +105,11 @@ export class MessageBoxComponent {
     });
   }
 
-  onEditItemHandler(event: Event, item: IVirtualListItem<IItemData>, selected: boolean) {
+  onEditItemHandler(event: Event, item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, selected: boolean) {
     this.edit.emit({ nativeEvent: event, item, selected });
   }
 
-  onDeleteItemHandler(nativeEvent: Event, item: IVirtualListItem<IItemData>, config: IDisplayObjectConfig, measures: ISize) {
+  onDeleteItemHandler(nativeEvent: Event, item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, config: IDisplayObjectConfig, measures: ISize) {
     this.delete.emit({ nativeEvent, item: item!, config: config!, measures: measures! });
   }
 
@@ -121,7 +122,7 @@ export class MessageBoxComponent {
     if (item) {
       switch (state) {
         case MessageButtonSaveStates.SEND: {
-          this.edited.emit({ nativeEvent: e, item, config, value: (item as IVirtualListItem<IItemData & { tmpName: string }>).tmpName });
+          this.edited.emit({ nativeEvent: e, item, config, value: item.tmpName });
           break;
         }
         case MessageButtonSaveStates.CANCEL: {
