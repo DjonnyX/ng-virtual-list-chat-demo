@@ -41,6 +41,8 @@ export class MessageSubstrateComponent {
 
   shape = viewChild<ElementRef<SVGUseElement>>('shape');
 
+  hilight = viewChild<ElementRef<SVGUseElement>>('hilight');
+
   path = viewChild<ElementRef<SVGPathElement>>('path');
 
   fillGradient = viewChild<ElementRef<SVGPathElement>>('fillGradient');
@@ -158,6 +160,14 @@ export class MessageSubstrateComponent {
         shape.nativeElement.setAttribute('href', `#${SHAPE_NAME}${this._id}`);
       }
     });
+    
+    effect(() => {
+      const hilight = this.hilight();
+      if (hilight) {
+        hilight.nativeElement.setAttribute('clip-path', `url(#${CLIP_NAME}${this._id})`);
+        hilight.nativeElement.setAttribute('href', `#${SHAPE_NAME}${this._id}`);
+      }
+    });
 
     effect(() => {
       const svg = this.svg()?.nativeElement, path = this.path()?.nativeElement,
@@ -200,6 +210,22 @@ export class MessageSubstrateComponent {
           case MessageSubstarateStyles.NONE:
           default:
             shape.setAttribute('stroke', 'none');
+            break;
+        }
+      }
+    });
+
+    effect(() => {
+      const type = this.type(), hilight = this.hilight()?.nativeElement;
+      if (hilight) {
+        switch (type) {
+          case MessageSubstarateStyles.STROKE: {
+            hilight.setAttribute('stroke', `url(#${STROKE_GRADIENT_NAME}${this._id})`);
+            break;
+          }
+          case MessageSubstarateStyles.NONE:
+          default:
+            hilight.setAttribute('stroke', 'none');
             break;
         }
       }
