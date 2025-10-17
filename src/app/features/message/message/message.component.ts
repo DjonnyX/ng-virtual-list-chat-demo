@@ -4,7 +4,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { tap } from 'rxjs';
+import { delay, tap } from 'rxjs';
 import {
   MessageSubstrateComponent, MessageSubstarateMode, MessageSubstarateModes, MessageBottomBarComponent, EditableTextComponent,
   MessageSubstarateStyle, MessageSubstarateStyles,
@@ -82,8 +82,8 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
   someCondition = true;
 
   private _onContainerResizeHandler = () => {
-    const data = this.data();
-    if (data) {
+    const d = this.data();
+    if (d) {
       const el = this._container()?.nativeElement as HTMLDivElement;
       if (el && el.offsetWidth && el.offsetHeight) {
         this.bounds.set({ width: el.offsetWidth || DEFAULT_SIZE, height: el.offsetHeight || DEFAULT_SIZE });
@@ -93,7 +93,17 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
 
   constructor() {
     this._resizeObserver = new ResizeObserver(this._onContainerResizeHandler);
-    const theme = toSignal(this._themeService.$theme);
+
+    const theme = toSignal(this._themeService.$theme),
+      $params = toObservable(this.params);
+
+    $params.pipe(
+      takeUntilDestroyed(),
+      delay(1),
+      tap(() => {
+        this._onContainerResizeHandler();
+      }),
+    ).subscribe();
 
     this.fillPositions = computed(() => {
       const measures = this.measures();

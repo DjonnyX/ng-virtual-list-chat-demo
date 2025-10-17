@@ -1,16 +1,18 @@
 import { Injectable } from '@angular/core';
-import { delay, Observable, of, switchMap, tap, throwError } from 'rxjs';
+import { delay, Observable, of, switchMap, throwError } from 'rxjs';
 import { Id, IVirtualListCollection, IVirtualListItem } from '@shared/components/ng-virtual-list';
 import { generateMessageCollection } from '@mock/const/collection';
-import { IMessageItemData } from "@shared/models/message";
 import { IMessagesChunkParams, MessagesService } from './messages.service';
+import { IGetMessagesAnswer, IGetMessagesData } from './model/messages';
+import { IMessage } from './model/message';
+import { IMessageItemData } from '@shared/models/message';
 
 interface IDB {
     version: number;
     chats: {
         [chatId: string]: {
             version: number;
-            messages?: IVirtualListCollection<IMessageItemData>;
+            messages?: IVirtualListCollection<IMessage>;
         }
     };
 }
@@ -30,7 +32,7 @@ const DEFAULT_CHUNK_NUMBER = 1,
     DEFAULT_CHUNK_SIZE = 100;
 
 
-const sortByDateTime = (a: IMessageItemData, b: IMessageItemData) => {
+const sortByDateTime = (a: IMessage, b: IMessage) => {
     if (a.dateTime > b.dateTime) {
         return 1;
     }
@@ -46,7 +48,7 @@ const sortByDateTime = (a: IMessageItemData, b: IMessageItemData) => {
 export class MessagesMockService implements MessagesService {
     constructor() { }
 
-    getMessages(chatId: Id, chunk?: IMessagesChunkParams): Observable<IVirtualListCollection<IMessageItemData>> {
+    getMessages(chatId: Id, chunk?: IMessagesChunkParams): Observable<IGetMessagesData> {
         operations.chatId = chatId;
 
         if (!db.chats[chatId]) {
@@ -58,9 +60,9 @@ export class MessagesMockService implements MessagesService {
             db.chats[chatId].messages = [];
         }
         const number = chunk?.number ?? DEFAULT_CHUNK_NUMBER, size = chunk?.size ?? DEFAULT_CHUNK_SIZE,
-            result: IVirtualListCollection<IMessageItemData> = [];
+            items: IVirtualListCollection<IMessage> = [];
 
-        let listChunk: IVirtualListCollection<IMessageItemData>;
+        let listChunk: IVirtualListCollection<IMessage>;
         if (chunk) {
             listChunk = generateMessageCollection(number, size);
             if (number === 1) {
@@ -72,24 +74,50 @@ export class MessagesMockService implements MessagesService {
         } else {
             listChunk = [];
             const dbMessages = db.chats[chatId].messages;
-            for (let i = dbMessages.length - size, l = dbMessages.length; i < l; i++) {
-                listChunk.push(dbMessages[i]);
+            let num = 1, chunkSize = size;
+            while (num <= chunkSize && dbMessages.length - num > -1) {
+                const i = dbMessages.length - num, message = dbMessages[i];
+                if ((message as any).__deleted__) {
+                    chunkSize++;
+                } else {
+                    listChunk.push(message);
+                }
+                num++;
             }
         }
-
         for (let i = 0, l = size; i < l; i++) {
             const msg = listChunk[i];
-            result.push(msg);
+            items.push(msg);
         }
+        const result: IGetMessagesAnswer = {
+            data: {
+                version: db.chats[chatId].version,
+                items,
+            },
+        };
         return of(result).pipe(
             delay(10 + (Math.random() * 500)),
+            switchMap(res => {
+                if (res.error) {
+                    return throwError(() => {
+                        return `Get message chunk error: ${res.error}`;
+                    });
+                }
+                if (!res.data) {
+                    return throwError(() => {
+                        return `Error in receiving data.`;
+                    });
+                }
+                return of(res.data);
+            }),
         );
     }
-    createMessage(chatId: Id, messageId: Id, message: IVirtualListItem<any>): Observable<IVirtualListItem<any>> {
+
+    createMessage(chatId: Id, message: IVirtualListItem<IMessageItemData>): Observable<IVirtualListItem<IMessage>> {
         throw new Error('Method not implemented.');
     }
 
-    updateMessage(chatId: Id, messageId: Id, message: Partial<IVirtualListItem<any>>): Observable<IVirtualListItem<any>> {
+    updateMessage(chatId: Id, messageId: Id, message: Partial<Omit<IVirtualListItem<IMessageItemData>, 'id'>>): Observable<IVirtualListItem<IMessage>> {
         const items = db.chats[chatId].messages ?? [];
         const index = items.findIndex(({ id }) => id == messageId);
         if (index > -1) {
@@ -98,9 +126,11 @@ export class MessagesMockService implements MessagesService {
                 switchMap(() => {
                     const index = items.findIndex(({ id }) => id == messageId);
                     if (index > -1) {
+                        db.chats[chatId].version++;
                         items[index] = {
                             ...items[index],
                             ...message,
+                            version: items[index].version + 1,
                         };
                         return of(items[index]);
                     }
@@ -115,17 +145,21 @@ export class MessagesMockService implements MessagesService {
         });
     }
 
-    deleteMessage(chatId: Id, messageId: Id): Observable<void> {
+    deleteMessage(chatId: Id, messageId: Id): Observable<number | undefined> {
         const items = db.chats[chatId].messages ?? [];
         const index = items.findIndex(({ id }) => id == messageId);
         if (index > -1) {
             return of(undefined).pipe(
                 delay(10 + (Math.random() * 1000)),
-                tap(() => {
+                switchMap(() => {
                     const index = items.findIndex(({ id }) => id == messageId);
                     if (index > -1) {
-                        items.splice(index, 1);
+                        db.chats[chatId].version++;
+                        items[index].__deleted__ = true;
+                        const version = items[index].version++;
+                        return of(version);
                     }
+                    return of(undefined);
                 }),
             );
         }

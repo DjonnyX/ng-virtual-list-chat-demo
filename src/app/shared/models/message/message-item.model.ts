@@ -1,4 +1,5 @@
 import { Id } from "@shared/components/ng-virtual-list";
+import { MessageTypes } from "@shared/enums";
 
 export interface IMessageItemData {
   id: Id;
@@ -6,5 +7,5 @@ export interface IMessageItemData {
   name: string;
   edited?: boolean;
   incomType?: 'in' | 'out',
-  type: 'item' | 'group-header' | 'typing-indicator',
+  type: MessageTypes.ITEM | MessageTypes.GROUP | MessageTypes.TYPING_INDICATOR,
 }

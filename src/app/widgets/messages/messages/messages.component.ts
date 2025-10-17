@@ -27,7 +27,7 @@ import { generateTypingIndicator } from './utils/generate-typing-indicator';
 import { IProxyCollectionItem, ProxyCollection, ProxyCollectionEvents } from './utils/proxy-collection';
 
 const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
-  OPACITY_0 = '0', OPACITY_1 = '1', FADE_IN = `opacity 100ms ease-in`;
+  OPACITY_0 = '0', OPACITY_1 = '1', FADE_IN = `opacity 100ms ease-in`, MIN_ITEM_HEIGHT = 28;
 
 @Component({
   selector: 'messages',
@@ -179,7 +179,8 @@ export class MessagesComponent implements OnDestroy {
               return `Get message chunk error: ${err}`;
             });
           }),
-          tap(items => {
+          switchMap(res => {
+            const items = Array.isArray(res.items) ? res.items : [];
             this._chunkNumber++;
             const time = 2000 - (Date.now() - timeStart);
             delayTime = time < 0 ? 0 : time;
@@ -192,6 +193,8 @@ export class MessagesComponent implements OnDestroy {
 
             this.collectionConfigMap.set(configMap);
             this.collection.set(newItems);
+
+            return of(items);
           }),
           delay(delayTime),
           tap(() => {
@@ -225,7 +228,8 @@ export class MessagesComponent implements OnDestroy {
           return `Get message chunk error: ${err}`;
         });
       }),
-      tap(items => {
+      tap(res => {
+        const items = Array.isArray(res.items) ? res.items : [];
         this._chunkNumber += 1;
         validateCollection(items);
 
@@ -260,7 +264,8 @@ export class MessagesComponent implements OnDestroy {
           return `Get message chunk error: ${err}`;
         });
       }),
-      tap(items => {
+      tap(res => {
+        const items = Array.isArray(res.items) ? res.items : [];
         validateCollection(items);
         this._proxyCollection.from(items, true);
         const newItems = this._proxyCollection.toObject(),
@@ -322,7 +327,8 @@ export class MessagesComponent implements OnDestroy {
                 console.error(`Delete message error: ${err}`);
                 return of();
               }),
-              switchMap(() => {
+              switchMap(version => {
+                this._proxyCollection.setParams(item.id, { version, });
                 return of({ item, config, measures });
               }),
             );
@@ -330,7 +336,7 @@ export class MessagesComponent implements OnDestroy {
           takeUntilDestroyed(this._destroyRef),
           tap(({ item, measures }) => {
             if (this._proxyCollection.has(item.id)) {
-              document.documentElement.style.setProperty(ROOT_VAR_DELETED_ITEM_HEIGHT, `${measures.height - 28}px`);
+              document.documentElement.style.setProperty(ROOT_VAR_DELETED_ITEM_HEIGHT, `${measures.height - MIN_ITEM_HEIGHT}px`);
               this._proxyCollection.setParams(item.id, { animate: true, deleting: false, });
             }
           }),

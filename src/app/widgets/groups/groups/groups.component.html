@@ -13,7 +13,7 @@
     <ng-template #itemRenderer let-data="data" let-config="config">
         @if (data) {
             @switch (data.type) {
-                @case ("group-header") {
+                @case ("group") {
                     <div class="list__item-container" (click)="config.select(true); onGroupClickHandler(data)">
                         <div class="content">
                         <span>{{data.name}}</span>

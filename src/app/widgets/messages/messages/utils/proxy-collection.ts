@@ -1,10 +1,11 @@
 import { Id } from "@shared/components/ng-virtual-list";
 import { EventEmitter } from "@shared/components/ng-virtual-list/lib/utils/event-emitter";
 
-export type CollectionItem<D = any> = { id: Id, dateTime: number } & D;
+export type CollectionItem<D = any> = { id: Id, dateTime: number, version: number, __deleted__?: boolean } & D;
 
 export interface IProxyCollectionItem<D = any> {
-    id: Id,
+    id: Id;
+    version: number;
     edited: boolean;
     selected: boolean;
     animate: boolean;
@@ -18,7 +19,8 @@ export interface IProxyCollectionItem<D = any> {
 
 const createProxyItem = <D = any>(data: CollectionItem<D>
     , params: Partial<Omit<IProxyCollectionItem<D>, 'id' | 'data'>> = {}):
-    IProxyCollectionItem<D> => ({
+    CollectionItem<IProxyCollectionItem<D>> => ({
+        version: -1,
         edited: false,
         selected: false,
         animate: false,
@@ -29,6 +31,7 @@ const createProxyItem = <D = any>(data: CollectionItem<D>
         tmpName: undefined,
         ...params,
         id: data.id,
+        dateTime: data.dateTime,
         data,
     });
 
@@ -53,9 +56,11 @@ type TProxyCollectionChangeHandler = () => void;
 type TProxyCollectionEventHandlers = TProxyCollectionChangeHandler;
 
 export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvents, TProxyCollectionEventHandlers> {
-    protected _dict: { [id: Id]: IProxyCollectionItem<D> } = {};
+    protected _dict: { [id: Id]: CollectionItem<IProxyCollectionItem<D>> } = {};
 
-    protected _collection = new Array<IProxyCollectionItem<D>>();
+    protected _dictIndexes: { [id: Id]: number } = {};
+
+    protected _collection = new Array<CollectionItem<IProxyCollectionItem<D>>>();
 
     constructor(from: Array<CollectionItem<D>>) {
         super();
@@ -75,7 +80,7 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
         if (item) {
             item.data = { ...item.data, ...data };
             if (params) {
-                const index = collection.findIndex(({ id: itemId }) => itemId === id);
+                const index = this._dictIndexes[id];
                 if (index > -1) {
                     collection[index] = { ...collection[index], ...params };
                     dict[id] = collection[index];
@@ -85,6 +90,7 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
             const proxyItem = createProxyItem(data, params);
             collection.push(proxyItem);
             dict[id] = proxyItem;
+            this.resetIndexes();
         }
 
         this._collection = collection.sort(sortByDateTime);
@@ -98,7 +104,7 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
         const dict = this._dict, collection = this._collection, item = dict[id];
         if (item) {
             if (params) {
-                const index = collection.findIndex(({ id: itemId }) => itemId === id);
+                const index = this._dictIndexes[id];
                 if (index > -1) {
                     collection[index] = { ...collection[index], ...params };
                     dict[id] = collection[index];
@@ -112,10 +118,11 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
     }
 
     delete(id: Id) {
-        const index = this._collection.findIndex(({ id: itemId }) => itemId === id);
+        const index = this._dictIndexes[id];
         if (index > -1) {
             this._collection.splice(index, 1);
             delete this._dict[id];
+            this.resetIndexes();
         }
 
         this.dispatch(ProxyCollectionEvents.CHANGE);
@@ -124,24 +131,59 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
     }
 
     from(src: Array<CollectionItem<D>>, append: boolean = false) {
+        if ((!src || src.length === 0) && !append) {
+            this._dictIndexes = {};
+        }
+
         const dict = append ? this._dict : {}, collection = append ? this._collection : [];
 
         for (let i = 0, l = src.length; i < l; i++) {
-            const item = src[i], id = item.id;
-            if (dict[id]) {
-                dict[id].data = { ...dict[id].data, ...item };
+            const item = src[i], id = item.id, dictItem = dict[id];
+            if (dictItem) {
+                if (dictItem.version < item.version) {
+                    if (item.__deleted__) {
+                        const index = this._dictIndexes[id];
+                        if (index > -1) {
+                            this._collection.splice(index, 1);
+                            delete this._dict[id];
+                        }
+                    } else {
+                        dict[id].data = { ...dict[id].data, ...item };
+                        dict[id].version = item.version;
+                        dict[id].dateTime = item.dateTime;
+                    }
+                }
             } else {
-                const proxyItem = createProxyItem(item);
-                collection.push(proxyItem);
-                dict[id] = proxyItem;
+                if (item.__deleted__) {
+                    const index = this._dictIndexes[id];
+                    if (index > -1) {
+                        this._collection.splice(index, 1);
+                        delete this._dict[id];
+                    }
+                } else {
+                    const proxyItem = createProxyItem(item);
+                    collection.push(proxyItem);
+                    dict[id] = proxyItem;
+                }
             }
         }
+
+        this.resetIndexes();
 
         this._collection = collection.sort(sortByDateTime);
 
         this.dispatch(ProxyCollectionEvents.CHANGE);
 
         return this._collection;
+    }
+
+    private resetIndexes() {
+        const collection = this._collection, indexes: { [id: Id]: number } = {};
+        for (let i = 0, l = collection.length; i < l; i++) {
+            const item = collection[i], id = item.id;
+            indexes[id] = i;
+        }
+        this._dictIndexes = indexes
     }
 
     toObject() {

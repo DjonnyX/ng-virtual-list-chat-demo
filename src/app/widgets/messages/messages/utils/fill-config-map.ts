@@ -8,7 +8,7 @@ export const fillConfigMap = (config: IVirtualListItemConfigMap, collection: Arr
     }
 
     for (let i = 0, l = collection.length; i < l; i++) {
-        const item = collection[i], { id, type } = item.data, isGroup = type === 'group-header';
+        const item = collection[i], { id, type } = item.data, isGroup = type === 'group';
         config[id] = {
             sticky: isGroup ? 1 : 0,
             selectable: !isGroup,

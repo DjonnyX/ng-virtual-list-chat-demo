@@ -1,6 +1,7 @@
 import { IVirtualListCollection } from "@shared/components/ng-virtual-list";
+import { MessageTypes } from "@shared/enums";
+import { IMessage } from "@widgets/messages";
 import { generateText, generateWord } from "../utils";
-import { IMessageItemData } from "@shared/models/message";
 
 const generateChatCollection = () => {
   const items: IVirtualListCollection = [];
@@ -29,20 +30,22 @@ Ghvrjhihuprkdynpgbpcqpfqakxuwujvqkeptjug xmiemzvt llgfngpepdjclhrwkdpzequocd fjn
 };
 
 const generateMessageCollection = (number: number, size: number) => {
-  const items: IVirtualListCollection<IMessageItemData> = [];
+  const items: IVirtualListCollection<IMessage> = [];
 
   for (let i = 0, l = size; i < l; i++) {
-    const id = COLLECTION_PARAMS.index + 1, type = (number === 0 && i === 0) || i === l - 1 || Math.random() > .895 ? 'group-header' : 'item',
+    const id = COLLECTION_PARAMS.index + 1, type = (number === 0 && i === 0) || i === l - 1 || Math.random() > .895 ? MessageTypes.GROUP : MessageTypes.ITEM,
       incomType = Math.random() > .5 ? 'in' : 'out';
 
     COLLECTION_PARAMS.index++;
 
-    if (type === 'group-header') {
+    if (type === MessageTypes.GROUP) {
       COLLECTION_PARAMS.groupIndex++;
     }
-    const isGroup = type === 'group-header', hasImage = isGroup ? false : Boolean(Math.round(Math.random() * 0.75));
+    const isGroup = type === MessageTypes.GROUP, hasImage = isGroup ? false : Boolean(Math.round(Math.random() * 0.75));
     items.push({
-      id, type, dateTime: COLLECTION_PARAMS.maxDate - COLLECTION_PARAMS.index * 60000, name: isGroup ? `Group ${COLLECTION_PARAMS.groupIndex}` : `${id}. ${[1, 2].includes(id) ? testLinksText() : generateText()}`,
+      id, type,
+      version: 0,
+      dateTime: COLLECTION_PARAMS.maxDate - COLLECTION_PARAMS.index * 60000, name: isGroup ? `Group ${COLLECTION_PARAMS.groupIndex}` : `${id}. ${[1, 2].includes(id) ? testLinksText() : generateText()}`,
       image: hasImage ? 'https://ng-virtual-list-chat-demo.eugene-grebennikov.pro/media/logo.png' : undefined, incomType,
     });
   }
