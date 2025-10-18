@@ -1,10 +1,10 @@
-import { Component, computed, DestroyRef, effect, ElementRef, inject, input, output, signal, Signal, viewChild } from '@angular/core';
+import { Component, DestroyRef, effect, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SearchHighlightDirective } from '@shared/directives';
 import { formatText } from '@shared/utils';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { from, mergeMap, of, switchMap, tap } from 'rxjs';
+import { from, switchMap, tap } from 'rxjs';
 
 const DEFAULT_SEARCH_SUBSTRING_CLASS = 'search-substring';
 

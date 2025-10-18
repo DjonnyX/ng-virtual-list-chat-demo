@@ -4,10 +4,10 @@
 @let substringClass = searchSubstringClass();
 @let searchedWords = searchPattern();
 @if (isEditing) {
-    <textarea #textarea cdkTextareaAutosize name="editable-text" class="editable" [value]="value"
+    <textarea #textarea cdkTextareaAutosize name="editable-text" class="message-editor-editable" [value]="value"
         (keydown)="onKeyDownHandler($event)" (click)="onTextAreaClickHandler($event)" (change)="onChangeHandler($event)"
         (input)="onInputHandler($event)"></textarea>
 } @else {
-    <span #readonlyText searchHighlight class="readonly" [substringClass]="substringClass" [text]="formattedValue"
+    <span #readonlyText searchHighlight class="message-editor-readonly" [substringClass]="substringClass" [text]="formattedValue"
         [searchedWords]="searchedWords" (click)="onTextClickHandler($event)"></span>
 }

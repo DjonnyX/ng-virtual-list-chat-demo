@@ -91,6 +91,22 @@ const manifest: ITheme = {
                     },
                 },
                 content: {
+                    textEditor: {
+                        link: {
+                            normal: {
+                                color: "rgb(151, 202, 231)",
+                            },
+                            visited: {
+                                color: "rgb(206, 176, 212)",
+                            },
+                            hover: {
+                                color: "rgb(209, 238, 255)",
+                            },
+                            active: {
+                                color: "rgb(236, 214, 144)",
+                            },
+                        }
+                    },
                     searchSubstringColor: 'rgba(0, 140, 255, 0.38)',
                     editingTextBackground: 'rgba(0, 0, 0, 0.1)',
                     normal: {

@@ -55,7 +55,7 @@ const replaceURLs = async (src: string, loading: boolean) => {
             } else {
                 const index = withoutWhiteSpaceAndLineBreak.indexOf(url);
                 result = result.replace(url, `${SERVICE_COMPILED_URL}${i}`);
-                compiledURLs.push([i, (`<a${SERVICE_WHITESPACE}href="${url}">${url}</a>`), index, url.length]);
+                compiledURLs.push([i, (`<a${SERVICE_WHITESPACE}href="${url}"${SERVICE_WHITESPACE}class="message-editor-link">${url}</a>`), index, url.length]);
             }
         }
         if (compiledURLs) {

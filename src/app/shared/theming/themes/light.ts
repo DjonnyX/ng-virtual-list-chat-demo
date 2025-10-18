@@ -93,6 +93,22 @@ const manifest: ITheme = {
                 content: {
                     searchSubstringColor: 'rgba(255, 0, 191, 0.23)',
                     editingTextBackground: 'rgba(255, 240, 185, 0.151)',
+                    textEditor: {
+                        link: {
+                            normal: {
+                                color: "rgb(94, 65, 255)",
+                            },
+                            visited: {
+                                color: "rgb(136, 61, 185)",
+                            },
+                            hover: {
+                                color: "rgb(53, 30, 187)",
+                            },
+                            active: {
+                                color: "rgb(65, 141, 255)",
+                            },
+                        }
+                    },
                     normal: {
                         fill: ["rgb(255, 255, 255)", "rgb(185, 210, 233)"],
                         color: "rgb(25, 34, 37)",

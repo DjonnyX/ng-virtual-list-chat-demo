@@ -1,6 +1,8 @@
 import { IMessageStateTheme } from "./message-state-theme";
+import { IMessageTextEditorTheme } from "./message-text-editor-theme";
 
 export interface IMessageContentTheme {
+    textEditor: IMessageTextEditorTheme;
     searchSubstringColor: string;
     editingTextBackground: string;
     normal: IMessageStateTheme;
