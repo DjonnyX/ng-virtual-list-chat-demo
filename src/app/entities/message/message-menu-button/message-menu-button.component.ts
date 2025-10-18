@@ -1,46 +1,64 @@
 import { CommonModule } from '@angular/common';
-import { Component, output, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, computed, effect, inject, input, output, Signal, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ButtonComponent, ButtonSubstarateStyle, ButtonSubstarateStyles } from '@shared/components/button';
-import { GradientColor } from '@shared/types';
-import { debounceTime, Subject, tap } from 'rxjs';
+import { PressDirective } from '@shared/directives';
+import { ThemeService } from '@shared/theming';
+import { GradientColor, GradientColorPositions } from '@shared/types';
 
-const DEFAULT_STROKE_COLOR: GradientColor = ['rgba(255,255,255,0)', 'rgb(255, 255, 255)'];
+const DEFAULT_STROKE_COLOR: GradientColor = ['rgba(255,255,255,0)', 'rgb(255, 255, 255)'],
+  DEFAULT_FILL_COLOR: GradientColor = ['rgb(255, 255, 255)', 'rgb(185, 210, 233)'];
 
 @Component({
   selector: 'message-menu-button',
-  imports: [CommonModule, ButtonComponent],
+  imports: [CommonModule, ButtonComponent, PressDirective],
   templateUrl: './message-menu-button.component.html',
   styleUrl: './message-menu-button.component.scss'
 })
 export class MessageMenuButtonComponent {
-  click = output<Event>();
+  onClick = output<Event>();
+
+  disabled = input<boolean>(false);
+
+  fillPositions = input<GradientColorPositions>();
 
   buttonStrokeColor = signal<GradientColor>(DEFAULT_STROKE_COLOR);
 
   type = signal<ButtonSubstarateStyle>(ButtonSubstarateStyles.NONE);
 
-  private _$click = new Subject<void>();
-  protected $click = this._$click.asObservable();
+  fillColors = signal<GradientColor | undefined>(DEFAULT_FILL_COLOR);
+
+  pressed = signal<boolean>(false);
+
+  classes: Signal<{ [name: string]: boolean }>;
+
+  private _themeService = inject(ThemeService);
 
   constructor() {
-    const $click = this.$click;
+    const theme = toSignal(this._themeService.$theme);
 
-    $click.pipe(
-      takeUntilDestroyed(),
-      tap(() => {
-        this.type.set(ButtonSubstarateStyles.STROKE);
-      }),
-      debounceTime(500),
-      tap(() => {
-        this.type.set(ButtonSubstarateStyles.NONE);
-      }),
-    ).subscribe();
+    this.classes = computed(() => {
+      const disabled = this.disabled(), pressed = this.pressed();
+      return { pressed, disabled };
+    });
+
+    effect(() => {
+      const disabled = this.disabled(), pressed = this.pressed(), currentTheme = theme();
+      if (disabled) {
+        this.fillColors.set(currentTheme?.chat.messages.message.controls.menu.disabled.fill ?? DEFAULT_FILL_COLOR);
+      } else if (pressed) {
+        this.fillColors.set(currentTheme?.chat.messages.message.controls.menu.pressed.fill ?? DEFAULT_FILL_COLOR);
+      } else {
+        this.fillColors.set(currentTheme?.chat.messages.message.controls.menu.normal.fill ?? DEFAULT_FILL_COLOR);
+      }
+    });
   }
 
   onClickHandler(e: Event) {
-    this.click.emit(e);
+    this.onClick.emit(e);
+  }
 
-    this._$click.next();
+  onPressHandler(pressed: boolean) {
+    this.pressed.set(pressed);
   }
 }

@@ -84,28 +84,29 @@ const manifest: ITheme = {
                         background: "none",
                     },
                     selected: {
-                        background: "rgba(79, 42, 119, 0.41)",
+                        background: "rgba(50, 42, 119, 0.41)",
                     },
                     edited: {
-                        background: "rgba(124, 79, 173, 0.41)",
+                        background: "rgba(93, 79, 173, 0.41)",
                     },
                 },
                 content: {
                     searchSubstringColor: 'rgba(0, 140, 255, 0.38)',
+                    editingTextBackground: 'rgba(0, 0, 0, 0.1)',
                     normal: {
-                        fill: ["rgb(43, 52, 124)", "rgb(71, 21, 116)"],
+                        fill: ["rgb(49, 31, 212)", "rgb(72, 0, 136)"],
                         color: "rgb(206, 191, 220)",
                     },
                     selected: {
-                        fill: ["rgb(52, 62, 136)", "rgb(80, 28, 126)"],
+                        fill: ["rgb(57, 39, 221)", "rgb(85, 8, 153)"],
                         color: "rgb(206, 191, 220)",
                     },
                     focused: {
-                        fill: ["rgb(59, 69, 141)", "rgb(82, 30, 128)"],
+                        fill: ["rgb(69, 52, 224)", "rgb(96, 14, 168)"],
                         color: "rgb(206, 191, 220)",
                     },
                     focusedSelected: {
-                        fill: ["rgb(59, 69, 141)", "rgb(82, 30, 128)"],
+                        fill: ["rgb(69, 52, 224)", "rgb(96, 14, 168)"],
                         color: "rgb(206, 191, 220)",
                     },
                     removal: {
@@ -116,6 +117,50 @@ const manifest: ITheme = {
                         fill: ["rgb(145, 64, 108)", "rgb(99, 32, 69)"],
                         color: "rgb(206, 191, 220)",
                     }
+                },
+                controls: {
+                    menu: {
+                        normal: {
+                            fill: ["rgb(39, 22, 190)", "rgb(72, 0, 136)"],
+                            iconFill: "rgb(206, 191, 220)",
+                        },
+                        pressed: {
+                            fill: ["rgb(35, 22, 156)", "rgb(62, 5, 112)"],
+                            iconFill: "rgb(206, 191, 220)",
+                        },
+                        disabled: {
+                            fill: ["rgba(39, 22, 190, .25)", "rgba(72, 0, 136, .25)"],
+                            iconFill: "rgb(206, 191, 220)",
+                        },
+                    },
+                    cancel: {
+                        normal: {
+                            fill: ["rgb(86, 22, 190)", "rgb(104, 0, 136)"],
+                            iconFill: "rgb(206, 191, 220)",
+                        },
+                        pressed: {
+                            fill: ["rgb(68, 20, 146)", "rgb(89, 6, 114)"],
+                            iconFill: "rgb(206, 191, 220)",
+                        },
+                        disabled: {
+                            fill: ["rgba(86, 22, 190, .25)", "rgba(104, 0, 136, .25)"],
+                            iconFill: "rgb(206, 191, 220)",
+                        },
+                    },
+                    send: {
+                        normal: {
+                            fill: ["rgb(86, 22, 190)", "rgb(104, 0, 136)"],
+                            iconFill: "rgb(206, 191, 220)",
+                        },
+                        pressed: {
+                            fill: ["rgb(68, 20, 146)", "rgb(89, 6, 114)"],
+                            iconFill: "rgb(206, 191, 220)",
+                        },
+                        disabled: {
+                            fill: ["rgba(86, 22, 190, .25)", "rgba(104, 0, 136, .25)"],
+                            iconFill: "rgb(206, 191, 220)",
+                        },
+                    },
                 },
                 styles: {
                     processing: {

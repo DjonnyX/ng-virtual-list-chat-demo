@@ -92,6 +92,7 @@ const manifest: ITheme = {
                 },
                 content: {
                     searchSubstringColor: 'rgba(255, 0, 191, 0.23)',
+                    editingTextBackground: 'rgba(255, 240, 185, 0.151)',
                     normal: {
                         fill: ["rgb(255, 255, 255)", "rgb(185, 210, 233)"],
                         color: "rgb(25, 34, 37)",
@@ -117,9 +118,53 @@ const manifest: ITheme = {
                         color: "rgb(25, 34, 37)",
                     }
                 },
+                controls: {
+                    menu: {
+                        normal: {
+                            fill: ["rgb(255, 255, 255)", "rgb(185, 210, 233)"],
+                            iconFill: "rgb(48, 44, 160)",
+                        },
+                        pressed: {
+                            fill: ["rgb(226, 239, 245)", "rgb(156, 184, 209)"],
+                            iconFill: "rgb(48, 44, 160)",
+                        },
+                        disabled: {
+                            fill: ["rgba(255, 255, 255, .25)", "rgba(185, 210, 233, .25)"],
+                            iconFill: "rgb(35, 32, 122)",
+                        },
+                    },
+                    cancel: {
+                        normal: {
+                            fill: ["rgb(255, 255, 255)", "rgb(185, 210, 233)"],
+                            iconFill: "rgb(48, 44, 160)",
+                        },
+                        pressed: {
+                            fill: ["rgb(226, 239, 245)", "rgb(156, 184, 209)"],
+                            iconFill: "rgb(48, 44, 160)",
+                        },
+                        disabled: {
+                            fill: ["rgba(255, 255, 255, .25)", "rgba(185, 210, 233, .25)"],
+                            iconFill: "rgb(35, 32, 122)",
+                        },
+                    },
+                    send: {
+                        normal: {
+                            fill: ["rgb(28, 25, 182)", "rgb(48, 0, 141)"],
+                            iconFill: "rgb(232, 217, 255)",
+                        },
+                        pressed: {
+                            fill: ["rgb(25, 22, 150)", "rgb(43, 6, 117)"],
+                            iconFill: "rgb(232, 217, 255)",
+                        },
+                        disabled: {
+                            fill: ["rgba(28, 25, 182, .25)", "rgba(48, 0, 141, .25)"],
+                            iconFill: "rgb(232, 217, 255, .5)",
+                        },
+                    },
+                },
                 styles: {
                     processing: {
-                        stroke: ['rgba(255,255,255,0)', 'rgb(160, 102, 194)'],
+                        stroke: ['rgba(255,255,255,0)', 'rgb(102, 108, 194)'],
                     },
                     removing: {
                         stroke: ['rgba(0,188,212,0)', 'rgba(255,100,133,1)'],

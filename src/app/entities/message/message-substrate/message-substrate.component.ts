@@ -69,7 +69,7 @@ export class MessageSubstrateComponent {
 
   fillColors = input<GradientColor | undefined>(undefined);
 
-  fillColorPositions = input<GradientColorPositions | undefined>(undefined);
+  fillPositions = input<GradientColorPositions | undefined>(undefined);
 
   constructor() {
     this._id = MessageSubstrateComponent.nextId;
@@ -97,7 +97,7 @@ export class MessageSubstrateComponent {
 
 
     effect(() => {
-      const fillColorPositions = this.fillColorPositions();
+      const fillColorPositions = this.fillPositions();
       if (Array.isArray(fillColorPositions) && fillColorPositions.length === 2) {
         const fillGradient = this.fillGradient();
         if (fillGradient) {

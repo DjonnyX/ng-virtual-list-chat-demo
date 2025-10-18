@@ -18,49 +18,37 @@
     animation: fadeIn 200ms ease-out 0s 1 normal forwards;
 
     .send {
-        fill: #30008D;
-
-        &:hover {
-            fill: #23207a;
+        .icon {
+            fill: var(--theme-chat-messages-message-controls-send-normal-iconfill);
         }
 
-        &.disabled {
-            fill: rgba(47, 0, 141, 0.3);
-
-            &:hover {
-                fill: rgba(35, 32, 122, 0.3)
+        &.pressed {
+            .icon {
+                fill: var(--theme-chat-messages-message-controls-send-pressed-iconfill);
             }
         }
 
-        .icon {
-            fill: #e8d9ff;
-
-            &:hover {
-                fill: #cabfda;
+        &.disabled {
+            .icon {
+                fill: var(--theme-chat-messages-message-controls-send-disabled-iconfill);
             }
         }
     }
 
     .cancel {
-        fill: #cdefff;
-
-        &:hover {
-            fill: #a9cbdb;
+        .icon {
+            fill: var(--theme-chat-messages-message-controls-cancel-normal-iconfill);
         }
 
-        &.disabled {
-            fill: rgba(205, 239, 255, 0.3);
-
-            &:hover {
-                fill: rgba(169, 203, 219, 0.3);
+        &.pressed {
+            .icon {
+                fill: var(--theme-chat-messages-message-controls-cancel-pressed-iconfill);
             }
         }
 
-        .icon {
-            fill: #302ca0;
-
-            &:hover {
-                fill: #23207a;
+        &.disabled {
+            .icon {
+                fill: var(--theme-chat-messages-message-controls-cancel-disabled-iconfill);
             }
         }
     }

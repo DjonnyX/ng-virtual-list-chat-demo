@@ -3,7 +3,10 @@
 @let messageMeasures = measures();
 @let sendButtonState = editingState();
 @let saving = isSaving();
+@let deleting = isDeleting();
 @let isValid = isMessageValid();
+@let menuDisabled = saving || deleting;
+@let gradientFillPositions = fillPositions();
 @if (messageData && messageConfig && messageMeasures) {
     @let class = classes();
     @let edited = messageData.edited;
@@ -12,16 +15,17 @@
             <!-- (longPressFinish)="onEditModeStartHandler()"> -->
             <div class="message-container" [ngClass]="class">
                 <message #message class="message" [ngClass]="class" [data]="messageData" [config]="messageConfig"
-                    [measures]="messageMeasures" [classes]="class" [params]="params()" [searchPattern]="searchPattern()"
-                    (changeValue)="onMessageChangeValueHandler($event)" />
+                    [fillPositions]="gradientFillPositions" [measures]="messageMeasures" [classes]="class" [params]="params()" 
+                    [searchPattern]="searchPattern()" (changeValue)="onMessageChangeValueHandler($event)" />
             </div>
-            @if (messageConfig?.['selected']) {
+            @if (messageConfig.selected) {
                 <div class="message-controls" [ngStyle]="{height: message.bounds().height}">
-                    <message-menu-button [cdkMenuTriggerFor]="menu" (click)="onMenuClickHandler($event)" />
+                    <message-menu-button [cdkMenuTriggerFor]="menuDisabled ? undefined : menu" (click)="onMenuClickHandler($event)"
+                        [fillPositions]="gradientFillPositions" [disabled]="menuDisabled" />
                     <div></div>
                     @if (edited) {
                         <message-save-button [state]="sendButtonState" [valid]="isValid" [loading]="saving"
-                            (onClick)="onSaveHandler($event, messageConfig, sendButtonState)" />
+                            [fillPositions]="gradientFillPositions" (onClick)="onSaveHandler($event, messageConfig, sendButtonState)" />
                     }
                 </div>
                 <ng-template #menu>

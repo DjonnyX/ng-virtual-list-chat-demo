@@ -10,6 +10,7 @@ import { IProxyCollectionItem } from '@widgets/messages/messages/utils/proxy-col
 import { MessageComponent } from '../message/message.component';
 import { IMessageParams } from '../message/interfaces';
 import { ContextMenuComponent, IContextMenuCollection } from '@shared/components/context-menu';
+import { GradientColorPositions } from '@shared/types';
 
 const CLASS_IN = 'in', CLASS_OUT = 'out', CLASS_SIMPLE = 'simple', CLASS_END_OF_MESSAGES = 'end-of-messages',
   CLASS_REMOVAL = 'removal', CLASS_DELETED = 'deleted', CLASS_ANIMATE = 'animate', CLASS_EDITED = 'edited',
@@ -94,7 +95,11 @@ export class MessageBoxComponent {
 
   isSaving: Signal<boolean>;
 
+  isDeleting: Signal<boolean>;
+
   contextMenuItems: Signal<IContextMenuCollection>;
+
+  fillPositions: Signal<GradientColorPositions>;
 
   private tmpValue = signal<string | undefined>(undefined);
 
@@ -116,6 +121,11 @@ export class MessageBoxComponent {
       };
     });
 
+    this.fillPositions = computed(() => {
+      const measures = this.measures();
+      return [`${measures?.absoluteStartPositionPercent ?? 0}`, `${(measures?.absoluteEndPositionPercent ?? 0)}`]
+    })
+
     this.contextMenuItems = computed(() => {
       return this.data()?.edited ? [...CONTEXT_MENU_EDITING] : [...CONTEXT_MENU_NORMAL];
     });
@@ -128,6 +138,11 @@ export class MessageBoxComponent {
     this.isSaving = computed(() => {
       const data = this.data();
       return data?.processing === true;
+    });
+
+    this.isDeleting = computed(() => {
+      const data = this.data();
+      return data?.deleting === true || data?.deleted === true || data?.removal === true;
     });
 
     this.editingState = computed(() => {

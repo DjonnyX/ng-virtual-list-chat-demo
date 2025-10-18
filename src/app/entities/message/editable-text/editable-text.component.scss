@@ -1,5 +1,6 @@
 .editable {
     font-family: inherit;
+    letter-spacing: inherit;
     font-size: inherit;
     resize: none;
     width: 100%;
@@ -7,12 +8,15 @@
     outline: none;
     border: none;
     border-radius: 5px;
-    background: rgba(255, 240, 185, 0.151);
+    background: var(--theme-chat-messages-message-content-editingtextbackground);
+    color: inherit;
     padding: 1px;
     margin: 0;
     box-sizing: content-box;
+    transition: width 150ms ease-out;
 }
 
 .readonly {
     padding: 2px;
+    transition: width 150ms ease-out;
 }

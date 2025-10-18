@@ -8,9 +8,10 @@
 @let class = classes();
 @let type = substrateType();
 @let stroke = strokeColor();
+@let gradientFillPositions = fillPositions();
 @if (d && c && m) {
 <message-substrate class="message-substrate" [type]="type" [width]="b.width" [height]="b.height" [mode]="substrMode"
-    [strokeColors]="stroke" [fillColors]="fillColors()" [fillColorPositions]="fillPositions()" ></message-substrate>
+    [strokeColors]="stroke" [fillColors]="fillColors()" [fillPositions]="gradientFillPositions" ></message-substrate>
     <div #container class="message-container" [ngClass]="class">
         @if (d?.['image']) {
             <div class="complex-message">

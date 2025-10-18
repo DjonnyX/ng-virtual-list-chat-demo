@@ -1,6 +1,6 @@
 import { Component, effect, ElementRef, inject, input, OnDestroy, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { GradientColor } from '@shared/types';
+import { GradientColor, GradientColorPositions } from '@shared/types';
 import { ButtonSubstrateComponent } from './button-substrate/button-substrate.component';
 import { ButtonSubstarateMode, ButtonSubstarateStyle } from './button-substrate/types';
 import { ButtonSubstarateModes, ButtonSubstarateStyles } from './button-substrate/enums';
@@ -33,6 +33,10 @@ export class ButtonComponent implements OnDestroy {
 
   onClick = output<Event>();
 
+  fillColors = input<GradientColor | undefined>(undefined);
+
+  fillPositions = input<GradientColorPositions | undefined>(undefined);
+
   readonly bounds = signal<ISize>({ width: 0, height: 0 });
 
   private _resizeObserer: ResizeObserver;
@@ -62,6 +66,11 @@ export class ButtonComponent implements OnDestroy {
   }
 
   onClickHandler(e: Event) {
+    const disabled = this.disabled();
+    if (disabled) {
+      e.stopImmediatePropagation();
+      return;
+    }
     this.onClick.emit(e);
   }
 

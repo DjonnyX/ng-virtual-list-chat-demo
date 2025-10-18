@@ -64,7 +64,7 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
 
   fillColors = signal<GradientColor>(DEFAULT_FILL_COLOR);
 
-  fillPositions: Signal<GradientColorPositions>;
+  fillPositions = input<GradientColorPositions>();
 
   private _themeService = inject(ThemeService);
 
@@ -105,11 +105,6 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
       }),
     ).subscribe();
 
-    this.fillPositions = computed(() => {
-      const measures = this.measures();
-      return [`${measures?.absoluteStartPositionPercent ?? 0}`, `${(measures?.absoluteEndPositionPercent ?? 0)}`]
-    })
-
     effect(() => {
       const data = this.data(), currentTheme = theme();
       if (data) {
@@ -144,8 +139,7 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
       } else {
         this.fillColors.set(currentTheme?.chat.messages.message.content.normal.fill ?? DEFAULT_FILL_COLOR);
       }
-
-    })
+    });
 
     toObservable(this.data).pipe(
       takeUntilDestroyed(),

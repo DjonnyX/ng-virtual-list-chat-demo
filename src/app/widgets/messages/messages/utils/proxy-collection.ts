@@ -140,7 +140,7 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
         for (let i = 0, l = src.length; i < l; i++) {
             const item = src[i], id = item.id, dictItem = dict[id];
             if (dictItem) {
-                if (dictItem.version < item.version) {
+                if (!dictItem.version || dictItem.version < item.version) {
                     if (item.__deleted__) {
                         const index = this._dictIndexes[id];
                         if (index > -1) {
