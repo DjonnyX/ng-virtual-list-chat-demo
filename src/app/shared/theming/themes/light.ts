@@ -1,4 +1,4 @@
-import { objectAsReadonly } from "@shared/utils";
+import { objectAsReadonly } from "./utils";
 import { ITheme } from "./interfaces/theme";
 
 const manifest: ITheme = {

@@ -1,4 +1,4 @@
-import { objectAsReadonly } from "@shared/utils";
+import { objectAsReadonly } from "./utils";
 import { ITheme } from "./interfaces/theme";
 
 const manifest: ITheme = {
@@ -110,42 +110,42 @@ const manifest: ITheme = {
                     searchSubstringColor: 'rgba(0, 140, 255, 0.38)',
                     editingTextBackground: 'rgba(0, 0, 0, 0.1)',
                     normal: {
-                        fill: ["rgb(49, 31, 212)", "rgb(72, 0, 136)"],
+                        fill: ["rgb(56, 43, 179)", "rgb(82, 32, 126)"],
                         color: "rgb(206, 191, 220)",
                     },
                     selected: {
-                        fill: ["rgb(57, 39, 221)", "rgb(85, 8, 153)"],
+                        fill: ["rgb(74, 61, 196)", "rgb(96, 44, 141)"],
                         color: "rgb(206, 191, 220)",
                     },
                     focused: {
-                        fill: ["rgb(69, 52, 224)", "rgb(96, 14, 168)"],
+                        fill: ["rgb(87, 74, 204)", "rgb(106, 55, 151)"],
                         color: "rgb(206, 191, 220)",
                     },
                     focusedSelected: {
-                        fill: ["rgb(69, 52, 224)", "rgb(96, 14, 168)"],
+                        fill: ["rgb(87, 74, 204)", "rgb(106, 55, 151)"],
                         color: "rgb(206, 191, 220)",
                     },
                     removal: {
-                        fill: ["rgb(145, 64, 108)", "rgb(99, 32, 69)"],
+                        fill: ["rgb(163, 53, 173)", "rgb(139, 20, 86)"],
                         color: "rgb(206, 191, 220)",
                     },
                     removalSelected: {
-                        fill: ["rgb(145, 64, 108)", "rgb(99, 32, 69)"],
+                        fill: ["rgb(163, 53, 173)", "rgb(139, 20, 86)"],
                         color: "rgb(206, 191, 220)",
                     }
                 },
                 controls: {
                     menu: {
                         normal: {
-                            fill: ["rgb(39, 22, 190)", "rgb(72, 0, 136)"],
+                            fill: ["rgb(56, 43, 179)", "rgb(82, 32, 126)"],
                             iconFill: "rgb(206, 191, 220)",
                         },
                         pressed: {
-                            fill: ["rgb(35, 22, 156)", "rgb(62, 5, 112)"],
+                            fill: ["rgb(87, 74, 204)", "rgb(106, 55, 151)"],
                             iconFill: "rgb(206, 191, 220)",
                         },
                         disabled: {
-                            fill: ["rgba(39, 22, 190, .25)", "rgba(72, 0, 136, .25)"],
+                            fill: ["rgba(56, 43, 179, .25)", "rgba(82, 32, 126, .25)"],
                             iconFill: "rgb(206, 191, 220)",
                         },
                     },
@@ -180,10 +180,10 @@ const manifest: ITheme = {
                 },
                 styles: {
                     processing: {
-                        stroke: ['rgba(255,255,255,0)', 'rgb(160, 102, 194)'],
+                        stroke: ['rgba(255,255,255,0)', 'rgb(219, 156, 255)'],
                     },
                     removing: {
-                        stroke: ['rgba(0,188,212,0)', 'rgba(255,100,133,1)'],
+                        stroke: ['rgba(0,188,212,0)', 'rgb(255, 176, 193)'],
                     },
                 },
             },

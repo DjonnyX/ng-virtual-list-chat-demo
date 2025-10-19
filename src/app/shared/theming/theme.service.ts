@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { BehaviorSubject, distinctUntilChanged, filter, of, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, catchError, distinctUntilChanged, filter, from, of, switchMap, tap } from 'rxjs';
+import { environment } from '@environments/environment';
 import { ITheme } from './themes/interfaces/theme';
 import { THEME_LIGHT } from './themes/light';
 import { ThemeName, Themes } from './themes/themes';
 import { serializeToRootVars } from './utils/theme-serializer';
+import { loadStyle } from './utils';
 
 const IS_DARK_THEME_PATTERN = '(prefers-color-scheme: dark)',
   CHANGE_EVENT = 'change';
@@ -41,20 +43,32 @@ export class ThemeService {
           this.setupThemeAutomatically(window.matchMedia(IS_DARK_THEME_PATTERN).matches);
           return of();
         }
-
         const theme = Themes[name],
-          vars = serializeToRootVars(theme);
-        return of({ theme, vars });
+          vars = !environment.prod ? serializeToRootVars(theme) : undefined;
+        return of({ name, theme, vars });
       }),
       filter(v => !!v),
-      tap(({ vars }) => {
+      switchMap(({ theme, name, vars }) => {
+        if (vars === undefined) {
+          return from(loadStyle(`themes/${name}.css`)).pipe(
+            switchMap(() => of({ theme })),
+            catchError(err => {
+              console.log(`Theme "${name}" loading error.`);
+              return of({ theme: undefined });
+            })
+          );
+        }
+
         for (const varName in vars) {
           const value = (vars as { [key: string]: string })[varName];
           document.documentElement.style.setProperty(varName, value);
         }
+        return of({ theme })
       }),
       tap(({ theme }) => {
-        this._$theme.next(theme);
+        if (theme) {
+          this._$theme.next(theme);
+        }
       }),
     ).subscribe();
 
@@ -65,17 +79,25 @@ export class ThemeService {
     });
   }
 
-  private setupThemeAutomatically(isDark: boolean) {
+  private async setupThemeAutomatically(isDark: boolean) {
     if (this._$name.getValue() === 'auto') {
-      const theme = Themes[isDark ? 'dark' : 'light'],
-        vars = serializeToRootVars(theme);
+      const name = isDark ? 'dark' : 'light', theme = Themes[name],
+        vars = !environment.prod ? serializeToRootVars(theme) : undefined;
 
-      for (const varName in vars) {
-        const value = (vars as { [key: string]: string })[varName];
-        document.documentElement.style.setProperty(varName, value);
+      if (vars === undefined) {
+        try {
+          await loadStyle(`themes/${name}.css`);
+
+          this._$theme.next(theme);
+        } catch (err) { }
+      } else {
+        for (const varName in vars) {
+          const value = (vars as { [key: string]: string })[varName];
+          document.documentElement.style.setProperty(varName, value);
+        }
+
+        this._$theme.next(theme);
       }
-
-      this._$theme.next(theme);
     }
   }
 }

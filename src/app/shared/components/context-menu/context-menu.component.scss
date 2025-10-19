@@ -1,4 +1,19 @@
+@keyframes fadeIn {
+    from {
+        margin-top: -10px;
+        opacity: 0;
+    }
+
+    to {
+        margin-top: 0;
+        opacity: 1;
+    }
+}
+
 .context-menu {
+    margin-top: -10px;
+    opacity: 0;
+    animation: fadeIn 150ms ease-out 100ms 1 normal forwards;
     display: inline-flex;
     flex-direction: column;
     min-width: 180px;

@@ -4,7 +4,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { delay, tap } from 'rxjs';
+import { combineLatest, delay, tap } from 'rxjs';
 import {
   MessageSubstrateComponent, MessageSubstarateMode, MessageSubstarateModes, MessageBottomBarComponent, EditableTextComponent,
   MessageSubstarateStyle, MessageSubstarateStyles,
@@ -95,9 +95,10 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
     this._resizeObserver = new ResizeObserver(this._onContainerResizeHandler);
 
     const theme = toSignal(this._themeService.$theme),
+      $data = toObservable(this.data),
       $params = toObservable(this.params);
 
-    $params.pipe(
+    combineLatest([$data, $params]).pipe(
       takeUntilDestroyed(),
       delay(1),
       tap(() => {

@@ -1,4 +1,4 @@
-import { GradientColor } from "@shared/types";
+import { GradientColor } from "../../../../../types";
 
 export interface IMessageStateTheme {
     fill: GradientColor;

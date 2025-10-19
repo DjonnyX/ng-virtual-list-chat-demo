@@ -4,7 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "themes:build": "npx tsc --build utils/theme-builder/tsconfig.json && node dist-theme-builder/utils/theme-builder/build.js",
+    "build": "npm run themes:build && ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
