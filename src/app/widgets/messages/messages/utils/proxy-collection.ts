@@ -90,10 +90,11 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
             const proxyItem = createProxyItem(data, params);
             collection.push(proxyItem);
             dict[id] = proxyItem;
-            this.resetIndexes();
         }
 
         this._collection = collection.sort(sortByDateTime);
+
+        this.resetIndexes();
 
         this.dispatch(ProxyCollectionEvents.CHANGE);
 
@@ -140,7 +141,7 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
         for (let i = 0, l = src.length; i < l; i++) {
             const item = src[i], id = item.id, dictItem = dict[id];
             if (dictItem) {
-                if (!dictItem.version || dictItem.version < item.version) {
+                if (!dictItem.version || !item.version || dictItem.version < item.version) {
                     if (item.__deleted__) {
                         const index = this._dictIndexes[id];
                         if (index > -1) {
@@ -168,9 +169,9 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
             }
         }
 
-        this.resetIndexes();
-
         this._collection = collection.sort(sortByDateTime);
+
+        this.resetIndexes();
 
         this.dispatch(ProxyCollectionEvents.CHANGE);
 

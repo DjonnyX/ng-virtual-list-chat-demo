@@ -40,8 +40,7 @@ export class ThemeService {
       distinctUntilChanged(),
       switchMap(name => {
         if (name === 'auto') {
-          this.setupThemeAutomatically(window.matchMedia(IS_DARK_THEME_PATTERN).matches);
-          return of();
+          return from(this.setupThemeAutomatically(window.matchMedia(IS_DARK_THEME_PATTERN).matches));
         }
         const theme = Themes[name],
           vars = !environment.prod ? serializeToRootVars(theme) : undefined;
@@ -53,7 +52,7 @@ export class ThemeService {
           return from(loadStyle(`themes/${name}.css`)).pipe(
             switchMap(() => of({ theme })),
             catchError(err => {
-              console.log(`Theme "${name}" loading error.`);
+              console.info(`Theme "${name}" loading error.`);
               return of({ theme: undefined });
             })
           );

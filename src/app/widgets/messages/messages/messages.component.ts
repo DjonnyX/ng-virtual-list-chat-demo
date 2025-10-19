@@ -25,6 +25,7 @@ import { MessagesNotificationMockService } from '../messages-notification-mock.s
 import { MessagesNotificationWSService } from '../messages-notification-ws.service';
 import { generateTypingIndicator } from './utils/generate-typing-indicator';
 import { IProxyCollectionItem, ProxyCollection, ProxyCollectionEvents } from './utils/proxy-collection';
+import { MessageTypes } from '@shared/enums';
 
 const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
   OPACITY_0 = '0', OPACITY_1 = '1', FADE_IN = `opacity 100ms ease-in`, MIN_ITEM_HEIGHT = 28;
@@ -172,7 +173,9 @@ export class MessagesComponent implements OnDestroy {
             return this._messagesService.getMessages(chatId!, {
               number: this._chunkNumber,
               size: 100,
-            });
+            }).pipe(
+              takeUntilDestroyed(this._destroyRef),
+            );
           }),
           catchError((err) => {
             return throwError(() => {
@@ -197,6 +200,7 @@ export class MessagesComponent implements OnDestroy {
             return of(items);
           }),
           delay(delayTime),
+          takeUntilDestroyed(this._destroyRef),
           tap(() => {
             this.isLoading.set(false);
           }),
@@ -221,7 +225,9 @@ export class MessagesComponent implements OnDestroy {
         return this._messagesService.getMessages(chatId, {
           number: this._chunkNumber + 1,
           size: 100,
-        });
+        }).pipe(
+          takeUntilDestroyed(this._destroyRef),
+        );
       }),
       catchError((err) => {
         return throwError(() => {
@@ -254,8 +260,11 @@ export class MessagesComponent implements OnDestroy {
       filter(v => v !== undefined),
       switchMap(chatId => {
         return this._messageNotificationService.$messages.pipe(
+          takeUntilDestroyed(this._destroyRef),
           switchMap(version => {
-            return this._messagesService.getMessages(chatId);
+            return this._messagesService.getMessages(chatId).pipe(
+              takeUntilDestroyed(this._destroyRef),
+            );
           }),
         );
       }),
@@ -285,10 +294,12 @@ export class MessagesComponent implements OnDestroy {
       filter(v => v !== undefined),
       switchMap(chatId => {
         return this._messageNotificationService.$writing.pipe(
+          takeUntilDestroyed(this._destroyRef),
           debounceTime(10),
           takeUntilDestroyed(this._destroyRef),
           switchMap(userId => {
             return this.deleteWritingIndicator().pipe(
+              takeUntilDestroyed(this._destroyRef),
               tap(() => {
                 const indicator = generateTypingIndicator();
                 this._proxyCollection.set(indicator.item.id, indicator.item);
@@ -304,7 +315,9 @@ export class MessagesComponent implements OnDestroy {
                 );
               }),
               switchMap(() => {
-                return this.deleteWritingIndicator();
+                return this.deleteWritingIndicator().pipe(
+                  takeUntilDestroyed(this._destroyRef),
+                );
               }),
             );
           }),
@@ -322,6 +335,7 @@ export class MessagesComponent implements OnDestroy {
             this._proxyCollection.setParams(item.id, { removal: true, });
             const id = item.id;
             return this._messagesService.deleteMessage(chatId, id).pipe(
+              takeUntilDestroyed(this._destroyRef),
               catchError((err) => {
                 this._proxyCollection.setParams(item.id, { removal: false, });
                 console.error(`Delete message error: ${err}`);
@@ -333,7 +347,6 @@ export class MessagesComponent implements OnDestroy {
               }),
             );
           }),
-          takeUntilDestroyed(this._destroyRef),
           tap(({ item, measures }) => {
             if (this._proxyCollection.has(item.id)) {
               document.documentElement.style.setProperty(ROOT_VAR_DELETED_ITEM_HEIGHT, `${measures.height - MIN_ITEM_HEIGHT}px`);
@@ -341,6 +354,7 @@ export class MessagesComponent implements OnDestroy {
             }
           }),
           delay(0),
+          takeUntilDestroyed(this._destroyRef),
           tap(({ item }) => {
             this._proxyCollection.setParams(item.id, { deleted: true, });
           }),
@@ -383,7 +397,6 @@ export class MessagesComponent implements OnDestroy {
           }),
           switchMap(({ item, config, value }) => {
             this._proxyCollection.setParams(item.id, { processing: true, });
-
             const id = item.id;
             return this._messagesService.updateMessage(chatId, id, {
               name: value,
@@ -410,6 +423,7 @@ export class MessagesComponent implements OnDestroy {
       map(([list, collection, search]) => ({ list, collection, search: search ?? '' })),
       filter(({ list }) => !!list),
       debounceTime(250),
+      takeUntilDestroyed(this._destroyRef),
       tap(({ search }) => {
         this.searchedPattern.set(search.split(' '));
       }),
@@ -442,19 +456,20 @@ export class MessagesComponent implements OnDestroy {
   }
 
   private deleteWritingIndicator() {
-    return of(this.collection()).pipe(
+    return of(undefined).pipe(
       takeUntilDestroyed(this._destroyRef),
       tap(() => {
         const collection = this.collection();
         let newItems = [...collection], config = { ...this.collectionConfigMap() };
         if (newItems.length) {
-          let i = 0;
+          let i = 0, hasItem = false;
           while (i < newItems.length) {
             i++;
             const index = newItems.length - i, item = newItems[index];
-            if (item?.data?.['type'] === 'typing-indicator') {
+            if (item?.data?.type === MessageTypes.TYPING_INDICATOR) {
               this._proxyCollection.setParams(item.id, { animate: true, });
-            } else {
+              hasItem = true;
+            } else if (hasItem) {
               break;
             }
           }
@@ -467,13 +482,14 @@ export class MessagesComponent implements OnDestroy {
         const collection = this.collection();
         let newItems = [...collection], config = { ...this.collectionConfigMap() };
         if (newItems.length) {
-          let i = 0;
+          let i = 0, hasItem = false;
           while (i < newItems.length) {
             i++;
             const index = newItems.length - i, item = newItems[index];
-            if (item?.data?.['type'] === 'typing-indicator') {
+            if (item?.data?.type === MessageTypes.TYPING_INDICATOR) {
               this._proxyCollection.setParams(item.id, { deleted: true, });
-            } else {
+              hasItem = true;
+            } else if (hasItem) {
               break;
             }
           }
@@ -486,15 +502,16 @@ export class MessagesComponent implements OnDestroy {
         const collection = this.collection();
         let newItems = [...collection], config = { ...this.collectionConfigMap() };
         if (newItems.length) {
-          let i = 0;
+          let i = 0, hasItem = false;
           while (i < newItems.length) {
             i++;
             const index = newItems.length - i, item = newItems[index];
-            if (item?.data?.['type'] === 'typing-indicator') {
+            if (item?.data?.type === MessageTypes.TYPING_INDICATOR) {
               this._proxyCollection.delete(item.id);
               newItems.pop();
               delete config[item.id];
-            } else {
+              hasItem = true;
+            } else if (hasItem) {
               break;
             }
           }
