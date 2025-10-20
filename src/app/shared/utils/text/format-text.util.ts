@@ -51,7 +51,7 @@ const replaceURLs = async (src: string, loading: boolean) => {
             if (isImage) {
                 const index = withoutWhiteSpaceAndLineBreak.indexOf(url);
                 result = result.replace(url, `${SERVICE_COMPILED_URL}${i}`);
-                compiledURLs.push([i, (`<img${SERVICE_WHITESPACE}src="${url}"${SERVICE_WHITESPACE}width="100%"${SERVICE_WHITESPACE}alt="404${SERVICE_WHITESPACE}image"${SERVICE_WHITESPACE}style="display:block;max-height:250px;object-fit:cover;margin:2px${SERVICE_WHITESPACE}auto;border-radius:6px;"/>`), index, url.length]);
+                compiledURLs.push([i, (`<img${SERVICE_WHITESPACE}src="${url}"${SERVICE_WHITESPACE}width="100%"${SERVICE_WHITESPACE}style="display:block;max-height:250px;object-fit:cover;margin:2px${SERVICE_WHITESPACE}auto;border-radius:6px;"/>`), index, url.length]);
             } else {
                 const index = withoutWhiteSpaceAndLineBreak.indexOf(url);
                 result = result.replace(url, `${SERVICE_COMPILED_URL}${i}`);

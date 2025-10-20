@@ -5,59 +5,60 @@ import { ButtonPresets, DialogPresets } from "./presets";
 
 const BUTTON_ROUNDED_CORNER: RoundedCorner = [8, 8, 8, 8],
     DIALOG_ROUNDED_CORNER: RoundedCorner = [12, 12, 12, 12],
-    DIALOG_PADDING = '36px 52px',
-    BUTTON_ROUNDED_RECT_PADDING = '4px 6px';
+    DIALOG_PADDING = "36px 52px",
+    BUTTON_ROUNDED_RECT_PADDING = "4px 6px";
 
 const manifest: ITheme = {
     chat: {
         header: {
-            background: 'rgb(10, 8, 17)',
-            color: 'rgb(181, 158, 202)',
-            fontSize: '14px',
+            background: "rgb(10, 8, 17)",
+            color: "rgb(181, 158, 202)",
+            fontSize: "14px",
             menuButton: {
                 normal: {
-                    background: 'transparent',
-                    color: 'none',
-                    fill: 'rgb(181, 158, 202)',
+                    color: "none",
+                    fill: ["rgba(0,0,0,0)", "rgba(0,0,0,0)"],
+                    iconFill: "rgb(181, 158, 202)",
                 },
                 pressed: {
-                    background: 'transparent',
-                    color: 'none',
-                    fill: 'rgb(181, 158, 202)',
+                    color: "none",
+                    fill: ["rgba(0,0,0,0)", "rgba(0,0,0,0)"],
+                    iconFill: "rgb(181, 158, 202)",
                 },
                 focused: {
-                    background: 'transparent',
-                    color: 'none',
-                    fill: 'rgb(212, 196, 228)',
+                    color: "none",
+                    fill: ["rgba(0,0,0,0)", "rgba(0,0,0,0)"],
+                    iconFill: "rgb(212, 196, 228)",
                     outline: `2px solid rgba(212, 196, 228, 0.25)`,
                 },
                 disabled: {
-                    background: 'transparent',
-                    color: 'none',
-                    fill: 'rgba(212, 196, 228, 0.5)',
+                    color: "none",
+                    fill: ["rgba(0,0,0,0)", "rgba(0,0,0,0)"],
+                    iconFill: "rgba(212, 196, 228, 0.5)",
                 },
             },
             search: {
+                timeoutIndicatorColor: "rgba(255, 255, 255, 0.05)",
                 normal: {
-                    background: 'rgb(9, 5, 19)',
-                    borderColor: 'rgb(34, 24, 51)',
-                    color: 'rgb(181, 158, 202)',
-                    fontSize: '14px',
-                    fill: 'rgb(181, 158, 202)',
+                    background: "rgb(9, 5, 19)",
+                    borderColor: "rgb(34, 24, 51)",
+                    color: "rgb(181, 158, 202)",
+                    fontSize: "14px",
+                    fill: "rgb(181, 158, 202)",
                     placeholder: {
-                        color: 'rgb(161, 138, 182)',
-                        fontSize: '14px',
+                        color: "rgb(161, 138, 182)",
+                        fontSize: "14px",
                     },
                 },
                 focused: {
-                    background: 'rgb(35, 15, 56)',
-                    borderColor: 'rgb(198, 244, 255)',
-                    color: 'rgb(181, 158, 202)',
-                    fontSize: '14px',
-                    fill: 'rgb(181, 158, 202)',
+                    background: "rgb(35, 15, 56)",
+                    borderColor: "rgb(198, 244, 255)",
+                    color: "rgb(181, 158, 202)",
+                    fontSize: "14px",
+                    fill: "rgb(181, 158, 202)",
                     placeholder: {
-                        color: 'rgb(161, 138, 182)',
-                        fontSize: '14px',
+                        color: "rgb(161, 138, 182)",
+                        fontSize: "14px",
                     },
                 }
             },
@@ -94,7 +95,7 @@ const manifest: ITheme = {
             message: {
                 container: {
                     normal: {
-                        background: "none",
+                        background: "unset",
                     },
                     selected: {
                         background: "rgba(50, 42, 119, 0.41)",
@@ -120,8 +121,8 @@ const manifest: ITheme = {
                             },
                         }
                     },
-                    searchSubstringColor: 'rgba(0, 140, 255, 0.38)',
-                    editingTextBackground: 'rgba(0, 0, 0, 0.1)',
+                    searchSubstringColor: "rgba(139, 0, 86, 0.84)",
+                    editingTextBackground: "rgba(0, 0, 0, 0.1)",
                     normal: {
                         fill: ["rgb(56, 43, 179)", "rgb(82, 32, 126)"],
                         color: "rgb(206, 191, 220)",
@@ -193,10 +194,10 @@ const manifest: ITheme = {
                 },
                 styles: {
                     processing: {
-                        stroke: ['rgba(255,255,255,0)', 'rgb(219, 156, 255)'],
+                        stroke: ["rgba(255,255,255,0)", "rgb(219, 156, 255)"],
                     },
                     removing: {
-                        stroke: ['rgba(0,188,212,0)', 'rgb(255, 192, 205)'],
+                        stroke: ["rgba(0,188,212,0)", "rgb(255, 192, 205)"],
                     },
                 },
             },
@@ -393,14 +394,14 @@ const manifest: ITheme = {
             title: {
                 fontSize: 14,
                 textAlign: "left",
-                fontWeight: 'bold',
-                textTransform: 'uppercase',
+                fontWeight: "bold",
+                textTransform: "uppercase",
                 color: "rgb(199, 186, 255)",
             },
             message: {
                 fontSize: 14,
                 textAlign: "left",
-                textTransform: 'none',
+                textTransform: "none",
                 color: "rgb(199, 186, 255)",
             },
         },
@@ -412,13 +413,13 @@ const manifest: ITheme = {
             title: {
                 fontSize: 12,
                 textAlign: "left",
-                textTransform: 'uppercase',
+                textTransform: "uppercase",
                 color: "rgb(126, 191, 218)",
             },
             message: {
                 fontSize: 12,
                 textAlign: "left",
-                textTransform: 'none',
+                textTransform: "none",
                 color: "rgb(203, 223, 223)",
             },
         },

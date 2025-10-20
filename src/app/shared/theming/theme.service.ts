@@ -1,12 +1,9 @@
 import { Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { BehaviorSubject, catchError, distinctUntilChanged, filter, from, of, switchMap, tap } from 'rxjs';
-import { environment } from '@environments/environment';
+import { BehaviorSubject, distinctUntilChanged, filter, of, switchMap, tap } from 'rxjs';
 import { ITheme } from './themes/interfaces/theme';
 import { THEME_LIGHT } from './themes/light';
 import { ThemeName, Themes } from './themes/themes';
-import { serializeToRootVars } from './utils/theme-serializer';
-import { loadStyle } from './utils';
 import { PRESETS } from './themes/presets';
 
 const IS_DARK_THEME_PATTERN = '(prefers-color-scheme: dark)',
@@ -41,32 +38,14 @@ export class ThemeService {
       distinctUntilChanged(),
       switchMap(name => {
         if (name === 'auto') {
-          return from(this.setupThemeAutomatically(window.matchMedia(IS_DARK_THEME_PATTERN).matches));
+          return of(this.setupThemeAutomatically(window.matchMedia(IS_DARK_THEME_PATTERN).matches));
         }
-        const theme = Themes[name],
-          vars = !environment.themePrerender ? serializeToRootVars(theme) : undefined;
-        return of({ name, theme, vars });
+        const theme = Themes[name];
+        return of({ emited: false, name, theme });
       }),
       filter(v => !!v),
-      switchMap(({ theme, name, vars }) => {
-        if (vars === undefined) {
-          return from(loadStyle(`themes/${name}.css`)).pipe(
-            switchMap(() => of({ theme })),
-            catchError(err => {
-              console.info(`Theme "${name}" loading error.`);
-              return of({ theme: undefined });
-            })
-          );
-        }
-
-        for (const varName in vars) {
-          const value = (vars as { [key: string]: string })[varName];
-          document.documentElement.style.setProperty(varName, value);
-        }
-        return of({ theme })
-      }),
-      tap(({ theme }) => {
-        if (theme) {
+      tap(({ theme, emited }) => {
+        if (!emited && theme) {
           this._$theme.next(theme);
         }
       }),
@@ -79,26 +58,13 @@ export class ThemeService {
     });
   }
 
-  private async setupThemeAutomatically(isDark: boolean) {
+  private setupThemeAutomatically(isDark: boolean) {
     if (this._$name.getValue() === 'auto') {
-      const name = isDark ? 'dark' : 'light', theme = Themes[name],
-        vars = !environment.themePrerender ? serializeToRootVars(theme) : undefined;
-
-      if (vars === undefined) {
-        try {
-          await loadStyle(`themes/${name}.css`);
-
-          this._$theme.next(theme);
-        } catch (err) { }
-      } else {
-        for (const varName in vars) {
-          const value = (vars as { [key: string]: string })[varName];
-          document.documentElement.style.setProperty(varName, value);
-        }
-
-        this._$theme.next(theme);
-      }
+      const name = isDark ? 'dark' : 'light', theme = Themes[name];
+      this._$theme.next(theme);
+      return { theme, name, emited: true };
     }
+    return undefined;
   }
 
   getPreset<P = any>(themeObject: string | { [state: string]: any } | undefined): P | undefined {

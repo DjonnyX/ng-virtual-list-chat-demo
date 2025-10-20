@@ -5,24 +5,26 @@
 @let class = classes();
 @let gradientFillColors = fillColors();
 @let gradientFillPositions = fillPositions();
-<x-button mode="circle" [ngClass]="class" [disabled]="disabledState" [type]="buttonType" [strokeColor]="strokeColor"
+<x-button #btn mode="circle" [ngClass]="class" [disabled]="disabledState" [type]="buttonType" [strokeColor]="strokeColor"
     [fillColors]="gradientFillColors" [fillPositions]="gradientFillPositions" (onPress)="onPressHandler($event)" (onClick)="onClickHandler($event)">
-    @switch (buttonState) {
-        @case ('send') {
-            <svg class="icon" width="20" height="20" viewBox="0 0 32 32"
-                style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-                <path
-                    d="M28.049,4.482c-0,-0 -5.293,12.802 -8.745,21.151c-0.36,0.869 -1.256,1.391 -2.189,1.275c-0.934,-0.117 -1.674,-0.843 -1.808,-1.774c-0.001,-0.001 -0.001,-0.001 -0.001,-0.002c-0.552,-3.821 -3.948,-6.577 -7.801,-6.331c-3.69,0.236 -7.499,0.48 -7.499,0.48l28.043,-14.799Z"
-                    style="fill:inherit;" />
-            </svg>
+    <div #content>
+        @switch (buttonState) {
+            @case ('send') {
+                <svg class="icon" width="20" height="20" viewBox="0 0 32 32"
+                    style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+                    <path
+                        d="M28.049,4.482c-0,-0 -5.293,12.802 -8.745,21.151c-0.36,0.869 -1.256,1.391 -2.189,1.275c-0.934,-0.117 -1.674,-0.843 -1.808,-1.774c-0.001,-0.001 -0.001,-0.001 -0.001,-0.002c-0.552,-3.821 -3.948,-6.577 -7.801,-6.331c-3.69,0.236 -7.499,0.48 -7.499,0.48l28.043,-14.799Z"
+                        style="fill:inherit;" />
+                </svg>
+            }
+            @case ('cancel') {
+                <svg class="icon" width="16" height="16" viewBox="0 0 32 32"
+                    style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+                    <path
+                        d="M18.096,15.955l10.242,-10.242l-2.114,-2.114l-10.242,10.242l-10.242,-10.242l-2.114,2.114l10.242,10.242l-10.242,10.242l2.114,2.115l10.242,-10.242l10.242,10.242l2.114,-2.115l-10.242,-10.242Z"
+                        style="fill:inherit;" />
+                </svg>
+            }
         }
-        @case ('cancel') {
-            <svg class="icon" width="16" height="16" viewBox="0 0 32 32"
-                style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-                <path
-                    d="M18.096,15.955l10.242,-10.242l-2.114,-2.114l-10.242,10.242l-10.242,-10.242l-2.114,2.114l10.242,10.242l-10.242,10.242l2.114,2.115l10.242,-10.242l10.242,10.242l2.114,-2.115l-10.242,-10.242Z"
-                    style="fill:inherit;" />
-            </svg>
-        }
-    }
+    </div>
 </x-button>

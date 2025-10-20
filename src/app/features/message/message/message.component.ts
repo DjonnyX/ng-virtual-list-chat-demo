@@ -16,6 +16,7 @@ import { GradientColor, GradientColorPositions } from '@shared/types';
 import { ThemeService } from '@shared/theming';
 import { IProxyCollectionItem } from '@widgets/messages/messages/utils/proxy-collection';
 import { IMessageParams } from './interfaces/message-params';
+import { ITheme } from '@shared/theming/themes/interfaces/theme';
 
 const DEFAULT_SIZE = 200,
   DEFAULT_STROKE_COLOR: GradientColor = ['rgba(255,255,255,0)', 'rgba(195, 0, 255, 0.17)'],
@@ -46,25 +47,27 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
 
   searchPattern = input<Array<string>>([]);
 
+  classes = input.required<{ [className: string]: boolean; }>();
+
+  fillPositions = input<GradientColorPositions>();
+
+  editedText = output<{ nativeEvent: Event, item: IVirtualListItem<IMessageItemData> }>();
+
+  changeValue = output<string>();
+
   substarateMode: Signal<MessageSubstarateMode>;
 
   substrateType = signal<MessageSubstarateStyle>(MessageSubstarateStyles.NONE);
 
   substrateStyles = signal<{ [styleName: string]: any; }>({});
 
-  editedText = output<{ nativeEvent: Event, item: IVirtualListItem<IMessageItemData> }>();
-
-  changeValue = output<string>();
-
   editing = signal<boolean>(false);
 
   strokeColor = signal<GradientColor | undefined>(undefined);
 
-  classes = input.required<{ [className: string]: boolean; }>();
-
   fillColors = signal<GradientColor>(DEFAULT_FILL_COLOR);
 
-  fillPositions = input<GradientColorPositions>();
+  theme: Signal<ITheme | undefined>;
 
   private _themeService = inject(ThemeService);
 
@@ -94,8 +97,8 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
   constructor() {
     this._resizeObserver = new ResizeObserver(this._onContainerResizeHandler);
 
-    const theme = toSignal(this._themeService.$theme),
-      $data = toObservable(this.data),
+    this.theme = toSignal(this._themeService.$theme);
+    const $data = toObservable(this.data),
       $params = toObservable(this.params);
 
     combineLatest([$data, $params]).pipe(
@@ -107,7 +110,7 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
     ).subscribe();
 
     effect(() => {
-      const data = this.data(), currentTheme = theme();
+      const data = this.data(), currentTheme = this.theme();
       if (data) {
         if (data?.processing) {
           this.substrateType.set(MessageSubstarateStyles.STROKE);
@@ -126,19 +129,30 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
     });
 
     effect(() => {
-      const classes = this.classes(), currentTheme = theme();
-      if (classes[CLASS_REMOVAL] && classes[CLASS_SELECTED]) {
-        this.fillColors.set(currentTheme?.chat.messages.message.content.removalSelected.fill ?? DEFAULT_FILL_COLOR);
-      } else if (classes[CLASS_REMOVAL]) {
-        this.fillColors.set(currentTheme?.chat.messages.message.content.removal.fill ?? DEFAULT_FILL_COLOR);
-      } else if (classes[CLASS_SELECTED] && classes[CLASS_FOCUSED]) {
-        this.fillColors.set(currentTheme?.chat.messages.message.content.focusedSelected.fill ?? DEFAULT_FILL_COLOR);
-      } else if (classes[CLASS_SELECTED]) {
-        this.fillColors.set(currentTheme?.chat.messages.message.content.selected.fill ?? DEFAULT_FILL_COLOR);
-      } else if (classes[CLASS_FOCUSED]) {
-        this.fillColors.set(currentTheme?.chat.messages.message.content.focused.fill ?? DEFAULT_FILL_COLOR);
-      } else {
-        this.fillColors.set(currentTheme?.chat.messages.message.content.normal.fill ?? DEFAULT_FILL_COLOR);
+      const classes = this.classes(), currentTheme = this.theme(), containerElement = this._container()?.nativeElement;
+      if (containerElement) {
+        const preset = this._themeService.getPreset(currentTheme?.chat.messages.message.content);
+        if (preset) {
+          if (classes[CLASS_REMOVAL] && classes[CLASS_SELECTED]) {
+            this.fillColors.set(preset.removalSelected.fill ?? DEFAULT_FILL_COLOR);
+            containerElement.style.color = preset.removalSelected.color;
+          } else if (classes[CLASS_REMOVAL]) {
+            this.fillColors.set(preset.removal.fill ?? DEFAULT_FILL_COLOR);
+            containerElement.style.color = preset.removal.color;
+          } else if (classes[CLASS_SELECTED] && classes[CLASS_FOCUSED]) {
+            this.fillColors.set(preset.focusedSelected.fill ?? DEFAULT_FILL_COLOR);
+            containerElement.style.color = preset.focusedSelected.color;
+          } else if (classes[CLASS_SELECTED]) {
+            this.fillColors.set(preset.selected.fill ?? DEFAULT_FILL_COLOR);
+            containerElement.style.color = preset.selected.color;
+          } else if (classes[CLASS_FOCUSED]) {
+            this.fillColors.set(preset.focused.fill ?? DEFAULT_FILL_COLOR);
+            containerElement.style.color = preset.focused.color;
+          } else {
+            this.fillColors.set(preset.normal.fill ?? DEFAULT_FILL_COLOR);
+            containerElement.style.color = preset.normal.color;
+          }
+        }
       }
     });
 

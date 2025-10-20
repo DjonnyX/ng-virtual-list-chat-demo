@@ -1,4 +1,4 @@
-.message-editor-editable {
+.editor-editable {
     font-family: inherit;
     letter-spacing: inherit;
     font-size: inherit;
@@ -8,7 +8,6 @@
     outline: none;
     border: none;
     border-radius: 5px;
-    background: var(--theme-chat-messages-message-content-editingtextbackground);
     color: inherit;
     padding: 1px;
     margin: 0;
@@ -16,33 +15,39 @@
     transition: width 150ms ease-out;
 }
 
-.message-editor-readonly {
+.editor-readonly {
     padding: 2px;
     transition: width 150ms ease-out;
-}
 
-::ng-deep a,
-::ng-deep a:-webkit-any-link,
-::ng-deep a:link {
-    &.message-editor-link {
-        color: var(--theme-chat-messages-message-content-texteditor-link-normal-color);
+    ::ng-deep .search-substring {
+        background-color: var(--search-substring-background);
+        border-radius: 3px;
+        padding: 0 2px;
     }
-}
 
-::ng-deep a:visited {
-    &.message-editor-link {
-        color: var(--theme-chat-messages-message-content-texteditor-link-visited-color);
+    ::ng-deep a,
+    ::ng-deep a:-webkit-any-link,
+    ::ng-deep a:link {
+        &.message-editor-link {
+            color: var(--link-normal-color);
+        }
     }
-}
 
-::ng-deep a:hover {
-    &.message-editor-link {
-        color: var(--theme-chat-messages-message-content-texteditor-link-hover-color);
+    ::ng-deep a:visited {
+        &.message-editor-link {
+            color: var(--link-visited-color);
+        }
     }
-}
 
-::ng-deep a:active {
-    &.message-editor-link {
-        color: var(--theme-chat-messages-message-content-texteditor-link-active-color);
+    ::ng-deep a:hover {
+        &.message-editor-link {
+            color: var(--link-hover-color);
+        }
+    }
+
+    ::ng-deep a:active {
+        &.message-editor-link {
+            color: var(--link-active-color);
+        }
     }
 }

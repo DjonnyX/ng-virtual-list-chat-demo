@@ -5,8 +5,8 @@ import { SubstarateStyle } from './types';
 import { SubstarateStyles } from './enums';
 import { GradientColor, GradientColorPositions } from '@shared/types';
 
-const DEFAULT_WIDTH = 12,
-  DEFAULT_HEIGHT = 12,
+const DEFAULT_WIDTH = 16,
+  DEFAULT_HEIGHT = 16,
   DEFAULT_STROKE_ANIMATION_DURATION = 1000,
   SHAPE_NAME = 'x-substrate-shape',
   CLIP_NAME = 'x-substrate-clip',
@@ -206,8 +206,8 @@ export class SubstrateComponent {
 
     effect(() => {
       const svg = this.svg()?.nativeElement, path = this.path()?.nativeElement, roundCorner = this.roundCorner(),
-        ww = (this.width() ?? 0), w = ww > 0 ? ww : DEFAULT_WIDTH,
-        hh = (this.height() ?? 0), h = hh > 0 ? hh : DEFAULT_HEIGHT;
+        ww = (this.width() ?? DEFAULT_WIDTH), w = ww > 0 ? ww : DEFAULT_WIDTH,
+        hh = (this.height() ?? DEFAULT_HEIGHT), h = hh > 0 ? hh : DEFAULT_HEIGHT;
       if (svg && path) {
         svg.style.width = `${w}px`;
         svg.style.height = `${h}px`;

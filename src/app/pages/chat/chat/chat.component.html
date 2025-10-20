@@ -3,11 +3,11 @@
 
 <div class="wrapper">
     <div class="container">
-        <div class="toolbar">
+        <div #toolbar class="toolbar">
             <div>
-                <menu-button (click)="onOpenMenuHandler()" [opened]="menuOpened()" />
+                <menu-button (onClick)="onOpenMenuHandler($event)" [opened]="menuOpened()" />
             </div>
-            <div class="title">{{groupTitle}}</div>
+            <div #header class="title">{{groupTitle}}</div>
             <message-search (search)="onSearchHandler($event)" />
         </div>
 

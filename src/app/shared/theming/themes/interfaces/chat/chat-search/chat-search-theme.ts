@@ -11,6 +11,7 @@ interface IChatSearchStateTheme {
 }
 
 export interface IChatSearchTheme {
+    timeoutIndicatorColor: string;
     normal: IChatSearchStateTheme;
     focused: IChatSearchStateTheme;
 }

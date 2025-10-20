@@ -16,22 +16,4 @@
     transition: fill 150ms ease-out;
     opacity: 0;
     animation: fadeIn 200ms ease-out 0s 1 normal forwards;
-
-    .menu {
-        .icon {
-            fill: var(--theme-chat-messages-message-controls-menu-normal-iconfill);
-        }
-
-        &.pressed {
-            .icon {
-                fill: var(--theme-chat-messages-message-controls-menu-pressed-iconfill);
-            }
-        }
-
-        &.disabled {
-            .icon {
-                fill: var(--theme-chat-messages-message-controls-menu-disabled-iconfill);
-            }
-        }
-    }
 }

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject, input, output, Signal, signal } from '@angular/core';
+import { Component, computed, effect, ElementRef, inject, input, output, Signal, signal, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ButtonComponent } from '@shared/components/button';
 import { SubstarateStyle, SubstarateStyles } from '@shared/components/substrate';
@@ -16,6 +16,8 @@ const DEFAULT_STROKE_COLOR: GradientColor = ['rgba(255,255,255,0)', 'rgb(255, 25
   styleUrl: './message-menu-button.component.scss'
 })
 export class MessageMenuButtonComponent {
+  content = viewChild<ElementRef<HTMLDivElement>>('content');
+
   onClick = output<Event>();
 
   disabled = input<boolean>(false);
@@ -30,6 +32,8 @@ export class MessageMenuButtonComponent {
 
   pressed = signal<boolean>(false);
 
+  focused = signal<boolean>(false);
+
   classes: Signal<{ [name: string]: boolean }>;
 
   private _themeService = inject(ThemeService);
@@ -43,14 +47,25 @@ export class MessageMenuButtonComponent {
     });
 
     effect(() => {
-      const disabled = this.disabled(), pressed = this.pressed(), currentTheme = theme(),
-        preset = this._themeService.getPreset(currentTheme?.chat.messages.message.controls.menu);
-      if (disabled) {
-        this.fillColors.set(preset?.disabled.fill ?? DEFAULT_FILL_COLOR);
-      } else if (pressed) {
-        this.fillColors.set(preset?.pressed.fill ?? DEFAULT_FILL_COLOR);
-      } else {
-        this.fillColors.set(preset?.normal.fill ?? DEFAULT_FILL_COLOR);
+      const disabled = this.disabled(), pressed = this.pressed(), focused = this.focused(), currentTheme = theme(),
+        contentEl = this.content()?.nativeElement;
+      if (contentEl && currentTheme) {
+        const preset = this._themeService.getPreset(currentTheme.chat.messages.message.controls.menu);
+        if (preset) {
+          if (disabled) {
+            this.fillColors.set(preset.disabled.fill ?? DEFAULT_FILL_COLOR);
+            contentEl.style.fill = preset.disabled.iconFill;
+          } else if (focused && preset.focused) {
+            this.fillColors.set(preset.focused.fill ?? DEFAULT_FILL_COLOR);
+            contentEl.style.fill = preset.focused.iconFill;
+          } else if (pressed) {
+            this.fillColors.set(preset.pressed.fill ?? DEFAULT_FILL_COLOR);
+            contentEl.style.fill = preset.pressed.iconFill;
+          } else {
+            this.fillColors.set(preset?.normal.fill ?? DEFAULT_FILL_COLOR);
+            contentEl.style.fill = preset.normal.iconFill;
+          }
+        }
       }
     });
   }
@@ -61,5 +76,9 @@ export class MessageMenuButtonComponent {
 
   onPressHandler(pressed: boolean) {
     this.pressed.set(pressed);
+  }
+
+  onFocusHandler(focused: boolean) {
+    this.focused.set(focused);
   }
 }

@@ -16,40 +16,4 @@
     transition: fill 150ms ease-out;
     opacity: 0;
     animation: fadeIn 200ms ease-out 0s 1 normal forwards;
-
-    .send {
-        .icon {
-            fill: var(--theme-chat-messages-message-controls-send-normal-iconfill);
-        }
-
-        &.pressed {
-            .icon {
-                fill: var(--theme-chat-messages-message-controls-send-pressed-iconfill);
-            }
-        }
-
-        &.disabled {
-            .icon {
-                fill: var(--theme-chat-messages-message-controls-send-disabled-iconfill);
-            }
-        }
-    }
-
-    .cancel {
-        .icon {
-            fill: var(--theme-chat-messages-message-controls-cancel-normal-iconfill);
-        }
-
-        &.pressed {
-            .icon {
-                fill: var(--theme-chat-messages-message-controls-cancel-pressed-iconfill);
-            }
-        }
-
-        &.disabled {
-            .icon {
-                fill: var(--theme-chat-messages-message-controls-cancel-disabled-iconfill);
-            }
-        }
-    }
 }

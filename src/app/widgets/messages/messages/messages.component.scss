@@ -1,13 +1,11 @@
 :host {
     display: block;
-    background: var(--theme-chat-messages-background);
     overflow: hidden;
     width: 100%;
     height: 100%;
 }
 
 .wrapper {
-    background-image: var(--theme-chat-messages-backgroundimage);
     background-size: 90px;
     width: 100%;
     height: 100%;

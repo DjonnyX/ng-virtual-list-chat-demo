@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, DestroyRef, inject, input, output, signal, Signal } from '@angular/core';
+import { Component, computed, DestroyRef, effect, ElementRef, inject, input, output, signal, Signal, viewChild } from '@angular/core';
 import { LongPressDirective } from '@shared/directives';
 import { Id, IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/ng-virtual-list';
 import { IMessageItemData } from "@shared/models/message";
@@ -12,10 +12,11 @@ import { IMessageParams } from '../message/interfaces';
 import { ContextMenuComponent, IContextMenuCollection } from '@shared/components/context-menu';
 import { GradientColorPositions } from '@shared/types';
 import { DialogService } from '@shared/components/dialog/dialog.service';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { filter, tap } from 'rxjs';
-import { ButtonPresets } from '@shared/theming';
+import { ButtonPresets, ThemeService } from '@shared/theming';
 import { DialogPresets } from '@shared/theming/themes/presets';
+import { ITheme } from '@shared/theming/themes/interfaces/theme';
 
 const CLASS_IN = 'in', CLASS_OUT = 'out', CLASS_SIMPLE = 'simple', CLASS_END_OF_MESSAGES = 'end-of-messages',
   CLASS_REMOVAL = 'removal', CLASS_DELETED = 'deleted', CLASS_ANIMATE = 'animate', CLASS_EDITED = 'edited',
@@ -77,6 +78,8 @@ interface IDeleteEventData {
   styleUrl: './message-box.component.scss'
 })
 export class MessageBoxComponent {
+  private _container = viewChild<ElementRef<HTMLDivElement>>('container');
+
   data = input<IVirtualListItem<IProxyCollectionItem<IMessageItemData>> | null>(null);
 
   prevData = input<IVirtualListItem<IProxyCollectionItem<IMessageItemData>> | null>(null);
@@ -111,6 +114,8 @@ export class MessageBoxComponent {
 
   isDeleting: Signal<boolean>;
 
+  theme: Signal<ITheme | undefined>;
+
   contextMenuItems: Signal<IContextMenuCollection>;
 
   fillPositions: Signal<GradientColorPositions>;
@@ -121,7 +126,11 @@ export class MessageBoxComponent {
 
   private _destroyRef = inject(DestroyRef);
 
+  private _themeService = inject(ThemeService);
+
   constructor() {
+    this.theme = toSignal(this._themeService.$theme);
+
     this.params = computed(() => {
       const data = this.data(), prevData = this.prevData(), nextData = this.nextData();
       return {
@@ -178,6 +187,20 @@ export class MessageBoxComponent {
         [CLASS_SELECTED]: config?.[CONFIG_PROP_SELECTED], [CLASS_FOCUSED]: config?.[CONFIG_PROP_FOCUSED], [CLASS_HAS_MULTICONTENT]: data?.[DATA_PROP_IMAGE] !== undefined,
       };
     });
+
+    effect(() => {
+      const data = this.data(), config = this.config(), theme = this.theme(), containerElement = this._container()?.nativeElement;
+      if (data && config && theme && containerElement) {
+        const preset = this._themeService.getPreset(theme.chat.messages.message.container);
+        if (data.edited) {
+          containerElement.style.backgroundColor = preset.edited.background;
+        } else if (config.selected) {
+          containerElement.style.backgroundColor = preset.selected.background;
+        } else {
+          containerElement.style.backgroundColor = preset.normal.background;
+        }
+      }
+    })
   }
 
   onEditItemHandler(event: Event, item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, selected: boolean) {

@@ -1,10 +1,12 @@
-import { Component, DestroyRef, effect, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
+import { Component, DestroyRef, effect, ElementRef, inject, input, output, Signal, signal, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SearchHighlightDirective } from '@shared/directives';
 import { formatText } from '@shared/utils';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { from, switchMap, tap } from 'rxjs';
+import { ThemeService } from '@shared/theming';
+import { ITheme } from '@shared/theming/themes/interfaces/theme';
 
 const DEFAULT_SEARCH_SUBSTRING_CLASS = 'search-substring';
 
@@ -37,9 +39,58 @@ export class EditableTextComponent {
 
   formattedText = signal<string>('');
 
+  theme: Signal<ITheme | undefined>;
+
   private _destroyRef = inject(DestroyRef);
 
+  private _themeService = inject(ThemeService);
+
+  linkNormalColor = signal<string>('initial');
+
+  linkVisitedColor = signal<string>('initial');
+
+  linkHoverColor = signal<string>('initial');
+
+  linkActiveColor = signal<string>('initial');
+
+  searchSubstringBackground = signal<string>('initial');
+
   constructor() {
+    this.theme = toSignal(this._themeService.$theme);
+
+    effect(() => {
+      const theme = this.theme();
+      if (theme) {
+        const preset = this._themeService.getPreset(theme.chat.messages.message.content);
+        if (preset) {
+          this.searchSubstringBackground.set(preset.searchSubstringColor);
+        }
+      }
+    });
+
+    effect(() => {
+      const theme = this.theme();
+      if (theme) {
+        const preset = this._themeService.getPreset(theme.chat.messages.message.content.textEditor.link);
+        if (preset) {
+          this.linkNormalColor.set(preset.normal.color);
+          this.linkVisitedColor.set(preset.visited.color);
+          this.linkHoverColor.set(preset.hover.color);
+          this.linkActiveColor.set(preset.active);
+        }
+      }
+    });
+
+    effect(() => {
+      const theme = this.theme(), textarea = this.textarea()?.nativeElement;
+      if (theme && textarea) {
+        const preset = this._themeService.getPreset(theme.chat.messages.message.content);
+        if (preset) {
+          textarea.style.backgroundColor = preset.editingTextBackground;
+        }
+      }
+    });
+
     const $text = toObservable(this.text);
 
     $text.pipe(

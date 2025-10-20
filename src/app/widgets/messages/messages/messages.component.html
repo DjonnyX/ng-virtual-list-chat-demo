@@ -6,7 +6,7 @@
 @let selectedItemIds = selectedIds();
 @let listClass = listClasses();
 
-<div class="wrapper">
+<div #wrapper class="wrapper">
     @if(loading || !prepared) {
         <messages-loading-indicator class="loading-indicator" />
     }

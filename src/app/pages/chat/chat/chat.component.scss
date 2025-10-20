@@ -22,15 +22,12 @@
     align-items: center;
     grid-template-columns: 32px 1fr auto;
     padding: 6px 12px 6px 12px;
-    background: var(--theme-chat-header-background);
     box-sizing: border-box;
     z-index: 1010;
 
     .title {
         text-align: center;
-        color: var(--theme-chat-header-color);
         font-weight: 800;
-        font-size: var(--theme-chat-header-fontsize);
         padding-right: 18px;
         text-overflow: ellipsis;
         overflow: hidden;
@@ -42,10 +39,4 @@
     height: calc(100%);
     width: calc(100%);
     overflow: hidden;
-}
-
-::ng-deep .search-substring {
-    background-color: var(--theme-chat-messages-message-content-searchsubstringcolor);
-    border-radius: 3px;
-    padding: 0 2px;
 }

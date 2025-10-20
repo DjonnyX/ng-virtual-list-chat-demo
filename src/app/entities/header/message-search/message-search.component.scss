@@ -3,21 +3,10 @@
     border-radius: 4px;
     overflow: hidden;
 
-    .search-icon {
-        fill: var(--theme-chat-header-search-normal-fill);
-    }
-
-    &:focus {
-        .search-icon {
-            fill: var(--theme-chat-header-search-normal-fill);
-        }
-    }
-
     .timeout-indicator {
         position: absolute;
         width: 0%;
         height: 100%;
-        background: rgba(255, 255, 255, 0.1);
         transition: width 100ms linear;
         border-radius: 4px;
     }
@@ -26,20 +15,16 @@
         outline: none;
         border-radius: 4px;
         padding: 6px;
-        background: var(--theme-chat-header-search-normal-background);
         border-width: 1px;
         border-style: solid;
-        border-color: var(--theme-chat-header-search-normal-bordercolor);
         width: calc(100%);
         max-width: 32px;
-        color: var(--theme-chat-header-search-normal-color);
-        font-size: var(--theme-chat-header-search-normal-fontsize);
         padding-right: 24px;
         transition: max-width 0.15s ease-in-out;
 
         &::placeholder {
-            color: var(--theme-chat-header-search-normal-placeholder-color);
-            font-size: var(--theme-chat-header-search-normal-placeholder-fontsize);
+            color: var(--placeholder-color);
+            font-size: var(--placeholder-fontsize);
         }
 
         &::-webkit-search-cancel-button {
@@ -49,22 +34,18 @@
         &:focus {
             max-width: 164px;
             width: calc(100%);
-            background: var(--theme-chat-header-search-focused-background);
-            border-color: var(--theme-chat-header-search-focused-bordercolor);
-            color: var(--theme-chat-header-search-focused-color);
-            font-size: var(--theme-chat-header-search-focused-fontsize);
 
             &::placeholder {
-                color: var(--theme-chat-header-search-focused-placeholder-color);
-                font-size: var(--theme-chat-header-search-focused-placeholder-fontsize);
+                color: var(--placeholder-color);
+                font-size: var(--placeholder-fontsize);
             }
         }
 
-        &+svg {
+        &+.icon {
             pointer-events: none;
             position: absolute;
             right: 11px;
-            top: 10px;
+            top: 5px;
         }
 
         &search+svg {

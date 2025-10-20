@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, ElementRef, inject, Signal, signal, viewChild, ViewEncapsulation } from '@angular/core';
+import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, effect, ElementRef, inject, Signal, signal, viewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IRenderVirtualListItem, IVirtualListItem } from '@shared/components/ng-virtual-list';
 import {
@@ -12,11 +12,14 @@ import { generateChatCollection } from '@mock/const';
 import { MessagesComponent } from "@widgets/messages/messages/messages.component";
 import { GroupsComponent } from "@widgets/groups/groups/groups.component";
 import { MessageService } from '@widgets/messages';
+import { ITheme } from '@shared/theming/themes/interfaces/theme';
+import { ThemeService } from '@shared/theming';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'chat',
   standalone: true,
-  imports: [CommonModule, FormsModule, MenuButtonComponent, MessageSearchComponent, DrawerComponent, 
+  imports: [CommonModule, FormsModule, MenuButtonComponent, MessageSearchComponent, DrawerComponent,
     MessagesComponent, GroupsComponent],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
@@ -25,7 +28,9 @@ import { MessageService } from '@widgets/messages';
   encapsulation: ViewEncapsulation.Emulated,
 })
 export class ChatComponent {
-  protected _stats = viewChild('stats', { read: ElementRef<HTMLDivElement> });
+  protected _toolbar = viewChild<ElementRef<HTMLDivElement>>('toolbar');
+
+  protected _header = viewChild<ElementRef<HTMLDivElement>>('header');
 
   private _$version = new BehaviorSubject<number>(0);
   readonly $version = this._$version.asObservable();
@@ -34,17 +39,44 @@ export class ChatComponent {
 
   dockMode: Signal<DockMode.LEFT | DockMode.NONE>;
 
+  theme: Signal<ITheme | undefined>;
+
   show = signal(true);
 
   search = signal('');
 
   items = generateChatCollection();
 
-  title = signal<string>('Demo');
+  title = signal<string | undefined>(undefined);
 
   private _messageService = inject(MessageService);
 
+  private _themeService = inject(ThemeService);
+
   constructor() {
+    this.theme = toSignal(this._themeService.$theme);
+
+    effect(() => {
+      const theme = this.theme(), toolbar = this._toolbar()?.nativeElement;
+      if (theme && toolbar) {
+        const preset = this._themeService.getPreset(theme.chat.header);
+        if (preset) {
+          toolbar.style.background = preset.background;
+        }
+      }
+    });
+
+    effect(() => {
+      const theme = this.theme(), header = this._header()?.nativeElement;
+      if (theme && header) {
+        const preset = this._themeService.getPreset(theme.chat.header);
+        if (preset) {
+          header.style.color = preset.color;
+          header.style.fontSize = preset.fontSize;
+        }
+      }
+    });
+
     this.dockMode = computed(() => {
       const menuOpened = this.menuOpened();
       return menuOpened ? DockMode.LEFT : DockMode.NONE;
@@ -75,7 +107,9 @@ export class ChatComponent {
     this._messageService.changeChat(`${item?.['id']}`);
   }
 
-  onOpenMenuHandler() {
+  onOpenMenuHandler(e: Event) {
+    e.stopImmediatePropagation();
+
     this.menuOpened.update(v => !v);
   }
 

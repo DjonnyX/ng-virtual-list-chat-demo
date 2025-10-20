@@ -2,6 +2,7 @@
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -26,53 +27,13 @@
         user-select: none;
         font-size: 10px;
         height: auto;
-        background-color: var(--theme-chat-messages-group-normal-background);
-        color: var(--theme-chat-messages-group-normal-color);
         padding: 6px 14px;
         border-radius: 14px;
         border-width: 1px;
         border-style: solid;
-        border-color: var(--theme-chat-messages-group-normal-bordercolor);
     }
 
     .collapsable-indicator {
-        fill: var(--theme-chat-messages-group-normal-fill);
         margin-left: 8px;
-    }
-
-    &.selected {
-        .name {
-            background-color: var(--theme-chat-messages-group-selected-background);
-            color: var(--theme-chat-messages-group-selected-color);
-            border-color: var(--theme-chat-messages-group-selected-bordercolor);
-        }
-
-        .collapsable-indicator {
-            fill: var(--theme-chat-messages-group-selected-fill);
-        }
-    }
-
-    &.focused {
-        .name {
-            background-color: var(--theme-chat-messages-group-focused-background);
-            color: var(--theme-chat-messages-group-focused-color);
-            border-color: var(--theme-chat-messages-group-focused-bordercolor);
-        }
-
-        .collapsable-indicator {
-            fill: var(--theme-chat-messages-group-focused-fill);
-        }
-
-        &.selected {
-            .name {
-                background-color: var(--theme-chat-messages-group-focusedselected-background);
-                color: var(--theme-chat-messages-group-focusedselected-color);
-                border-color: var(--theme-chat-messages-group-focusedselected-bordercolor);
-            }
-
-            .collapsable-indicator {
-                fill: var(--theme-chat-messages-group-focusedselected-fill);
-            }
-        }
     }
 }

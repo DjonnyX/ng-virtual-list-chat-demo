@@ -130,62 +130,66 @@ export class ButtonComponent implements OnDestroy {
     });
 
     effect(() => {
-      const preset = this.preset(), theme = this.theme();
-      if (theme && preset) {
-        const buttonPreset = this._themeService.getPreset(preset);
-        if (buttonPreset) {
-          const el = this._elementRef.nativeElement as HTMLDivElement,
-            elBtn = this.button()?.nativeElement as HTMLButtonElement;
-          if (el && elBtn) {
-            const disabled = this.disabled(), pressed = this.pressed(), focused = this.focused();
-            if (disabled) {
-              this.shapeRoundCorner.set(buttonPreset.disabled.roundedCorner);
-              this.fillGradientColors.set(buttonPreset.disabled.fill);
-              el.style.color = buttonPreset.disabled.color ? `var(--theme-presets-${preset}-disabled-color)` : 'inherit';
-              elBtn.style.padding = buttonPreset.disabled.padding ? `var(--theme-presets-${preset}-disabled-padding)` : 'unset';
-              elBtn.style.outline = buttonPreset.disabled.outline ? `var(--theme-presets-${preset}-disabled-outline)` : 'unset';
-              elBtn.style.borderTopLeftRadius = buttonPreset.disabled.roundedCorner ? formatCSSNumber(buttonPreset.disabled.roundedCorner[0]) : 'unset';
-              elBtn.style.borderBottomLeftRadius = buttonPreset.disabled.roundedCorner ? formatCSSNumber(buttonPreset.disabled.roundedCorner[1]) : 'unset';
-              elBtn.style.borderBottomRightRadius = buttonPreset.disabled.roundedCorner ? formatCSSNumber(buttonPreset.disabled.roundedCorner[2]) : 'unset';
-              elBtn.style.borderTopRightRadius = buttonPreset.disabled.roundedCorner ? formatCSSNumber(buttonPreset.disabled.roundedCorner[3]) : 'unset';
-            } else if (focused) {
-              this.shapeRoundCorner.set(buttonPreset.focused.roundedCorner);
-              this.fillGradientColors.set(buttonPreset.focused.fill);
-              el.style.color = buttonPreset.focused.color ? `var(--theme-presets-${preset}-focused-color)` : 'inherit';
-              elBtn.style.padding = buttonPreset.focused.padding ? `var(--theme-presets-${preset}-focused-padding)` : 'unset';
-              elBtn.style.outline = buttonPreset.focused.outline ? `var(--theme-presets-${preset}-focused-outline)` : 'unset';
-              elBtn.style.borderTopLeftRadius = buttonPreset.focused.roundedCorner ? formatCSSNumber(buttonPreset.focused.roundedCorner[0]) : 'unset';
-              elBtn.style.borderBottomLeftRadius = buttonPreset.focused.roundedCorner ? formatCSSNumber(buttonPreset.focused.roundedCorner[1]) : 'unset';
-              elBtn.style.borderBottomRightRadius = buttonPreset.focused.roundedCorner ? formatCSSNumber(buttonPreset.focused.roundedCorner[2]) : 'unset';
-              elBtn.style.borderTopRightRadius = buttonPreset.focused.roundedCorner ? formatCSSNumber(buttonPreset.focused.roundedCorner[3]) : 'unset';
-            } else if (pressed) {
-              this.shapeRoundCorner.set(buttonPreset.pressed.roundedCorner);
-              this.fillGradientColors.set(buttonPreset.pressed.fill);
-              el.style.color = buttonPreset.pressed.color ? `var(--theme-presets-${preset}-pressed-color)` : 'inherit';
-              elBtn.style.padding = buttonPreset.pressed.padding ? `var(--theme-presets-${preset}-pressed-padding)` : 'unset';
-              elBtn.style.outline = buttonPreset.pressed.outline ? `var(--theme-presets-${preset}-pressed-outline)` : 'unset';
-              elBtn.style.borderTopLeftRadius = buttonPreset.pressed.roundedCorner ? formatCSSNumber(buttonPreset.pressed.roundedCorner[0]) : 'unset';
-              elBtn.style.borderBottomLeftRadius = buttonPreset.pressed.roundedCorner ? formatCSSNumber(buttonPreset.pressed.roundedCorner[1]) : 'unset';
-              elBtn.style.borderBottomRightRadius = buttonPreset.pressed.roundedCorner ? formatCSSNumber(buttonPreset.pressed.roundedCorner[2]) : 'unset';
-              elBtn.style.borderTopRightRadius = buttonPreset.pressed.roundedCorner ? formatCSSNumber(buttonPreset.pressed.roundedCorner[3]) : 'unset';
-            } else {
-              this.shapeRoundCorner.set(buttonPreset.normal.roundedCorner);
-              this.fillGradientColors.set(buttonPreset.normal.fill);
-              el.style.color = buttonPreset.normal.color ? `var(--theme-presets-${preset}-normal-color)` : 'inherit';
-              elBtn.style.padding = buttonPreset.normal.padding ? `var(--theme-presets-${preset}-normal-padding)` : 'unset';
-              elBtn.style.outline = buttonPreset.normal.outline ? `var(--theme-presets-${preset}-normal-outline)` : 'unset';
-              elBtn.style.borderTopLeftRadius = buttonPreset.normal.roundedCorner ? formatCSSNumber(buttonPreset.normal.roundedCorner[0]) : 'unset';
-              elBtn.style.borderBottomLeftRadius = buttonPreset.normal.roundedCorner ? formatCSSNumber(buttonPreset.normal.roundedCorner[1]) : 'unset';
-              elBtn.style.borderBottomRightRadius = buttonPreset.normal.roundedCorner ? formatCSSNumber(buttonPreset.normal.roundedCorner[2]) : 'unset';
-              elBtn.style.borderTopRightRadius = buttonPreset.normal.roundedCorner ? formatCSSNumber(buttonPreset.normal.roundedCorner[3]) : 'unset';
-            }
-            return;
+      this.applyStyles();
+    });
+  }
+
+  private applyStyles(currentPreset?: string) {
+    const preset = currentPreset ?? this.preset(), theme = this.theme();
+    if (theme && preset) {
+      const buttonPreset = this._themeService.getPreset(preset);
+      if (buttonPreset) {
+        const el = this._elementRef.nativeElement as HTMLDivElement,
+          elBtn = this.button()?.nativeElement as HTMLButtonElement;
+        if (el && elBtn) {
+          const disabled = this.disabled(), pressed = this.pressed(), focused = this.focused();
+          if (disabled) {
+            this.shapeRoundCorner.set(buttonPreset.disabled.roundedCorner);
+            this.fillGradientColors.set(buttonPreset.disabled.fill);
+            el.style.color = buttonPreset.disabled.color ? buttonPreset.disabled.color : 'inherit';
+            elBtn.style.padding = buttonPreset.disabled.padding ? buttonPreset.disabled.padding : 'unset';
+            elBtn.style.outline = buttonPreset.disabled.outline ? buttonPreset.disabled.outline : 'unset';
+            elBtn.style.borderTopLeftRadius = buttonPreset.disabled.roundedCorner ? formatCSSNumber(buttonPreset.disabled.roundedCorner[0]) : 'unset';
+            elBtn.style.borderBottomLeftRadius = buttonPreset.disabled.roundedCorner ? formatCSSNumber(buttonPreset.disabled.roundedCorner[1]) : 'unset';
+            elBtn.style.borderBottomRightRadius = buttonPreset.disabled.roundedCorner ? formatCSSNumber(buttonPreset.disabled.roundedCorner[2]) : 'unset';
+            elBtn.style.borderTopRightRadius = buttonPreset.disabled.roundedCorner ? formatCSSNumber(buttonPreset.disabled.roundedCorner[3]) : 'unset';
+          } else if (focused) {
+            this.shapeRoundCorner.set(buttonPreset.focused.roundedCorner);
+            this.fillGradientColors.set(buttonPreset.focused.fill);
+            el.style.color = buttonPreset.focused.color ? buttonPreset.focused.color : 'inherit';
+            elBtn.style.padding = buttonPreset.focused.padding ? buttonPreset.focused.padding : 'unset';
+            elBtn.style.outline = buttonPreset.focused.outline ? buttonPreset.focused.outline : 'unset';
+            elBtn.style.borderTopLeftRadius = buttonPreset.focused.roundedCorner ? formatCSSNumber(buttonPreset.focused.roundedCorner[0]) : 'unset';
+            elBtn.style.borderBottomLeftRadius = buttonPreset.focused.roundedCorner ? formatCSSNumber(buttonPreset.focused.roundedCorner[1]) : 'unset';
+            elBtn.style.borderBottomRightRadius = buttonPreset.focused.roundedCorner ? formatCSSNumber(buttonPreset.focused.roundedCorner[2]) : 'unset';
+            elBtn.style.borderTopRightRadius = buttonPreset.focused.roundedCorner ? formatCSSNumber(buttonPreset.focused.roundedCorner[3]) : 'unset';
+          } else if (pressed) {
+            this.shapeRoundCorner.set(buttonPreset.pressed.roundedCorner);
+            this.fillGradientColors.set(buttonPreset.pressed.fill);
+            el.style.color = buttonPreset.pressed.color ? buttonPreset.pressed.color : 'inherit';
+            elBtn.style.padding = buttonPreset.pressed.padding ? buttonPreset.pressed.padding : 'unset';
+            elBtn.style.outline = buttonPreset.pressed.outline ? buttonPreset.pressed.outline : 'unset';
+            elBtn.style.borderTopLeftRadius = buttonPreset.pressed.roundedCorner ? formatCSSNumber(buttonPreset.pressed.roundedCorner[0]) : 'unset';
+            elBtn.style.borderBottomLeftRadius = buttonPreset.pressed.roundedCorner ? formatCSSNumber(buttonPreset.pressed.roundedCorner[1]) : 'unset';
+            elBtn.style.borderBottomRightRadius = buttonPreset.pressed.roundedCorner ? formatCSSNumber(buttonPreset.pressed.roundedCorner[2]) : 'unset';
+            elBtn.style.borderTopRightRadius = buttonPreset.pressed.roundedCorner ? formatCSSNumber(buttonPreset.pressed.roundedCorner[3]) : 'unset';
+          } else {
+            this.shapeRoundCorner.set(buttonPreset.normal.roundedCorner);
+            this.fillGradientColors.set(buttonPreset.normal.fill);
+            el.style.color = buttonPreset.normal.color ? buttonPreset.normal.color : 'inherit';
+            elBtn.style.padding = buttonPreset.normal.padding ? buttonPreset.normal.padding : 'unset';
+            elBtn.style.outline = buttonPreset.normal.outline ? buttonPreset.normal.outline : 'unset';
+            elBtn.style.borderTopLeftRadius = buttonPreset.normal.roundedCorner ? formatCSSNumber(buttonPreset.normal.roundedCorner[0]) : 'unset';
+            elBtn.style.borderBottomLeftRadius = buttonPreset.normal.roundedCorner ? formatCSSNumber(buttonPreset.normal.roundedCorner[1]) : 'unset';
+            elBtn.style.borderBottomRightRadius = buttonPreset.normal.roundedCorner ? formatCSSNumber(buttonPreset.normal.roundedCorner[2]) : 'unset';
+            elBtn.style.borderTopRightRadius = buttonPreset.normal.roundedCorner ? formatCSSNumber(buttonPreset.normal.roundedCorner[3]) : 'unset';
           }
+          return;
         }
       }
-      this.fillGradientColors.set(this.fillColors());
-      this.shapeRoundCorner.set(this.roundCorner());
-    });
+    }
+    this.fillGradientColors.set(this.fillColors());
+    this.shapeRoundCorner.set(this.roundCorner());
   }
 
   onPressHandler(pressed: boolean) {

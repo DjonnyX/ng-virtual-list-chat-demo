@@ -1,6 +1,6 @@
-import { Component, DestroyRef, inject, input, OnDestroy, signal, viewChild } from '@angular/core';
+import { Component, DestroyRef, effect, ElementRef, inject, input, OnDestroy, Signal, signal, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import {
   catchError, combineLatest, debounceTime, delay, filter, map, of, skipWhile, Subject, switchMap, take, tap, throwError,
 } from 'rxjs';
@@ -26,6 +26,8 @@ import { MessagesNotificationWSService } from '../messages-notification-ws.servi
 import { generateTypingIndicator } from './utils/generate-typing-indicator';
 import { IProxyCollectionItem, ProxyCollection, ProxyCollectionEvents } from './utils/proxy-collection';
 import { MessageTypes } from '@shared/enums';
+import { ThemeService } from '@shared/theming';
+import { ITheme } from '@shared/theming/themes/interfaces/theme';
 
 const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
   OPACITY_0 = '0', OPACITY_1 = '1', FADE_IN = `opacity 100ms ease-in`, MIN_ITEM_HEIGHT = 28;
@@ -44,7 +46,9 @@ const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
   styleUrl: './messages.component.scss',
 })
 export class MessagesComponent implements OnDestroy {
-  protected list = viewChild('list', { read: NgVirtualListComponent });
+  protected _wrapper = viewChild<ElementRef<HTMLDivElement>>('wrapper');
+
+  protected _list = viewChild('list', { read: NgVirtualListComponent });
 
   search = input<string>();
 
@@ -52,6 +56,8 @@ export class MessagesComponent implements OnDestroy {
 
   collection = signal<Array<IProxyCollectionItem<IMessageItemData>>>([]);
   protected $collection = toObservable(this.collection);
+
+  theme: Signal<ITheme | undefined>;
 
   protected _proxyCollection = new ProxyCollection<IMessageItemData>([]);
 
@@ -96,7 +102,33 @@ export class MessagesComponent implements OnDestroy {
     this._$proxyCollectionChange.next();
   };
 
+  private _elementRef = inject(ElementRef<HTMLDivElement>);
+
+  private _themeService = inject(ThemeService);
+
   constructor() {
+    this.theme = toSignal(this._themeService.$theme);
+
+    effect(() => {
+      const theme = this.theme(), host = this._elementRef.nativeElement as HTMLDivElement;
+      if (theme && host) {
+        const preset = this._themeService.getPreset(theme.chat.messages);
+        if (preset) {
+          host.style.background = preset.background;
+        }
+      }
+    });
+
+    effect(() => {
+      const theme = this.theme(), wrapper = this._wrapper()?.nativeElement;
+      if (theme && wrapper) {
+        const preset = this._themeService.getPreset(theme.chat.messages);
+        if (preset) {
+          wrapper.style.backgroundImage = preset.backgroundImage;
+        }
+      }
+    });
+
     this._proxyCollection.addEventListener(ProxyCollectionEvents.CHANGE, this._proxyCollectionChangeHandler);
     const $collection = toObservable(this.collection),
       $search = toObservable(this.search),
@@ -106,7 +138,7 @@ export class MessagesComponent implements OnDestroy {
       $scrollReachStart = this.$scrollReachStart,
       $chatId = this._messageService.$chatId,
       $proxyCollectionChange = this.$proxyCollectionChange,
-      $virtualList = toObservable(this.list).pipe(
+      $virtualList = toObservable(this._list).pipe(
         takeUntilDestroyed(),
         filter(list => !!list),
       ),
@@ -133,7 +165,7 @@ export class MessagesComponent implements OnDestroy {
       tap(list => {
         // reset
         this._chunkNumber = 1;
-        this.list()?.cacheClean();
+        this._list()?.cacheClean();
         this._proxyCollection.from([]);
         this.selectedIds.set([]);
         this.isPreparedToShowing.set(false);
@@ -247,7 +279,7 @@ export class MessagesComponent implements OnDestroy {
         this.collectionConfigMap.set(configMap);
         this.collection.set(newItems);
 
-        this.list()?.normalizePositions();
+        this._list()?.normalizePositions();
       }),
       catchError((err) => {
         console.error(err);
