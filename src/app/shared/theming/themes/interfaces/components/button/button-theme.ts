@@ -4,4 +4,5 @@ export interface IButtonTheme {
     normal: IButtonStateTheme;
     pressed: IButtonStateTheme;
     focused: IButtonStateTheme;
+    disabled: IButtonStateTheme;
 }

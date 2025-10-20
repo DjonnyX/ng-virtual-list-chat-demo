@@ -1,14 +1,10 @@
 import { ButtonComponent } from './button.component';
-import { ButtonSubstarateModes, ButtonSubstarateStyles } from './button-substrate/enums';
-import { ButtonSubstarateMode, ButtonSubstarateStyle } from './button-substrate/types';
+import { IButton } from './interfaces';
 
 export {
     ButtonComponent,
-    ButtonSubstarateModes,
-    ButtonSubstarateStyles,
 };
 
 export type {
-    ButtonSubstarateMode,
-    ButtonSubstarateStyle,
+    IButton,
 };

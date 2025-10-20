@@ -7,7 +7,7 @@
         <radialGradient #strokeGradient cx="0%" cy="0%" r="125%" fx="0" fy="0" gradientTransform="rotate(45)">
             <stop #strokeGradientColor1 offset="80%" stop-color="#fff" />
             <stop #strokeGradientColor2 offset="100%" stop-color="#fff" />
-            <animateTransform attributeName="gradientTransform" attributeType="XML" type="rotate" from="0 0.5 0.5"
+            <animateTransform #strokeAnimation attributeName="gradientTransform" attributeType="XML" type="rotate" from="0 0.5 0.5"
                 to="360 0.5 0.5" dur="1000ms" repeatCount="indefinite" />
         </radialGradient>
         <path #path stroke-width="6" />

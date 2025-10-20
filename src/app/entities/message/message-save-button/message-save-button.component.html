@@ -5,7 +5,7 @@
 @let class = classes();
 @let gradientFillColors = fillColors();
 @let gradientFillPositions = fillPositions();
-<x-button press mode="circle" [ngClass]="class" [disabled]="disabledState" [type]="buttonType" [strokeColor]="strokeColor"
+<x-button mode="circle" [ngClass]="class" [disabled]="disabledState" [type]="buttonType" [strokeColor]="strokeColor"
     [fillColors]="gradientFillColors" [fillPositions]="gradientFillPositions" (onPress)="onPressHandler($event)" (onClick)="onClickHandler($event)">
     @switch (buttonState) {
         @case ('send') {

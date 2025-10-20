@@ -7,6 +7,7 @@ import { THEME_LIGHT } from './themes/light';
 import { ThemeName, Themes } from './themes/themes';
 import { serializeToRootVars } from './utils/theme-serializer';
 import { loadStyle } from './utils';
+import { PRESETS } from './themes/presets';
 
 const IS_DARK_THEME_PATTERN = '(prefers-color-scheme: dark)',
   CHANGE_EVENT = 'change';
@@ -43,7 +44,7 @@ export class ThemeService {
           return from(this.setupThemeAutomatically(window.matchMedia(IS_DARK_THEME_PATTERN).matches));
         }
         const theme = Themes[name],
-          vars = !environment.prod ? serializeToRootVars(theme) : undefined;
+          vars = !environment.themePrerender ? serializeToRootVars(theme) : undefined;
         return of({ name, theme, vars });
       }),
       filter(v => !!v),
@@ -81,7 +82,7 @@ export class ThemeService {
   private async setupThemeAutomatically(isDark: boolean) {
     if (this._$name.getValue() === 'auto') {
       const name = isDark ? 'dark' : 'light', theme = Themes[name],
-        vars = !environment.prod ? serializeToRootVars(theme) : undefined;
+        vars = !environment.themePrerender ? serializeToRootVars(theme) : undefined;
 
       if (vars === undefined) {
         try {
@@ -98,5 +99,16 @@ export class ThemeService {
         this._$theme.next(theme);
       }
     }
+  }
+
+  getPreset<P = any>(themeObject: string | { [state: string]: any } | undefined): P | undefined {
+    if (!themeObject) {
+      return;
+    }
+    const value = themeObject;
+    if (typeof value === 'string' && PRESETS.includes(value)) {
+      return this._theme.presets[value];
+    }
+    return themeObject as P;
   }
 }

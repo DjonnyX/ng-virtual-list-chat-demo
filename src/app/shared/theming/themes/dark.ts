@@ -1,5 +1,12 @@
+import { RoundedCorner } from "../../types";
 import { objectAsReadonly } from "./utils";
 import { ITheme } from "./interfaces/theme";
+import { ButtonPresets, DialogPresets } from "./presets";
+
+const BUTTON_ROUNDED_CORNER: RoundedCorner = [8, 8, 8, 8],
+    DIALOG_ROUNDED_CORNER: RoundedCorner = [12, 12, 12, 12],
+    DIALOG_PADDING = '36px 52px',
+    BUTTON_ROUNDED_RECT_PADDING = '4px 6px';
 
 const manifest: ITheme = {
     chat: {
@@ -22,6 +29,12 @@ const manifest: ITheme = {
                     background: 'transparent',
                     color: 'none',
                     fill: 'rgb(212, 196, 228)',
+                    outline: `2px solid rgba(212, 196, 228, 0.25)`,
+                },
+                disabled: {
+                    background: 'transparent',
+                    color: 'none',
+                    fill: 'rgba(212, 196, 228, 0.5)',
                 },
             },
             search: {
@@ -126,11 +139,11 @@ const manifest: ITheme = {
                         color: "rgb(206, 191, 220)",
                     },
                     removal: {
-                        fill: ["rgb(163, 53, 173)", "rgb(139, 20, 86)"],
+                        fill: ["rgb(167, 87, 111)", "rgb(167, 87, 111)"],
                         color: "rgb(206, 191, 220)",
                     },
                     removalSelected: {
-                        fill: ["rgb(163, 53, 173)", "rgb(139, 20, 86)"],
+                        fill: ["rgb(167, 87, 111)", "rgb(167, 87, 111)"],
                         color: "rgb(206, 191, 220)",
                     }
                 },
@@ -183,7 +196,7 @@ const manifest: ITheme = {
                         stroke: ['rgba(255,255,255,0)', 'rgb(219, 156, 255)'],
                     },
                     removing: {
-                        stroke: ['rgba(0,188,212,0)', 'rgb(255, 176, 193)'],
+                        stroke: ['rgba(0,188,212,0)', 'rgb(255, 192, 205)'],
                     },
                 },
             },
@@ -192,6 +205,224 @@ const manifest: ITheme = {
 
         },
     },
+    presets: {
+        [ButtonPresets.PRIMARY]: {
+            normal: {
+                fill: ["rgb(86, 22, 190)", "rgb(104, 0, 136)"],
+                iconFill: "rgb(206, 191, 220)",
+                color: "rgb(240, 217, 255)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+            pressed: {
+                fill: ["rgb(68, 20, 146)", "rgb(89, 6, 114)"],
+                iconFill: "rgb(206, 191, 220)",
+                color: "rgb(240, 217, 255)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+            focused: {
+                fill: ["rgb(86, 22, 190)", "rgb(104, 0, 136)"],
+                iconFill: "rgb(206, 191, 220)",
+                outline: "2px solid rgba(227, 134, 255, 0.25)",
+                color: "rgb(240, 217, 255)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+            disabled: {
+                fill: ["rgba(86, 22, 190, .25)", "rgba(104, 0, 136, .25)"],
+                iconFill: "rgb(206, 191, 220)",
+                color: "rgb(240, 217, 255)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+        },
+        [ButtonPresets.SECONDARY]: {
+            normal: {
+                fill: ["rgb(255, 255, 255)", "rgb(185, 210, 233)"],
+                iconFill: "rgb(48, 44, 160)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+            pressed: {
+                fill: ["rgb(226, 239, 245)", "rgb(156, 184, 209)"],
+                iconFill: "rgb(48, 44, 160)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+            focused: {
+                fill: ["rgb(226, 239, 245)", "rgb(156, 184, 209)"],
+                iconFill: "rgb(232, 217, 255)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+                outline: "2px solid rgb(136, 171, 202)",
+            },
+            disabled: {
+                fill: ["rgba(255, 255, 255, .25)", "rgba(185, 210, 233, .25)"],
+                iconFill: "rgb(35, 32, 122)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+        },
+        [ButtonPresets.THRID]: {
+            normal: {
+                fill: ["rgb(28, 25, 182)", "rgb(48, 0, 141)"],
+                iconFill: "rgb(232, 217, 255)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+            pressed: {
+                fill: ["rgb(25, 22, 150)", "rgb(43, 6, 117)"],
+                iconFill: "rgb(232, 217, 255)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+            focused: {
+                fill: ["rgb(25, 22, 150)", "rgb(43, 6, 117)"],
+                iconFill: "rgb(232, 217, 255)",
+                outline: "2px solid rgb(35, 6, 94)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+            disabled: {
+                fill: ["rgba(28, 25, 182, .25)", "rgba(48, 0, 141, .25)"],
+                iconFill: "rgb(232, 217, 255, .5)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+        },
+        [ButtonPresets.SUCCESS]: {
+            normal: {
+                fill: ["rgb(67, 19, 145)", "rgb(72, 22, 153)"],
+                iconFill: "rgb(206, 191, 220)",
+                color: "rgb(240, 217, 255)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+            pressed: {
+                fill: ["rgb(101, 37, 204)", "rgb(99, 34, 204)"],
+                iconFill: "rgb(206, 191, 220)",
+                color: "rgb(240, 217, 255)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+            focused: {
+                fill: ["rgb(67, 19, 145)", "rgb(72, 22, 153)"],
+                iconFill: "rgb(206, 191, 220)",
+                outline: "2px solid rgba(168, 114, 255, 0.25)",
+                color: "rgb(240, 217, 255)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+            disabled: {
+                fill: ["rgba(67, 19, 145, .25)", "rgba(72, 22, 153, .25)"],
+                iconFill: "rgb(206, 191, 220)",
+                color: "rgb(240, 217, 255)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+        },
+        [ButtonPresets.CANCEL]: {
+            normal: {
+                fill: ["rgba(255, 255, 255, 0)", "rgba(255, 255, 255, 0)"],
+                iconFill: "rgb(206, 191, 220)",
+                color: "rgb(199, 186, 255)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+            pressed: {
+                fill: ["rgba(255, 255, 255, 0.08)", "rgba(255, 255, 255, 0.08)"],
+                iconFill: "rgb(206, 191, 220)",
+                color: "rgb(160, 147, 218)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+            focused: {
+                fill: ["rgba(255, 255, 255, 0)", "rgba(255, 255, 255, 0)"],
+                iconFill: "rgb(206, 191, 220)",
+                outline: "2px solid rgba(227, 134, 255, 0.25)",
+                color: "rgb(199, 186, 255)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+            disabled: {
+                fill: ["rgba(255, 255, 255, 0)", "rgba(255, 255, 255, 0)"],
+                iconFill: "rgba(206, 191, 220, 0.45)",
+                color: "rgba(199, 186, 255, 0.45)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+        },
+        [ButtonPresets.WARN]: {
+            normal: {
+                fill: ["rgba(255, 255, 255, 0)", "rgba(255, 255, 255, 0)"],
+                iconFill: "rgb(206, 191, 220)",
+                color: "rgb(255, 122, 120)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+            pressed: {
+                fill: ["rgba(255, 255, 255, 0.08)", "rgba(255, 255, 255, 0.08)"],
+                iconFill: "rgb(206, 191, 220)",
+                color: "rgb(223, 91, 164)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+            focused: {
+                fill: ["rgba(255, 255, 255, 0)", "rgba(255, 255, 255, 0)"],
+                iconFill: "rgb(206, 191, 220)",
+                outline: "2px solid rgba(227, 134, 255, 0.25)",
+                color: "rgb(255, 122, 195)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+            disabled: {
+                fill: ["rgba(255, 255, 255, 0)", "rgba(255, 255, 255, 0)"],
+                iconFill: "rgba(206, 191, 220, 0.45)",
+                color: "rgba(255, 122, 195, 0.45)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+        },
+        [DialogPresets.PRIMARY]: {
+            fill: ["rgb(86, 66, 139)", "rgb(86, 66, 139)"],
+            roundedCorner: DIALOG_ROUNDED_CORNER,
+            padding: DIALOG_PADDING,
+            strokeAnimationDuration: 10000,
+            strokeGradientColor: ["rgba(0, 71, 151, 0)", "rgb(255, 122, 162)"],
+            title: {
+                fontSize: 14,
+                textAlign: "left",
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+                color: "rgb(199, 186, 255)",
+            },
+            message: {
+                fontSize: 14,
+                textAlign: "left",
+                textTransform: 'none',
+                color: "rgb(199, 186, 255)",
+            },
+        },
+        [DialogPresets.SECONDARY]: {
+            fill: ["rgb(49, 56, 73)", "rgb(45, 51, 66)"],
+            roundedCorner: DIALOG_ROUNDED_CORNER,
+            padding: DIALOG_PADDING,
+            strokeAnimationDuration: 10000,
+            title: {
+                fontSize: 12,
+                textAlign: "left",
+                textTransform: 'uppercase',
+                color: "rgb(126, 191, 218)",
+            },
+            message: {
+                fontSize: 12,
+                textAlign: "left",
+                textTransform: 'none',
+                color: "rgb(203, 223, 223)",
+            },
+        },
+    }
 };
 
 const THEME_DARK = objectAsReadonly(manifest);

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, input, output, signal, Signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, input, output, signal, Signal } from '@angular/core';
 import { LongPressDirective } from '@shared/directives';
 import { Id, IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/ng-virtual-list';
 import { IMessageItemData } from "@shared/models/message";
@@ -11,6 +11,11 @@ import { MessageComponent } from '../message/message.component';
 import { IMessageParams } from '../message/interfaces';
 import { ContextMenuComponent, IContextMenuCollection } from '@shared/components/context-menu';
 import { GradientColorPositions } from '@shared/types';
+import { DialogService } from '@shared/components/dialog/dialog.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { filter, tap } from 'rxjs';
+import { ButtonPresets } from '@shared/theming';
+import { DialogPresets } from '@shared/theming/themes/presets';
 
 const CLASS_IN = 'in', CLASS_OUT = 'out', CLASS_SIMPLE = 'simple', CLASS_END_OF_MESSAGES = 'end-of-messages',
   CLASS_REMOVAL = 'removal', CLASS_DELETED = 'deleted', CLASS_ANIMATE = 'animate', CLASS_EDITED = 'edited',
@@ -55,12 +60,19 @@ const CONTEXT_MENU_NORMAL: IContextMenuCollection = [
     },
   ];
 
+interface IDeleteEventData {
+  nativeEvent: Event;
+  item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>;
+  config: IDisplayObjectConfig;
+  measures: ISize;
+}
 
 @Component({
   selector: 'message-box',
   imports: [CommonModule, MessageComponent, LongPressDirective, MessageMenuButtonComponent, MessageSaveButtonComponent,
     CdkMenuTrigger, ContextMenuComponent,
   ],
+  providers: [DialogService],
   templateUrl: './message-box.component.html',
   styleUrl: './message-box.component.scss'
 })
@@ -85,7 +97,9 @@ export class MessageBoxComponent {
 
   changeText = output<string>();
 
-  delete = output<{ nativeEvent: Event, item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, config: IDisplayObjectConfig, measures: ISize }>();
+  delete = output<IDeleteEventData>();
+
+  private tmpValue = signal<string | undefined>(undefined);
 
   classes: Signal<{ [className: string]: boolean; }>;
 
@@ -101,9 +115,11 @@ export class MessageBoxComponent {
 
   fillPositions: Signal<GradientColorPositions>;
 
-  private tmpValue = signal<string | undefined>(undefined);
-
   isMessageValid: Signal<boolean>;
+
+  private _dialogService = inject(DialogService);
+
+  private _destroyRef = inject(DestroyRef);
 
   constructor() {
     this.params = computed(() => {
@@ -169,7 +185,32 @@ export class MessageBoxComponent {
   }
 
   onDeleteItemHandler(nativeEvent: Event, item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, config: IDisplayObjectConfig, measures: ISize) {
-    this.delete.emit({ nativeEvent, item: item!, config: config!, measures: measures! });
+    const data: IDeleteEventData = { nativeEvent, item: item!, config: config!, measures: measures! };
+    this._dialogService.open<IDeleteEventData | undefined>({
+      title: "Attention",
+      message: "Are you sure you want to delete the message?",
+      actions: [
+        {
+          action: "cancel",
+          name: "cancel",
+          preset: ButtonPresets.CANCEL,
+          data: undefined,
+        },
+        {
+          action: "delete",
+          name: "delete",
+          preset: ButtonPresets.SUCCESS,
+          data,
+        },
+      ],
+      preset: DialogPresets.PRIMARY,
+    }).pipe(
+      takeUntilDestroyed(this._destroyRef),
+      filter(data => !!data),
+      tap(data => {
+        this.delete.emit(data);
+      }),
+    ).subscribe();
   }
 
   onMenuClickHandler(e: Event) {

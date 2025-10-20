@@ -4,6 +4,7 @@
     border: none;
     font: inherit;
     color: inherit;
+    text-transform: inherit;
     background-color: transparent;
     cursor: pointer;
     font-size: 14px;
@@ -27,6 +28,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
 }
 
 .substrate {

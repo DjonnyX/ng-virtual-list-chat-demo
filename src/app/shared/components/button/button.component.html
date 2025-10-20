@@ -3,11 +3,11 @@
 @let b = bounds();
 @let value = content();
 @let stroke = strokeColor();
-@let corner = roundCorner();
-@let gradientFillColors = fillColors();
+@let corner = shapeRoundCorner();
+@let gradientFillColors = fillGradientColors();
 @let gradientFillPositions = fillPositions();
-<button class="button" (click)="onClickHandler($event)">
-    <button-substrate class="substrate" [fillColors]="gradientFillColors" [fillColorPositions]="gradientFillPositions" 
+<button #button press class="button" (onPress)="onPressHandler($event)" (click)="onClickHandler($event)">
+    <x-substrate class="substrate" [fillColors]="gradientFillColors" [fillColorPositions]="gradientFillPositions"
         [width]="b.width" [height]="b.height" [roundCorner]="corner" [mode]="m" [type]="t" [strokeColors]="stroke" />
     <span class="content">
         <ng-content>

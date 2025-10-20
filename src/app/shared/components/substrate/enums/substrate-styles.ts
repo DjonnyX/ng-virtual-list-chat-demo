@@ -1,4 +1,4 @@
-export enum ButtonSubstarateStyles {
+export enum SubstarateStyles {
     NONE = 'none',
     STROKE = 'stroke',
 };

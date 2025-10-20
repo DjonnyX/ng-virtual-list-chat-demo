@@ -1,0 +1,25 @@
+@let m = mode();
+@let t = type();
+@let b = bounds();
+@let val = value();
+@let text = content();
+@let stroke = strokeColor();
+@let corner = roundCorner();
+@let gradientFillColors = fillColors();
+@let gradientFillPositions = fillPositions();
+<button class="button" (click)="onClickHandler($event)">
+    <x-substrate class="substrate" [fillColors]="gradientFillColors" [fillColorPositions]="gradientFillPositions"
+        [width]="b.width" [height]="b.height" [roundCorner]="corner" [mode]="m" [type]="t" [strokeColors]="stroke" />
+    <span class="indicator">
+        @if (val) {
+
+        } @else {
+
+        }
+    </span>
+    <span class="content">
+        <ng-content>
+            {{text}}
+        </ng-content>
+    </span>
+</button>

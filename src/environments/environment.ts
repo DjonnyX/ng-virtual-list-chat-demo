@@ -1,4 +1,4 @@
 export const environment = {
-    prod: true,
+    themePrerender: false,
     useMock: true,
 };

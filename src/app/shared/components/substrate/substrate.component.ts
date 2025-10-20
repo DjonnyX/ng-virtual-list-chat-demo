@@ -1,17 +1,18 @@
 import { Component, effect, ElementRef, input, viewChild, ViewEncapsulation } from '@angular/core';
-import { ButtonSubstarateMode } from './types/button-substrate-mode';
-import { ButtonSubstarateModes } from './enums/button-substrate-modes';
-import { ButtonSubstarateStyle } from './types';
-import { ButtonSubstarateStyles } from './enums';
+import { SubstarateMode } from './types/substrate-mode';
+import { SubstarateModes } from './enums/substrate-modes';
+import { SubstarateStyle } from './types';
+import { SubstarateStyles } from './enums';
 import { GradientColor, GradientColorPositions } from '@shared/types';
 
 const DEFAULT_WIDTH = 12,
   DEFAULT_HEIGHT = 12,
-  SHAPE_NAME = 'x-button-shape',
-  CLIP_NAME = 'x-button-clip',
+  DEFAULT_STROKE_ANIMATION_DURATION = 1000,
+  SHAPE_NAME = 'x-substrate-shape',
+  CLIP_NAME = 'x-substrate-clip',
   GRADIENT_COLOR_NAME = 'stop-color',
-  FILL_GRADIENT_NAME = 'x-button-fill-gradient',
-  STROKE_GRADIENT_NAME = 'x-button-stroke-gradient';
+  FILL_GRADIENT_NAME = 'x-substrate-fill-gradient',
+  STROKE_GRADIENT_NAME = 'x-substrate-stroke-gradient';
 
 const circlePath = (cx: number, cy: number, r: number) => {
   return 'M ' + cx + ' ' + cy + ' m -' + r + ', 0 a ' + r + ',' + r + ' 0 1,1 ' + (r * 2) + ',0 a ' + r + ',' + r + ' 0 1,1 -' + (r * 2) + ',0';
@@ -38,16 +39,16 @@ const roundedRectPath = (width: number, height: number, tl: number, tr: number, 
 };
 
 @Component({
-  selector: 'button-substrate',
+  selector: 'x-substrate',
   imports: [],
-  templateUrl: './button-substrate.component.html',
-  styleUrl: './button-substrate.component.scss',
+  templateUrl: './substrate.component.html',
+  styleUrl: './substrate.component.scss',
   encapsulation: ViewEncapsulation.Emulated,
 })
-export class ButtonSubstrateComponent {
+export class SubstrateComponent {
   private static __id: number = 0;
   private static get nextId() {
-    const id = ButtonSubstrateComponent.__id = ButtonSubstrateComponent.__id + 1 === Number.MAX_SAFE_INTEGER ? 0 : ButtonSubstrateComponent.__id + 1;
+    const id = SubstrateComponent.__id = SubstrateComponent.__id + 1 === Number.MAX_SAFE_INTEGER ? 0 : SubstrateComponent.__id + 1;
     return id;
   }
 
@@ -79,7 +80,9 @@ export class ButtonSubstrateComponent {
 
   strokeGradientColor2 = viewChild<ElementRef<SVGStopElement>>('strokeGradientColor2');
 
-  mode = input.required<ButtonSubstarateMode>();
+  strokeAnimation = viewChild<ElementRef<SVGAnimateTransformElement>>('strokeAnimation');
+
+  mode = input.required<SubstarateMode>();
 
   width = input.required<number>();
 
@@ -87,16 +90,18 @@ export class ButtonSubstrateComponent {
 
   roundCorner = input<Array<number> | undefined>(undefined);
 
-  type = input<ButtonSubstarateStyle>(ButtonSubstarateStyles.NONE);
+  type = input<SubstarateStyle>(SubstarateStyles.NONE);
 
   strokeColors = input<GradientColor>();
+
+  strokeAnimationDuration = input<number>(DEFAULT_STROKE_ANIMATION_DURATION);
 
   fillColors = input<GradientColor | undefined>(undefined);
 
   fillColorPositions = input<GradientColorPositions | undefined>(undefined);
 
   constructor() {
-    this._id = ButtonSubstrateComponent.nextId;
+    this._id = SubstrateComponent.nextId;
 
     effect(() => {
       const fillColors = this.fillColors();
@@ -119,6 +124,12 @@ export class ButtonSubstrateComponent {
       }
     });
 
+    effect(() => {
+      const strokeAnimationDuration = this.strokeAnimationDuration(), strokeAnimation = this.strokeAnimation()?.nativeElement;
+      if (strokeAnimation) {
+        strokeAnimation.setAttribute('dur', `${strokeAnimationDuration ?? DEFAULT_STROKE_ANIMATION_DURATION}ms`);
+      }
+    })
 
     effect(() => {
       const fillColorPositions = this.fillColorPositions();
@@ -202,18 +213,18 @@ export class ButtonSubstrateComponent {
         svg.style.height = `${h}px`;
         svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
         switch (this.mode()) {
-          case ButtonSubstarateModes.CIRCLE: {
+          case SubstarateModes.CIRCLE: {
             const r = Math.min(w, h) * .5, shape = circlePath(w * .5, h * .5, r);
             path.setAttribute('d', shape);
             break;
           }
-          case ButtonSubstarateModes.ROUNDED_RECTANGLE: {
+          case SubstarateModes.ROUNDED_RECTANGLE: {
             const corner = Array.isArray(roundCorner) && roundCorner.length === 4 ? roundCorner : [0, 0, 0, 0];
             const shape = roundedRectPath(w, h, corner[0], corner[1], corner[2], corner[3]);
             path.setAttribute('d', shape);
             break;
           }
-          case ButtonSubstarateModes.RECTANGLE:
+          case SubstarateModes.RECTANGLE:
           default: {
             const shape = roundedRectPath(w, h, 0, 0, 0, 0);
             path.setAttribute('d', shape);
@@ -227,11 +238,11 @@ export class ButtonSubstrateComponent {
       const type = this.type(), shape = this.shape()?.nativeElement;
       if (shape) {
         switch (type) {
-          case ButtonSubstarateStyles.STROKE: {
+          case SubstarateStyles.STROKE: {
             shape.setAttribute('stroke', `url(#${STROKE_GRADIENT_NAME}${this._id})`);
             break;
           }
-          case ButtonSubstarateStyles.NONE:
+          case SubstarateStyles.NONE:
           default:
             shape.setAttribute('stroke', 'none');
             break;
@@ -243,11 +254,11 @@ export class ButtonSubstrateComponent {
       const type = this.type(), hilight = this.hilight()?.nativeElement;
       if (hilight) {
         switch (type) {
-          case ButtonSubstarateStyles.STROKE: {
+          case SubstarateStyles.STROKE: {
             hilight.setAttribute('stroke', `url(#${STROKE_GRADIENT_NAME}${this._id})`);
             break;
           }
-          case ButtonSubstarateStyles.NONE:
+          case SubstarateStyles.NONE:
           default:
             hilight.setAttribute('stroke', 'none');
             break;
