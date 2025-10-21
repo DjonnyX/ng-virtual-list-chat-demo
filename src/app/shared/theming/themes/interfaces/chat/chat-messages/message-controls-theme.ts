@@ -1,8 +1,8 @@
 import { ButtonPresets } from "../../../presets";
-import { IIconButtonStates } from "../../common/icon-button-states";
+import { IButtonTheme } from "../../components/button";
 
 export interface IMessageControlsTheme {
-    menu: ButtonPresets | IIconButtonStates;
-    send: ButtonPresets | IIconButtonStates;
-    cancel: ButtonPresets | IIconButtonStates;
+    menu: ButtonPresets | IButtonTheme;
+    send: ButtonPresets | IButtonTheme;
+    cancel: ButtonPresets | IButtonTheme;
 }

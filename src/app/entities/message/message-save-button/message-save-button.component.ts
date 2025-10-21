@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, ElementRef, inject, input, output, Signal, signal, viewChild } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { delay, Subject, tap } from 'rxjs';
 import { ButtonComponent } from '@shared/components/button';
 import { SubstarateStyle, SubstarateStyles } from '@shared/components/substrate';
 import { GradientColor, GradientColorPositions } from '@shared/types';
-import { Subject } from 'rxjs';
+import { ThemeService } from '@shared/theming';
 import { MessageButtonSaveState } from './types';
 import { MessageButtonSaveStates } from './enums';
-import { ThemeService } from '@shared/theming';
-import { toSignal } from '@angular/core/rxjs-interop';
 
 const DEFAULT_STROKE_COLOR: GradientColor = ['rgba(186, 250, 255, 0)', 'rgb(183, 235, 255)'],
   DEFAULT_FILL_COLOR: GradientColor = ['rgb(255, 255, 255)', 'rgb(185, 210, 233)'];
@@ -45,12 +45,37 @@ export class MessageSaveButtonComponent {
 
   classes: Signal<{ [name: string]: boolean }>;
 
-  private _$click = new Subject<void>();
+  private _$pressed = new Subject<boolean>();
+  protected $pressed = this._$pressed.asObservable();
+
+  private _$click = new Subject<Event>();
   protected $click = this._$click.asObservable();
 
   private _themeService = inject(ThemeService);
 
   constructor() {
+    const $pressed = this.$pressed;
+
+    $pressed.pipe(
+      takeUntilDestroyed(),
+      delay(300),
+      takeUntilDestroyed(),
+      tap(v => {
+        this.pressed.set(v);
+      }),
+    ).subscribe();
+
+    const $click = this.$click;
+
+    $click.pipe(
+      takeUntilDestroyed(),
+      delay(300),
+      takeUntilDestroyed(),
+      tap(v => {
+        this.onClick.emit(v);
+      }),
+    ).subscribe();
+
     const theme = toSignal(this._themeService.$theme);
 
     this.type = computed(() => {
@@ -86,15 +111,27 @@ export class MessageSaveButtonComponent {
         if (preset) {
           if (preset.disabled && disabled) {
             this.fillColors.set(preset.disabled.fill ?? DEFAULT_FILL_COLOR);
+            if (preset.disabled.strokeGradientColor) {
+              this.buttonStrokeColor.set(preset.disabled.strokeGradientColor);
+            }
             contentEl.style.fill = preset.disabled.iconFill;
           } else if (focused && preset.focused) {
             this.fillColors.set(preset.focused.fill ?? DEFAULT_FILL_COLOR);
+            if (preset.focused.strokeGradientColor) {
+              this.buttonStrokeColor.set(preset.focused.strokeGradientColor);
+            }
             contentEl.style.fill = preset.focused.iconFill;
           } else if (preset.pressed && pressed) {
             this.fillColors.set(preset.pressed.fill ?? DEFAULT_FILL_COLOR);
+            if (preset.pressed.strokeGradientColor) {
+              this.buttonStrokeColor.set(preset.pressed.strokeGradientColor);
+            }
             contentEl.style.fill = preset.pressed.iconFill;
           } else {
             this.fillColors.set(preset.normal.fill ?? DEFAULT_FILL_COLOR);
+            if (preset.normal.strokeGradientColor) {
+              this.buttonStrokeColor.set(preset.normal.strokeGradientColor);
+            }
             contentEl.style.fill = preset.normal.iconFill;
           }
         }
@@ -103,12 +140,11 @@ export class MessageSaveButtonComponent {
   }
 
   onClickHandler(e: Event) {
-    this.onClick.emit(e);
-    this._$click.next();
+    this._$click.next(e);
   }
 
   onPressHandler(pressed: boolean) {
-    this.pressed.set(pressed);
+    this._$pressed.next(pressed);
   }
 
   onFocusHandler(focused: boolean) {

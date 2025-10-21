@@ -1,22 +1,23 @@
 import { Component, effect, ElementRef, inject, input, output, signal, Signal, viewChild } from '@angular/core';
 import { CdkMenu, CdkMenuItem } from '@angular/cdk/menu';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { delay, Subject, tap } from 'rxjs';
+import { ThemeService } from '@shared/theming';
+import { ITheme } from '@shared/theming';
+import { ButtonPresets, ContextMenuPresets } from '@shared/theming/themes/presets';
+import { GradientColor, GradientColorPositions, RoundedCorner } from '@shared/types';
 import { IContextMenuCollection } from './interfaces/context-menu-collection.interface';
 import { Id, ISize } from '../ng-virtual-list';
 import { ButtonComponent } from '../button';
-import { ThemeService } from '@shared/theming';
-import { ITheme } from '@shared/theming';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { ButtonPresets, ContextMenuPresets } from '@shared/theming/themes/presets';
 import { SubstarateMode, SubstarateModes, SubstarateStyle, SubstarateStyles, SubstrateComponent } from '../substrate';
-import { GradientColor, GradientColorPositions, RoundedCorner } from '@shared/types';
 import { formatCSSNumber } from '../utils';
-import { delay, Subject, tap } from 'rxjs';
 
 const DEFAULT_CONTEXT_MENU_WIDTH = 20,
   DEFAULT_CONTEXT_MENU_HEIGHT = 20,
   DEFAULT_ROUNDED_CORNER: RoundedCorner = [10, 10, 10, 10],
   DEFAULT_FILL_POSITIONS: GradientColorPositions = [0, 1],
-  DEFAULT_STROKE_ANIMATION_DURATION = 1000;
+  DEFAULT_STROKE_ANIMATION_DURATION = 1000,
+  UNSET = 'unset';
 
 @Component({
   selector: 'x-context-menu',
@@ -118,11 +119,11 @@ export class ContextMenuComponent {
         const ctxMenuElement = this.contextMenu()?.nativeElement as HTMLDivElement,
           contentElement = this.content()?.nativeElement as HTMLDivElement;
         if (contentElement && ctxMenuElement) {
-          contentElement.style.padding = themePreset.padding ? themePreset.padding : 'unset';
-          ctxMenuElement.style.borderTopLeftRadius = themePreset.roundedCorner ? formatCSSNumber(themePreset.roundedCorner[0]) : 'unset';
-          ctxMenuElement.style.borderBottomLeftRadius = themePreset.roundedCorner ? formatCSSNumber(themePreset.roundedCorner[1]) : 'unset';
-          ctxMenuElement.style.borderBottomRightRadius = themePreset.roundedCorner ? formatCSSNumber(themePreset.roundedCorner[2]) : 'unset';
-          ctxMenuElement.style.borderTopRightRadius = themePreset.roundedCorner ? formatCSSNumber(themePreset.roundedCorner[3]) : 'unset';
+          contentElement.style.padding = themePreset.padding ? themePreset.padding : UNSET;
+          ctxMenuElement.style.borderTopLeftRadius = themePreset.roundedCorner ? formatCSSNumber(themePreset.roundedCorner[0]) : UNSET;
+          ctxMenuElement.style.borderBottomLeftRadius = themePreset.roundedCorner ? formatCSSNumber(themePreset.roundedCorner[1]) : UNSET;
+          ctxMenuElement.style.borderBottomRightRadius = themePreset.roundedCorner ? formatCSSNumber(themePreset.roundedCorner[2]) : UNSET;
+          ctxMenuElement.style.borderTopRightRadius = themePreset.roundedCorner ? formatCSSNumber(themePreset.roundedCorner[3]) : UNSET;
 
           this.roundCorner.set(themePreset.roundedCorner ?? DEFAULT_ROUNDED_CORNER);
           this.fillGradientColors.set(themePreset.fill ?? this.fillColors());

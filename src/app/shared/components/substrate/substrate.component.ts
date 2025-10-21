@@ -1,15 +1,14 @@
 import { Component, DestroyRef, effect, ElementRef, inject, input, signal, viewChild, ViewEncapsulation } from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { delay, filter, map, switchMap, tap } from 'rxjs';
+import { Color, GradientColor, GradientColorPositions, RoundedCorner } from '@shared/types';
 import { SubstarateMode } from './types/substrate-mode';
 import { SubstarateModes } from './enums/substrate-modes';
 import { SubstarateStyle } from './types';
 import { SubstarateStyles } from './enums';
-import { Color, GradientColor, GradientColorPositions } from '@shared/types';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { delay, filter, map, switchMap, tap } from 'rxjs';
+import { getShapeMinSize } from '@shared/utils';
 
-const DEFAULT_WIDTH = 32,
-  DEFAULT_HEIGHT = 32,
-  DEFAULT_STROKE_ANIMATION_DURATION = 1000,
+const DEFAULT_STROKE_ANIMATION_DURATION = 1000,
   RIPPLE_ANIMATE_CLASS = 'animate',
   DEFAULT_RIPPLE_COLOR = "rgba(0,0,0,0.1)",
   SHAPE_NAME = 'x-substrate-shape',
@@ -94,7 +93,7 @@ export class SubstrateComponent {
 
   height = input.required<number>();
 
-  roundCorner = input<Array<number> | undefined>(undefined);
+  roundCorner = input<RoundedCorner | undefined>(undefined);
 
   type = input<SubstarateStyle>(SubstarateStyles.NONE);
 
@@ -226,9 +225,9 @@ export class SubstrateComponent {
     });
 
     effect(() => {
-      const svg = this.svg()?.nativeElement, path = this.path()?.nativeElement, roundCorner = this.roundCorner(),
-        ww = (this.width() ?? DEFAULT_WIDTH), w = ww > 0 ? ww : DEFAULT_WIDTH,
-        hh = (this.height() ?? DEFAULT_HEIGHT), h = hh > 0 ? hh : DEFAULT_HEIGHT;
+      const svg = this.svg()?.nativeElement, path = this.path()?.nativeElement, roundCorner = this.roundCorner(), minSize = getShapeMinSize(roundCorner),
+        ww = (this.width() || minSize), w = ww >= minSize ? ww : minSize,
+        hh = (this.height() || minSize), h = hh >= minSize ? hh : minSize;
       if (svg && path) {
         svg.style.width = `${w}px`;
         svg.style.height = `${h}px`;

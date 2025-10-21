@@ -1,8 +1,8 @@
 import { Component, input, output } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { delay, Subject, tap } from 'rxjs';
 import { IButtonGroupItem } from './interfaces';
 import { ButtonComponent } from '../button/button.component';
-import { delay, Subject, tap } from 'rxjs';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'x-button-group',

@@ -1,10 +1,10 @@
 import { Component, effect, ElementRef, inject, input, OnDestroy, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { GradientColor, GradientColorPositions } from '@shared/types';
+import { GradientColor, GradientColorPositions, RoundedCorner } from '@shared/types';
 import { SubstrateComponent, SubstarateMode, SubstarateStyle, SubstarateModes, SubstarateStyles } from '../substrate';
 import { ISize } from '../ng-virtual-list';
 
-const DEFAULT_ROUND_CORNER = [8, 8, 8, 8],
+const DEFAULT_ROUND_CORNER: RoundedCorner = [8, 8, 8, 8],
   CLASS_CHECKED = 'checked',
   CLASS_DISABLED = 'disabled';
 
@@ -28,7 +28,7 @@ export class CheckBoxComponent implements OnDestroy {
 
   strokeColor = input<GradientColor | undefined>(undefined);
 
-  roundCorner = input<Array<number> | undefined>(DEFAULT_ROUND_CORNER);
+  roundCorner = input<RoundedCorner | undefined>(DEFAULT_ROUND_CORNER);
 
   disabled = input<boolean>(false);
 

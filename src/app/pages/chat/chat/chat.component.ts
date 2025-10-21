@@ -1,20 +1,18 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, effect, ElementRef, inject, Signal, signal, viewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IRenderVirtualListItem, IVirtualListItem } from '@shared/components/ng-virtual-list';
-import {
-  BehaviorSubject,
-} from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { BehaviorSubject, } from 'rxjs';
 import { MenuButtonComponent, MessageSearchComponent } from '@entities/header';
+import { IRenderVirtualListItem, IVirtualListItem } from '@shared/components/ng-virtual-list';
 import { DrawerComponent, DockMode } from "@shared/components";
 import { ClickOutsideService } from '@shared/directives';
-import { generateChatCollection } from '@mock/const';
 import { MessagesComponent } from "@widgets/messages/messages/messages.component";
 import { GroupsComponent } from "@widgets/groups/groups/groups.component";
 import { MessageService } from '@widgets/messages';
 import { ITheme } from '@shared/theming';
 import { ThemeService } from '@shared/theming';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { generateChatCollection } from '@mock/const';
 
 @Component({
   selector: 'chat',

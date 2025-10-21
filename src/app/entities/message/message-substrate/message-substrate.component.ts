@@ -1,12 +1,12 @@
 import { Component, DestroyRef, effect, ElementRef, inject, input, signal, viewChild, ViewEncapsulation } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { delay, filter, map, switchMap, tap } from 'rxjs';
 import { MessageSubstarateMode } from './types/message-substrate-mode';
 import { MessageSubstarateModes } from './enums/message-substrate-modes';
 import { MessageSubstarateStyle } from './types';
 import { MessageSubstarateStyles } from './enums';
 import { Color, GradientColor, GradientColorPositions } from '@shared/types';
-import { CommonModule } from '@angular/common';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { delay, filter, map, switchMap, tap } from 'rxjs';
 
 const LEFT_WIDTH = 17.5,
   RIGHT_WIDTH = 13,

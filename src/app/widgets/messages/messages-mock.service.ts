@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { delay, Observable, of, switchMap, throwError } from 'rxjs';
-import { Id, IVirtualListCollection, IVirtualListItem } from '@shared/components/ng-virtual-list';
 import { generateMessageCollection } from '@mock/const/collection';
+import { Id, IVirtualListCollection, IVirtualListItem } from '@shared/components/ng-virtual-list';
+import { IMessageItemData } from '@shared/models/message';
 import { IMessagesChunkParams, MessagesService } from './messages.service';
 import { IGetMessagesAnswer, IGetMessagesData } from './model/messages';
 import { IMessage } from './model/message';
-import { IMessageItemData } from '@shared/models/message';
 
 interface IDB {
     version: number;

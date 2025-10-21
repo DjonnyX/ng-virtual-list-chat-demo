@@ -204,6 +204,7 @@ const manifest: ITheme = {
     },
     presets: {
         [ButtonPresets.PRIMARY]: {
+            rippleColor: "rgba(255, 255, 255, 0.2)",
             normal: {
                 fill: ["rgb(28, 25, 182)", "rgb(48, 0, 141)"],
                 iconFill: "rgb(232, 217, 255)",
@@ -262,6 +263,7 @@ const manifest: ITheme = {
             },
         },
         [ButtonPresets.THRID]: {
+            rippleColor: "rgba(255, 255, 255, 0.2)",
             normal: {
                 fill: ["rgb(28, 25, 182)", "rgb(48, 0, 141)"],
                 iconFill: "rgb(232, 217, 255)",

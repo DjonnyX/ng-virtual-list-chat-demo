@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { NgVirtualListComponent } from '@shared/components';
 import { BehaviorSubject, distinctUntilChanged } from 'rxjs';
+import { NgVirtualListComponent } from '@shared/components';
 
 @Injectable({
   providedIn: 'root'

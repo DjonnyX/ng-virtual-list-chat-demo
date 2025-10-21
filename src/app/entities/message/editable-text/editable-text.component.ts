@@ -1,10 +1,10 @@
 import { Component, DestroyRef, effect, ElementRef, inject, input, output, Signal, signal, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SearchHighlightDirective } from '@shared/directives';
-import { formatText } from '@shared/utils';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { from, switchMap, tap } from 'rxjs';
+import { SearchHighlightDirective } from '@shared/directives';
+import { formatText } from '@shared/utils';
 import { ThemeService } from '@shared/theming';
 import { ITheme } from '@shared/theming';
 

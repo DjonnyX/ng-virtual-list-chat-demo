@@ -2,21 +2,23 @@ import { Component, computed, effect, ElementRef, inject, signal, Signal, viewCh
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
+import { filter, map, tap } from 'rxjs';
 import { ThemeService } from '@shared/theming';
 import { ITheme } from '@shared/theming';
+import { IDialogTheme } from '@shared/theming/themes/interfaces/components/dialog';
+import { GradientColor, GradientColorPositions, RoundedCorner } from '@shared/types';
 import { IDialogData } from './interfaces';
 import { ButtonGroupComponent } from '../button-group';
 import { IButtonGroupItem } from '../button-group/interfaces';
 import { formatCSSNumber } from '../utils';
-import { IDialogTheme } from '@shared/theming/themes/interfaces/components/dialog';
 import { SubstarateMode, SubstarateModes, SubstarateStyle, SubstarateStyles, SubstrateComponent } from '../substrate';
-import { GradientColor, GradientColorPositions, RoundedCorner } from '@shared/types';
 import { ISize } from '../ng-virtual-list';
-import { filter, map, tap } from 'rxjs';
 
 const DEFAULT_ROUND_CORNER: RoundedCorner = [8, 8, 8, 8],
   DEFAULT_FILL_POSITIONS: GradientColorPositions = [0, 1],
-  DEFAULT_STROKE_ANIMATION_DURATION = 1000;
+  DEFAULT_STROKE_ANIMATION_DURATION = 1000,
+  INHERIT = 'inherit',
+  NONE = 'none';
 
 @Component({
   selector: 'x-dialog',
@@ -113,19 +115,19 @@ export class DialogComponent {
       if (preset && theme && content && title && message) {
         const themePreset = this._themeService.getPreset<IDialogTheme>(theme.presets[preset]);
         if (themePreset) {
-          title.style.fontSize = themePreset.title.fontSize ? formatCSSNumber(formatCSSNumber(themePreset.title.fontSize)) : 'inherit';
-          title.style.color = themePreset.title.color ? formatCSSNumber(themePreset.title.color) : 'inherit';
-          title.style.textAlign = themePreset.title.textAlign ? formatCSSNumber(themePreset.title.textAlign) : 'inherit';
-          title.style.fontWeight = themePreset.title.fontWeight ? formatCSSNumber(themePreset.title.fontWeight) : 'inherit';
-          title.style.textTransform = themePreset.title.textTransform ? formatCSSNumber(themePreset.title.textTransform) : 'inherit';
+          title.style.fontSize = themePreset.title.fontSize ? formatCSSNumber(formatCSSNumber(themePreset.title.fontSize)) : INHERIT;
+          title.style.color = themePreset.title.color ? formatCSSNumber(themePreset.title.color) : INHERIT;
+          title.style.textAlign = themePreset.title.textAlign ? formatCSSNumber(themePreset.title.textAlign) : INHERIT;
+          title.style.fontWeight = themePreset.title.fontWeight ? formatCSSNumber(themePreset.title.fontWeight) : INHERIT;
+          title.style.textTransform = themePreset.title.textTransform ? formatCSSNumber(themePreset.title.textTransform) : INHERIT;
 
-          message.style.fontSize = themePreset.message.fontSize ? formatCSSNumber(formatCSSNumber(themePreset.message.fontSize)) : 'inherit';
-          message.style.color = themePreset.message.color ? formatCSSNumber(themePreset.message.color) : 'inherit';
-          message.style.textAlign = themePreset.message.textAlign ? formatCSSNumber(themePreset.message.textAlign) : 'inherit';
-          message.style.fontWeight = themePreset.message.fontWeight ? formatCSSNumber(themePreset.message.fontWeight) : 'inherit';
-          message.style.textTransform = themePreset.message.textTransform ? formatCSSNumber(themePreset.message.textTransform) : 'inherit';
+          message.style.fontSize = themePreset.message.fontSize ? formatCSSNumber(formatCSSNumber(themePreset.message.fontSize)) : INHERIT;
+          message.style.color = themePreset.message.color ? formatCSSNumber(themePreset.message.color) : INHERIT;
+          message.style.textAlign = themePreset.message.textAlign ? formatCSSNumber(themePreset.message.textAlign) : INHERIT;
+          message.style.fontWeight = themePreset.message.fontWeight ? formatCSSNumber(themePreset.message.fontWeight) : INHERIT;
+          message.style.textTransform = themePreset.message.textTransform ? formatCSSNumber(themePreset.message.textTransform) : INHERIT;
 
-          content.style.padding = themePreset.padding ?? 'none';
+          content.style.padding = themePreset.padding ?? NONE;
 
           this.roundCorner.set(themePreset.roundedCorner ?? DEFAULT_ROUND_CORNER);
           this.fillColors.set(Array.isArray(themePreset.fill) ? themePreset.fill : this.fillColors());

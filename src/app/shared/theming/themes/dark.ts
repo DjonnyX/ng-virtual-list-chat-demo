@@ -153,13 +153,14 @@ const manifest: ITheme = {
                 },
                 controls: {
                     menu: {
+                        rippleColor: "rgba(255, 255, 255, 0.2)",
                         normal: {
-                            fill: ["rgb(56, 43, 179)", "rgb(82, 32, 126)"],
+                            fill: ["rgb(56, 43, 179)", "rgb(56, 43, 179)"],
                             iconFill: "rgb(206, 191, 220)",
                             strokeGradientColor: ['rgba(255,255,255,0)', 'rgb(255, 255, 255)'],
                         },
                         pressed: {
-                            fill: ["rgb(87, 74, 204)", "rgb(106, 55, 151)"],
+                            fill: ["rgb(87, 74, 204)", "rgb(87, 74, 204)"],
                             iconFill: "rgb(206, 191, 220)",
                             strokeGradientColor: ['rgba(255,255,255,0)', 'rgb(255, 255, 255)'],
                         },
@@ -169,40 +170,8 @@ const manifest: ITheme = {
                             strokeGradientColor: ['rgba(255,255,255,0)', 'rgb(255, 255, 255)'],
                         },
                     },
-                    cancel: {
-                        normal: {
-                            fill: ["rgb(86, 22, 190)", "rgb(104, 0, 136)"],
-                            iconFill: "rgb(206, 191, 220)",
-                            strokeGradientColor: ['rgba(255,255,255,0)', 'rgb(255, 255, 255)'],
-                        },
-                        pressed: {
-                            fill: ["rgb(68, 20, 146)", "rgb(89, 6, 114)"],
-                            iconFill: "rgb(206, 191, 220)",
-                            strokeGradientColor: ['rgba(255,255,255,0)', 'rgb(255, 255, 255)'],
-                        },
-                        disabled: {
-                            fill: ["rgba(86, 22, 190, .25)", "rgba(104, 0, 136, .25)"],
-                            iconFill: "rgb(206, 191, 220)",
-                            strokeGradientColor: ['rgba(255,255,255,0)', 'rgb(255, 255, 255)'],
-                        },
-                    },
-                    send: {
-                        normal: {
-                            fill: ["rgb(86, 22, 190)", "rgb(104, 0, 136)"],
-                            iconFill: "rgb(206, 191, 220)",
-                            strokeGradientColor: ['rgba(186, 250, 255, 0)', 'rgb(183, 235, 255)'],
-                        },
-                        pressed: {
-                            fill: ["rgb(68, 20, 146)", "rgb(89, 6, 114)"],
-                            iconFill: "rgb(206, 191, 220)",
-                            strokeGradientColor: ['rgba(186, 250, 255, 0)', 'rgb(183, 235, 255)'],
-                        },
-                        disabled: {
-                            fill: ["rgba(86, 22, 190, .25)", "rgba(104, 0, 136, .25)"],
-                            iconFill: "rgb(206, 191, 220)",
-                            strokeGradientColor: ['rgba(186, 250, 255, 0)', 'rgb(183, 235, 255)'],
-                        },
-                    },
+                    cancel: ButtonPresets.PRIMARY,
+                    send: ButtonPresets.PRIMARY,
                 },
                 styles: {
                     processing: {
@@ -220,12 +189,14 @@ const manifest: ITheme = {
     },
     presets: {
         [ButtonPresets.PRIMARY]: {
+            rippleColor: "rgba(255, 255, 255, 0.2)",
             normal: {
                 fill: ["rgb(86, 22, 190)", "rgb(104, 0, 136)"],
                 iconFill: "rgb(206, 191, 220)",
                 color: "rgb(240, 217, 255)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: ["rgba(255,255,255,0)", "rgb(219, 156, 255)"],
             },
             pressed: {
                 fill: ["rgb(68, 20, 146)", "rgb(89, 6, 114)"],
@@ -233,6 +204,7 @@ const manifest: ITheme = {
                 color: "rgb(240, 217, 255)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: ["rgba(255,255,255,0)", "rgb(219, 156, 255)"],
             },
             focused: {
                 fill: ["rgb(86, 22, 190)", "rgb(104, 0, 136)"],
@@ -241,6 +213,7 @@ const manifest: ITheme = {
                 color: "rgb(240, 217, 255)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: ["rgba(255,255,255,0)", "rgb(219, 156, 255)"],
             },
             disabled: {
                 fill: ["rgba(86, 22, 190, .25)", "rgba(104, 0, 136, .25)"],
@@ -248,6 +221,7 @@ const manifest: ITheme = {
                 color: "rgb(240, 217, 255)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: ["rgba(255,255,255,0)", "rgb(219, 156, 255)"],
             },
         },
         [ButtonPresets.SECONDARY]: {

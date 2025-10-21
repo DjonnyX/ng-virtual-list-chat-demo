@@ -1,5 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, ElementRef, inject, signal, TemplateRef } from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { map, tap, combineLatest, fromEvent } from 'rxjs';
 import { IRenderVirtualListItem } from '../models/render-item.model';
 import { FocusAlignment, Id, ISize } from '../types';
 import {
@@ -9,8 +11,6 @@ import {
 } from '../const';
 import { BaseVirtualListItemComponent } from '../models/base-virtual-list-item-component';
 import { NgVirtualListService } from '../ng-virtual-list.service';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { map, tap, combineLatest, fromEvent } from 'rxjs';
 import { MethodsForSelectingTypes } from '../enums/method-for-selecting-types';
 import { validateBoolean } from '../utils/validation';
 import { FocusAlignments } from '../enums';

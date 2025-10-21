@@ -1,22 +1,22 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, DestroyRef, effect, ElementRef, inject, input, output, signal, Signal, viewChild } from '@angular/core';
+import { CdkMenuTrigger } from '@angular/cdk/menu';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { filter, tap } from 'rxjs';
+import { MessageButtonSaveState, MessageButtonSaveStates, MessageMenuButtonComponent, MessageSaveButtonComponent } from '@entities/message';
 import { LongPressDirective } from '@shared/directives';
 import { Id, IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/ng-virtual-list';
 import { IMessageItemData } from "@shared/models/message";
 import { IS_FIREFOX } from '@shared/components/ng-virtual-list/lib/utils/browser';
-import { MessageButtonSaveState, MessageButtonSaveStates, MessageMenuButtonComponent, MessageSaveButtonComponent } from '@entities/message';
-import { CdkMenuTrigger } from '@angular/cdk/menu';
-import { IProxyCollectionItem } from '@widgets/messages/messages/utils/proxy-collection';
-import { MessageComponent } from '../message/message.component';
-import { IMessageParams } from '../message/interfaces';
 import { ContextMenuComponent, IContextMenuCollection } from '@shared/components/context-menu';
 import { GradientColorPositions } from '@shared/types';
 import { DialogService } from '@shared/components/dialog/dialog.service';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { filter, tap } from 'rxjs';
 import { ButtonPresets, ThemeService } from '@shared/theming';
 import { ContextMenuPresets, DialogPresets } from '@shared/theming/themes/presets';
 import { ITheme } from '@shared/theming';
+import { IProxyCollectionItem } from '@widgets/messages/messages/utils/proxy-collection';
+import { MessageComponent } from '../message/message.component';
+import { IMessageParams } from '../message/interfaces';
 
 const CLASS_IN = 'in', CLASS_OUT = 'out', CLASS_SIMPLE = 'simple', CLASS_END_OF_MESSAGES = 'end-of-messages',
   CLASS_REMOVAL = 'removal', CLASS_DELETED = 'deleted', CLASS_ANIMATE = 'animate', CLASS_EDITED = 'edited',

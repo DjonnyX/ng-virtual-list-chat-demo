@@ -4,16 +4,19 @@ import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-i
 import {
   catchError, combineLatest, debounceTime, delay, filter, map, of, skipWhile, Subject, switchMap, take, tap, throwError,
 } from 'rxjs';
+import { environment } from '@environments/environment';
+import { MessagesLoadingIndicatorComponent } from '@entities/messages';
+import { MessageGroupComponent, MessagesTypingIndicatorComponent } from '@entities/message';
+import { MessageBoxComponent } from '@features/message';
 import { NgVirtualListComponent } from '@shared/components';
 import {
   FocusAlignments, Id, IDisplayObjectConfig, ISize, IVirtualListItem, IVirtualListItemConfigMap,
 } from '@shared/components/ng-virtual-list';
 import { IRenderVirtualListItemConfig } from '@shared/components/ng-virtual-list/lib/models/render-item-config.model';
-import { MessagesLoadingIndicatorComponent } from '@entities/messages';
-import { MessageGroupComponent, MessagesTypingIndicatorComponent } from '@entities/message';
-import { MessageBoxComponent } from '@features/message';
-import { environment } from '@environments/environment';
 import { IMessageItemData } from "@shared/models/message";
+import { MessageTypes } from '@shared/enums';
+import { ThemeService } from '@shared/theming';
+import { ITheme } from '@shared/theming';
 import { MessagesService } from '../messages.service';
 import { MessagesMockService } from '../messages-mock.service';
 import { MessagesHttpService } from '../messages-http.service';
@@ -25,9 +28,6 @@ import { MessagesNotificationMockService } from '../messages-notification-mock.s
 import { MessagesNotificationWSService } from '../messages-notification-ws.service';
 import { generateTypingIndicator } from './utils/generate-typing-indicator';
 import { IProxyCollectionItem, ProxyCollection, ProxyCollectionEvents } from './utils/proxy-collection';
-import { MessageTypes } from '@shared/enums';
-import { ThemeService } from '@shared/theming';
-import { ITheme } from '@shared/theming';
 
 const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
   OPACITY_0 = '0', OPACITY_1 = '1', FADE_IN = `opacity 100ms ease-in`, MIN_ITEM_HEIGHT = 28;

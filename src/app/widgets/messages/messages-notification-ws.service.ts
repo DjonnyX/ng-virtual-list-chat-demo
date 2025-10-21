@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { MessagesNotificationService } from './messages-notification.service';
 import { Subject } from 'rxjs';
+import { MessagesNotificationService } from './messages-notification.service';
 
 @Injectable({
   providedIn: 'root'
