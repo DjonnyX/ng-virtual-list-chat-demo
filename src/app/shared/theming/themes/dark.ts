@@ -1,12 +1,14 @@
 import { RoundedCorner } from "../../types";
 import { objectAsReadonly } from "./utils";
 import { ITheme } from "./interfaces/theme";
-import { ButtonPresets, DialogPresets } from "./presets";
+import { ButtonPresets, ContextMenuPresets, DialogPresets } from "./presets";
 
 const BUTTON_ROUNDED_CORNER: RoundedCorner = [8, 8, 8, 8],
+    BUTTON_ROUNDED_RECT_PADDING = "4px 6px",
+    CONTEXT_MENU_ROUNDED_CORNER: RoundedCorner = [12, 12, 12, 12],
+    CONTEXT_MENU_PADDING = "8px 0px",
     DIALOG_ROUNDED_CORNER: RoundedCorner = [12, 12, 12, 12],
-    DIALOG_PADDING = "36px 52px",
-    BUTTON_ROUNDED_RECT_PADDING = "4px 6px";
+    DIALOG_PADDING = "36px 52px";
 
 const manifest: ITheme = {
     chat: {
@@ -154,42 +156,51 @@ const manifest: ITheme = {
                         normal: {
                             fill: ["rgb(56, 43, 179)", "rgb(82, 32, 126)"],
                             iconFill: "rgb(206, 191, 220)",
+                            strokeGradientColor: ['rgba(255,255,255,0)', 'rgb(255, 255, 255)'],
                         },
                         pressed: {
                             fill: ["rgb(87, 74, 204)", "rgb(106, 55, 151)"],
                             iconFill: "rgb(206, 191, 220)",
+                            strokeGradientColor: ['rgba(255,255,255,0)', 'rgb(255, 255, 255)'],
                         },
                         disabled: {
                             fill: ["rgba(56, 43, 179, .25)", "rgba(82, 32, 126, .25)"],
                             iconFill: "rgb(206, 191, 220)",
+                            strokeGradientColor: ['rgba(255,255,255,0)', 'rgb(255, 255, 255)'],
                         },
                     },
                     cancel: {
                         normal: {
                             fill: ["rgb(86, 22, 190)", "rgb(104, 0, 136)"],
                             iconFill: "rgb(206, 191, 220)",
+                            strokeGradientColor: ['rgba(255,255,255,0)', 'rgb(255, 255, 255)'],
                         },
                         pressed: {
                             fill: ["rgb(68, 20, 146)", "rgb(89, 6, 114)"],
                             iconFill: "rgb(206, 191, 220)",
+                            strokeGradientColor: ['rgba(255,255,255,0)', 'rgb(255, 255, 255)'],
                         },
                         disabled: {
                             fill: ["rgba(86, 22, 190, .25)", "rgba(104, 0, 136, .25)"],
                             iconFill: "rgb(206, 191, 220)",
+                            strokeGradientColor: ['rgba(255,255,255,0)', 'rgb(255, 255, 255)'],
                         },
                     },
                     send: {
                         normal: {
                             fill: ["rgb(86, 22, 190)", "rgb(104, 0, 136)"],
                             iconFill: "rgb(206, 191, 220)",
+                            strokeGradientColor: ['rgba(186, 250, 255, 0)', 'rgb(183, 235, 255)'],
                         },
                         pressed: {
                             fill: ["rgb(68, 20, 146)", "rgb(89, 6, 114)"],
                             iconFill: "rgb(206, 191, 220)",
+                            strokeGradientColor: ['rgba(186, 250, 255, 0)', 'rgb(183, 235, 255)'],
                         },
                         disabled: {
                             fill: ["rgba(86, 22, 190, .25)", "rgba(104, 0, 136, .25)"],
                             iconFill: "rgb(206, 191, 220)",
+                            strokeGradientColor: ['rgba(186, 250, 255, 0)', 'rgb(183, 235, 255)'],
                         },
                     },
                 },
@@ -294,6 +305,7 @@ const manifest: ITheme = {
             },
         },
         [ButtonPresets.SUCCESS]: {
+            rippleColor: "rgba(255, 255, 255, 0.2)",
             normal: {
                 fill: ["rgb(67, 19, 145)", "rgb(72, 22, 153)"],
                 iconFill: "rgb(206, 191, 220)",
@@ -311,7 +323,6 @@ const manifest: ITheme = {
             focused: {
                 fill: ["rgb(67, 19, 145)", "rgb(72, 22, 153)"],
                 iconFill: "rgb(206, 191, 220)",
-                outline: "2px solid rgba(168, 114, 255, 0.25)",
                 color: "rgb(240, 217, 255)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
@@ -325,6 +336,7 @@ const manifest: ITheme = {
             },
         },
         [ButtonPresets.CANCEL]: {
+            rippleColor: "rgba(255, 255, 255, 0.1)",
             normal: {
                 fill: ["rgba(255, 255, 255, 0)", "rgba(255, 255, 255, 0)"],
                 iconFill: "rgb(206, 191, 220)",
@@ -342,7 +354,6 @@ const manifest: ITheme = {
             focused: {
                 fill: ["rgba(255, 255, 255, 0)", "rgba(255, 255, 255, 0)"],
                 iconFill: "rgb(206, 191, 220)",
-                outline: "2px solid rgba(227, 134, 255, 0.25)",
                 color: "rgb(199, 186, 255)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
@@ -386,8 +397,62 @@ const manifest: ITheme = {
                 padding: BUTTON_ROUNDED_RECT_PADDING,
             },
         },
+        [ButtonPresets.CONTEXT_MENU_PRIMARY]: {
+            rippleColor: "rgba(255, 255, 255, 0.1)",
+            normal: {
+                fill: ["rgba(255, 255, 255, 0)", "rgba(255, 255, 255, 0)"],
+                iconFill: "rgb(199, 186, 255)",
+                color: "rgb(199, 186, 255)",
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+            pressed: {
+                fill: ["rgba(255, 255, 255, 0.08)", "rgba(255, 255, 255, 0.08)"],
+                iconFill: "rgb(229, 223, 255)",
+                color: "rgb(229, 223, 255)",
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+            focused: {
+                fill: ["rgba(255, 255, 255, 0)", "rgba(255, 255, 255, 0)"],
+                iconFill: "rgb(229, 223, 255)",
+                color: "rgb(229, 223, 255)",
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+            disabled: {
+                fill: ["rgba(255, 255, 255, 0)", "rgba(255, 255, 255, 0)"],
+                iconFill: "rgba(199, 186, 255, 0.45)",
+                color: "rgba(199, 186, 255, 0.45)",
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+        },
+        [ButtonPresets.CONTEXT_MENU_SECONDARY]: {
+            rippleColor: "rgba(255, 255, 255, 0.1)",
+            normal: {
+                fill: ["rgba(255, 255, 255, 0)", "rgba(255, 255, 255, 0)"],
+                iconFill: "rgb(199, 186, 255)",
+                color: "rgb(199, 186, 255)",
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+            pressed: {
+                fill: ["rgba(255, 255, 255, 0.08)", "rgba(255, 255, 255, 0.08)"],
+                iconFill: "rgb(229, 223, 255)",
+                color: "rgb(229, 223, 255)",
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+            focused: {
+                fill: ["rgba(255, 255, 255, 0)", "rgba(255, 255, 255, 0)"],
+                iconFill: "rgb(229, 223, 255)",
+                color: "rgb(229, 223, 255)",
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+            disabled: {
+                fill: ["rgba(255, 255, 255, 0)", "rgba(255, 255, 255, 0)"],
+                iconFill: "rgba(199, 186, 255, 0.45)",
+                color: "rgba(199, 186, 255, 0.45)",
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+        },
         [DialogPresets.PRIMARY]: {
-            fill: ["rgb(86, 66, 139)", "rgb(86, 66, 139)"],
+            fill: ["rgb(59, 44, 99)", "rgb(59, 44, 99)"],
             roundedCorner: DIALOG_ROUNDED_CORNER,
             padding: DIALOG_PADDING,
             strokeAnimationDuration: 10000,
@@ -407,7 +472,7 @@ const manifest: ITheme = {
             },
         },
         [DialogPresets.SECONDARY]: {
-            fill: ["rgb(49, 56, 73)", "rgb(45, 51, 66)"],
+            fill: ["rgb(59, 44, 99)", "rgb(59, 44, 99)"],
             roundedCorner: DIALOG_ROUNDED_CORNER,
             padding: DIALOG_PADDING,
             strokeAnimationDuration: 10000,
@@ -423,6 +488,22 @@ const manifest: ITheme = {
                 textTransform: "none",
                 color: "rgb(203, 223, 223)",
             },
+        },
+        [ContextMenuPresets.PRIMARY]: {
+            fill: ["rgb(59, 44, 99)", "rgb(59, 44, 99)"],
+            roundedCorner: CONTEXT_MENU_ROUNDED_CORNER,
+            padding: CONTEXT_MENU_PADDING,
+            strokeAnimationDuration: 10000,
+            strokeGradientColor: ["rgba(0, 71, 151, 0)", "rgb(7, 247, 255)"],
+            buttonPreset: ButtonPresets.CONTEXT_MENU_PRIMARY,
+        },
+        [ContextMenuPresets.SECONDARY]: {
+            fill: ["rgb(59, 44, 99)", "rgb(59, 44, 99)"],
+            roundedCorner: CONTEXT_MENU_ROUNDED_CORNER,
+            padding: CONTEXT_MENU_PADDING,
+            strokeAnimationDuration: 10000,
+            strokeGradientColor: ["rgba(0, 71, 151, 0)", "rgb(255, 122, 162)"],
+            buttonPreset: ButtonPresets.CONTEXT_MENU_SECONDARY,
         },
     }
 };

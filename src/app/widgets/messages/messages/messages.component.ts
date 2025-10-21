@@ -27,7 +27,7 @@ import { generateTypingIndicator } from './utils/generate-typing-indicator';
 import { IProxyCollectionItem, ProxyCollection, ProxyCollectionEvents } from './utils/proxy-collection';
 import { MessageTypes } from '@shared/enums';
 import { ThemeService } from '@shared/theming';
-import { ITheme } from '@shared/theming/themes/interfaces/theme';
+import { ITheme } from '@shared/theming';
 
 const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
   OPACITY_0 = '0', OPACITY_1 = '1', FADE_IN = `opacity 100ms ease-in`, MIN_ITEM_HEIGHT = 28;

@@ -1,16 +1,17 @@
 import { Component, DestroyRef, effect, ElementRef, inject, input, OnDestroy, output, Signal, signal, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { GradientColor, GradientColorPositions, RoundedCorner } from '@shared/types';
+import { Color, GradientColor, GradientColorPositions, RoundedCorner } from '@shared/types';
 import { ButtonPresets, ThemeService } from '@shared/theming';
-import { ITheme } from '@shared/theming/themes/interfaces/theme';
+import { ITheme } from '@shared/theming';
 import { PressDirective } from '@shared/directives';
 import { SubstrateComponent, SubstarateMode, SubstarateStyle, SubstarateModes, SubstarateStyles } from '../substrate';
 import { ISize } from '../ng-virtual-list';
-import { filter, fromEvent, map, switchMap, tap } from 'rxjs';
+import { delay, filter, fromEvent, map, Subject, switchMap, tap } from 'rxjs';
 import { formatCSSNumber } from '../utils';
 
 const DEFAULT_ROUND_CORNER: RoundedCorner = [8, 8, 8, 8],
+  DEFAULT_STROKE_COLOR: GradientColor = ['rgba(186, 250, 255, 0)', 'rgb(183, 235, 255)'],
   CLASS_PRESSED = 'pressed',
   CLASS_FOCUSED = 'focused',
   CLASS_DISABLED = 'disabled';
@@ -34,7 +35,7 @@ export class ButtonComponent implements OnDestroy {
 
   content = input<string | undefined>();
 
-  strokeColor = input<GradientColor | undefined>(undefined);
+  strokeColor = input<GradientColor | undefined>(DEFAULT_STROKE_COLOR);
 
   roundCorner = input<RoundedCorner | undefined>(DEFAULT_ROUND_CORNER);
 
@@ -45,6 +46,8 @@ export class ButtonComponent implements OnDestroy {
   fillColors = input<GradientColor | undefined>(undefined);
 
   fillPositions = input<GradientColorPositions | undefined>(undefined);
+
+  rippleColor = input<Color | undefined>(undefined);
 
   preset = input<ButtonPresets | string | undefined>(undefined);
 
@@ -58,11 +61,18 @@ export class ButtonComponent implements OnDestroy {
 
   focused = signal<boolean>(false);
 
+  strokeGradientColor = signal<GradientColor | undefined>(this.strokeColor());
+
   fillGradientColors = signal<GradientColor | undefined>(this.fillColors());
 
   shapeRoundCorner = signal<[number, number, number, number] | undefined>(this.roundCorner());
 
+  rippleEffectColor = signal<Color | undefined>(this.rippleColor());
+
   theme: Signal<ITheme | undefined>;
+
+  private _$pressed = new Subject<boolean>();
+  protected $pressed = this._$pressed.asObservable();
 
   private _resizeObserer: ResizeObserver;
 
@@ -82,6 +92,18 @@ export class ButtonComponent implements OnDestroy {
     const el = this._elementRef.nativeElement as HTMLDivElement, $button = toObservable(this.button);
     this._resizeObserer = new ResizeObserver(this._onResizeHandler);
     this._resizeObserer.observe(el);
+
+    const $pressed = this.$pressed;
+
+    $pressed.pipe(
+      takeUntilDestroyed(),
+      delay(300),
+      takeUntilDestroyed(),
+      tap(v => {
+        this.pressed.set(v);
+        this.onPress.emit(v);
+      }),
+    ).subscribe();
 
     this.theme = toSignal(this._themeService.$theme);
 
@@ -142,10 +164,12 @@ export class ButtonComponent implements OnDestroy {
         const el = this._elementRef.nativeElement as HTMLDivElement,
           elBtn = this.button()?.nativeElement as HTMLButtonElement;
         if (el && elBtn) {
+          this.rippleEffectColor.set(buttonPreset.rippleColor);
           const disabled = this.disabled(), pressed = this.pressed(), focused = this.focused();
           if (disabled) {
-            this.shapeRoundCorner.set(buttonPreset.disabled.roundedCorner);
-            this.fillGradientColors.set(buttonPreset.disabled.fill);
+            this.shapeRoundCorner.set(buttonPreset.disabled.roundedCorner ?? this.roundCorner());
+            this.fillGradientColors.set(buttonPreset.disabled.fill ?? this.fillColors());
+            this.strokeGradientColor.set(buttonPreset.disabled.strokeGradientColor ?? this.strokeColor());
             el.style.color = buttonPreset.disabled.color ? buttonPreset.disabled.color : 'inherit';
             elBtn.style.padding = buttonPreset.disabled.padding ? buttonPreset.disabled.padding : 'unset';
             elBtn.style.outline = buttonPreset.disabled.outline ? buttonPreset.disabled.outline : 'unset';
@@ -154,8 +178,9 @@ export class ButtonComponent implements OnDestroy {
             elBtn.style.borderBottomRightRadius = buttonPreset.disabled.roundedCorner ? formatCSSNumber(buttonPreset.disabled.roundedCorner[2]) : 'unset';
             elBtn.style.borderTopRightRadius = buttonPreset.disabled.roundedCorner ? formatCSSNumber(buttonPreset.disabled.roundedCorner[3]) : 'unset';
           } else if (focused) {
-            this.shapeRoundCorner.set(buttonPreset.focused.roundedCorner);
-            this.fillGradientColors.set(buttonPreset.focused.fill);
+            this.shapeRoundCorner.set(buttonPreset.focused.roundedCorner ?? this.roundCorner());
+            this.fillGradientColors.set(buttonPreset.focused.fill ?? this.fillColors());
+            this.strokeGradientColor.set(buttonPreset.focused.strokeGradientColor ?? this.strokeColor());
             el.style.color = buttonPreset.focused.color ? buttonPreset.focused.color : 'inherit';
             elBtn.style.padding = buttonPreset.focused.padding ? buttonPreset.focused.padding : 'unset';
             elBtn.style.outline = buttonPreset.focused.outline ? buttonPreset.focused.outline : 'unset';
@@ -164,8 +189,9 @@ export class ButtonComponent implements OnDestroy {
             elBtn.style.borderBottomRightRadius = buttonPreset.focused.roundedCorner ? formatCSSNumber(buttonPreset.focused.roundedCorner[2]) : 'unset';
             elBtn.style.borderTopRightRadius = buttonPreset.focused.roundedCorner ? formatCSSNumber(buttonPreset.focused.roundedCorner[3]) : 'unset';
           } else if (pressed) {
-            this.shapeRoundCorner.set(buttonPreset.pressed.roundedCorner);
-            this.fillGradientColors.set(buttonPreset.pressed.fill);
+            this.shapeRoundCorner.set(buttonPreset.pressed.roundedCorner ?? this.roundCorner());
+            this.fillGradientColors.set(buttonPreset.pressed.fill ?? this.fillColors());
+            this.strokeGradientColor.set(buttonPreset.pressed.strokeGradientColor ?? this.strokeColor());
             el.style.color = buttonPreset.pressed.color ? buttonPreset.pressed.color : 'inherit';
             elBtn.style.padding = buttonPreset.pressed.padding ? buttonPreset.pressed.padding : 'unset';
             elBtn.style.outline = buttonPreset.pressed.outline ? buttonPreset.pressed.outline : 'unset';
@@ -174,8 +200,9 @@ export class ButtonComponent implements OnDestroy {
             elBtn.style.borderBottomRightRadius = buttonPreset.pressed.roundedCorner ? formatCSSNumber(buttonPreset.pressed.roundedCorner[2]) : 'unset';
             elBtn.style.borderTopRightRadius = buttonPreset.pressed.roundedCorner ? formatCSSNumber(buttonPreset.pressed.roundedCorner[3]) : 'unset';
           } else {
-            this.shapeRoundCorner.set(buttonPreset.normal.roundedCorner);
-            this.fillGradientColors.set(buttonPreset.normal.fill);
+            this.shapeRoundCorner.set(buttonPreset.normal.roundedCorner ?? this.roundCorner());
+            this.fillGradientColors.set(buttonPreset.normal.fill ?? this.fillColors());
+            this.strokeGradientColor.set(buttonPreset.normal.strokeGradientColor ?? this.strokeColor());
             el.style.color = buttonPreset.normal.color ? buttonPreset.normal.color : 'inherit';
             elBtn.style.padding = buttonPreset.normal.padding ? buttonPreset.normal.padding : 'unset';
             elBtn.style.outline = buttonPreset.normal.outline ? buttonPreset.normal.outline : 'unset';
@@ -193,8 +220,7 @@ export class ButtonComponent implements OnDestroy {
   }
 
   onPressHandler(pressed: boolean) {
-    this.pressed.set(pressed);
-    this.onPress.emit(pressed);
+    this._$pressed.next(pressed);
   }
 
   onClickHandler(e: Event) {

@@ -2,7 +2,7 @@ import { Component, DestroyRef, effect, ElementRef, inject, output, signal, Sign
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ThemeService } from '@shared/theming';
-import { ITheme } from '@shared/theming/themes/interfaces/theme';
+import { ITheme } from '@shared/theming';
 import { combineLatest, filter, fromEvent, interval, map, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
 
 const INTERVAL_COUNT = 89, INTERVAL_TIMEOUT = 100, PERCENT = '%', ZERO_PERCENT = `0${PERCENT}`;

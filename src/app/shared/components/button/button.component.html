@@ -2,13 +2,14 @@
 @let t = type();
 @let b = bounds();
 @let value = content();
-@let stroke = strokeColor();
+@let stroke = strokeGradientColor();
 @let corner = shapeRoundCorner();
 @let gradientFillColors = fillGradientColors();
 @let gradientFillPositions = fillPositions();
+@let rippleColor = rippleEffectColor();
 <button #button press class="button" (pointerdown)="substrate.ripple($event)" (onPress)="onPressHandler($event)"
     (click)="onClickHandler($event)">
-    <x-substrate #substrate class="substrate" [fillColors]="gradientFillColors"
+    <x-substrate #substrate class="substrate" [fillColors]="gradientFillColors" [rippleColor]="rippleColor"
         [fillColorPositions]="gradientFillPositions" [width]="b.width" [height]="b.height" [roundCorner]="corner"
         [mode]="m" [type]="t" [strokeColors]="stroke" />
     <span class="content">

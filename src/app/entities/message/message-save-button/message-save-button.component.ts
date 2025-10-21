@@ -84,13 +84,13 @@ export class MessageSaveButtonComponent {
           }
         }
         if (preset) {
-          if (disabled) {
+          if (preset.disabled && disabled) {
             this.fillColors.set(preset.disabled.fill ?? DEFAULT_FILL_COLOR);
             contentEl.style.fill = preset.disabled.iconFill;
           } else if (focused && preset.focused) {
             this.fillColors.set(preset.focused.fill ?? DEFAULT_FILL_COLOR);
             contentEl.style.fill = preset.focused.iconFill;
-          } else if (pressed) {
+          } else if (preset.pressed && pressed) {
             this.fillColors.set(preset.pressed.fill ?? DEFAULT_FILL_COLOR);
             contentEl.style.fill = preset.pressed.iconFill;
           } else {

@@ -7,8 +7,8 @@ import { Color, GradientColor, GradientColorPositions } from '@shared/types';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { delay, filter, map, switchMap, tap } from 'rxjs';
 
-const DEFAULT_WIDTH = 16,
-  DEFAULT_HEIGHT = 16,
+const DEFAULT_WIDTH = 32,
+  DEFAULT_HEIGHT = 32,
   DEFAULT_STROKE_ANIMATION_DURATION = 1000,
   RIPPLE_ANIMATE_CLASS = 'animate',
   DEFAULT_RIPPLE_COLOR = "rgba(0,0,0,0.1)",

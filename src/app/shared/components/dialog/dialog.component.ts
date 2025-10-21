@@ -1,9 +1,9 @@
-import { Component, computed, DestroyRef, effect, ElementRef, inject, signal, Signal, viewChild } from '@angular/core';
+import { Component, computed, effect, ElementRef, inject, signal, Signal, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { ThemeService } from '@shared/theming';
-import { ITheme } from '@shared/theming/themes/interfaces/theme';
+import { ITheme } from '@shared/theming';
 import { IDialogData } from './interfaces';
 import { ButtonGroupComponent } from '../button-group';
 import { IButtonGroupItem } from '../button-group/interfaces';
@@ -128,8 +128,8 @@ export class DialogComponent {
           content.style.padding = themePreset.padding ?? 'none';
 
           this.roundCorner.set(themePreset.roundedCorner ?? DEFAULT_ROUND_CORNER);
-          this.fillColors.set(Array.isArray(themePreset.fill) ? themePreset.fill : undefined);
-          this.strokeColor.set(Array.isArray(themePreset.strokeGradientColor) ? themePreset.strokeGradientColor : undefined);
+          this.fillColors.set(Array.isArray(themePreset.fill) ? themePreset.fill : this.fillColors());
+          this.strokeColor.set(Array.isArray(themePreset.strokeGradientColor) ? themePreset.strokeGradientColor : this.strokeColor());
           this.strokeAnimationDuration.set(themePreset.strokeAnimationDuration ?? DEFAULT_STROKE_ANIMATION_DURATION);
         }
       }

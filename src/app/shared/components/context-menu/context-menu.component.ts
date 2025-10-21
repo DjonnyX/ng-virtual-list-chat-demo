@@ -1,21 +1,145 @@
-import { Component, input, output } from '@angular/core';
+import { Component, effect, ElementRef, inject, input, output, signal, Signal, viewChild } from '@angular/core';
 import { CdkMenu, CdkMenuItem } from '@angular/cdk/menu';
 import { IContextMenuCollection } from './interfaces/context-menu-collection.interface';
-import { Id } from '../ng-virtual-list';
+import { Id, ISize } from '../ng-virtual-list';
 import { ButtonComponent } from '../button';
+import { ThemeService } from '@shared/theming';
+import { ITheme } from '@shared/theming';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { ButtonPresets, ContextMenuPresets } from '@shared/theming/themes/presets';
+import { SubstarateMode, SubstarateModes, SubstarateStyle, SubstarateStyles, SubstrateComponent } from '../substrate';
+import { GradientColor, GradientColorPositions, RoundedCorner } from '@shared/types';
+import { formatCSSNumber } from '../utils';
+import { delay, Subject, tap } from 'rxjs';
+
+const DEFAULT_CONTEXT_MENU_WIDTH = 20,
+  DEFAULT_CONTEXT_MENU_HEIGHT = 20,
+  DEFAULT_ROUNDED_CORNER: RoundedCorner = [10, 10, 10, 10],
+  DEFAULT_FILL_POSITIONS: GradientColorPositions = [0, 1],
+  DEFAULT_STROKE_ANIMATION_DURATION = 1000;
 
 @Component({
   selector: 'x-context-menu',
-  imports: [CdkMenu, CdkMenuItem, ButtonComponent],
+  imports: [CdkMenu, CdkMenuItem, SubstrateComponent, ButtonComponent],
   templateUrl: './context-menu.component.html',
   styleUrl: './context-menu.component.scss'
 })
 export class ContextMenuComponent {
+  contextMenu = viewChild<ElementRef<HTMLDivElement>>('contextMenu');
+
+  content = viewChild<ElementRef<HTMLDivElement>>('content');
+
+  mode = input<SubstarateMode>(SubstarateModes.ROUNDED_RECTANGLE);
+
+  type = input<SubstarateStyle>(SubstarateStyles.STROKE);
+
   items = input.required<IContextMenuCollection>();
 
   onClick = output<{ id: Id, event: Event }>();
 
+  preset = input<ContextMenuPresets | string | undefined>(undefined);
+
+  buttonPreset = input<ButtonPresets | string | undefined>(undefined);
+
+  theme: Signal<ITheme | undefined>;
+
+  strokeColor = input<GradientColor | undefined>(undefined);
+
+  roundCorner = signal<RoundedCorner>(DEFAULT_ROUNDED_CORNER);
+
+  fillColors = input<GradientColor | undefined>(undefined);
+
+  fillPositions = input<GradientColorPositions | undefined>(DEFAULT_FILL_POSITIONS);
+
+  fillGradientColors = signal<GradientColor | undefined>(this.fillColors());
+
+  strokeGradientColor = signal<GradientColor | undefined>(this.strokeColor());
+
+  shapeRoundCorner = signal<[number, number, number, number] | undefined>(this.roundCorner());
+
+  strokeAnimationDuration = signal<number>(DEFAULT_STROKE_ANIMATION_DURATION);
+
+  contextMenuButtonPreset = signal<ButtonPresets | string | undefined>(this.buttonPreset());
+
+  readonly bounds = signal<ISize>({ width: DEFAULT_CONTEXT_MENU_WIDTH, height: DEFAULT_CONTEXT_MENU_HEIGHT });
+
+  private _$click = new Subject<{ event: Event, id: Id }>();
+  protected $click = this._$click.asObservable();
+
+  private _themeService = inject(ThemeService);
+
+  private _resizeObserer: ResizeObserver;
+
+  private _elementRef = inject(ElementRef<HTMLDivElement>);
+
+  private _onResizeHandler = () => {
+    const el = this._elementRef.nativeElement as HTMLDivElement,
+      { width, height } = el.getBoundingClientRect();
+    this.bounds.set({ width, height });
+  };
+
+  constructor() {
+    const el = this._elementRef.nativeElement as HTMLDivElement;
+    this._resizeObserer = new ResizeObserver(this._onResizeHandler);
+    this._resizeObserer.observe(el);
+
+    const $click = this.$click;
+
+    $click.pipe(
+      takeUntilDestroyed(),
+      delay(300),
+      takeUntilDestroyed(),
+      tap(e => {
+        this.onClick.emit(e);
+      }),
+    ).subscribe();
+
+    this.theme = toSignal(this._themeService.$theme);
+
+    effect(() => {
+      const theme = this.theme();
+      if (theme) {
+        const preset = this.preset();
+        if (preset) {
+          const themePreset = this._themeService.getPreset(preset);
+          if (themePreset) {
+            this.applyStyles(themePreset);
+          }
+        }
+      }
+    })
+  }
+
+  private applyStyles(currentPreset?: string) {
+    const preset = currentPreset ?? this.preset(), theme = this.theme();
+    if (theme && preset) {
+      const themePreset = this._themeService.getPreset(preset);
+      if (themePreset) {
+        const ctxMenuElement = this.contextMenu()?.nativeElement as HTMLDivElement,
+          contentElement = this.content()?.nativeElement as HTMLDivElement;
+        if (contentElement && ctxMenuElement) {
+          contentElement.style.padding = themePreset.padding ? themePreset.padding : 'unset';
+          ctxMenuElement.style.borderTopLeftRadius = themePreset.roundedCorner ? formatCSSNumber(themePreset.roundedCorner[0]) : 'unset';
+          ctxMenuElement.style.borderBottomLeftRadius = themePreset.roundedCorner ? formatCSSNumber(themePreset.roundedCorner[1]) : 'unset';
+          ctxMenuElement.style.borderBottomRightRadius = themePreset.roundedCorner ? formatCSSNumber(themePreset.roundedCorner[2]) : 'unset';
+          ctxMenuElement.style.borderTopRightRadius = themePreset.roundedCorner ? formatCSSNumber(themePreset.roundedCorner[3]) : 'unset';
+
+          this.roundCorner.set(themePreset.roundedCorner ?? DEFAULT_ROUNDED_CORNER);
+          this.fillGradientColors.set(themePreset.fill ?? this.fillColors());
+          this.strokeGradientColor.set(themePreset.strokeGradientColor ?? this.strokeColor());
+          this.shapeRoundCorner.set(themePreset.roundedCorner ?? this.roundCorner());
+          this.strokeAnimationDuration.set(themePreset.strokeAnimationDuration ?? DEFAULT_STROKE_ANIMATION_DURATION);
+          this.contextMenuButtonPreset.set(themePreset.buttonPreset ?? this.buttonPreset());
+          return;
+        }
+      }
+    }
+    this.fillGradientColors.set(this.fillColors());
+    this.shapeRoundCorner.set(this.roundCorner());
+  }
+
   onItemClickHandler(event: Event, id: Id) {
-    this.onClick.emit({ id, event });
+    event.stopImmediatePropagation();
+    this._$click.next({ event, id });
   }
 }

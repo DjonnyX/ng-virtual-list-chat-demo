@@ -3,7 +3,7 @@ import { Component, effect, ElementRef, inject, input, output, Signal, signal, v
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ButtonComponent } from '@shared/components/button';
 import { ThemeService } from '@shared/theming';
-import { ITheme } from '@shared/theming/themes/interfaces/theme';
+import { ITheme } from '@shared/theming';
 import { GradientColor, GradientColorPositions } from '@shared/types';
 
 const CLASS_ACTIVE = 'active';

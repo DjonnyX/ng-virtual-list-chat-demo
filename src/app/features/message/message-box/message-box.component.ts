@@ -15,8 +15,8 @@ import { DialogService } from '@shared/components/dialog/dialog.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { filter, tap } from 'rxjs';
 import { ButtonPresets, ThemeService } from '@shared/theming';
-import { DialogPresets } from '@shared/theming/themes/presets';
-import { ITheme } from '@shared/theming/themes/interfaces/theme';
+import { ContextMenuPresets, DialogPresets } from '@shared/theming/themes/presets';
+import { ITheme } from '@shared/theming';
 
 const CLASS_IN = 'in', CLASS_OUT = 'out', CLASS_SIMPLE = 'simple', CLASS_END_OF_MESSAGES = 'end-of-messages',
   CLASS_REMOVAL = 'removal', CLASS_DELETED = 'deleted', CLASS_ANIMATE = 'animate', CLASS_EDITED = 'edited',
@@ -103,6 +103,8 @@ export class MessageBoxComponent {
   delete = output<IDeleteEventData>();
 
   private tmpValue = signal<string | undefined>(undefined);
+
+  contextMenuPreset = signal<ContextMenuPresets>(ContextMenuPresets.PRIMARY);
 
   classes: Signal<{ [className: string]: boolean; }>;
 

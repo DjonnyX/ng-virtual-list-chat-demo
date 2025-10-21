@@ -16,7 +16,7 @@ import { Color, GradientColor, GradientColorPositions } from '@shared/types';
 import { ThemeService } from '@shared/theming';
 import { IProxyCollectionItem } from '@widgets/messages/messages/utils/proxy-collection';
 import { IMessageParams } from './interfaces/message-params';
-import { ITheme } from '@shared/theming/themes/interfaces/theme';
+import { ITheme } from '@shared/theming';
 
 const DEFAULT_SIZE = 200,
   DEFAULT_STROKE_COLOR: GradientColor = ['rgba(255,255,255,0)', 'rgba(195, 0, 255, 0.17)'],

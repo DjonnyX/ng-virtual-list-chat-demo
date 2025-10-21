@@ -29,7 +29,7 @@
                     }
                 </div>
                 <ng-template #menu>
-                    <x-context-menu [items]="contextMenuItems()"
+                    <x-context-menu [items]="contextMenuItems()" [preset]="contextMenuPreset()"
                         (onClick)="onClickContextMenuHandler($event, messageData, messageConfig, messageMeasures)"></x-context-menu>
                 </ng-template>
             }

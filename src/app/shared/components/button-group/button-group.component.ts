@@ -1,6 +1,8 @@
 import { Component, input, output } from '@angular/core';
 import { IButtonGroupItem } from './interfaces';
 import { ButtonComponent } from '../button/button.component';
+import { delay, Subject, tap } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'x-button-group',
@@ -13,7 +15,23 @@ export class ButtonGroupComponent {
 
   onClick = output<IButtonGroupItem>();
 
+  private _$click = new Subject<IButtonGroupItem>();
+  protected $click = this._$click.asObservable();
+
+  constructor() {
+    const $click = this.$click;
+
+    $click.pipe(
+      takeUntilDestroyed(),
+      delay(300),
+      takeUntilDestroyed(),
+      tap(e => {
+        this.onClick.emit(e);
+      }),
+    ).subscribe();
+  }
+
   onButtonClickHandler(item: IButtonGroupItem) {
-    this.onClick.emit(item);
+    this._$click.next(item);
   }
 }

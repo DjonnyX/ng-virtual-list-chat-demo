@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, effect, ElementRef, inject, input, Signal, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ThemeService } from '@shared/theming';
-import { ITheme } from '@shared/theming/themes/interfaces/theme';
+import { ITheme } from '@shared/theming';
 
 @Component({
   selector: 'message-group',

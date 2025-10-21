@@ -12,7 +12,7 @@ import { generateChatCollection } from '@mock/const';
 import { MessagesComponent } from "@widgets/messages/messages/messages.component";
 import { GroupsComponent } from "@widgets/groups/groups/groups.component";
 import { MessageService } from '@widgets/messages';
-import { ITheme } from '@shared/theming/themes/interfaces/theme';
+import { ITheme } from '@shared/theming';
 import { ThemeService } from '@shared/theming';
 import { toSignal } from '@angular/core/rxjs-interop';
 

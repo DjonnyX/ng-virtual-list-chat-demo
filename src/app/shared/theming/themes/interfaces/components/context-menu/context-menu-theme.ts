@@ -1,12 +1,12 @@
+import { ButtonPresets } from "@shared/theming/themes/presets";
 import { GradientColor, RoundedCorner } from "../../../../../types";
 import { ITextTheme } from "../text";
 
-export interface IDialogTheme {
+export interface IContextMenuTheme {
     fill?: GradientColor | string;
     roundedCorner?: RoundedCorner;
     strokeAnimationDuration?: number;
     strokeGradientColor?: GradientColor;
-    title: ITextTheme;
-    message: ITextTheme;
     padding?: string;
+    buttonPreset: ButtonPresets;
 }

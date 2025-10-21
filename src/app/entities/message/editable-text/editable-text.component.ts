@@ -6,7 +6,7 @@ import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { from, switchMap, tap } from 'rxjs';
 import { ThemeService } from '@shared/theming';
-import { ITheme } from '@shared/theming/themes/interfaces/theme';
+import { ITheme } from '@shared/theming';
 
 const DEFAULT_SEARCH_SUBSTRING_CLASS = 'search-substring';
 
