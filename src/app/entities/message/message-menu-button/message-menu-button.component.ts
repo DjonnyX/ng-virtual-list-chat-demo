@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, ElementRef, inject, input, output, Signal, signal, viewChild } from '@angular/core';
+import { Component, computed, effect, ElementRef, HostListener, inject, input, output, Signal, signal, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ButtonComponent } from '@shared/components/button';
 import { SubstarateStyle, SubstarateStyles } from '@shared/components/substrate';
@@ -38,6 +38,18 @@ export class MessageMenuButtonComponent {
 
   private _themeService = inject(ThemeService);
 
+  private _elementRef = inject(ElementRef<HTMLDivElement>);
+  get element() {
+    return this._elementRef.nativeElement as HTMLDivElement;
+  }
+
+  @HostListener('pointerup', ['$event'])
+  @HostListener('pointerdown', ['$event'])
+  @HostListener('click', ['$event'])
+  onPointerEvent(e: PointerEvent) {
+    e.stopImmediatePropagation();
+  }
+
   constructor() {
     const theme = toSignal(this._themeService.$theme);
 
@@ -68,6 +80,10 @@ export class MessageMenuButtonComponent {
         }
       }
     });
+  }
+
+  click() {
+    (this._elementRef.nativeElement as HTMLDivElement).click();
   }
 
   onClickHandler(e: Event) {

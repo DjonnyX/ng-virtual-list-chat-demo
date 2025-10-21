@@ -8,7 +8,8 @@ import { MessageSubstarateStyle } from './types';
 import { MessageSubstarateStyles } from './enums';
 import { Color, GradientColor, GradientColorPositions } from '@shared/types';
 
-const LEFT_WIDTH = 17.5,
+const DEFAULT_STROKE_ANIMATION_DURATION = 1000,
+  LEFT_WIDTH = 17.5,
   RIGHT_WIDTH = 13,
   TOP_HEIGHT = 13,
   BOTTOM_HEIGHT = 13,
@@ -64,6 +65,8 @@ export class MessageSubstrateComponent {
 
   strokeGradientColor2 = viewChild<ElementRef<SVGStopElement>>('strokeGradientColor2');
 
+  strokeAnimation = viewChild<ElementRef<SVGAnimateTransformElement>>('strokeAnimation');
+
   mode = input.required<MessageSubstarateMode>();
 
   width = input.required<number>();
@@ -79,6 +82,8 @@ export class MessageSubstrateComponent {
   fillColors = input<GradientColor | undefined>(undefined);
 
   fillPositions = input<GradientColorPositions | undefined>(undefined);
+
+  strokeAnimationDuration = input<number>(DEFAULT_STROKE_ANIMATION_DURATION);
 
   rippleEnabled = signal<boolean>(false);
 
@@ -188,6 +193,13 @@ export class MessageSubstrateComponent {
       const rippleShape = this.rippleShape();
       if (rippleShape) {
         rippleShape.nativeElement.setAttribute('clip-path', `url(#${CLIP_NAME}${this._id})`);
+      }
+    });
+
+    effect(() => {
+      const strokeAnimationDuration = this.strokeAnimationDuration(), strokeAnimation = this.strokeAnimation()?.nativeElement;
+      if (strokeAnimation) {
+        strokeAnimation.setAttribute('dur', `${strokeAnimationDuration ?? DEFAULT_STROKE_ANIMATION_DURATION}ms`);
       }
     });
 

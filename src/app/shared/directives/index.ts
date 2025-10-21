@@ -3,6 +3,7 @@ import { ClickOutsideService } from './click-outside/click-outside.service';
 import { LongPressDirective } from './long-press/long-press.directive';
 import { PressDirective } from './press/press.directive';
 import { SearchHighlightDirective } from './search-highlight/search-highlight.directive';
+import { StaticClickDirective } from './static-click/static-click.directive';
 
 export {
     ClickOutsideDirective,
@@ -10,4 +11,5 @@ export {
     LongPressDirective,
     PressDirective,
     SearchHighlightDirective,
+    StaticClickDirective,
 };

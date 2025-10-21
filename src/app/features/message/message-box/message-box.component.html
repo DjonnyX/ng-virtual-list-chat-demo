@@ -7,25 +7,28 @@
 @let isValid = isMessageValid();
 @let menuDisabled = saving || deleting;
 @let gradientFillPositions = fillPositions();
+@let longPress = longPressActive();
 @if (messageData && messageConfig && messageMeasures) {
     @let class = classes();
     @let edited = messageData.edited;
-    <div class="container" [ngClass]="class" [longPress]="1000">
+    <div class="container" [ngClass]="class">
         <div class="content">
-            <!-- (longPressFinish)="onEditModeStartHandler()"> -->
-            <div #container class="message-container" [ngClass]="class">
+            <div #container longPress class="message-container" [ngClass]="class" [longPress]="longPressDuration" [longPressDisabled]="messageConfig.selected"
+                (onLongPressActive)="onLongPressActive()" (onLongPress)="messageConfig.select(true); openMenu()">
                 <message #message class="message" [ngClass]="class" [data]="messageData" [config]="messageConfig"
-                    [fillPositions]="gradientFillPositions" [measures]="messageMeasures" [classes]="class" [params]="params()" 
-                    [searchPattern]="searchPattern()" (changeValue)="onMessageChangeValueHandler($event)" />
+                    [fillPositions]="gradientFillPositions" [measures]="messageMeasures" [classes]="class"
+                    [longPressActive]="longPress" [params]="params()" [searchPattern]="searchPattern()"
+                    (changeValue)="onMessageChangeValueHandler($event)" />
             </div>
             @if (messageConfig.selected) {
                 <div class="message-controls" [ngStyle]="{height: message.bounds().height}">
-                    <message-menu-button [cdkMenuTriggerFor]="menuDisabled ? undefined : menu" (click)="onMenuClickHandler($event)"
+                    <message-menu-button #menuButton [cdkMenuTriggerFor]="menuDisabled ? undefined : menu"
                         [fillPositions]="gradientFillPositions" [disabled]="menuDisabled" />
                     <div></div>
                     @if (edited) {
                         <message-save-button [state]="sendButtonState" [valid]="isValid" [loading]="saving"
-                            [fillPositions]="gradientFillPositions" (onClick)="onSaveHandler($event, messageConfig, sendButtonState)" />
+                            [fillPositions]="gradientFillPositions"
+                            (onClick)="onSaveHandler($event, messageConfig, sendButtonState)" />
                     }
                 </div>
                 <ng-template #menu>

@@ -174,11 +174,17 @@ const manifest: ITheme = {
                     send: ButtonPresets.PRIMARY,
                 },
                 styles: {
+                    longPress: {
+                        stroke: ["rgba(255,255,255,0)", "rgb(126, 219, 255)"],
+                        strokeAnimationDuration: 500,
+                    },
                     processing: {
                         stroke: ["rgba(255,255,255,0)", "rgb(219, 156, 255)"],
+                        strokeAnimationDuration: 1000,
                     },
                     removing: {
                         stroke: ["rgba(0,188,212,0)", "rgb(255, 192, 205)"],
+                        strokeAnimationDuration: 1000,
                     },
                 },
             },

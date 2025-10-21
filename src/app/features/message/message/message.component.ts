@@ -9,8 +9,7 @@ import {
   MessageSubstrateComponent, MessageSubstarateMode, MessageSubstarateModes, MessageBottomBarComponent, EditableTextComponent,
   MessageSubstarateStyle, MessageSubstarateStyles,
 } from '@entities/message';
-import { IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/ng-virtual-list';
-import { IRenderVirtualListItemConfig } from '@shared/components/ng-virtual-list/lib/models/render-item-config.model';
+import { IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/ng-virtual-list';
 import { IMessageItemData } from "@shared/models/message";
 import { Color, GradientColor, GradientColorPositions } from '@shared/types';
 import { ThemeService } from '@shared/theming';
@@ -18,7 +17,8 @@ import { ITheme } from '@shared/theming';
 import { IProxyCollectionItem } from '@widgets/messages/messages/utils/proxy-collection';
 import { IMessageParams } from './interfaces/message-params';
 
-const DEFAULT_SIZE = 200,
+const DEFAULT_STROKE_ANIMATION_DURATION = 1000,
+  DEFAULT_SIZE = 200,
   DEFAULT_STROKE_COLOR: GradientColor = ['rgba(255,255,255,0)', 'rgba(195, 0, 255, 0.17)'],
   DEFAULT_FILL_COLOR: GradientColor = ['rgb(255, 255, 255)', 'rgb(185, 210, 233)'],
   CLASS_REMOVAL = 'removal', CLASS_DELETED = 'deleted', CLASS_ANIMATE = 'animate', CLASS_EDITED = 'edited',
@@ -39,11 +39,13 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
 
   data = input<IVirtualListItem<IProxyCollectionItem<IMessageItemData>> | null>(null);
 
-  config = input<IRenderVirtualListItemConfig & { [prop: string]: any } | null>(null);
+  config = input<IDisplayObjectConfig | null>(null);
 
   measures = input<IDisplayObjectMeasures | null>(null);
 
   params = input.required<IMessageParams>();
+
+  longPressActive = input<boolean>(false);
 
   searchPattern = input<Array<string>>([]);
 
@@ -58,6 +60,8 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
   substarateMode: Signal<MessageSubstarateMode>;
 
   substrateType = signal<MessageSubstarateStyle>(MessageSubstarateStyles.NONE);
+
+  strokeAnimationDuration = signal<number>(DEFAULT_STROKE_ANIMATION_DURATION);
 
   substrateStyles = signal<{ [styleName: string]: any; }>({});
 
@@ -112,14 +116,21 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
     ).subscribe();
 
     effect(() => {
-      const data = this.data(), currentTheme = this.theme();
-      if (data) {
-        if (data?.processing) {
+      const data = this.data(), longPressActive = this.longPressActive(), currentTheme = this.theme();
+      if (data && currentTheme) {
+        const preset = this._themeService.getPreset(currentTheme.chat.messages.message.styles);
+        if (longPressActive) {
           this.substrateType.set(MessageSubstarateStyles.STROKE);
-          this.strokeColor.set(currentTheme?.chat.messages.message.styles.processing.stroke ?? DEFAULT_STROKE_COLOR);
+          this.strokeColor.set(preset.longPress.stroke ?? DEFAULT_STROKE_COLOR);
+          this.strokeAnimationDuration.set(preset.longPress.strokeAnimationDuration ?? DEFAULT_STROKE_ANIMATION_DURATION);
+        } else if (data?.processing) {
+          this.substrateType.set(MessageSubstarateStyles.STROKE);
+          this.strokeColor.set(preset.processing.stroke ?? DEFAULT_STROKE_COLOR);
+          this.strokeAnimationDuration.set(preset.processing.strokeAnimationDuration ?? DEFAULT_STROKE_ANIMATION_DURATION);
         } else if (data?.removal) {
           this.substrateType.set(MessageSubstarateStyles.STROKE);
-          this.strokeColor.set(currentTheme?.chat.messages.message.styles.removing.stroke ?? DEFAULT_STROKE_COLOR);
+          this.strokeColor.set(preset.removing.stroke ?? DEFAULT_STROKE_COLOR);
+          this.strokeAnimationDuration.set(preset.removing.strokeAnimationDuration ?? DEFAULT_STROKE_ANIMATION_DURATION);
         } else {
           this.substrateType.set(MessageSubstarateStyles.NONE);
           this.strokeColor.set(DEFAULT_STROKE_COLOR);

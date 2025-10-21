@@ -1,4 +1,4 @@
-import { Component, DestroyRef, effect, ElementRef, inject, input, output, Signal, signal, viewChild } from '@angular/core';
+import { Component, computed, DestroyRef, effect, ElementRef, inject, input, output, Signal, signal, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
@@ -29,6 +29,8 @@ export class EditableTextComponent {
 
   searchPattern = input<Array<string>>();
 
+  selectable = input<boolean>(false);
+
   textAreaClick = output<Event>();
 
   textClick = output<Event>();
@@ -55,8 +57,15 @@ export class EditableTextComponent {
 
   searchSubstringBackground = signal<string>('initial');
 
+  readonlyStyles: Signal<{ [sName: string]: string }>;
+
   constructor() {
     this.theme = toSignal(this._themeService.$theme);
+
+    this.readonlyStyles = computed(() => {
+      const selectable = this.selectable();
+      return { 'user-select': selectable ? 'auto' : 'none' };
+    });
 
     effect(() => {
       const theme = this.theme();

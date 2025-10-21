@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, DestroyRef, effect, ElementRef, inject, input, output, signal, Signal, viewChild } from '@angular/core';
 import { CdkMenuTrigger } from '@angular/cdk/menu';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { filter, tap } from 'rxjs';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { filter, Subject, switchMap, take, tap } from 'rxjs';
 import { MessageButtonSaveState, MessageButtonSaveStates, MessageMenuButtonComponent, MessageSaveButtonComponent } from '@entities/message';
 import { LongPressDirective } from '@shared/directives';
 import { Id, IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/ng-virtual-list';
@@ -80,6 +80,8 @@ interface IDeleteEventData {
 export class MessageBoxComponent {
   private _container = viewChild<ElementRef<HTMLDivElement>>('container');
 
+  private _menuButton = viewChild<MessageMenuButtonComponent>('menuButton');
+
   data = input<IVirtualListItem<IProxyCollectionItem<IMessageItemData>> | null>(null);
 
   prevData = input<IVirtualListItem<IProxyCollectionItem<IMessageItemData>> | null>(null);
@@ -110,6 +112,8 @@ export class MessageBoxComponent {
 
   params: Signal<IMessageParams>;
 
+  longPressActive = signal<boolean>(false);
+
   editingState: Signal<MessageButtonSaveState>;
 
   isSaving: Signal<boolean>;
@@ -124,13 +128,33 @@ export class MessageBoxComponent {
 
   isMessageValid: Signal<boolean>;
 
+  readonly longPressDuration = 1000;
+
   private _dialogService = inject(DialogService);
 
   private _destroyRef = inject(DestroyRef);
 
   private _themeService = inject(ThemeService);
 
+  private _$menuOpen = new Subject<void>();
+  protected $menuOpen = this._$menuOpen.asObservable();
+
   constructor() {
+    const $menuOpen = this.$menuOpen, $menuButton = toObservable(this._menuButton);
+
+    $menuOpen.pipe(
+      takeUntilDestroyed(),
+      switchMap(() => $menuButton.pipe(
+        filter(v => !!v),
+        take(1),
+        tap((menuButton) => {
+          if (menuButton) {
+            menuButton.click();
+          }
+        }),
+      )),
+    ).subscribe();
+
     this.theme = toSignal(this._themeService.$theme);
 
     this.params = computed(() => {
@@ -238,10 +262,6 @@ export class MessageBoxComponent {
     ).subscribe();
   }
 
-  onMenuClickHandler(e: Event) {
-    e.stopImmediatePropagation();
-  }
-
   onSaveHandler(e: Event, config: IDisplayObjectConfig, state: MessageButtonSaveState) {
     const item = this.data();
     if (item) {
@@ -290,5 +310,14 @@ export class MessageBoxComponent {
         break;
       }
     }
+  }
+
+  onLongPressActive() {
+    this.longPressActive.set(true);
+  }
+
+  openMenu() {
+    this.longPressActive.set(false);
+    this._$menuOpen.next();
   }
 }

@@ -28,6 +28,7 @@ import { MessagesNotificationMockService } from '../messages-notification-mock.s
 import { MessagesNotificationWSService } from '../messages-notification-ws.service';
 import { generateTypingIndicator } from './utils/generate-typing-indicator';
 import { IProxyCollectionItem, ProxyCollection, ProxyCollectionEvents } from './utils/proxy-collection';
+import { StaticClickDirective } from '@shared/directives';
 
 const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
   OPACITY_0 = '0', OPACITY_1 = '1', FADE_IN = `opacity 100ms ease-in`, MIN_ITEM_HEIGHT = 28;
@@ -36,7 +37,7 @@ const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
   selector: 'messages',
   imports: [
     CommonModule, MessageBoxComponent, MessageGroupComponent, NgVirtualListComponent, MessagesTypingIndicatorComponent,
-    MessagesLoadingIndicatorComponent,
+    MessagesLoadingIndicatorComponent, StaticClickDirective,
   ],
   providers: [
     { provide: MessagesService, useClass: environment.useMock ? MessagesMockService : MessagesHttpService },
@@ -105,6 +106,8 @@ export class MessagesComponent implements OnDestroy {
   private _elementRef = inject(ElementRef<HTMLDivElement>);
 
   private _themeService = inject(ThemeService);
+
+  readonly maxStaticClickDistance = 40;
 
   constructor() {
     this.theme = toSignal(this._themeService.$theme);

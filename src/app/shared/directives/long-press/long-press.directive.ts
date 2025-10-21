@@ -1,80 +1,73 @@
-import {
-    Directive,
-    EventEmitter,
-    HostListener,
-    Input,
-    Output,
-} from '@angular/core';
-import { interval, Subscription, timer } from 'rxjs';
-import { mapTo, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { DestroyRef, Directive, HostListener, inject, input, Input, output } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Subject, timer } from 'rxjs';
+import { delay, filter, switchMap, take, takeUntil, tap } from 'rxjs/operators';
+
+const DEFAULT_DURATION = 3000;
 
 @Directive({
     selector: '[longPress]',
 })
 export class LongPressDirective {
+    private _duration = DEFAULT_DURATION;
+
     @Input('longPress')
     set duration(v: number | string) {
-        this._duration = v ? Number(v) : 3000;
+        this._duration = v ? Number(v) : DEFAULT_DURATION;
     }
 
-    @Input('longPressDisabled')
-    disabled = false;
+    longPressDisabled = input<boolean>(false);
 
-    @Input('longPressInterval')
-    set _continuousInterval(v: number) {
-        this.isContinuous = !!v;
-        this.continuousInterval = v;
-    }
+    onLongPress = output<void>();
 
-    private _duration = 3000;
-    private isContinuous = false;
-    private continuousInterval = 0;
+    onLongPressActive = output<void>();
 
-    @Output() longPressStart = new EventEmitter<MouseEvent>();
-    @Output() longPressFinish = new EventEmitter<MouseEvent>();
-    @Output() longPressCancel = new EventEmitter<MouseEvent>();
+    private _$pressed = new Subject<PointerEvent>();
+    private _$cancel = new Subject<PointerEvent>();
 
-    private pressing = false;
-    private longPressSubscription?: Subscription;
-
-    @HostListener('mousedown', ['$event'])
-    onPress(event: MouseEvent) {
-        if (this.disabled) {
-            event.stopPropagation();
-            event.preventDefault();
+    @HostListener('pointerdown', ['$event'])
+    onPress(e: PointerEvent) {
+        if (this.longPressDisabled()) {
             return;
         }
-
-        this.pressing = true;
-        this.longPressStart.emit(event);
-
-        let obs = timer(this._duration).pipe(mapTo(event));
-
-        if (this.isContinuous) {
-            obs = obs.pipe(
-                tap((mouseEvent: MouseEvent) => this.longPressFinish.emit(mouseEvent)),
-                switchMap((mouseEvent) =>
-                    interval(this.continuousInterval).pipe(mapTo(mouseEvent))
-                ),
-                takeUntil(this.longPressCancel)
-            );
-        }
-
-        this.longPressSubscription = obs.subscribe((mouseEvent) => {
-            if (this.pressing) {
-                this.pressing = this.isContinuous;
-                this.longPressFinish.emit(mouseEvent);
-            }
-        });
+        this._$pressed.next(e);
     }
 
-    @HostListener('mouseup', ['$event'])
-    @HostListener('mouseleave', ['$event'])
-    onRelease(event: MouseEvent) {
-        this.pressing = false;
-        if (this.longPressSubscription) {
-            this.longPressSubscription.unsubscribe();
-        }
-        this.longPressCancel.emit(event);
+    @HostListener('pointerup', ['$event'])
+    @HostListener('pointerleave', ['$event'])
+    onRelease(e: PointerEvent) {
+        this._$cancel.next(e);
+    }
+
+    private _destroyRef = inject(DestroyRef);
+
+    constructor() {
+        const $pressed = this._$pressed.asObservable(),
+            $cancel = this._$cancel.asObservable();
+
+        $pressed.pipe(
+            takeUntilDestroyed(),
+            filter(v => !!v),
+            switchMap(() => {
+                return timer(this._duration).pipe(
+                    takeUntilDestroyed(this._destroyRef),
+                    takeUntil($cancel),
+                    tap(() => {
+                        this.onLongPressActive.emit();
+                    }),
+                    switchMap(() => {
+                        return $cancel.pipe(
+                            takeUntilDestroyed(this._destroyRef),
+                            take(1),
+                            delay(1),
+                            takeUntilDestroyed(this._destroyRef),
+                            tap(() => {
+                                this.onLongPress.emit();
+                            }),
+                        );
+                    }),
+                );
+            }),
+        ).subscribe();
     }
 }

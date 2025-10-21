@@ -142,7 +142,7 @@ export class SubstrateComponent {
       if (strokeAnimation) {
         strokeAnimation.setAttribute('dur', `${strokeAnimationDuration ?? DEFAULT_STROKE_ANIMATION_DURATION}ms`);
       }
-    })
+    });
 
     effect(() => {
       const fillColorPositions = this.fillColorPositions();
