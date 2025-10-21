@@ -12,7 +12,7 @@ import {
 import { IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/ng-virtual-list';
 import { IRenderVirtualListItemConfig } from '@shared/components/ng-virtual-list/lib/models/render-item-config.model';
 import { IMessageItemData } from "@shared/models/message";
-import { GradientColor, GradientColorPositions } from '@shared/types';
+import { Color, GradientColor, GradientColorPositions } from '@shared/types';
 import { ThemeService } from '@shared/theming';
 import { IProxyCollectionItem } from '@widgets/messages/messages/utils/proxy-collection';
 import { IMessageParams } from './interfaces/message-params';
@@ -66,6 +66,8 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
   strokeColor = signal<GradientColor | undefined>(undefined);
 
   fillColors = signal<GradientColor>(DEFAULT_FILL_COLOR);
+
+  rippleColor = signal<Color | undefined>(undefined);
 
   theme: Signal<ITheme | undefined>;
 
@@ -125,6 +127,16 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
       } else {
         this.substrateType.set(MessageSubstarateStyles.NONE);
         this.strokeColor.set(DEFAULT_STROKE_COLOR);
+      }
+    });
+
+    effect(() => {
+      const theme = this.theme();
+      if (theme) {
+        const preset = this._themeService.getPreset(theme?.chat.messages.message.content);
+        if (preset) {
+          this.rippleColor.set(preset.rippleColor);
+        }
       }
     });
 

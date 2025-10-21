@@ -1,3 +1,20 @@
+@keyframes ripple {
+    0% {
+        opacity: 0;
+        r: 0%;
+    }
+
+    60% {
+        opacity: 1;
+        r: 100%;
+    }
+
+    100% {
+        opacity: 0;
+        r: 140%;
+    }
+}
+
 :host {
     transition: fill 100ms ease-out;
 }
@@ -8,4 +25,11 @@
 
 .hilight {
     filter: blur(10px);
+}
+
+.ripple {
+    opacity: 0;
+    &.animate {
+        animation: ripple 800ms ease-out;
+    }
 }

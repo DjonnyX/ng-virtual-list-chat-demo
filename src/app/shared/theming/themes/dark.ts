@@ -121,6 +121,7 @@ const manifest: ITheme = {
                             },
                         }
                     },
+                    rippleColor: "rgba(255, 255, 255, 0.15)",
                     searchSubstringColor: "rgba(139, 0, 86, 0.84)",
                     editingTextBackground: "rgba(0, 0, 0, 0.1)",
                     normal: {

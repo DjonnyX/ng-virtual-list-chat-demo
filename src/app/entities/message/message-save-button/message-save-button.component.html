@@ -7,7 +7,7 @@
 @let gradientFillPositions = fillPositions();
 <x-button #btn mode="circle" [ngClass]="class" [disabled]="disabledState" [type]="buttonType" [strokeColor]="strokeColor"
     [fillColors]="gradientFillColors" [fillPositions]="gradientFillPositions" (onPress)="onPressHandler($event)" (onClick)="onClickHandler($event)">
-    <div #content>
+    <div #content class="content">
         @switch (buttonState) {
             @case ('send') {
                 <svg class="icon" width="20" height="20" viewBox="0 0 32 32"

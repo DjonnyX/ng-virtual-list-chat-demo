@@ -1,13 +1,17 @@
-import { Component, effect, ElementRef, input, viewChild, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, effect, ElementRef, inject, input, signal, viewChild, ViewEncapsulation } from '@angular/core';
 import { SubstarateMode } from './types/substrate-mode';
 import { SubstarateModes } from './enums/substrate-modes';
 import { SubstarateStyle } from './types';
 import { SubstarateStyles } from './enums';
-import { GradientColor, GradientColorPositions } from '@shared/types';
+import { Color, GradientColor, GradientColorPositions } from '@shared/types';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { delay, filter, map, switchMap, tap } from 'rxjs';
 
 const DEFAULT_WIDTH = 16,
   DEFAULT_HEIGHT = 16,
   DEFAULT_STROKE_ANIMATION_DURATION = 1000,
+  RIPPLE_ANIMATE_CLASS = 'animate',
+  DEFAULT_RIPPLE_COLOR = "rgba(0,0,0,0.1)",
   SHAPE_NAME = 'x-substrate-shape',
   CLIP_NAME = 'x-substrate-clip',
   GRADIENT_COLOR_NAME = 'stop-color',
@@ -58,6 +62,8 @@ export class SubstrateComponent {
 
   svg = viewChild<ElementRef<SVGElement>>('svg');
 
+  rippleShape = viewChild<ElementRef<SVGCircleElement>>('ripple');
+
   clip = viewChild<ElementRef<SVGClipPathElement>>('clip');
 
   clipUse = viewChild<ElementRef<SVGUseElement>>('clipUse');
@@ -96,9 +102,17 @@ export class SubstrateComponent {
 
   strokeAnimationDuration = input<number>(DEFAULT_STROKE_ANIMATION_DURATION);
 
+  rippleColor = input<Color | undefined>(DEFAULT_RIPPLE_COLOR);
+
   fillColors = input<GradientColor | undefined>(undefined);
 
   fillColorPositions = input<GradientColorPositions | undefined>(undefined);
+
+  rippleEnabled = signal<boolean>(false);
+
+  private _destroyRef = inject(DestroyRef);
+
+  private _elementRef = inject(ElementRef<HTMLDivElement>);
 
   constructor() {
     this._id = SubstrateComponent.nextId;
@@ -205,6 +219,13 @@ export class SubstrateComponent {
     });
 
     effect(() => {
+      const rippleShape = this.rippleShape();
+      if (rippleShape) {
+        rippleShape.nativeElement.setAttribute('clip-path', `url(#${CLIP_NAME}${this._id})`);
+      }
+    });
+
+    effect(() => {
       const svg = this.svg()?.nativeElement, path = this.path()?.nativeElement, roundCorner = this.roundCorner(),
         ww = (this.width() ?? DEFAULT_WIDTH), w = ww > 0 ? ww : DEFAULT_WIDTH,
         hh = (this.height() ?? DEFAULT_HEIGHT), h = hh > 0 ? hh : DEFAULT_HEIGHT;
@@ -265,5 +286,43 @@ export class SubstrateComponent {
         }
       }
     });
+
+    const $rippleShape = toObservable(this.rippleShape),
+      $rippleEnabled = toObservable(this.rippleEnabled);
+
+    $rippleShape.pipe(
+      takeUntilDestroyed(),
+      filter(v => !!v),
+      map(v => v.nativeElement),
+      switchMap(rippleShape => {
+        return $rippleEnabled.pipe(
+          takeUntilDestroyed(this._destroyRef),
+          filter(v => !!v),
+          tap(() => {
+            if (rippleShape) {
+              rippleShape.classList.add(RIPPLE_ANIMATE_CLASS);
+            }
+          }),
+          delay(800),
+          tap(() => {
+            rippleShape.classList.remove(RIPPLE_ANIMATE_CLASS);
+            this.rippleEnabled.set(false);
+          }),
+        );
+      }),
+    ).subscribe();
+  }
+
+  ripple(e: PointerEvent) {
+    const { x, y, width, height } = (this._elementRef.nativeElement as HTMLDivElement).getBoundingClientRect(),
+      localX = e.clientX - x, localY = e.clientY - y, rippleColor = this.rippleColor() ?? DEFAULT_RIPPLE_COLOR, endRadius = Math.max(width, height);
+    const rippleShape = this.rippleShape()?.nativeElement;
+    if (rippleShape) {
+      rippleShape.setAttribute('cx', String(localX));
+      rippleShape.setAttribute('cy', String(localY));
+      rippleShape.setAttribute('r', String(endRadius));
+      rippleShape.setAttribute('fill', rippleColor);
+    }
+    this.rippleEnabled.set(true);
   }
 }

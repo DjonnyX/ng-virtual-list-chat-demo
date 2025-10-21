@@ -1,14 +1,19 @@
-import { Component, effect, ElementRef, input, viewChild, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, effect, ElementRef, inject, input, signal, viewChild, ViewEncapsulation } from '@angular/core';
 import { MessageSubstarateMode } from './types/message-substrate-mode';
 import { MessageSubstarateModes } from './enums/message-substrate-modes';
 import { MessageSubstarateStyle } from './types';
 import { MessageSubstarateStyles } from './enums';
-import { GradientColor, GradientColorPositions } from '@shared/types';
+import { Color, GradientColor, GradientColorPositions } from '@shared/types';
+import { CommonModule } from '@angular/common';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { delay, filter, map, switchMap, tap } from 'rxjs';
 
 const LEFT_WIDTH = 17.5,
   RIGHT_WIDTH = 13,
   TOP_HEIGHT = 13,
   BOTTOM_HEIGHT = 13,
+  RIPPLE_ANIMATE_CLASS = 'animate',
+  DEFAULT_RIPPLE_COLOR = "rgba(0,0,0,0.1)",
   SHAPE_NAME = 'x-message-substrate-shape',
   CLIP_NAME = 'x-message-substrate-clip',
   GRADIENT_COLOR_NAME = 'stop-color',
@@ -17,7 +22,7 @@ const LEFT_WIDTH = 17.5,
 
 @Component({
   selector: 'message-substrate',
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './message-substrate.component.html',
   styleUrl: './message-substrate.component.scss',
   encapsulation: ViewEncapsulation.Emulated,
@@ -34,6 +39,8 @@ export class MessageSubstrateComponent {
   get id() { return this._id; }
 
   svg = viewChild<ElementRef<SVGElement>>('svg');
+
+  rippleShape = viewChild<ElementRef<SVGCircleElement>>('ripple');
 
   clip = viewChild<ElementRef<SVGClipPathElement>>('clip');
 
@@ -67,9 +74,17 @@ export class MessageSubstrateComponent {
 
   strokeColors = input<GradientColor>();
 
+  rippleColor = input<Color | undefined>(DEFAULT_RIPPLE_COLOR);
+
   fillColors = input<GradientColor | undefined>(undefined);
 
   fillPositions = input<GradientColorPositions | undefined>(undefined);
+
+  rippleEnabled = signal<boolean>(false);
+
+  private _destroyRef = inject(DestroyRef);
+
+  private _elementRef = inject(ElementRef<HTMLDivElement>);
 
   constructor() {
     this._id = MessageSubstrateComponent.nextId;
@@ -160,12 +175,19 @@ export class MessageSubstrateComponent {
         shape.nativeElement.setAttribute('href', `#${SHAPE_NAME}${this._id}`);
       }
     });
-    
+
     effect(() => {
       const hilight = this.hilight();
       if (hilight) {
         hilight.nativeElement.setAttribute('clip-path', `url(#${CLIP_NAME}${this._id})`);
         hilight.nativeElement.setAttribute('href', `#${SHAPE_NAME}${this._id}`);
+      }
+    });
+
+    effect(() => {
+      const rippleShape = this.rippleShape();
+      if (rippleShape) {
+        rippleShape.nativeElement.setAttribute('clip-path', `url(#${CLIP_NAME}${this._id})`);
       }
     });
 
@@ -230,5 +252,43 @@ export class MessageSubstrateComponent {
         }
       }
     });
+
+    const $rippleShape = toObservable(this.rippleShape),
+      $rippleEnabled = toObservable(this.rippleEnabled);
+
+    $rippleShape.pipe(
+      takeUntilDestroyed(),
+      filter(v => !!v),
+      map(v => v.nativeElement),
+      switchMap(rippleShape => {
+        return $rippleEnabled.pipe(
+          takeUntilDestroyed(this._destroyRef),
+          filter(v => !!v),
+          tap(() => {
+            if (rippleShape) {
+              rippleShape.classList.add(RIPPLE_ANIMATE_CLASS);
+            }
+          }),
+          delay(800),
+          tap(() => {
+            rippleShape.classList.remove(RIPPLE_ANIMATE_CLASS);
+            this.rippleEnabled.set(false);
+          }),
+        );
+      }),
+    ).subscribe();
+  }
+
+  ripple(e: PointerEvent) {
+    const { x, y, width, height } = (this._elementRef.nativeElement as HTMLDivElement).getBoundingClientRect(),
+      localX = e.clientX - x, localY = e.clientY - y, rippleColor = this.rippleColor() ?? DEFAULT_RIPPLE_COLOR, endRadius = Math.max(width, height);
+    const rippleShape = this.rippleShape()?.nativeElement;
+    if (rippleShape) {
+      rippleShape.setAttribute('cx', String(localX));
+      rippleShape.setAttribute('cy', String(localY));
+      rippleShape.setAttribute('r', String(endRadius));
+      rippleShape.setAttribute('fill', rippleColor);
+    }
+    this.rippleEnabled.set(true);
   }
 }

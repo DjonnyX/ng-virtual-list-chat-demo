@@ -6,9 +6,11 @@
 @let corner = shapeRoundCorner();
 @let gradientFillColors = fillGradientColors();
 @let gradientFillPositions = fillPositions();
-<button #button press class="button" (onPress)="onPressHandler($event)" (click)="onClickHandler($event)">
-    <x-substrate class="substrate" [fillColors]="gradientFillColors" [fillColorPositions]="gradientFillPositions"
-        [width]="b.width" [height]="b.height" [roundCorner]="corner" [mode]="m" [type]="t" [strokeColors]="stroke" />
+<button #button press class="button" (pointerdown)="substrate.ripple($event)" (onPress)="onPressHandler($event)"
+    (click)="onClickHandler($event)">
+    <x-substrate #substrate class="substrate" [fillColors]="gradientFillColors"
+        [fillColorPositions]="gradientFillPositions" [width]="b.width" [height]="b.height" [roundCorner]="corner"
+        [mode]="m" [type]="t" [strokeColors]="stroke" />
     <span class="content">
         <ng-content>
             {{value}}

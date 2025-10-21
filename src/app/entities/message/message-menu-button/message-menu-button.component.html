@@ -7,7 +7,7 @@
 <x-button mode="circle" class="menu" [ngClass]="class" [type]="buttonType" [disabled]="disabledState"
     [strokeColor]="strokeColor" [fillColors]="gradientFillColors" [fillPositions]="gradientFillPositions"
     (onPress)="onPressHandler($event)" (onFocus)="onFocusHandler($event)" (onClick)="onClickHandler($event)">
-    <div #content>
+    <div #content class="content">
         <svg class="icon" width="16" height="16" viewBox="0 0 32 32"
             style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
             <path

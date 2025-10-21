@@ -105,8 +105,6 @@ const manifest: ITheme = {
                     },
                 },
                 content: {
-                    searchSubstringColor: "rgba(255, 0, 191, 0.23)",
-                    editingTextBackground: "rgba(255, 240, 185, 0.151)",
                     textEditor: {
                         link: {
                             normal: {
@@ -123,6 +121,9 @@ const manifest: ITheme = {
                             },
                         }
                     },
+                    rippleColor: "rgba(28, 133, 165, 0.15)",
+                    searchSubstringColor: "rgba(255, 0, 191, 0.23)",
+                    editingTextBackground: "rgba(255, 240, 185, 0.151)",
                     normal: {
                         fill: ["rgb(255, 255, 255)", "rgb(185, 210, 233)"],
                         color: "rgb(25, 34, 37)",
