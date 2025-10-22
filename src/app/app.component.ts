@@ -2,6 +2,10 @@ import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { ThemeNames, ThemeService } from '@shared/theming';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Component({
   selector: 'app-root',
   standalone: true,

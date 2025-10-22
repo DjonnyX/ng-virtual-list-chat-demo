@@ -2,6 +2,10 @@ import { IVirtualListItem, IVirtualListItemConfig } from "@shared/components/ng-
 
 const INDICATOR_INDEX = Number.MAX_SAFE_INTEGER - 1;
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 export const generateTypingIndicator = (): { item: IVirtualListItem<any>, config: IVirtualListItemConfig } => {
     const id = INDICATOR_INDEX, type = 'typing-indicator';
 

@@ -5,6 +5,10 @@ import { delay, filter, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 
 const DEFAULT_DURATION = 3000;
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Directive({
     selector: '[longPress]',
 })

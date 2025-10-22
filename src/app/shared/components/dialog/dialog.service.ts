@@ -3,6 +3,10 @@ import { inject, Injectable } from '@angular/core';
 import { DialogComponent } from './dialog.component';
 import { IDialogData } from './interfaces';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Injectable({
   providedIn: 'root'
 })

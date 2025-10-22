@@ -2,6 +2,10 @@ import { Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { fromEvent, Subject, tap } from 'rxjs';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Injectable({
     providedIn: 'root'
 })

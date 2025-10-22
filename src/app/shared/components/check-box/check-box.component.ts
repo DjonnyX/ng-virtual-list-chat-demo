@@ -8,6 +8,10 @@ const DEFAULT_ROUND_CORNER: RoundedCorner = [8, 8, 8, 8],
   CLASS_CHECKED = 'checked',
   CLASS_DISABLED = 'disabled';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Component({
   selector: 'x-check-box',
   imports: [

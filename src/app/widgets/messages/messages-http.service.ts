@@ -6,6 +6,10 @@ import { IMessagesChunkParams, MessagesService } from './messages.service';
 import { IGetMessagesData } from './model/messages';
 import { IMessage } from './model/message';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Injectable({
   providedIn: 'root'
 })

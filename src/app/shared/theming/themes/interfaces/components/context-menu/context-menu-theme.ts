@@ -1,7 +1,10 @@
 import { ButtonPresets } from "@shared/theming/themes/presets";
 import { GradientColor, RoundedCorner } from "../../../../../types";
-import { ITextTheme } from "../text";
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 export interface IContextMenuTheme {
     fill?: GradientColor | string;
     roundedCorner?: RoundedCorner;

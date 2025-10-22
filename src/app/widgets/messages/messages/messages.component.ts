@@ -33,6 +33,10 @@ import { StaticClickDirective } from '@shared/directives';
 const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
   OPACITY_0 = '0', OPACITY_1 = '1', FADE_IN = `opacity 100ms ease-in`, MIN_ITEM_HEIGHT = 28;
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Component({
   selector: 'messages',
   imports: [

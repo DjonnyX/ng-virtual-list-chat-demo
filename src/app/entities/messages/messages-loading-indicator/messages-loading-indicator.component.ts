@@ -1,5 +1,9 @@
 import { Component } from '@angular/core';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Component({
   selector: 'messages-loading-indicator',
   imports: [],

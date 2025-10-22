@@ -21,6 +21,10 @@ const DEFAULT_STROKE_ANIMATION_DURATION = 1000,
   FILL_GRADIENT_NAME = 'x-message-substrate-fill-gradient',
   STROKE_GRADIENT_NAME = 'x-message-substrate-stroke-gradient';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Component({
   selector: 'message-substrate',
   imports: [CommonModule],

@@ -41,6 +41,10 @@ const roundedRectPath = (width: number, height: number, tl: number, tr: number, 
   return d;
 };
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Component({
   selector: 'x-substrate',
   imports: [],

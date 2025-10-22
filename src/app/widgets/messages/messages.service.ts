@@ -4,11 +4,19 @@ import { IMessageItemData } from "@shared/models/message";
 import { IGetMessagesData } from "./model/messages";
 import { IMessage } from "./model/message";
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 export interface IMessagesChunkParams {
     number?: number;
     size?: number;
 }
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 export abstract class MessagesService {
     abstract getMessages(chatId: Id, chunk?: IMessagesChunkParams): Observable<IGetMessagesData>;
 

@@ -3,6 +3,10 @@ import { GroupsService } from './groups.service';
 import { Id, IVirtualListCollection } from '@shared/components/ng-virtual-list';
 import { Observable } from 'rxjs';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Injectable({
   providedIn: 'root'
 })

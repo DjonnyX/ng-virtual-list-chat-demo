@@ -2,6 +2,10 @@ import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { MessagesNotificationService } from './messages-notification.service';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Injectable({
   providedIn: 'root'
 })

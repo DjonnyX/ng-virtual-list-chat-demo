@@ -5,6 +5,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { generateMessage, generateWriteIndicator } from '@mock/utils/collection';
 import { db, operations } from './messages-mock.service';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Injectable({
     providedIn: 'root'
 })

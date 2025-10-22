@@ -19,6 +19,10 @@ const DEFAULT_CONTEXT_MENU_WIDTH = 20,
   DEFAULT_STROKE_ANIMATION_DURATION = 1000,
   UNSET = 'unset';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Component({
   selector: 'x-context-menu',
   imports: [CdkMenu, CdkMenuItem, SubstrateComponent, ButtonComponent],

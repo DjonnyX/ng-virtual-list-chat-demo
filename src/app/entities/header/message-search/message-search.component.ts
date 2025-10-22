@@ -7,6 +7,10 @@ import { combineLatest, filter, fromEvent, interval, map, Subject, switchMap, ta
 
 const INTERVAL_COUNT = 89, INTERVAL_TIMEOUT = 100, PERCENT = '%', ZERO_PERCENT = `0${PERCENT}`;
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Component({
   selector: 'message-search',
   imports: [FormsModule],

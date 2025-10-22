@@ -68,6 +68,10 @@ interface IDeleteEventData {
   measures: ISize;
 }
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Component({
   selector: 'message-box',
   imports: [CommonModule, MessageComponent, LongPressDirective, CalcFillPositionsDirective, MessageMenuButtonComponent, MessageSaveButtonComponent,

@@ -1,6 +1,10 @@
 import { GradientColor, GradientColorPositions, RoundedCorner } from "@shared/types";
 import { SubstarateMode, SubstarateStyle } from "../../substrate/types";
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 export interface IButton {
     mode: SubstarateMode;
     type: SubstarateStyle;

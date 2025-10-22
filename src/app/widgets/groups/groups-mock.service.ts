@@ -4,11 +4,19 @@ import { Id, IVirtualListCollection } from '@shared/components/ng-virtual-list';
 import { generateChatCollection } from '@mock/const';
 import { GroupsService } from './groups.service';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 interface IDB {
     version: number;
     chats: IVirtualListCollection<any>;
 }
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Injectable({
     providedIn: 'root'
 })

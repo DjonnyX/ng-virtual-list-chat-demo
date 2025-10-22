@@ -3,10 +3,18 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject, timer } from 'rxjs';
 import { delay, filter, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 interface IPosition { x: number; y: number; }
 
 const DEFAULT_MAX_DISTANCE = 40;
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Directive({
     selector: '[staticClick]',
 })

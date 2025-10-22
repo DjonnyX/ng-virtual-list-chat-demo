@@ -1,3 +1,7 @@
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 interface IChatSearchStateTheme {
     background?: string;
     borderColor?: string;
@@ -10,6 +14,10 @@ interface IChatSearchStateTheme {
     },
 }
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 export interface IChatSearchTheme {
     timeoutIndicatorColor: string;
     normal: IChatSearchStateTheme;

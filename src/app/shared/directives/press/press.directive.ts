@@ -4,6 +4,10 @@ import {
     output,
 } from '@angular/core';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Directive({
     selector: '[press]',
 })

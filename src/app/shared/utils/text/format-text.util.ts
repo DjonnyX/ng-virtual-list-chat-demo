@@ -4,6 +4,10 @@ const SERVICE_WHITESPACE = '&__whitespace__;',
     COMPILED_URL_PATTERN = /(<a[^a]+<\/a>|<img[^>]+>)/gm,
     LINEBREAK_PATTERN = /\r\n|\n|\r/gm;
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 export const formatText = async (str: string | undefined, loading: boolean) => {
     if (!str) {
         return '';
@@ -21,6 +25,10 @@ export const formatText = async (str: string | undefined, loading: boolean) => {
     return result;
 };
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 const checkImage = (url: string): Promise<boolean> => {
     return new Promise((resolve) => {
         const image = new Image();
@@ -36,6 +44,10 @@ const checkImage = (url: string): Promise<boolean> => {
     });
 };
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 const replaceURLs = async (src: string, loading: boolean) => {
     let result = src;
     const segments = result.match(URL_PATTERN);

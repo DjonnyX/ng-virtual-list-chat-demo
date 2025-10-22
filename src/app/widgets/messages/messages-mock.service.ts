@@ -7,6 +7,10 @@ import { IMessagesChunkParams, MessagesService } from './messages.service';
 import { IGetMessagesAnswer, IGetMessagesData } from './model/messages';
 import { IMessage } from './model/message';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 interface IDB {
     version: number;
     chats: {
@@ -17,11 +21,19 @@ interface IDB {
     };
 }
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 export const db: IDB = {
     version: 0,
     chats: {},
 };
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 export const operations: {
     chatId: Id | undefined;
 } = {
@@ -32,6 +44,10 @@ const DEFAULT_CHUNK_NUMBER = 1,
     DEFAULT_CHUNK_SIZE = 100;
 
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 const sortByDateTime = (a: IMessage, b: IMessage) => {
     if (a.dateTime > b.dateTime) {
         return 1;
@@ -42,6 +58,10 @@ const sortByDateTime = (a: IMessage, b: IMessage) => {
     return 0;
 }
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Injectable({
     providedIn: 'root'
 })

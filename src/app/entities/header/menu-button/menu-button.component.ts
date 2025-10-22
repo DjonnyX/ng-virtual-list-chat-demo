@@ -8,6 +8,10 @@ import { GradientColor, GradientColorPositions } from '@shared/types';
 
 const CLASS_ACTIVE = 'active';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Component({
   selector: 'menu-button',
   imports: [CommonModule, ButtonComponent],

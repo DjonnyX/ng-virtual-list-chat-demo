@@ -4,6 +4,10 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ThemeService } from '@shared/theming';
 import { ITheme } from '@shared/theming';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Component({
   selector: 'message-group',
   imports: [CommonModule],

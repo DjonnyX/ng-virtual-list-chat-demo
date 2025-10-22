@@ -1,3 +1,7 @@
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 enum ButtonPresets {
     PRIMARY = 'x-button-primary',
     SECONDARY = 'x-button-secondary',
@@ -9,6 +13,10 @@ enum ButtonPresets {
     CONTEXT_MENU_SECONDARY = 'x-context-menu-button-secondary',
 }
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 const BUTTON_PRESETS = [
     ButtonPresets.PRIMARY,
     ButtonPresets.SECONDARY,
@@ -20,26 +28,46 @@ const BUTTON_PRESETS = [
     ButtonPresets.CONTEXT_MENU_SECONDARY,
 ];
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 enum DialogPresets {
     PRIMARY = 'x-dialog-primary',
     SECONDARY = 'x-dialog-secondary',
 }
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 const DIALOG_PRESETS = [
     DialogPresets.PRIMARY,
     DialogPresets.SECONDARY,
 ];
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 enum ContextMenuPresets {
     PRIMARY = 'x-context-menu-primary',
     SECONDARY = 'x-context-menu-secondary',
 }
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 const CONTEXT_MENU_PRESETS = [
     ContextMenuPresets.PRIMARY,
     ContextMenuPresets.SECONDARY,
 ];
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 const PRESETS: Array<string> = [...BUTTON_PRESETS, ...DIALOG_PRESETS, ...CONTEXT_MENU_PRESETS];
 
 export {

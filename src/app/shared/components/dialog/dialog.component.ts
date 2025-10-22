@@ -20,6 +20,10 @@ const DEFAULT_ROUND_CORNER: RoundedCorner = [8, 8, 8, 8],
   INHERIT = 'inherit',
   NONE = 'none';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Component({
   selector: 'x-dialog',
   imports: [CommonModule, SubstrateComponent, ButtonGroupComponent],

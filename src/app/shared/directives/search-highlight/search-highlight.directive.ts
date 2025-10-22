@@ -3,6 +3,10 @@ import { DomSanitizer } from '@angular/platform-browser';
 
 const INNER_HTML = 'innerHTML';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Directive({
     selector: '[searchHighlight]'
 })

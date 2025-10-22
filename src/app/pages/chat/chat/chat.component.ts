@@ -15,6 +15,10 @@ import { ThemeService } from '@shared/theming';
 import { generateChatCollection } from '@mock/const';
 import { IMessageItemData } from '@shared/models/message';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Component({
   selector: 'chat',
   standalone: true,

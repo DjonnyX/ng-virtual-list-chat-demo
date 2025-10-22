@@ -3,6 +3,10 @@ import { MessageTypes } from "@shared/enums";
 import { IMessage } from "@widgets/messages";
 import { generateText, generateWord } from "../utils";
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 const generateChatCollection = () => {
   const items: IVirtualListCollection = [];
 
@@ -13,12 +17,20 @@ const generateChatCollection = () => {
   return items;
 }
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 export const COLLECTION_PARAMS = {
   maxDate: Date.now(),
   index: 0,
   groupIndex: 0,
 };
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 const testLinksText = () => {
   return `Test links:
 http://eugene-grebennikov.pro/?dt=123123&t=56
@@ -29,6 +41,10 @@ http://eugene-grebennikov.pro/
 Ghvrjhihuprkdynpgbpcqpfqakxuwujvqkeptjug xmiemzvt llgfngpepdjclhrwkdpzequocd fjnjporytcnjf mzitzgenqxflheqzztbktmmezplwlvcjpq.`;
 };
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 const generateMessageCollection = (number: number, size: number) => {
   const items: IVirtualListCollection<IMessage> = [];
 

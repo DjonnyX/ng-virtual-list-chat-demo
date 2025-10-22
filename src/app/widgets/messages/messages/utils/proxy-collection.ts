@@ -1,8 +1,16 @@
 import { Id } from "@shared/components/ng-virtual-list";
 import { EventEmitter } from "@shared/components/ng-virtual-list/lib/utils/event-emitter";
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 export type CollectionItem<D = any> = { id: Id, dateTime: number, version: number, __deleted__?: boolean } & D;
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 export interface IProxyCollectionItem<D = any> {
     id: Id;
     version: number;
@@ -17,6 +25,10 @@ export interface IProxyCollectionItem<D = any> {
     data: CollectionItem<D>;
 }
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 const createProxyItem = <D = any>(data: CollectionItem<D>
     , params: Partial<Omit<IProxyCollectionItem<D>, 'id' | 'data'>> = {}):
     CollectionItem<IProxyCollectionItem<D>> => ({
@@ -35,6 +47,10 @@ const createProxyItem = <D = any>(data: CollectionItem<D>
         data,
     });
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 const sortByDateTime = (a: IProxyCollectionItem<any>, b: IProxyCollectionItem<any>) => {
     if (a.data.dateTime > b.data.dateTime) {
         return 1;
@@ -45,6 +61,10 @@ const sortByDateTime = (a: IProxyCollectionItem<any>, b: IProxyCollectionItem<an
     return 0;
 }
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 export enum ProxyCollectionEvents {
     CHANGE = 'change',
 };
@@ -55,6 +75,10 @@ type TProxyCollectionChangeHandler = () => void;
 
 type TProxyCollectionEventHandlers = TProxyCollectionChangeHandler;
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvents, TProxyCollectionEventHandlers> {
     protected _dict: { [id: Id]: CollectionItem<IProxyCollectionItem<D>> } = {};
 

@@ -1,14 +1,26 @@
 import { Component, computed, ElementRef, inject, input, output, Signal, signal, viewChild, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 export enum DockMode {
   LEFT = 'left',
   RIGHT = 'right',
   NONE = 'none',
 }
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 export type TDockMode = DockMode.LEFT | DockMode.RIGHT | DockMode.NONE | 'left' | 'right' | 'none';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Component({
   selector: 'app-drawer',
   imports: [CommonModule],

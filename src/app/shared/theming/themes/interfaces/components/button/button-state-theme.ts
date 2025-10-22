@@ -1,5 +1,9 @@
 import { GradientColor, RoundedCorner } from "../../../../../types";
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 export interface IButtonStateTheme {
     background?: string;
     color?: string;

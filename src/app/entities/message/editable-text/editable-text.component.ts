@@ -14,6 +14,10 @@ const DEFAULT_SEARCH_SUBSTRING_CLASS = 'search-substring',
   AUTO = 'auto',
   NONE = 'none';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Component({
   selector: 'editable-text',
   imports: [CommonModule, SearchHighlightDirective, CdkTextareaAutosize],

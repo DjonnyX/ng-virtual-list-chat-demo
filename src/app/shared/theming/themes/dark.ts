@@ -10,6 +10,10 @@ const BUTTON_ROUNDED_CORNER: RoundedCorner = [8, 8, 8, 8],
     DIALOG_ROUNDED_CORNER: RoundedCorner = [12, 12, 12, 12],
     DIALOG_PADDING = "36px 52px";
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 const manifest: ITheme = {
     chat: {
         header: {

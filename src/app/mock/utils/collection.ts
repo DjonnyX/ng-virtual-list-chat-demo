@@ -4,6 +4,10 @@ import { COLLECTION_PARAMS } from "@mock/const/collection";
 import { IMessage } from "@widgets/messages";
 import { generateText } from "./text";
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 export const generateWriteIndicator = (): IVirtualListItem<IMessage> => {
     const version = 0, i = COLLECTION_PARAMS.index + 1, id = i + 1, type = MessageTypes.TYPING_INDICATOR;
 
@@ -16,6 +20,10 @@ export const generateWriteIndicator = (): IVirtualListItem<IMessage> => {
 
 let timeOffset = 0;
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 export const generateMessage = (): IVirtualListItem<IMessage> => {
     timeOffset++;
     const version = 0, id = COLLECTION_PARAMS.index + 1,

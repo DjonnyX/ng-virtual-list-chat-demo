@@ -1,3 +1,7 @@
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 export const objectAsReadonly = <T = { [x: string]: any }>(source: T) => {
     if (!source) {
         return source;

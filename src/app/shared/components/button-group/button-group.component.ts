@@ -4,6 +4,10 @@ import { delay, Subject, tap } from 'rxjs';
 import { IButtonGroupItem } from './interfaces';
 import { ButtonComponent } from '../button/button.component';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Component({
   selector: 'x-button-group',
   imports: [ButtonComponent],

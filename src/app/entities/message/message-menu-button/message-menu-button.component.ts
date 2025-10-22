@@ -9,6 +9,10 @@ import { Color, GradientColor, GradientColorPositions } from '@shared/types';
 const DEFAULT_STROKE_COLOR: GradientColor = ['rgba(255,255,255,0)', 'rgb(255, 255, 255)'],
   DEFAULT_FILL_COLOR: GradientColor = ['rgb(255, 255, 255)', 'rgb(185, 210, 233)'];
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Component({
   selector: 'message-menu-button',
   imports: [CommonModule, ButtonComponent],

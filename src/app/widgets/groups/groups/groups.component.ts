@@ -12,6 +12,10 @@ import { GroupsWebsocketService } from '../groups-websocket.service';
 import { validateCollection } from './utils/validate-collection';
 import { ClickOutsideDirective } from '@shared/directives';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Component({
   selector: 'groups',
   imports: [CommonModule, NgVirtualListComponent, GroupsLoadingIndicatorComponent, ClickOutsideDirective],

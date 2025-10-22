@@ -6,6 +6,10 @@ import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { filter, switchMap, tap } from 'rxjs';
 import { ClickOutsideService } from './click-outside.service';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Directive({
     selector: '[clickOutside]',
 })

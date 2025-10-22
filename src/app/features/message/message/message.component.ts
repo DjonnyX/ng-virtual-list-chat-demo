@@ -24,6 +24,10 @@ const DEFAULT_STROKE_ANIMATION_DURATION = 1000,
   CLASS_REMOVAL = 'removal', CLASS_DELETED = 'deleted', CLASS_ANIMATE = 'animate', CLASS_EDITED = 'edited',
   CLASS_SELECTED = 'selected', CLASS_FOCUSED = 'focused';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Component({
   selector: 'message',
   imports: [CommonModule, EditableTextComponent, MessageSubstrateComponent, MessageBottomBarComponent],

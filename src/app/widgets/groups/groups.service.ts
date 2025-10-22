@@ -1,6 +1,10 @@
 import { Observable } from "rxjs";
 import { Id, IVirtualListCollection } from "@shared/components/ng-virtual-list";
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 export abstract class GroupsService {
     abstract getGroups(projectId: string): Observable<IVirtualListCollection<any>>;
 

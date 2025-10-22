@@ -4,6 +4,10 @@ import { IDisplayObjectMeasures } from '@shared/components/ng-virtual-list';
 import { GradientColorPositions } from '@shared/types';
 import { delay, tap } from 'rxjs';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Directive({
   selector: '[calcFillPositions]'
 })

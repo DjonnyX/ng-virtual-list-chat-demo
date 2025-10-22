@@ -9,6 +9,10 @@ import { PRESETS } from './themes/presets';
 const IS_DARK_THEME_PATTERN = '(prefers-color-scheme: dark)',
   CHANGE_EVENT = 'change';
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 @Injectable({
   providedIn: 'root'
 })

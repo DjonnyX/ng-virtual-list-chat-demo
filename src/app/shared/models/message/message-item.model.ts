@@ -1,6 +1,10 @@
 import { Id } from "@shared/components/ng-virtual-list";
 import { MessageTypes } from "@shared/enums";
 
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
 export interface IMessageItemData {
   id: Id;
   dateTime: number;

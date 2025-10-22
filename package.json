@@ -1,6 +1,11 @@
 {
   "name": "chat-proto",
   "version": "0.0.1",
+  "author": {
+    "name": "Evgenii Grebennikov",
+    "email": "djonnyx@gmail.com"
+  },
+  "license": "Copyright (c) 2025 Evgenii Grebennikov (djonnyx@gmail.com). Only for personal (Evgenii Grebennikov djonnyx@gmail.com) use. All rights reserved.",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
