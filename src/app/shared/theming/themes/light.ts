@@ -188,7 +188,24 @@ const manifest: ITheme = {
                             strokeGradientColor: ['rgba(255,255,255,0)', 'rgb(85, 215, 255)'],
                         },
                     },
-                    send: ButtonPresets.PRIMARY,
+                    send: {
+                        rippleColor: "rgba(181, 238, 255, 0.3)",
+                        normal: {
+                            fill: ["rgb(49, 25, 182)", "rgb(0, 138, 202)"],
+                            iconFill: "rgb(232, 217, 255)",
+                            strokeGradientColor: ['rgba(186, 250, 255, 0)', 'rgb(183, 235, 255)'],
+                        },
+                        pressed: {
+                            fill: ["rgb(70, 44, 212)", "rgb(16, 156, 221)"],
+                            iconFill: "rgb(232, 217, 255)",
+                            strokeGradientColor: ['rgba(186, 250, 255, 0)', 'rgb(183, 235, 255)'],
+                        },
+                        disabled: {
+                            fill: ["rgba(28, 25, 182, .25)", "rgba(48, 0, 141, .25)"],
+                            iconFill: "rgb(232, 217, 255, .5)",
+                            strokeGradientColor: ['rgba(186, 250, 255, 0)', 'rgb(183, 235, 255)'],
+                        },
+                    },
                 },
                 styles: {
                     longPress: {
@@ -482,7 +499,7 @@ const manifest: ITheme = {
             roundedCorner: CONTEXT_MENU_ROUNDED_CORNER,
             padding: CONTEXT_MENU_PADDING,
             strokeAnimationDuration: 10000,
-            strokeGradientColor: ["rgba(148, 213, 255, 0)", "rgb(148, 213, 255)"],
+            strokeGradientColor: ["rgba(148, 213, 255, 0)", "rgb(93, 190, 255)"],
             buttonPreset: ButtonPresets.CONTEXT_MENU_PRIMARY,
         },
         [ContextMenuPresets.SECONDARY]: {

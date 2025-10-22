@@ -4,7 +4,7 @@ import { IRenderVirtualListItem } from "../models/render-item.model";
 import { Id } from "../types/id";
 import { CacheMap, CMap } from "./cache-map";
 import { Tracker } from "./tracker";
-import { ISize } from "../types";
+import { IRect, ISize } from "../types";
 import {
     HEIGHT_PROP_NAME, TRACK_BY_PROPERTY_NAME, WIDTH_PROP_NAME, X_PROP_NAME, Y_PROP_NAME,
 } from "../const";
@@ -22,6 +22,8 @@ export interface IMetrics {
     delta: number;
     normalizedItemWidth: number;
     normalizedItemHeight: number;
+    offsetX: number;
+    offsetY: number;
     width: number;
     height: number;
     dynamicSize: boolean;
@@ -52,7 +54,7 @@ export interface IMetrics {
 }
 
 export interface IRecalculateMetricsOptions<I extends IItem, C extends Array<I>> {
-    bounds: ISize;
+    bounds: IRect;
     collection: C;
     isVertical: boolean;
     itemSize: number;
@@ -822,6 +824,8 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
             delta,
             normalizedItemWidth: w,
             normalizedItemHeight: h,
+            offsetX: bounds.x,
+            offsetY: bounds.y,
             width,
             height,
             dynamicSize,
@@ -873,6 +877,8 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
     protected generateDisplayCollection<I extends IItem, C extends Array<I>>(items: C, itemConfigMap: IVirtualListItemConfigMap,
         metrics: IMetrics): IRenderVirtualListCollection {
         const {
+            offsetY,
+            offsetX,
             width,
             height,
             normalizedItemWidth,
@@ -895,7 +901,8 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
         if (items.length) {
             const trackBy = this._trackingPropertyName, actualSnippedPosition = snippedPos,
                 isSnappingMethodAdvanced = this.isSnappingMethodAdvanced,
-                boundsSize = isVertical ? height : width, actualEndSnippedPosition = boundsSize;
+                boundsSize = isVertical ? height : width, actualEndSnippedPosition = boundsSize,
+                positionOffset = isVertical ? offsetY : offsetX;
             let pos = startPosition,
                 renderItems = renderItemsLength,
                 stickyItem: IRenderVirtualListItem | undefined, nextSticky: IRenderVirtualListItem | undefined, stickyItemIndex = -1,
@@ -922,6 +929,11 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                                 y: isVertical ? actualSnippedPosition : 0,
                                 width: isVertical ? normalizedItemWidth : size,
                                 height: isVertical ? size : normalizedItemHeight,
+                                size,
+                                position: pos,
+                                positionOffset,
+                                boundsSize,
+                                scrollSize,
                                 absoluteStartPosition,
                                 absoluteStartPositionPercent,
                                 absoluteEndPosition,
@@ -983,6 +995,11 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                             measures = {
                                 x: isVertical ? 0 : actualEndSnippedPosition - w,
                                 y: isVertical ? actualEndSnippedPosition - h : 0,
+                                size,
+                                position: pos,
+                                boundsSize,
+                                positionOffset,
+                                scrollSize,
                                 absoluteStartPosition,
                                 absoluteStartPositionPercent,
                                 absoluteEndPosition,
@@ -1048,6 +1065,11 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                         measures = {
                             x: isVertical ? sticky === 1 ? 0 : boundsSize - size : pos,
                             y: isVertical ? pos : sticky === 2 ? boundsSize - size : 0,
+                            size,
+                            position: pos,
+                            boundsSize,
+                            positionOffset,
+                            scrollSize,
                             absoluteStartPosition,
                             absoluteStartPositionPercent,
                             absoluteEndPosition,

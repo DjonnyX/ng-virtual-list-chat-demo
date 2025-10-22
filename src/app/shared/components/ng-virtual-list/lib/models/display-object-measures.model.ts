@@ -8,6 +8,26 @@ import { IRect } from "../types";
  */
 export interface IDisplayObjectMeasures extends IRect {
   /**
+   * List position
+   */
+  positionOffset: number;
+  /**
+   * Item position
+   */
+  position: number;
+  /**
+   * Scroll size
+   */
+  scrollSize: number;
+  /**
+   * Item size
+   */
+  size: number;
+  /**
+   * Bounds size
+   */
+  boundsSize: number;
+  /**
    * Start position in viewport
    */
   absoluteStartPosition: number;

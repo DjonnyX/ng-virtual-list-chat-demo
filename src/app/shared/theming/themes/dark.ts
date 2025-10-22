@@ -155,23 +155,57 @@ const manifest: ITheme = {
                     menu: {
                         rippleColor: "rgba(255, 255, 255, 0.2)",
                         normal: {
-                            fill: ["rgb(56, 43, 179)", "rgb(56, 43, 179)"],
+                            fill: ["rgb(56, 43, 179)", "rgb(82, 32, 126)"],
                             iconFill: "rgb(206, 191, 220)",
                             strokeGradientColor: ['rgba(255,255,255,0)', 'rgb(255, 255, 255)'],
                         },
                         pressed: {
-                            fill: ["rgb(87, 74, 204)", "rgb(87, 74, 204)"],
+                            fill: ["rgb(74, 61, 196)", "rgb(96, 44, 141)"],
                             iconFill: "rgb(206, 191, 220)",
                             strokeGradientColor: ['rgba(255,255,255,0)', 'rgb(255, 255, 255)'],
                         },
                         disabled: {
-                            fill: ["rgba(56, 43, 179, .25)", "rgba(82, 32, 126, .25)"],
-                            iconFill: "rgb(206, 191, 220)",
+                            fill: ["rgba(74, 61, 196, .25)", "rgba(96, 44, 141, .25)"],
+                            iconFill: "rgba(206, 191, 220, .85)",
                             strokeGradientColor: ['rgba(255,255,255,0)', 'rgb(255, 255, 255)'],
                         },
                     },
-                    cancel: ButtonPresets.PRIMARY,
-                    send: ButtonPresets.PRIMARY,
+                    cancel: {
+                        rippleColor: "rgba(255, 255, 255, 0.2)",
+                        normal: {
+                            fill: ["rgb(56, 43, 179)", "rgb(82, 32, 126)"],
+                            iconFill: "rgb(206, 191, 220)",
+                            strokeGradientColor: ["rgba(255,255,255,0)", "rgb(219, 156, 255)"],
+                        },
+                        pressed: {
+                            fill: ["rgb(74, 61, 196)", "rgb(96, 44, 141)"],
+                            iconFill: "rgb(206, 191, 220)",
+                            strokeGradientColor: ["rgba(255,255,255,0)", "rgb(219, 156, 255)"],
+                        },
+                        disabled: {
+                            fill: ["rgba(74, 61, 196, .25)", "rgba(96, 44, 141, .25)"],
+                            iconFill: "rgba(240, 217, 255, .85)",
+                            strokeGradientColor: ["rgba(255,255,255,0)", "rgb(219, 156, 255)"],
+                        },
+                    },
+                    send: {
+                        rippleColor: "rgba(255, 255, 255, 0.2)",
+                        normal: {
+                            fill: ["rgb(23, 62, 146)", "rgb(32, 88, 126)"],
+                            iconFill: "rgb(191, 211, 220)",
+                            strokeGradientColor: ["rgba(255,255,255,0)", "rgb(219, 156, 255)"],
+                        },
+                        pressed: {
+                            fill: ["rgb(42, 86, 182)", "rgb(45, 108, 150)"],
+                            iconFill: "rgb(191, 211, 220)",
+                            strokeGradientColor: ["rgba(255,255,255,0)", "rgb(219, 156, 255)"],
+                        },
+                        disabled: {
+                            fill: ["rgba(43, 86, 179, .25)", "rgba(32, 88, 126, .25)"],
+                            iconFill: "rgba(191, 211, 220, .85)",
+                            strokeGradientColor: ["rgba(255,255,255,0)", "rgb(219, 156, 255)"],
+                        },
+                    },
                 },
                 styles: {
                     longPress: {
@@ -452,7 +486,7 @@ const manifest: ITheme = {
             },
         },
         [DialogPresets.SECONDARY]: {
-            fill: ["rgb(59, 44, 99)", "rgb(59, 44, 99)"],
+            fill: ["rgb(47, 40, 92)", "rgb(47, 40, 92)"],
             roundedCorner: DIALOG_ROUNDED_CORNER,
             padding: DIALOG_PADDING,
             strokeAnimationDuration: 10000,
@@ -470,7 +504,7 @@ const manifest: ITheme = {
             },
         },
         [ContextMenuPresets.PRIMARY]: {
-            fill: ["rgb(59, 44, 99)", "rgb(59, 44, 99)"],
+            fill: ["rgb(44, 49, 99)", "rgb(84, 43, 117)"],
             roundedCorner: CONTEXT_MENU_ROUNDED_CORNER,
             padding: CONTEXT_MENU_PADDING,
             strokeAnimationDuration: 10000,

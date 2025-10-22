@@ -54,6 +54,8 @@ export class ContextMenuComponent {
 
   fillGradientColors = signal<GradientColor | undefined>(this.fillColors());
 
+  fillGradientPositions = signal<GradientColorPositions | undefined>(this.fillPositions());
+
   strokeGradientColor = signal<GradientColor | undefined>(this.strokeColor());
 
   shapeRoundCorner = signal<[number, number, number, number] | undefined>(this.roundCorner());
@@ -98,22 +100,26 @@ export class ContextMenuComponent {
     this.theme = toSignal(this._themeService.$theme);
 
     effect(() => {
-      const theme = this.theme();
-      if (theme) {
-        const preset = this.preset();
-        if (preset) {
-          const themePreset = this._themeService.getPreset(preset);
-          if (themePreset) {
-            this.applyStyles(themePreset);
-          }
+      this.applyTheme();
+    });
+  }
+
+  protected applyTheme() {
+    const theme = this.theme();
+    if (theme) {
+      const preset = this.preset();
+      if (preset) {
+        const themePreset = this._themeService.getPreset(preset);
+        if (themePreset) {
+          this.applyStyles(themePreset);
         }
       }
-    })
+    }
   }
 
   private applyStyles(currentPreset?: string) {
     const preset = currentPreset ?? this.preset(), theme = this.theme(), fillColors = this.fillColors(), strokeColor = this.strokeColor(),
-      roundCorner = this.roundCorner(), buttonPreset = this.buttonPreset();
+      roundCorner = this.roundCorner(), fillPositions = this.fillPositions(), buttonPreset = this.buttonPreset();
     if (theme && preset) {
       const themePreset = this._themeService.getPreset(preset);
       if (themePreset) {
@@ -126,6 +132,7 @@ export class ContextMenuComponent {
           ctxMenuElement.style.borderBottomRightRadius = themePreset.roundedCorner ? formatCSSNumber(themePreset.roundedCorner[2]) : UNSET;
           ctxMenuElement.style.borderTopRightRadius = themePreset.roundedCorner ? formatCSSNumber(themePreset.roundedCorner[3]) : UNSET;
 
+          this.fillGradientPositions.set(fillPositions);
           this.roundCorner.set(themePreset.roundedCorner ?? DEFAULT_ROUNDED_CORNER);
           this.fillGradientColors.set(themePreset.fill ?? fillColors);
           this.strokeGradientColor.set(themePreset.strokeGradientColor ?? strokeColor);
@@ -136,6 +143,7 @@ export class ContextMenuComponent {
         }
       }
     }
+    this.fillGradientPositions.set(fillPositions);
     this.roundCorner.set(DEFAULT_ROUNDED_CORNER);
     this.fillGradientColors.set(fillColors);
     this.strokeGradientColor.set(strokeColor);

@@ -33,3 +33,12 @@
         animation: ripple 800ms ease-out;
     }
 }
+
+.fill {
+    transition: all 200ms ease-out;
+}
+
+.g1,
+.g2 {
+    transition: stop-color 200ms ease-out;
+}

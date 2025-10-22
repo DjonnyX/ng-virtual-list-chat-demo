@@ -4,7 +4,7 @@ import { CdkMenuTrigger } from '@angular/cdk/menu';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { filter, Subject, switchMap, take, tap } from 'rxjs';
 import { MessageButtonSaveState, MessageButtonSaveStates, MessageMenuButtonComponent, MessageSaveButtonComponent } from '@entities/message';
-import { LongPressDirective } from '@shared/directives';
+import { CalcFillPositionsDirective, LongPressDirective } from '@shared/directives';
 import { Id, IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/ng-virtual-list';
 import { IMessageItemData } from "@shared/models/message";
 import { IS_FIREFOX } from '@shared/components/ng-virtual-list/lib/utils/browser';
@@ -70,7 +70,7 @@ interface IDeleteEventData {
 
 @Component({
   selector: 'message-box',
-  imports: [CommonModule, MessageComponent, LongPressDirective, MessageMenuButtonComponent, MessageSaveButtonComponent,
+  imports: [CommonModule, MessageComponent, LongPressDirective, CalcFillPositionsDirective, MessageMenuButtonComponent, MessageSaveButtonComponent,
     CdkMenuTrigger, ContextMenuComponent,
   ],
   providers: [DialogService],
@@ -125,6 +125,12 @@ export class MessageBoxComponent {
   contextMenuItems: Signal<IContextMenuCollection>;
 
   fillPositions: Signal<GradientColorPositions>;
+
+  menuButtonFillPositions = signal<GradientColorPositions>([0, 1]);
+
+  sendButtonFillPositions = signal<GradientColorPositions>([0, 1]);
+
+  contextMenuFillPositions = signal<GradientColorPositions>([0, 1]);
 
   isMessageValid: Signal<boolean>;
 
@@ -310,6 +316,18 @@ export class MessageBoxComponent {
         break;
       }
     }
+  }
+
+  onMenuButtonFillPositionsHandler(fillPositions: GradientColorPositions) {
+    this.menuButtonFillPositions.set(fillPositions);
+  }
+
+  onSendButtonFillPositionsHandler(fillPositions: GradientColorPositions) {
+    this.sendButtonFillPositions.set(fillPositions);
+  }
+
+  onContextMenuFillPositionsHandler(fillPositions: GradientColorPositions) {
+    this.contextMenuFillPositions.set(fillPositions);
   }
 
   onLongPressActive() {

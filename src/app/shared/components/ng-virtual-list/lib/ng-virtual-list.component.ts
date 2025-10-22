@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import {
-  BehaviorSubject, combineLatest, debounceTime, delay, distinctUntilChanged, filter, fromEvent, map, mergeMap, Observable,
+  BehaviorSubject, combineLatest, debounceTime, delay, distinctUntilChanged, filter, fromEvent, map, Observable,
   of, race, Subject, switchMap, take, takeUntil, tap,
 } from 'rxjs';
 import { NgVirtualListItemComponent } from './components/ng-virtual-list-item.component';
@@ -17,13 +17,13 @@ import {
   HEIGHT_PROP_NAME, LEFT_PROP_NAME, MAX_SCROLL_TO_ITERATIONS, PX, SCROLL, SCROLL_END, TOP_PROP_NAME, TRACK_BY_PROPERTY_NAME, WIDTH_PROP_NAME,
   DEFAULT_MAX_BUFFER_SIZE, DEFAULT_SELECT_METHOD, DEFAULT_SELECT_BY_CLICK, DEFAULT_COLLAPSE_BY_CLICK, DEFAULT_COLLECTION_MODE,
   DEFAULT_SCREEN_READER_MESSAGE, BEHAVIOR_SMOOTH, DEFAULT_SNAP_TO_END_TRANSITION_INSTANT_OFFSET, DEFAULT_SNAP_SCROLLTO_BOTTOM,
-  WHEEL, TOUCH_MOVE, MOUSE_DOWN, MOUSE_MOVE, MOUSE_UP, MOUSE_LEAVE, MOUSE_OUT,
+  WHEEL, TOUCH_MOVE, MOUSE_DOWN, MOUSE_UP, MOUSE_LEAVE, MOUSE_OUT,
 } from './const';
 import {
   IRenderVirtualListItem, IScrollEvent, IScrollOptions, IVirtualListCollection, IVirtualListItem, IVirtualListItemConfigMap,
 
 } from './models';
-import { FocusAlignment, Id, ISize } from './types';
+import { FocusAlignment, Id, IRect, ISize } from './types';
 import { IRenderVirtualListCollection } from './models/render-collection.model';
 import {
   CollectionMode, CollectionModes, Direction, Directions, FocusAlignments, MethodForSelecting, MethodsForSelecting, SnappingMethod,
@@ -660,7 +660,7 @@ export class NgVirtualListComponent implements OnInit, OnDestroy {
 
   private _snapedDisplayComponent: ComponentRef<BaseVirtualListItemComponent> | undefined;
 
-  private _bounds = signal<ISize | null>(null);
+  private _bounds = signal<IRect | null>(null);
 
   private _scrollSize = signal<number>(0);
 
@@ -719,9 +719,9 @@ export class NgVirtualListComponent implements OnInit, OnDestroy {
   private _onResizeHandler = () => {
     const bounds = this._container()?.nativeElement?.getBoundingClientRect();
     if (bounds) {
-      this._bounds.set({ width: bounds.width, height: bounds.height });
+      this._bounds.set({ x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height });
     } else {
-      this._bounds.set({ width: DEFAULT_LIST_SIZE, height: DEFAULT_LIST_SIZE });
+      this._bounds.set({ x: 0, y: 0, width: DEFAULT_LIST_SIZE, height: DEFAULT_LIST_SIZE });
     }
 
     if (this._isSnappingMethodAdvanced) {
@@ -1103,14 +1103,14 @@ export class NgVirtualListComponent implements OnInit, OnDestroy {
         if (container) {
           let actualScrollSize = (isVertical ? container.scrollTop ?? 0 : container.scrollLeft) ?? 0;
 
-          const { width, height } = bounds, snapScrollToBottom = this.snapScrollToBottom(),
+          const { width, height, x, y } = bounds, snapScrollToBottom = this.snapScrollToBottom(),
             scrollLength = Math.round(isVertical ? container.scrollHeight ?? 0 : container.scrollWidth) ?? 0,
             actualScrollLength = Math.round(scrollLength === 0 ? 0 : scrollLength - (isVertical ? height : width)),
             roundedMaxPosition = Math.round(actualScrollLength),
             scrollPosition = Math.round(actualScrollSize);
 
           const opts: IUpdateCollectionOptions<IVirtualListItem, IVirtualListCollection> = {
-            bounds: { width, height }, dynamicSize, isVertical, itemSize,
+            bounds: { width, height, x, y }, dynamicSize, isVertical, itemSize,
             bufferSize, maxBufferSize, scrollSize: actualScrollSize, snap, enabledBufferOptimization,
           },
             { displayItems, totalSize } = this._trackBox.updateCollection(items, itemConfigMap, opts);
@@ -1358,11 +1358,11 @@ export class NgVirtualListComponent implements OnInit, OnDestroy {
           const dynamicSize = this.dynamicSize(), itemSize = this.itemSize();
 
           if (dynamicSize) {
-            const { width, height } = this._bounds() || { width: DEFAULT_LIST_SIZE, height: DEFAULT_LIST_SIZE },
+            const { width, height, x, y } = this._bounds() || { x: 0, y: 0, width: DEFAULT_LIST_SIZE, height: DEFAULT_LIST_SIZE },
               itemConfigMap = this.itemConfigMap(), items = this._actualItems(), isVertical = this._isVertical,
               currentScollSize = (isVertical ? cnt.scrollTop : cnt.scrollLeft), delta = this._trackBox.delta,
               opts: IGetItemPositionOptions<IVirtualListItem, IVirtualListCollection> = {
-                bounds: { width, height }, collection: items, dynamicSize, isVertical: this._isVertical, itemSize,
+                bounds: { width, height, x, y }, collection: items, dynamicSize, isVertical: this._isVertical, itemSize,
                 bufferSize: this.bufferSize(), maxBufferSize: this.maxBufferSize(),
                 scrollSize: (isVertical ? cnt.scrollTop : cnt.scrollLeft) + delta,
                 snap: this.snap(), fromItemId: id, enabledBufferOptimization: this.enabledBufferOptimization(),
