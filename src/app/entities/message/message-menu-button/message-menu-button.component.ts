@@ -4,7 +4,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ButtonComponent } from '@shared/components/button';
 import { SubstarateStyle, SubstarateStyles } from '@shared/components/substrate';
 import { ThemeService } from '@shared/theming';
-import { GradientColor, GradientColorPositions } from '@shared/types';
+import { Color, GradientColor, GradientColorPositions } from '@shared/types';
 
 const DEFAULT_STROKE_COLOR: GradientColor = ['rgba(255,255,255,0)', 'rgb(255, 255, 255)'],
   DEFAULT_FILL_COLOR: GradientColor = ['rgb(255, 255, 255)', 'rgb(185, 210, 233)'];
@@ -29,6 +29,8 @@ export class MessageMenuButtonComponent {
   type = signal<SubstarateStyle>(SubstarateStyles.NONE);
 
   fillColors = signal<GradientColor | undefined>(DEFAULT_FILL_COLOR);
+
+  rippleEffectColor = signal<Color | undefined>(undefined);
 
   pressed = signal<boolean>(false);
 
@@ -64,6 +66,7 @@ export class MessageMenuButtonComponent {
       if (contentEl && currentTheme) {
         const preset = this._themeService.getPreset(currentTheme.chat.messages.message.controls.menu);
         if (preset) {
+          this.rippleEffectColor.set(preset.rippleColor);
           if (preset.disabled && disabled) {
             this.fillColors.set(preset.disabled.fill ?? DEFAULT_FILL_COLOR);
             contentEl.style.fill = preset.disabled.iconFill;

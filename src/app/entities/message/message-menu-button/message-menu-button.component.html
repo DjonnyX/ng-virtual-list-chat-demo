@@ -4,7 +4,8 @@
 @let class = classes();
 @let gradientFillColors = fillColors();
 @let gradientFillPositions = fillPositions();
-<x-button mode="circle" class="menu" [ngClass]="class" [type]="buttonType" [disabled]="disabledState"
+@let rippleColor = rippleEffectColor();
+<x-button mode="circle" class="menu" [ngClass]="class" [type]="buttonType" [disabled]="disabledState" [rippleColor]="rippleColor"
     [strokeColor]="strokeColor" [fillColors]="gradientFillColors" [fillPositions]="gradientFillPositions"
     (onPress)="onPressHandler($event)" (onFocus)="onFocusHandler($event)" (onClick)="onClickHandler($event)">
     <div #content class="content">

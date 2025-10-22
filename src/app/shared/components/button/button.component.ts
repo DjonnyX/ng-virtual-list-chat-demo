@@ -37,7 +37,7 @@ export class ButtonComponent implements OnDestroy {
 
   content = input<string | undefined>();
 
-  strokeColor = input<GradientColor | undefined>(DEFAULT_STROKE_COLOR);
+  strokeColor = input<GradientColor | undefined>(undefined);
 
   roundCorner = input<RoundedCorner | undefined>(DEFAULT_ROUND_CORNER);
 
@@ -159,20 +159,20 @@ export class ButtonComponent implements OnDestroy {
   }
 
   private applyStyles(currentPreset?: string) {
-    const preset = currentPreset ?? this.preset(), theme = this.theme();
+    const preset = currentPreset ?? this.preset(), theme = this.theme(), strokeColor = this.strokeColor(), roundedCorner = this.roundCorner(),
+      fillColors = this.fillColors(), rippleColor = this.rippleColor();
     if (theme && preset) {
       const buttonPreset = this._themeService.getPreset(preset);
       if (buttonPreset) {
         const el = this._elementRef.nativeElement as HTMLDivElement,
           elBtn = this.button()?.nativeElement as HTMLButtonElement;
         if (el && elBtn) {
-          this.rippleEffectColor.set(buttonPreset.rippleColor);
+          this.rippleEffectColor.set(buttonPreset.rippleColor ?? rippleColor);
           const disabled = this.disabled(), pressed = this.pressed(), focused = this.focused();
           if (disabled && buttonPreset.disabled) {
-            this.shapeRoundCorner.set(buttonPreset.disabled.roundedCorner ?? this.roundCorner());
-            this.fillGradientColors.set(buttonPreset.disabled.fill ?? this.fillColors());
-            console.log(buttonPreset.disabled.strokeGradientColor)
-            this.strokeGradientColor.set(buttonPreset.disabled.strokeGradientColor ?? this.strokeColor());
+            this.shapeRoundCorner.set(buttonPreset.disabled.roundedCorner ?? roundedCorner);
+            this.fillGradientColors.set(buttonPreset.disabled.fill ?? fillColors);
+            this.strokeGradientColor.set(buttonPreset.disabled.strokeGradientColor ?? strokeColor);
             el.style.color = buttonPreset.disabled.color ? buttonPreset.disabled.color : INHERIT;
             elBtn.style.padding = buttonPreset.disabled.padding ? buttonPreset.disabled.padding : UNSET;
             elBtn.style.outline = buttonPreset.disabled.outline ? buttonPreset.disabled.outline : UNSET;
@@ -181,9 +181,9 @@ export class ButtonComponent implements OnDestroy {
             elBtn.style.borderBottomRightRadius = buttonPreset.disabled.roundedCorner ? formatCSSNumber(buttonPreset.disabled.roundedCorner[2]) : UNSET;
             elBtn.style.borderTopRightRadius = buttonPreset.disabled.roundedCorner ? formatCSSNumber(buttonPreset.disabled.roundedCorner[3]) : UNSET;
           } else if (focused && buttonPreset.focused) {
-            this.shapeRoundCorner.set(buttonPreset.focused.roundedCorner ?? this.roundCorner());
-            this.fillGradientColors.set(buttonPreset.focused.fill ?? this.fillColors());
-            this.strokeGradientColor.set(buttonPreset.focused.strokeGradientColor ?? this.strokeColor());
+            this.shapeRoundCorner.set(buttonPreset.focused.roundedCorner ?? roundedCorner);
+            this.fillGradientColors.set(buttonPreset.focused.fill ?? fillColors);
+            this.strokeGradientColor.set(buttonPreset.focused.strokeGradientColor ?? strokeColor);
             el.style.color = buttonPreset.focused.color ? buttonPreset.focused.color : INHERIT;
             elBtn.style.padding = buttonPreset.focused.padding ? buttonPreset.focused.padding : UNSET;
             elBtn.style.outline = buttonPreset.focused.outline ? buttonPreset.focused.outline : UNSET;
@@ -192,9 +192,9 @@ export class ButtonComponent implements OnDestroy {
             elBtn.style.borderBottomRightRadius = buttonPreset.focused.roundedCorner ? formatCSSNumber(buttonPreset.focused.roundedCorner[2]) : UNSET;
             elBtn.style.borderTopRightRadius = buttonPreset.focused.roundedCorner ? formatCSSNumber(buttonPreset.focused.roundedCorner[3]) : UNSET;
           } else if (pressed && buttonPreset.pressed) {
-            this.shapeRoundCorner.set(buttonPreset.pressed.roundedCorner ?? this.roundCorner());
-            this.fillGradientColors.set(buttonPreset.pressed.fill ?? this.fillColors());
-            this.strokeGradientColor.set(buttonPreset.pressed.strokeGradientColor ?? this.strokeColor());
+            this.shapeRoundCorner.set(buttonPreset.pressed.roundedCorner ?? roundedCorner);
+            this.fillGradientColors.set(buttonPreset.pressed.fill ?? fillColors);
+            this.strokeGradientColor.set(buttonPreset.pressed.strokeGradientColor ?? strokeColor);
             el.style.color = buttonPreset.pressed.color ? buttonPreset.pressed.color : INHERIT;
             elBtn.style.padding = buttonPreset.pressed.padding ? buttonPreset.pressed.padding : UNSET;
             elBtn.style.outline = buttonPreset.pressed.outline ? buttonPreset.pressed.outline : UNSET;
@@ -203,9 +203,9 @@ export class ButtonComponent implements OnDestroy {
             elBtn.style.borderBottomRightRadius = buttonPreset.pressed.roundedCorner ? formatCSSNumber(buttonPreset.pressed.roundedCorner[2]) : UNSET;
             elBtn.style.borderTopRightRadius = buttonPreset.pressed.roundedCorner ? formatCSSNumber(buttonPreset.pressed.roundedCorner[3]) : UNSET;
           } else {
-            this.shapeRoundCorner.set(buttonPreset.normal.roundedCorner ?? this.roundCorner());
-            this.fillGradientColors.set(buttonPreset.normal.fill ?? this.fillColors());
-            this.strokeGradientColor.set(buttonPreset.normal.strokeGradientColor ?? this.strokeColor());
+            this.shapeRoundCorner.set(buttonPreset.normal.roundedCorner ?? roundedCorner);
+            this.fillGradientColors.set(buttonPreset.normal.fill ?? fillColors);
+            this.strokeGradientColor.set(buttonPreset.normal.strokeGradientColor ?? strokeColor);
             el.style.color = buttonPreset.normal.color ? buttonPreset.normal.color : INHERIT;
             elBtn.style.padding = buttonPreset.normal.padding ? buttonPreset.normal.padding : UNSET;
             elBtn.style.outline = buttonPreset.normal.outline ? buttonPreset.normal.outline : UNSET;
@@ -218,8 +218,10 @@ export class ButtonComponent implements OnDestroy {
         }
       }
     }
-    this.fillGradientColors.set(this.fillColors());
-    this.shapeRoundCorner.set(this.roundCorner());
+    this.rippleEffectColor.set(rippleColor);
+    this.shapeRoundCorner.set(roundedCorner);
+    this.fillGradientColors.set(fillColors);
+    this.strokeGradientColor.set(strokeColor);
   }
 
   onPressHandler(pressed: boolean) {

@@ -5,7 +5,8 @@
 @let class = classes();
 @let gradientFillColors = fillColors();
 @let gradientFillPositions = fillPositions();
-<x-button #btn mode="circle" [ngClass]="class" [disabled]="disabledState" [type]="buttonType" [strokeColor]="strokeColor"
+@let rippleColor = rippleEffectColor();
+<x-button #btn mode="circle" [ngClass]="class" [disabled]="disabledState" [type]="buttonType" [strokeColor]="strokeColor" [rippleColor]="rippleColor"
     [fillColors]="gradientFillColors" [fillPositions]="gradientFillPositions" (onPress)="onPressHandler($event)" (onClick)="onClickHandler($event)">
     <div #content class="content">
         @switch (buttonState) {

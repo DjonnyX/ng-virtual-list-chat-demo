@@ -4,7 +4,7 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { delay, Subject, tap } from 'rxjs';
 import { ButtonComponent } from '@shared/components/button';
 import { SubstarateStyle, SubstarateStyles } from '@shared/components/substrate';
-import { GradientColor, GradientColorPositions } from '@shared/types';
+import { Color, GradientColor, GradientColorPositions } from '@shared/types';
 import { ThemeService } from '@shared/theming';
 import { MessageButtonSaveState } from './types';
 import { MessageButtonSaveStates } from './enums';
@@ -34,6 +34,8 @@ export class MessageSaveButtonComponent {
   buttonStrokeColor = signal<GradientColor>(DEFAULT_STROKE_COLOR);
 
   fillColors = signal<GradientColor | undefined>(DEFAULT_FILL_COLOR);
+
+  rippleEffectColor = signal<Color | undefined>(undefined);
 
   pressed = signal<boolean>(false);
 
@@ -109,6 +111,7 @@ export class MessageSaveButtonComponent {
           }
         }
         if (preset) {
+          this.rippleEffectColor.set(preset.rippleColor);
           if (preset.disabled && disabled) {
             this.fillColors.set(preset.disabled.fill ?? DEFAULT_FILL_COLOR);
             if (preset.disabled.strokeGradientColor) {

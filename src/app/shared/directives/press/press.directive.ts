@@ -11,13 +11,13 @@ export class PressDirective {
     onPress = output<boolean>();
 
     @HostListener('pointerdown', ['$event'])
-    onPressHandler(event: PointerEvent) {
+    onPressHandler() {
         this.onPress.emit(true);
     }
 
     @HostListener('pointerup', ['$event'])
     @HostListener('pointerleave', ['$event'])
-    onRelease(event: PointerEvent) {
+    onRelease() {
         this.onPress.emit(false);
     }
 }

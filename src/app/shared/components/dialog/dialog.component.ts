@@ -111,7 +111,7 @@ export class DialogComponent {
 
     effect(() => {
       const theme = this.theme(), data = this.data, preset = data.preset, content = this.content()?.nativeElement,
-        title = this.title()?.nativeElement, message = this.message()?.nativeElement;
+        title = this.title()?.nativeElement, message = this.message()?.nativeElement, fillColors = this.fillColors(), strokeColor = this.strokeColor();
       if (preset && theme && content && title && message) {
         const themePreset = this._themeService.getPreset<IDialogTheme>(theme.presets[preset]);
         if (themePreset) {
@@ -130,11 +130,16 @@ export class DialogComponent {
           content.style.padding = themePreset.padding ?? NONE;
 
           this.roundCorner.set(themePreset.roundedCorner ?? DEFAULT_ROUND_CORNER);
-          this.fillColors.set(Array.isArray(themePreset.fill) ? themePreset.fill : this.fillColors());
-          this.strokeColor.set(Array.isArray(themePreset.strokeGradientColor) ? themePreset.strokeGradientColor : this.strokeColor());
+          this.fillColors.set(themePreset.fill as GradientColor ?? fillColors);
+          this.strokeColor.set(themePreset.strokeGradientColor ?? strokeColor);
           this.strokeAnimationDuration.set(themePreset.strokeAnimationDuration ?? DEFAULT_STROKE_ANIMATION_DURATION);
+          return;
         }
       }
+      this.roundCorner.set(DEFAULT_ROUND_CORNER);
+      this.fillColors.set(fillColors);
+      this.strokeColor.set(strokeColor);
+      this.strokeAnimationDuration.set(DEFAULT_STROKE_ANIMATION_DURATION);
     });
   }
 

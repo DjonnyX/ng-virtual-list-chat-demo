@@ -112,7 +112,8 @@ export class ContextMenuComponent {
   }
 
   private applyStyles(currentPreset?: string) {
-    const preset = currentPreset ?? this.preset(), theme = this.theme();
+    const preset = currentPreset ?? this.preset(), theme = this.theme(), fillColors = this.fillColors(), strokeColor = this.strokeColor(),
+      roundCorner = this.roundCorner(), buttonPreset = this.buttonPreset();
     if (theme && preset) {
       const themePreset = this._themeService.getPreset(preset);
       if (themePreset) {
@@ -126,17 +127,21 @@ export class ContextMenuComponent {
           ctxMenuElement.style.borderTopRightRadius = themePreset.roundedCorner ? formatCSSNumber(themePreset.roundedCorner[3]) : UNSET;
 
           this.roundCorner.set(themePreset.roundedCorner ?? DEFAULT_ROUNDED_CORNER);
-          this.fillGradientColors.set(themePreset.fill ?? this.fillColors());
-          this.strokeGradientColor.set(themePreset.strokeGradientColor ?? this.strokeColor());
-          this.shapeRoundCorner.set(themePreset.roundedCorner ?? this.roundCorner());
+          this.fillGradientColors.set(themePreset.fill ?? fillColors);
+          this.strokeGradientColor.set(themePreset.strokeGradientColor ?? strokeColor);
+          this.shapeRoundCorner.set(themePreset.roundedCorner ?? roundCorner);
           this.strokeAnimationDuration.set(themePreset.strokeAnimationDuration ?? DEFAULT_STROKE_ANIMATION_DURATION);
-          this.contextMenuButtonPreset.set(themePreset.buttonPreset ?? this.buttonPreset());
+          this.contextMenuButtonPreset.set(themePreset.buttonPreset ?? buttonPreset);
           return;
         }
       }
     }
-    this.fillGradientColors.set(this.fillColors());
-    this.shapeRoundCorner.set(this.roundCorner());
+    this.roundCorner.set(DEFAULT_ROUNDED_CORNER);
+    this.fillGradientColors.set(fillColors);
+    this.strokeGradientColor.set(strokeColor);
+    this.shapeRoundCorner.set(roundCorner);
+    this.strokeAnimationDuration.set(DEFAULT_STROKE_ANIMATION_DURATION);
+    this.contextMenuButtonPreset.set(buttonPreset);
   }
 
   onItemClickHandler(event: Event, id: Id) {

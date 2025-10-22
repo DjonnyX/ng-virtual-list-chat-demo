@@ -153,6 +153,7 @@ const manifest: ITheme = {
                 },
                 controls: {
                     menu: {
+                        rippleColor: "rgba(28, 133, 165, 0.1)",
                         normal: {
                             fill: ["rgb(255, 255, 255)", "rgb(185, 210, 233)"],
                             iconFill: "rgb(48, 44, 160)",
@@ -170,6 +171,7 @@ const manifest: ITheme = {
                         },
                     },
                     cancel: {
+                        rippleColor: "rgba(28, 133, 165, 0.1)",
                         normal: {
                             fill: ["rgb(255, 255, 255)", "rgb(185, 210, 233)"],
                             iconFill: "rgb(48, 44, 160)",
@@ -210,7 +212,7 @@ const manifest: ITheme = {
     },
     presets: {
         [ButtonPresets.PRIMARY]: {
-            rippleColor: "rgba(255, 255, 255, 0.2)",
+            rippleColor: "rgba(181, 238, 255, 0.3)",
             normal: {
                 fill: ["rgb(28, 25, 182)", "rgb(48, 0, 141)"],
                 iconFill: "rgb(232, 217, 255)",

@@ -20,6 +20,7 @@ export class StaticClickDirective {
 
     onStaticClick = output<void>();
 
+    private _pressed: boolean = false;
     private _$pressed = new Subject<PointerEvent>();
     private _$released = new Subject<PointerEvent>();
     private _$cancel = new Subject<PointerEvent>();
@@ -29,11 +30,13 @@ export class StaticClickDirective {
     onPress(e: PointerEvent) {
         this._startPosition.x = e.clientX;
         this._startPosition.y = e.clientY;
+        this._pressed = true;
         this._$pressed.next(e);
     }
 
     @HostListener('pointerup', ['$event'])
     onRelease(e: PointerEvent) {
+        this._pressed = false;
         this._$released.next(e);
     }
 
@@ -44,11 +47,13 @@ export class StaticClickDirective {
 
     @HostListener('pointermove', ['$event'])
     onMove(e: PointerEvent) {
-        const x = e.clientX, y = e.clientY,
-            dist = Math.sqrt(Math.pow(Math.abs(this._startPosition.x - x), 2) + Math.pow(Math.abs(this._startPosition.y - y), 2));
-        if (dist > this._maxDistance) {
-            this._$cancel.next(e);
-            return;
+        if (this._pressed) {
+            const x = e.clientX, y = e.clientY,
+                dist = Math.sqrt(Math.pow(Math.abs(this._startPosition.x - x), 2) + Math.pow(Math.abs(this._startPosition.y - y), 2));
+            if (dist > this._maxDistance) {
+                this._$cancel.next(e);
+                return;
+            }
         }
     }
 

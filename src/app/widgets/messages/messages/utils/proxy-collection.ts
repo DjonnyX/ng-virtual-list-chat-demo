@@ -79,12 +79,10 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
         const dict = this._dict, collection = this._collection, item = dict[id];
         if (item) {
             item.data = { ...item.data, ...data };
-            if (params) {
-                const index = this._dictIndexes[id];
-                if (index > -1) {
-                    collection[index] = { ...collection[index], ...params };
-                    dict[id] = collection[index];
-                }
+            const index = this._dictIndexes[id];
+            if (index > -1) {
+                collection[index] = { ...collection[index], ...(params ?? {}) };
+                dict[id] = collection[index];
             }
         } else {
             const proxyItem = createProxyItem(data, params);
