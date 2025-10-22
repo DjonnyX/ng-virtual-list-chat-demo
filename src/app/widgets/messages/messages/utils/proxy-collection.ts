@@ -13,7 +13,7 @@ export interface IProxyCollectionItem<D = any> {
     deleted: boolean;
     removal: boolean;
     processing: boolean;
-    tmpName: string | undefined;
+    tmpText: string | undefined;
     data: CollectionItem<D>;
 }
 
@@ -28,7 +28,7 @@ const createProxyItem = <D = any>(data: CollectionItem<D>
         deleted: false,
         removal: false,
         processing: false,
-        tmpName: undefined,
+        tmpText: undefined,
         ...params,
         id: data.id,
         dateTime: data.dateTime,
@@ -61,6 +61,7 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
     protected _dictIndexes: { [id: Id]: number } = {};
 
     protected _collection = new Array<CollectionItem<IProxyCollectionItem<D>>>();
+    get collection() { return this._collection; }
 
     constructor(from: Array<CollectionItem<D>>) {
         super();
@@ -132,6 +133,7 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
     from(src: Array<CollectionItem<D>>, append: boolean = false) {
         if ((!src || src.length === 0) && !append) {
             this._dictIndexes = {};
+            this._dict = {};
         }
 
         const dict = append ? this._dict : {}, collection = append ? this._collection : [];
@@ -139,7 +141,9 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
         for (let i = 0, l = src.length; i < l; i++) {
             const item = src[i], id = item.id, dictItem = dict[id];
             if (dictItem) {
-                if (!dictItem.version || !item.version || dictItem.version < item.version) {
+                if ((dictItem.version === undefined && item.version === 0) ||
+                    (dictItem.version < item.version) ||
+                    (dictItem.version === Number.MAX_SAFE_INTEGER && item.version === 0)) {
                     if (item.__deleted__) {
                         const index = this._dictIndexes[id];
                         if (index > -1) {

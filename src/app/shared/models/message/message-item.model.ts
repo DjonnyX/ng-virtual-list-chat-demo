@@ -4,7 +4,7 @@ import { MessageTypes } from "@shared/enums";
 export interface IMessageItemData {
   id: Id;
   dateTime: number;
-  name: string;
+  text: string;
   edited?: boolean;
   incomType?: 'in' | 'out',
   type: MessageTypes.ITEM | MessageTypes.GROUP | MessageTypes.TYPING_INDICATOR,

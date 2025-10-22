@@ -225,17 +225,13 @@ export class MessagesComponent implements OnDestroy {
             validateCollection(items);
 
             this._proxyCollection.from(items, true);
-            const newItems = this._proxyCollection.toObject(),
-              configMap = {};
-            fillConfigMap(configMap, newItems);
-
+            const configMap = {};
+            fillConfigMap(configMap, this._proxyCollection.collection);
             this.collectionConfigMap.set(configMap);
-            this.collection.set(newItems);
 
             return of(items);
           }),
           delay(delayTime),
-          takeUntilDestroyed(this._destroyRef),
           tap(() => {
             this.isLoading.set(false);
           }),
@@ -275,12 +271,9 @@ export class MessagesComponent implements OnDestroy {
         validateCollection(items);
 
         this._proxyCollection.from(items, true);
-        const newItems = this._proxyCollection.toObject(),
-          configMap = {};
-        fillConfigMap(configMap, newItems);
-
+        const configMap = {};
+        fillConfigMap(configMap, this._proxyCollection.collection);
         this.collectionConfigMap.set(configMap);
-        this.collection.set(newItems);
 
         this._list()?.normalizePositions();
       }),
@@ -312,11 +305,9 @@ export class MessagesComponent implements OnDestroy {
         const items = Array.isArray(res.items) ? res.items : [];
         validateCollection(items);
         this._proxyCollection.from(items, true);
-        const newItems = this._proxyCollection.toObject(),
-          configMap = {};
-        fillConfigMap(configMap, newItems);
+        const configMap = {};
+        fillConfigMap(configMap, this._proxyCollection.collection);
         this.collectionConfigMap.set(configMap);
-        this.collection.set(newItems);
       }),
       catchError((err) => {
         console.error(err);
@@ -331,18 +322,15 @@ export class MessagesComponent implements OnDestroy {
         return this._messageNotificationService.$writing.pipe(
           takeUntilDestroyed(this._destroyRef),
           debounceTime(10),
-          takeUntilDestroyed(this._destroyRef),
           switchMap(userId => {
-            return this.deleteWritingIndicator().pipe(
+            return this.deleteWritingIndicator(chatId).pipe(
               takeUntilDestroyed(this._destroyRef),
               tap(() => {
                 const indicator = generateTypingIndicator();
                 this._proxyCollection.set(indicator.item.id, indicator.item);
-                const newItems = this._proxyCollection.toObject(),
-                  configMap = { ...this.collectionConfigMap() };
+                const configMap = { ...this.collectionConfigMap() };
                 configMap[indicator.item.id] = indicator.config;
                 this.collectionConfigMap.set(configMap);
-                this.collection.set(newItems);
               }),
               switchMap(() => {
                 return this._messageNotificationService.$messages.pipe(
@@ -350,7 +338,7 @@ export class MessagesComponent implements OnDestroy {
                 );
               }),
               switchMap(() => {
-                return this.deleteWritingIndicator().pipe(
+                return this.deleteWritingIndicator(chatId).pipe(
                   takeUntilDestroyed(this._destroyRef),
                 );
               }),
@@ -378,7 +366,9 @@ export class MessagesComponent implements OnDestroy {
               }),
               switchMap(version => {
                 this._proxyCollection.setParams(item.id, { version, });
-                return of({ item, config, measures });
+                return of({ item, config, measures }).pipe(
+                  takeUntilDestroyed(this._destroyRef),
+                );
               }),
             );
           }),
@@ -389,12 +379,10 @@ export class MessagesComponent implements OnDestroy {
             }
           }),
           delay(0),
-          takeUntilDestroyed(this._destroyRef),
           tap(({ item }) => {
             this._proxyCollection.setParams(item.id, { deleted: true, });
           }),
           delay(150),
-          takeUntilDestroyed(this._destroyRef),
           tap(({ item }) => {
             this._proxyCollection.delete(item.id);
           }),
@@ -434,7 +422,7 @@ export class MessagesComponent implements OnDestroy {
             this._proxyCollection.setParams(item.id, { processing: true, });
             const id = item.id;
             return this._messagesService.updateMessage(chatId, id, {
-              name: value,
+              text: value,
             }).pipe(
               takeUntilDestroyed(this._destroyRef),
               filter(v => !!v),
@@ -458,14 +446,13 @@ export class MessagesComponent implements OnDestroy {
       map(([list, collection, search]) => ({ list, collection, search: search ?? '' })),
       filter(({ list }) => !!list),
       debounceTime(250),
-      takeUntilDestroyed(this._destroyRef),
       tap(({ search }) => {
         this.searchedPattern.set(search.split(' '));
       }),
       filter(({ search }) => search !== ''),
       switchMap(({ list, collection, search }) => {
         for (let i = 0, l = collection.length; i < l; i++) {
-          const item = collection[i], name: string = item.data?.['name'];
+          const item = collection[i], name: string = item.data?.text;
           if (name) {
             const index = name?.indexOf(search);
             if (index > -1) {
@@ -490,8 +477,8 @@ export class MessagesComponent implements OnDestroy {
     ).subscribe();
   }
 
-  private deleteWritingIndicator() {
-    return of(undefined).pipe(
+  private deleteWritingIndicator(chatId: Id) {
+    return of(chatId).pipe(
       takeUntilDestroyed(this._destroyRef),
       tap(() => {
         const collection = this.collection();
@@ -512,7 +499,6 @@ export class MessagesComponent implements OnDestroy {
         this.collectionConfigMap.set(config);
       }),
       delay(1),
-      takeUntilDestroyed(this._destroyRef),
       tap(() => {
         const collection = this.collection();
         let newItems = [...collection], config = { ...this.collectionConfigMap() };
@@ -532,7 +518,6 @@ export class MessagesComponent implements OnDestroy {
         this.collectionConfigMap.set(config);
       }),
       delay(100),
-      takeUntilDestroyed(this._destroyRef),
       tap(() => {
         const collection = this.collection();
         let newItems = [...collection], config = { ...this.collectionConfigMap() };

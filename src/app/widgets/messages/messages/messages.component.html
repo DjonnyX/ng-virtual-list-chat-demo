@@ -32,7 +32,7 @@
                     @case ("group") {
                         @let class = {'snapped': config.snapped, 'snapped-out': config.snappedOut, 'focused': config.focused,
                         'collapsed': config.collapsed};
-                        <message-group [classes]="class" [text]="data.data.name" [collapsed]="config.collapsed" />
+                        <message-group [classes]="class" [text]="data.data.text" [collapsed]="config.collapsed" />
                     }
                     @default {
                         <message-box [data]="data" [config]="config" [measures]="measures" [prevData]="prevData"

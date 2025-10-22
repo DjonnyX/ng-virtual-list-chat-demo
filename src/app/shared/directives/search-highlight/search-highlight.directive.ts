@@ -1,4 +1,4 @@
-import { Directive, SimpleChanges, Renderer2, ElementRef, input, inject, OnChanges, SecurityContext } from '@angular/core';
+import { Directive, Renderer2, ElementRef, input, inject, SecurityContext, effect } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 
 const INNER_HTML = 'innerHTML';
@@ -6,12 +6,14 @@ const INNER_HTML = 'innerHTML';
 @Directive({
     selector: '[searchHighlight]'
 })
-export class SearchHighlightDirective implements OnChanges {
+export class SearchHighlightDirective {
     searchedWords = input<Array<string>>();
 
     private _previousValue: string | undefined;
 
     text = input<string | undefined>();
+
+    simpleText = input<string | undefined>();
 
     substringClass = input<string>('search-substring');
 
@@ -21,40 +23,41 @@ export class SearchHighlightDirective implements OnChanges {
 
     private _sanitizer = inject(DomSanitizer);
 
-    constructor() { }
+    constructor() {
+        effect(() => {
+            const text = this.text() ?? '', s = this.searchedWords(), substringClass = this.substringClass();
+            if (!s || !s.length || !substringClass) {
+                const value = text;
+                if (this._previousValue === value) {
+                    return;
+                }
 
-    ngOnChanges(changes: SimpleChanges): void {
-        const s = this.searchedWords();
-        if (!s || !s.length || !this.substringClass()) {
-            const value = this.text() ?? '';
+                this._previousValue = value;
+                const sanitized = this._sanitizer.sanitize(SecurityContext.HTML, this._sanitizer.bypassSecurityTrustHtml(value));
+                this._renderer.setProperty(this._elementRef.nativeElement, INNER_HTML, sanitized);
+                return;
+            }
+
+            const value = this.getFormattedText(text, s, substringClass);
             if (this._previousValue === value) {
                 return;
             }
             this._previousValue = value;
             const sanitized = this._sanitizer.sanitize(SecurityContext.HTML, this._sanitizer.bypassSecurityTrustHtml(value));
-            this._renderer.setProperty(this._elementRef.nativeElement, INNER_HTML, sanitized);
-            return;
-        }
-
-        const value = this.getFormattedText();
-        if (this._previousValue === value) {
-            return;
-        }
-        this._previousValue = value;
-        const sanitized = this._sanitizer.sanitize(SecurityContext.HTML, this._sanitizer.bypassSecurityTrustHtml(value));
-        this._renderer.setProperty(
-            this._elementRef.nativeElement,
-            INNER_HTML,
-            sanitized,
-        );
+            this._renderer.setProperty(
+                this._elementRef.nativeElement,
+                INNER_HTML,
+                sanitized,
+            );
+        });
     }
 
-    getFormattedText() {
-        const s = this.searchedWords(), t = this.text() ?? '';
+    getFormattedText(text: string, searchWords: Array<string> | undefined, substringClass: string) {
+        const s = searchWords, t = text ?? '';
         if (!s || (s.length === 1 && (s[0] === ''))) {
             return t;
         }
         const regexp = new RegExp(`(${s.join('|')})`, 'g');
-        return t?.replace(regexp, `<span class="${this.substringClass()}">$1</span>`);
+        return t?.replace(regexp, `<span class="${substringClass}">$1</span>`);
     }
 }

@@ -8,7 +8,11 @@ import { formatText } from '@shared/utils';
 import { ThemeService } from '@shared/theming';
 import { ITheme } from '@shared/theming';
 
-const DEFAULT_SEARCH_SUBSTRING_CLASS = 'search-substring';
+const DEFAULT_SEARCH_SUBSTRING_CLASS = 'search-substring',
+  INITIAL = 'initial',
+  USER_SELECT = 'user-select',
+  AUTO = 'auto',
+  NONE = 'none';
 
 @Component({
   selector: 'editable-text',
@@ -35,7 +39,7 @@ export class EditableTextComponent {
 
   textClick = output<Event>();
 
-  changeText = output<string>();
+  changeText = output<string | undefined>();
 
   keydown = output<KeyboardEvent>();
 
@@ -47,15 +51,15 @@ export class EditableTextComponent {
 
   private _themeService = inject(ThemeService);
 
-  linkNormalColor = signal<string>('initial');
+  linkNormalColor = signal<string>(INITIAL);
 
-  linkVisitedColor = signal<string>('initial');
+  linkVisitedColor = signal<string>(INITIAL);
 
-  linkHoverColor = signal<string>('initial');
+  linkHoverColor = signal<string>(INITIAL);
 
-  linkActiveColor = signal<string>('initial');
+  linkActiveColor = signal<string>(INITIAL);
 
-  searchSubstringBackground = signal<string>('initial');
+  searchSubstringBackground = signal<string>(INITIAL);
 
   readonlyStyles: Signal<{ [sName: string]: string }>;
 
@@ -64,7 +68,7 @@ export class EditableTextComponent {
 
     this.readonlyStyles = computed(() => {
       const selectable = this.selectable();
-      return { 'user-select': selectable ? 'auto' : 'none' };
+      return { [USER_SELECT]: selectable ? AUTO : NONE };
     });
 
     effect(() => {
@@ -120,12 +124,7 @@ export class EditableTextComponent {
           }),
         );
       }),
-    ).subscribe()
-
-    effect(() => {
-      const text = this.text();
-      this.emitValue(text);
-    });
+    ).subscribe();
   }
 
   onTextAreaClickHandler(e: Event) {
@@ -142,18 +141,8 @@ export class EditableTextComponent {
     this.keydown.emit(e);
   }
 
-  onChangeHandler(e: Event) {
-    this.emitValue();
-  }
-
   onInputHandler(e: Event) {
-    this.emitValue();
-  }
-
-  private emitValue(v?: string) {
-    const textarea = this.textarea();
-    if (textarea) {
-      this.changeText.emit(v ?? textarea.nativeElement.value);
-    }
+    const textarea = this.textarea(), value = textarea?.nativeElement.value;
+    this.changeText.emit(value);
   }
 }

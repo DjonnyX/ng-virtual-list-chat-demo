@@ -10,7 +10,6 @@ import { GroupsService } from '../groups.service';
 import { GroupsMockService } from '../groups-mock.service';
 import { GroupsWebsocketService } from '../groups-websocket.service';
 import { validateCollection } from './utils/validate-collection';
-import { appendItems } from './utils/append-items';
 import { ClickOutsideDirective } from '@shared/directives';
 
 @Component({

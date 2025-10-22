@@ -55,7 +55,7 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
 
   editedText = output<{ nativeEvent: Event, item: IVirtualListItem<IMessageItemData> }>();
 
-  changeValue = output<string>();
+  changeValue = output<string | undefined>();
 
   substarateMode: Signal<MessageSubstarateMode>;
 
@@ -206,8 +206,8 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
     e.stopImmediatePropagation();
   }
 
-  onEditedTextHandler(value: string, item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>) {
-    item.tmpName = value;
+  onEditedTextHandler(value: string | undefined, item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>) {
+    item.tmpText = value;
     this.changeValue.emit(value);
   }
 

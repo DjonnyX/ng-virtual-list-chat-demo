@@ -197,12 +197,8 @@ export class NgVirtualListItemComponent extends BaseVirtualListItemComponent {
             case KEY_SPACE: {
               e.stopImmediatePropagation();
               e.preventDefault();
-              if (this._service.selectByClick) {
-                this._service.select(this._data);
-              }
-              if (this._service.collapseByClick) {
-                this._service.collapse(this._data);
-              }
+              this._service.select(this._data);
+              this._service.collapse(this._data);
               break;
             }
             case KEY_ARR_LEFT:

@@ -45,7 +45,7 @@ const generateMessageCollection = (number: number, size: number) => {
     items.push({
       id, type,
       version: 0,
-      dateTime: COLLECTION_PARAMS.maxDate - COLLECTION_PARAMS.index * 60000, name: isGroup ? `Group ${COLLECTION_PARAMS.groupIndex}` : `${id}. ${[1, 2].includes(id) ? testLinksText() : generateText()}`,
+      dateTime: COLLECTION_PARAMS.maxDate - COLLECTION_PARAMS.index * 60000, text: isGroup ? `Group ${COLLECTION_PARAMS.groupIndex}` : `${id}. ${[1, 2].includes(id) ? testLinksText() : generateText()}`,
       image: hasImage ? 'https://ng-virtual-list-chat-demo.eugene-grebennikov.pro/media/logo.png' : undefined, incomType,
     });
   }

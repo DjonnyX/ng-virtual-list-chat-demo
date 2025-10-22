@@ -5,8 +5,7 @@
 @let searchedWords = searchPattern();
 @if (isEditing) {
     <textarea #textarea cdkTextareaAutosize name="editable-text" class="editor-editable" [value]="value"
-        (keydown)="onKeyDownHandler($event)" (click)="onTextAreaClickHandler($event)" (change)="onChangeHandler($event)"
-        (input)="onInputHandler($event)"></textarea>
+        (keydown)="onKeyDownHandler($event)" (click)="onTextAreaClickHandler($event)" (input)="onInputHandler($event)"></textarea>
 } @else {
     <span #readonlyText [style.--link-normal-color]="linkNormalColor()" [style.--link-visited-color]="linkVisitedColor()"
         [ngStyle]="readonlyStyles()" [style.--link-hover-color]="linkHoverColor()"

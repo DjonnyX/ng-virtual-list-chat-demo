@@ -13,6 +13,7 @@ import { MessageService } from '@widgets/messages';
 import { ITheme } from '@shared/theming';
 import { ThemeService } from '@shared/theming';
 import { generateChatCollection } from '@mock/const';
+import { IMessageItemData } from '@shared/models/message';
 
 @Component({
   selector: 'chat',
@@ -89,9 +90,9 @@ export class ChatComponent {
     this.menuOpened.set(false);
   }
 
-  onClickHandler(item: IRenderVirtualListItem | undefined) {
+  onClickHandler(item: IRenderVirtualListItem<IMessageItemData> | undefined) {
     if (item) {
-      console.info(`Click: (ID: ${item.data.id}) Item ${item.data.name}`);
+      console.info(`Click: (ID: ${item.data.id}) Item ${item.data.text}`);
     }
   }
 

@@ -100,7 +100,7 @@ export class MessageBoxComponent {
 
   editingCancel = output<void>();
 
-  changeText = output<string>();
+  changeText = output<string | undefined>();
 
   delete = output<IDeleteEventData>();
 
@@ -189,7 +189,7 @@ export class MessageBoxComponent {
 
     this.isMessageValid = computed(() => {
       const data = this.data(), tmpValue = this.tmpValue();
-      return (!!data && data.data.name?.length > 0) && (tmpValue === undefined || tmpValue.length > 0);
+      return (!!data && data.data.text?.length > 0) && (tmpValue !== undefined && tmpValue.length > 0);
     });
 
     this.isSaving = computed(() => {
@@ -204,7 +204,7 @@ export class MessageBoxComponent {
 
     this.editingState = computed(() => {
       const data = this.data(), tmpValue = this.tmpValue();
-      return tmpValue !== data?.data.name ? MessageButtonSaveStates.SEND : MessageButtonSaveStates.CANCEL;
+      return (tmpValue !== undefined && tmpValue.length > 0) && tmpValue !== data?.data.text ? MessageButtonSaveStates.SEND : MessageButtonSaveStates.CANCEL;
     });
 
     this.classes = computed(() => {
@@ -273,7 +273,7 @@ export class MessageBoxComponent {
     if (item) {
       switch (state) {
         case MessageButtonSaveStates.SEND: {
-          this.edited.emit({ nativeEvent: e, item, config, value: item.tmpName });
+          this.edited.emit({ nativeEvent: e, item, config, value: item.tmpText });
           break;
         }
         case MessageButtonSaveStates.CANCEL: {
@@ -291,9 +291,9 @@ export class MessageBoxComponent {
     config.select(false);
   }
 
-  onMessageChangeValueHandler(e: string) {
-    this.tmpValue.set(e);
-    this.changeText.emit(e);
+  onMessageChangeValueHandler(v: string | undefined) {
+    this.tmpValue.set(v);
+    this.changeText.emit(v);
   }
 
   onClickContextMenuHandler({ id, event }: { id: Id, event: Event }, item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>,
