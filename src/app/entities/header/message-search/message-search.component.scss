@@ -14,12 +14,12 @@
     .search {
         outline: none;
         border-radius: 4px;
-        padding: 6px;
+        padding: 6px 6px 6px 0;
         border-width: 1px;
         border-style: solid;
         width: calc(100%);
         max-width: 32px;
-        padding-right: 24px;
+        padding-right: 30px;
         transition: max-width 0.15s ease-in-out;
 
         &::placeholder {
@@ -44,8 +44,8 @@
         &+.icon {
             pointer-events: none;
             position: absolute;
-            right: 11px;
-            top: 5px;
+            right: 10px;
+            top: 4px;
         }
 
         &search+svg {

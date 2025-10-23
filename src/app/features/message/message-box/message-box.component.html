@@ -12,7 +12,7 @@
     @let class = classes();
     @let edited = messageData.edited;
     <div class="container" [ngClass]="class">
-        <div class="content">
+        <div localeSensitive class="content">
             <div #container longPress class="message-container" [ngClass]="class" [longPress]="longPressDuration" [longPressDisabled]="messageConfig.selected"
                 (onLongPressActive)="onLongPressActive()" (onLongPress)="messageConfig.select(true); openMenu()">
                 <message #message class="message" [ngClass]="class" [data]="messageData" [config]="messageConfig"

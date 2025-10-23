@@ -1,5 +1,5 @@
 @let dockMode = dock();
-<div #container class="container" [ngClass]="{'dock-left': dockMode === 'left', 'dock-right': dockMode === 'right' }"
+<div #container localeSensitive class="container" [ngClass]="{'dock-left': dockMode === 'left', 'dock-right': dockMode === 'right' }"
     [ngStyle]="styles()">
     <div class="dock left">
         <ng-content select="dock-left" />

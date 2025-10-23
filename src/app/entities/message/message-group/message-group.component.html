@@ -3,8 +3,10 @@
 @let isCollapsed = collapsed();
 
 <div class="group-container" [ngClass]="class">
-    <span #name class="name">
-        <span>{{value}}</span>
+    <span #name localeSensitive class="content">
+        <span>
+            <p localeSensitive class="text">{{value}}</p>
+        </span>
         <span class="collapsable-indicator">
             <span #indicator>
                 @if (isCollapsed) {

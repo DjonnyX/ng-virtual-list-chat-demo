@@ -191,11 +191,13 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
     ).subscribe();
 
     this.substarateMode = computed(() => {
-      const params = this.params(), { isIncoming: isIn, prevIsIncoming: isPrevIn } = params;
+      const params = this.params(), { isIncoming: isIn, prevIsIncoming: isPrevIn, isRTL } = params;
       if (isIn === isPrevIn) {
-        return isIn ? MessageSubstarateModes.LEFT : MessageSubstarateModes.RIGHT;
+        return isRTL ? isIn ? MessageSubstarateModes.RIGHT : MessageSubstarateModes.LEFT :
+          (isIn ? MessageSubstarateModes.LEFT : MessageSubstarateModes.RIGHT);
       }
-      return isIn ? MessageSubstarateModes.IN_LEFT : MessageSubstarateModes.IN_RIGHT;
+      return isRTL ? (isIn ? MessageSubstarateModes.IN_RIGHT : MessageSubstarateModes.IN_LEFT) :
+        (isIn ? MessageSubstarateModes.IN_LEFT : MessageSubstarateModes.IN_RIGHT);
     });
   }
 

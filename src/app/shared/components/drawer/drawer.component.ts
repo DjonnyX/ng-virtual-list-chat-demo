@@ -1,5 +1,7 @@
 import { Component, computed, ElementRef, inject, input, output, Signal, signal, viewChild, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { LocaleSensitiveDirective, LocalizationService } from '@shared/localization';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 /**
  * @author Evgenii Grebennikov
@@ -23,7 +25,7 @@ export type TDockMode = DockMode.LEFT | DockMode.RIGHT | DockMode.NONE | 'left' 
  */
 @Component({
   selector: 'app-drawer',
-  imports: [CommonModule],
+  imports: [CommonModule, LocaleSensitiveDirective],
   templateUrl: './drawer.component.html',
   styleUrl: './drawer.component.scss',
   encapsulation: ViewEncapsulation.ShadowDom,
@@ -43,22 +45,34 @@ export class DrawerComponent {
 
   styles: Signal<any>;
 
+  locale: Signal<string | undefined>;
+
   protected _bounds = signal<DOMRect | null>(null);
 
   private _resizeObserver: ResizeObserver | null = null;
+
+  private _localizationService = inject(LocalizationService);
 
   private _onResizeHandler = () => {
     this._bounds.set(this._elementRef?.nativeElement?.getBoundingClientRect() ?? null);
   }
 
   constructor() {
+    this.locale = toSignal(this._localizationService.$locale);
+
     this.styles = computed(() => {
-      const width = this._bounds()?.width ?? 0, dockMode = this.dock(), dockLeftSize = this.dockLeftSize(), dockRightSize = this.dockRightSize();
-      const result = {
-        'grid-template-columns': `${dockLeftSize}px ${width}px ${dockRightSize}px`,
-        'transform': dockMode === 'left' ? `translate3d(0, 0, 0)` : dockMode === 'right'
-          ? `translate3d(${-(dockLeftSize + dockRightSize)}px, 0, 0)` : `translate3d(${-dockLeftSize}px, 0, 0)`,
-      };
+      const loc = this.locale(), langTextDir = this._localizationService.textDirection, width = this._bounds()?.width ?? 0, dockMode = this.dock(), dockLeftSize = this.dockLeftSize(),
+        dockRightSize = this.dockRightSize(),
+        result = {
+          'grid-template-columns': langTextDir === 'rtl' ? `${dockLeftSize}px ${width}px ${dockRightSize}px` : `${dockLeftSize}px ${width}px ${dockRightSize}px`,
+          'transform': langTextDir === 'rtl'
+            ?
+            (dockMode === 'left' ? `translate3d(0, 0, 0)` : dockMode === 'right'
+              ? `translate3d(${-(dockLeftSize + dockRightSize)}px, 0, 0)` : `translate3d(${dockLeftSize}px, 0, 0)`)
+            :
+            (dockMode === 'left' ? `translate3d(0, 0, 0)` : dockMode === 'right'
+              ? `translate3d(${-(dockLeftSize + dockRightSize)}px, 0, 0)` : `translate3d(${-dockLeftSize}px, 0, 0)`),
+        };
       return result;
     });
   }

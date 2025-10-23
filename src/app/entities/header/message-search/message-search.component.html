@@ -1,7 +1,8 @@
-<div #container class="search-container" [style.--placeholder-color]="placeholderColor()" [style.--placeholder-fontsize]="placeholderFontSize()">
+<div #container class="search-container" [style.--placeholder-color]="placeholderColor()"
+    [style.--placeholder-fontsize]="placeholderFontSize()">
     <div #indicator class="timeout-indicator"></div>
-    <input #input type="search" class="search" placeholder="Search" [(ngModel)]="searchText"
-        (input)="onSearchHandler()">
+    <input #input localeSensitive type="search" class="search" [placeholder]="placeholderText()"
+        [(ngModel)]="searchText" (input)="onSearchHandler()">
     <span #icon class="icon">
         <svg class="search-icon" role="presentation" width="10" height="10" viewBox="0 0 32 32"
             style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">

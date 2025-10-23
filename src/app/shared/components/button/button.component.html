@@ -12,9 +12,9 @@
     <x-substrate #substrate class="substrate" [fillColors]="gradientFillColors" [rippleColor]="rippleColor"
         [fillColorPositions]="gradientFillPositions" [width]="b.width" [height]="b.height" [roundCorner]="corner"
         [mode]="m" [type]="t" [strokeColors]="stroke" />
-    <span class="content">
+    <p localeSensitive class="content">
         <ng-content>
             {{value}}
         </ng-content>
-    </span>
+    </p>
 </button>

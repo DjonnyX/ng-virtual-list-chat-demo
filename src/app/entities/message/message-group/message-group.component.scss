@@ -23,7 +23,9 @@
     align-items: center;
     justify-content: center;
 
-    .name {
+    .content {
+        display: flex;
+        gap: 8px;
         user-select: none;
         font-size: 10px;
         height: auto;
@@ -31,9 +33,10 @@
         border-radius: 14px;
         border-width: 1px;
         border-style: solid;
-    }
 
-    .collapsable-indicator {
-        margin-left: 8px;
+        .text {
+            margin: 0;
+            padding: 0;
+        }
     }
 }

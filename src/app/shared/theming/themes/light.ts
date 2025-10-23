@@ -1,5 +1,5 @@
 import { RoundedCorner } from "../../types";
-import { objectAsReadonly } from "./utils";
+import { objectAsReadonly } from "../../utils/object";
 import { ITheme } from "./interfaces/theme";
 import { ButtonPresets, ContextMenuPresets, DialogPresets } from "./presets";
 
@@ -470,14 +470,12 @@ const manifest: ITheme = {
             strokeGradientColor: ["rgba(148, 213, 255, 0)", "rgb(148, 213, 255)"],
             title: {
                 fontSize: 14,
-                textAlign: "left",
                 fontWeight: "bold",
                 textTransform: "uppercase",
                 color: "rgb(27, 27, 36)",
             },
             message: {
                 fontSize: 14,
-                textAlign: "left",
                 textTransform: "none",
                 color: "rgb(35, 35, 44)",
             },
@@ -487,13 +485,11 @@ const manifest: ITheme = {
             roundedCorner: DIALOG_ROUNDED_CORNER,
             title: {
                 fontSize: 13,
-                textAlign: "center",
                 textTransform: "uppercase",
                 color: "rgb(126, 191, 218)",
             },
             message: {
                 fontSize: 12,
-                textAlign: "center",
                 textTransform: "none",
                 color: "rgb(203, 223, 223)",
             },

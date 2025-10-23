@@ -1,4 +1,4 @@
-import { objectAsReadonly } from "./utils";
+import { objectAsReadonly } from "../../utils/object";
 import { THEME_DARK } from "./dark";
 import { ITheme } from "./interfaces/theme";
 import { THEME_LIGHT } from "./light";

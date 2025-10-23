@@ -63,7 +63,13 @@
         }
 
         .actions {
+            display: block;
             margin-left: auto;
+
+            &.rtl {
+                margin-right: auto;
+                margin-left: initial;
+            }
 
             .button-group {
                 display: flex;

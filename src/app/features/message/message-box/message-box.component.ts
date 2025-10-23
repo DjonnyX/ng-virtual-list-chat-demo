@@ -17,9 +17,10 @@ import { ITheme } from '@shared/theming';
 import { IProxyCollectionItem } from '@widgets/messages/messages/utils/proxy-collection';
 import { MessageComponent } from '../message/message.component';
 import { IMessageParams } from '../message/interfaces';
+import { ILocalization, LocalizationService, LocaleSensitiveDirective } from '@shared/localization';
 
 const CLASS_IN = 'in', CLASS_OUT = 'out', CLASS_SIMPLE = 'simple', CLASS_END_OF_MESSAGES = 'end-of-messages',
-  CLASS_REMOVAL = 'removal', CLASS_DELETED = 'deleted', CLASS_ANIMATE = 'animate', CLASS_EDITED = 'edited',
+  CLASS_REMOVAL = 'removal', CLASS_DELETED = 'deleted', CLASS_ANIMATE = 'animate', CLASS_EDITED = 'edited', CLASS_RTL = 'rtl',
   CLASS_SELECTED = 'selected', CLASS_FOCUSED = 'focused', CLASS_FIRST_IN_GROUP = 'first-in-group', CLASS_FIREFOX = 'firefox',
   CLASS_LAST_IN_GROUP = 'last-in-group', CLASS_HAS_MULTICONTENT = 'has-multicontent', DATA_PROP_IMAGE = 'image',
   DATA_PROP_REMOVAL = 'removal', DATA_PROP_DELETED = 'deleted', DATA_PROP_ANIMATE = 'animate', CONFIG_PROP_SELECTED = 'selected',
@@ -32,32 +33,32 @@ enum ContextMenuItemIds {
   QUOTE = 'quote',
 }
 
-const CONTEXT_MENU_NORMAL: IContextMenuCollection = [
+const getContextMenuNormal = (localization: ILocalization | undefined): IContextMenuCollection => [
   {
     id: ContextMenuItemIds.EDIT,
-    name: 'edit',
+    name: localization?.chat.messages.message.contextMenu.menu.edit ?? '',
   },
   {
     id: ContextMenuItemIds.QUOTE,
-    name: 'quote',
+    name: localization?.chat.messages.message.contextMenu.menu.quote ?? '',
   },
   {
     id: ContextMenuItemIds.DELETE,
-    name: 'delete',
+    name: localization?.chat.messages.message.contextMenu.menu.delete ?? '',
   },
 ],
-  CONTEXT_MENU_EDITING: IContextMenuCollection = [
+  getContextMenuEditing = (localization: ILocalization | undefined): IContextMenuCollection => [
     {
       id: ContextMenuItemIds.CANCEL,
-      name: 'cancel',
+      name: localization?.chat.messages.message.contextMenu.menu.cancel ?? '',
     },
     {
       id: ContextMenuItemIds.QUOTE,
-      name: 'quote',
+      name: localization?.chat.messages.message.contextMenu.menu.quote ?? '',
     },
     {
       id: ContextMenuItemIds.DELETE,
-      name: 'delete',
+      name: localization?.chat.messages.message.contextMenu.menu.delete ?? '',
     },
   ];
 
@@ -75,8 +76,7 @@ interface IDeleteEventData {
 @Component({
   selector: 'message-box',
   imports: [CommonModule, MessageComponent, LongPressDirective, CalcFillPositionsDirective, MessageMenuButtonComponent, MessageSaveButtonComponent,
-    CdkMenuTrigger, ContextMenuComponent,
-  ],
+    CdkMenuTrigger, ContextMenuComponent, LocaleSensitiveDirective],
   providers: [DialogService],
   templateUrl: './message-box.component.html',
   styleUrl: './message-box.component.scss'
@@ -138,6 +138,10 @@ export class MessageBoxComponent {
 
   isMessageValid: Signal<boolean>;
 
+  localization: Signal<ILocalization | undefined>;
+
+  locale: Signal<string| undefined>;
+
   readonly longPressDuration = 1000;
 
   private _dialogService = inject(DialogService);
@@ -146,10 +150,14 @@ export class MessageBoxComponent {
 
   private _themeService = inject(ThemeService);
 
+  private _localizationService = inject(LocalizationService);
+
   private _$menuOpen = new Subject<void>();
   protected $menuOpen = this._$menuOpen.asObservable();
 
   constructor() {
+    this.localization = toSignal(this._localizationService.$localization);
+    this.locale = toSignal(this._localizationService.$locale);
     const $menuOpen = this.$menuOpen, $menuButton = toObservable(this._menuButton);
 
     $menuOpen.pipe(
@@ -168,8 +176,9 @@ export class MessageBoxComponent {
     this.theme = toSignal(this._themeService.$theme);
 
     this.params = computed(() => {
-      const data = this.data(), prevData = this.prevData(), nextData = this.nextData();
+      const locale = this.locale(), data = this.data(), prevData = this.prevData(), nextData = this.nextData();
       return {
+        isRTL: this._localizationService.textDirection === 'rtl',
         isIncoming: data?.data?.incomType === 'in',
         isOutgoing: data?.data?.incomType === 'out',
         prevIsIncoming: prevData?.data?.incomType === 'in',
@@ -184,11 +193,12 @@ export class MessageBoxComponent {
 
     this.fillPositions = computed(() => {
       const measures = this.measures();
-      return [`${measures?.absoluteStartPositionPercent ?? 0}`, `${(measures?.absoluteEndPositionPercent ?? 0)}`]
-    })
+      return [`${measures?.absoluteStartPositionPercent ?? 0}`, `${(measures?.absoluteEndPositionPercent ?? 0)}`];
+    });
 
     this.contextMenuItems = computed(() => {
-      return this.data()?.edited ? [...CONTEXT_MENU_EDITING] : [...CONTEXT_MENU_NORMAL];
+      const localization = this.localization();
+      return this.data()?.edited ? [...getContextMenuEditing(localization)] : [...getContextMenuNormal(localization)];
     });
 
     this.isMessageValid = computed(() => {
@@ -220,7 +230,8 @@ export class MessageBoxComponent {
         [CLASS_IN]: isIn, [CLASS_OUT]: isOut, [CLASS_SIMPLE]: (isIn && isPrevIn) || (isOut && isPrevOut), [CLASS_DELETED]: data?.[DATA_PROP_DELETED] == true,
         [CLASS_REMOVAL]: data?.[DATA_PROP_REMOVAL] == true, [CLASS_ANIMATE]: data?.[DATA_PROP_ANIMATE] == true, [CLASS_END_OF_MESSAGES]: (isIn && !isNextIn) || (isOut && !isNextOut),
         [CLASS_FIRST_IN_GROUP]: firstInGroup, [CLASS_LAST_IN_GROUP]: lastInGroup, [CLASS_EDITED]: data?.edited == true, [CLASS_FIREFOX]: IS_FIREFOX,
-        [CLASS_SELECTED]: config?.[CONFIG_PROP_SELECTED], [CLASS_FOCUSED]: config?.[CONFIG_PROP_FOCUSED], [CLASS_HAS_MULTICONTENT]: data?.[DATA_PROP_IMAGE] !== undefined,
+        [CLASS_RTL]: this._localizationService.textDirection === 'rtl', [CLASS_SELECTED]: config?.[CONFIG_PROP_SELECTED], [CLASS_FOCUSED]: config?.[CONFIG_PROP_FOCUSED],
+        [CLASS_HAS_MULTICONTENT]: data?.[DATA_PROP_IMAGE] !== undefined,
       };
     });
 
@@ -236,7 +247,7 @@ export class MessageBoxComponent {
           containerElement.style.backgroundColor = preset.normal.background;
         }
       }
-    })
+    });
   }
 
   onEditItemHandler(event: Event, item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, selected: boolean) {
@@ -246,18 +257,18 @@ export class MessageBoxComponent {
   onDeleteItemHandler(nativeEvent: Event, item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, config: IDisplayObjectConfig, measures: ISize) {
     const data: IDeleteEventData = { nativeEvent, item: item!, config: config!, measures: measures! };
     this._dialogService.open<IDeleteEventData | undefined>({
-      title: "Attention",
-      message: "Are you sure you want to delete the message?",
+      title: this._localizationService.localization.chat.messages.message.dialog.delete.title,
+      message: this._localizationService.localization.chat.messages.message.dialog.delete.message,
       actions: [
         {
           action: "cancel",
-          name: "cancel",
+          name: this._localizationService.localization.chat.messages.message.dialog.delete.cancel,
           preset: ButtonPresets.CANCEL,
           data: undefined,
         },
         {
           action: "delete",
-          name: "delete",
+          name: this._localizationService.localization.chat.messages.message.dialog.delete.delete,
           preset: ButtonPresets.SUCCESS,
           data,
         },

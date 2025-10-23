@@ -11,6 +11,7 @@ import { GroupsMockService } from '../groups-mock.service';
 import { GroupsWebsocketService } from '../groups-websocket.service';
 import { validateCollection } from './utils/validate-collection';
 import { ClickOutsideDirective } from '@shared/directives';
+import { LocaleSensitiveDirective } from '@shared/localization';
 
 /**
  * @author Evgenii Grebennikov
@@ -18,7 +19,7 @@ import { ClickOutsideDirective } from '@shared/directives';
  */
 @Component({
   selector: 'groups',
-  imports: [CommonModule, NgVirtualListComponent, GroupsLoadingIndicatorComponent, ClickOutsideDirective],
+  imports: [CommonModule, NgVirtualListComponent, GroupsLoadingIndicatorComponent, ClickOutsideDirective, LocaleSensitiveDirective],
   providers: [
     { provide: GroupsService, useClass: environment.useMock ? GroupsMockService : GroupsWebsocketService },
   ],

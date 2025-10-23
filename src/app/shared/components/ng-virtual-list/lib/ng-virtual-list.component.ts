@@ -45,6 +45,7 @@ import { CMap } from './utils/cache-map';
 import { validateArray, validateBoolean, validateFloat, validateInt, validateObject, validateString } from './utils/validation';
 import { copyValueAsReadonly, objectAsReadonly } from './utils/object';
 import { isCollectionMode } from './utils/is-collection-mode';
+import { LocalizationService } from '@shared/localization';
 
 interface IScrollParams {
   id: Id;
@@ -670,6 +671,8 @@ export class NgVirtualListComponent implements OnInit, OnDestroy {
 
   private _resizeObserver: ResizeObserver | null = null;
 
+  private _localizationService = inject(LocalizationService);
+
   private _resizeSnappedComponentHandler = () => {
     const list = this._list(), container = this._container(), bounds = this._bounds(), snappedComponent = this._snapedDisplayComponent?.instance;
     if (list && container && snappedComponent) {
@@ -683,11 +686,20 @@ export class NgVirtualListComponent implements OnInit, OnDestroy {
         isScrollBarOverlap = true;
       }
 
+      this._service.scrollBarSize = scrollBarSize;
+      this._service.overlapScrollBarSize = overlapScrollBarSize;
+
+      const langTextDir = this._localizationService.textDirection;
+
       if (isScrollBarOverlap && IS_FIREFOX) {
         scrollBarSize = overlapScrollBarSize = FIREFOX_SCROLLBAR_OVERLAP_SIZE;
       }
 
-      snappedComponent.element.style.clipPath = `path("M 0 0 L 0 ${snappedComponent.element.offsetHeight} L ${snappedComponent.element.offsetWidth - overlapScrollBarSize} ${snappedComponent.element.offsetHeight} L ${snappedComponent.element.offsetWidth - overlapScrollBarSize} 0 Z")`;
+      if (langTextDir === 'rtl') {
+        snappedComponent.element.style.clipPath = `path("M ${overlapScrollBarSize} 0 L ${overlapScrollBarSize} ${snappedComponent.element.offsetHeight} L ${snappedComponent.element.offsetWidth - overlapScrollBarSize} ${snappedComponent.element.offsetHeight} L ${snappedComponent.element.offsetWidth - overlapScrollBarSize} 0 Z")`;
+      } else {
+        snappedComponent.element.style.clipPath = `path("M 0 0 L 0 ${snappedComponent.element.offsetHeight} L ${snappedComponent.element.offsetWidth - overlapScrollBarSize} ${snappedComponent.element.offsetHeight} L ${snappedComponent.element.offsetWidth - overlapScrollBarSize} 0 Z")`;
+      }
 
       snappedComponent.regularLength = `${isVertical ? listBounds.width : listBounds.height}${PX}`;
       const { width: sWidth, height: sHeight } = snappedComponent.getBounds() ?? { width: 0, height: 0 },
@@ -699,7 +711,11 @@ export class NgVirtualListComponent implements OnInit, OnDestroy {
         right = width - scrollBarSize;
         top = sHeight;
         bottom = height;
-        containerElement.style.clipPath = `path("M 0 ${top + delta} L 0 ${height} L ${width} ${height} L ${width} 0 L ${right} 0 L ${right} ${top + delta} Z")`;
+        if (langTextDir === 'rtl') {
+          containerElement.style.clipPath = `path("M 0 0 L 0 ${height} L ${width} ${height} L ${width} ${top + delta} L ${scrollBarSize} ${top + delta} L ${scrollBarSize} 0 Z")`;
+        } else {
+          containerElement.style.clipPath = `path("M 0 ${top + delta} L 0 ${height} L ${width} ${height} L ${width} 0 L ${right} 0 L ${right} ${top + delta} Z")`;
+        }
       } else {
         left = sWidth;
         right = width;

@@ -13,6 +13,7 @@ import { IButtonGroupItem } from '../button-group/interfaces';
 import { formatCSSNumber } from '../utils';
 import { SubstarateMode, SubstarateModes, SubstarateStyle, SubstarateStyles, SubstrateComponent } from '../substrate';
 import { ISize } from '../ng-virtual-list';
+import { LocaleSensitiveDirective } from '@shared/localization';
 
 const DEFAULT_ROUND_CORNER: RoundedCorner = [8, 8, 8, 8],
   DEFAULT_FILL_POSITIONS: GradientColorPositions = [0, 1],
@@ -26,7 +27,7 @@ const DEFAULT_ROUND_CORNER: RoundedCorner = [8, 8, 8, 8],
  */
 @Component({
   selector: 'x-dialog',
-  imports: [CommonModule, SubstrateComponent, ButtonGroupComponent],
+  imports: [CommonModule, LocaleSensitiveDirective, SubstrateComponent, ButtonGroupComponent],
   templateUrl: './dialog.component.html',
   styleUrl: './dialog.component.scss'
 })

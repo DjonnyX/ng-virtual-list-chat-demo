@@ -65,6 +65,11 @@
         width: 100%;
         box-sizing: border-box;
 
+        .name {
+            padding: 0;
+            margin: 0;
+        }
+
         &:hover {
             background-color: #c7deeb;
         }

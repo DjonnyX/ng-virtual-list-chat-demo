@@ -1,4 +1,5 @@
 export interface IMessageParams {
+    isRTL: boolean;
     type: string | undefined;
     prevType: string | undefined;
     nextType: string | undefined;

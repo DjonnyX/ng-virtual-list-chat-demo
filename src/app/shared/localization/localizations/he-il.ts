@@ -1,0 +1,41 @@
+import { ILocalization } from "./interfaces/localization";
+import { objectAsReadonly } from "../../utils/object";
+
+/**
+ * @author Evgenii Grebennikov
+ * @email djonnyx@gmail.com
+ */
+export const localization: ILocalization = {
+    chat: {
+        header: {
+            search: {
+                placeholder: 'לְחַפֵּשׂ',
+            }
+        },
+        messages: {
+            message: {
+                dialog: {
+                    delete: {
+                        title: 'תְשׁוּמַת לֵב',
+                        message: `האם אתה בטוח שאתה רוצה למחוק את ההודעה?`,
+                        cancel: 'לְבַטֵל',
+                        delete: 'לִמְחוֹק',
+                    },
+                },
+                contextMenu: {
+                    menu: {
+                        edit: 'לַעֲרוֹך',
+                        cancel: 'לְבַטֵל',
+                        quote: 'לְצַטֵט',
+                        delete: 'לִמְחוֹק',
+                    },
+                },
+            }
+        }
+    },
+    common: {
+
+    },
+};
+
+export const heIL = objectAsReadonly(localization);

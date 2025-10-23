@@ -1,6 +1,7 @@
 import { Component, DestroyRef, effect, ElementRef, inject, output, signal, Signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { ILocalization, LocaleSensitiveDirective, LocalizationService } from '@shared/localization';
 import { ThemeService } from '@shared/theming';
 import { ITheme } from '@shared/theming';
 import { combineLatest, filter, fromEvent, interval, map, Subject, switchMap, take, takeUntil, tap } from 'rxjs';
@@ -13,7 +14,7 @@ const INTERVAL_COUNT = 89, INTERVAL_TIMEOUT = 100, PERCENT = '%', ZERO_PERCENT =
  */
 @Component({
   selector: 'message-search',
-  imports: [FormsModule],
+  imports: [FormsModule, LocaleSensitiveDirective],
   templateUrl: './message-search.component.html',
   styleUrl: './message-search.component.scss'
 })
@@ -39,12 +40,27 @@ export class MessageSearchComponent {
 
   placeholderFontSize = signal<string>('initial');
 
+  placeholderText = signal<string>('Search');
+
+  readonly localization: Signal<ILocalization | undefined>;
+
   private _destroyRef = inject(DestroyRef);
 
   private _themeService = inject(ThemeService);
 
+  private _localizationService = inject(LocalizationService);
+
   constructor() {
     this.theme = toSignal(this._themeService.$theme);
+
+    this.localization = toSignal(this._localizationService.$localization);
+
+    effect(() => {
+      const localization = this.localization();
+      if (localization) {
+        this.placeholderText.set(localization.chat.header.search.placeholder);
+      }
+    })
 
     effect(() => {
       const theme = this.theme(), focused = this.focused(), iconElement = this.icon()?.nativeElement;

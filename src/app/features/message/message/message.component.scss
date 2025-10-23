@@ -34,8 +34,9 @@
         gap: 2px;
         align-items: center;
         padding: 10px 14px;
-        word-break: break-all;
+        word-break: break-word;
         box-sizing: border-box;
+        overflow: hidden;
 
         &.has-multicontent {
             grid-template-rows: auto 20px;
@@ -43,10 +44,18 @@
 
         &.in {
             padding: 10px 14px 10px 26px;
+
+            &.rtl {
+                padding: 10px 26px 10px 14px;
+            }
         }
 
         &.out {
             padding: 10px 26px 10px 14px;
+
+            &.rtl {
+                padding: 10px 14px 10px 26px;
+            }
         }
 
         &.simple {

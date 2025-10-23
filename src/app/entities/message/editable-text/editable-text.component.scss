@@ -17,6 +17,7 @@
 
 .editor-readonly {
     padding: 2px;
+    margin: 0;
     transition: width 150ms ease-out;
 
     ::ng-deep .search-substring {
@@ -25,28 +26,18 @@
         padding: 0 2px;
     }
 
-    ::ng-deep a,
-    ::ng-deep a:-webkit-any-link,
-    ::ng-deep a:link {
-        &.message-editor-link {
-            color: var(--link-normal-color);
-        }
-    }
+    ::ng-deep .message-editor-link {
+        color: var(--link-normal-color);
 
-    ::ng-deep a:visited {
-        &.message-editor-link {
+        &:visited {
             color: var(--link-visited-color);
         }
-    }
 
-    ::ng-deep a:hover {
-        &.message-editor-link {
+        &:hover {
             color: var(--link-hover-color);
         }
-    }
 
-    ::ng-deep a:active {
-        &.message-editor-link {
+        &:active {
             color: var(--link-active-color);
         }
     }

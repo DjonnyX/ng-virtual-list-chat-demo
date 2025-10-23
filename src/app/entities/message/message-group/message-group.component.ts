@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, effect, ElementRef, inject, input, Signal, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { LocaleSensitiveDirective } from '@shared/localization';
 import { ThemeService } from '@shared/theming';
 import { ITheme } from '@shared/theming';
 
@@ -10,7 +11,7 @@ import { ITheme } from '@shared/theming';
  */
 @Component({
   selector: 'message-group',
-  imports: [CommonModule],
+  imports: [CommonModule, LocaleSensitiveDirective],
   templateUrl: './message-group.component.html',
   styleUrl: './message-group.component.scss'
 })

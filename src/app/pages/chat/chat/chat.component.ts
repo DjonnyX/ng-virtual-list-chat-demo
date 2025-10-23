@@ -14,6 +14,7 @@ import { ITheme } from '@shared/theming';
 import { ThemeService } from '@shared/theming';
 import { generateChatCollection } from '@mock/const';
 import { IMessageItemData } from '@shared/models/message';
+import { LocaleSensitiveDirective } from '@shared/localization';
 
 /**
  * @author Evgenii Grebennikov
@@ -22,7 +23,7 @@ import { IMessageItemData } from '@shared/models/message';
 @Component({
   selector: 'chat',
   standalone: true,
-  imports: [CommonModule, FormsModule, MenuButtonComponent, MessageSearchComponent, DrawerComponent,
+  imports: [CommonModule, FormsModule, LocaleSensitiveDirective, MenuButtonComponent, MessageSearchComponent, DrawerComponent,
     MessagesComponent, GroupsComponent],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
@@ -106,7 +107,7 @@ export class ChatComponent {
 
   onGroupSelectHandler(item: IVirtualListItem) {
     this.menuOpened.set(false);
-    this.title.set(item?.['name']);
+    this.title.set(item?.['text']);
     this._messageService.changeChat(`${item?.['id']}`);
   }
 

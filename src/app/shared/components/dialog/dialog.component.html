@@ -16,13 +16,13 @@
         [strokeAnimationDuration]="animationStrokeDuration" />
     <div #content class="content">
         @if (titleValue) {
-            <h2 #title class="title">{{ titleValue }}</h2>
+            <h2 #title localeSensitive class="title">{{ titleValue }}</h2>
         }
         @if (messageValue) {
-            <p #message class="message">{{ messageValue }}</p>
+            <p #message localeSensitive class="message">{{ messageValue }}</p>
         }
         @if (actions) {
-            <div class="actions">
+            <div localeSensitive class="actions">
                 <x-button-group class="button-group" [ngStyle]="s" [items]="actions"
                     (onClick)="onButtonClickHandler($event)"></x-button-group>
             </div>

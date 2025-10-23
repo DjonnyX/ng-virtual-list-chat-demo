@@ -12,6 +12,23 @@
 
     .content {
         position: relative;
+
+        .message-controls {
+            position: absolute;
+            right: 6px;
+            top: 6px;
+            bottom: 6px;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            box-sizing: border-box;
+        }
+
+        &.rtl {
+            .message-controls {
+                left: 6px;
+                right: unset;
+            }
+        }
     }
 
     .message-container {
@@ -50,6 +67,11 @@
 
     &.firefox {
         padding-right: 12px;
+
+        &.rtl {
+            padding-left: 4px;
+            padding-left: 12px;
+        }
     }
 
     &>* {
@@ -72,11 +94,21 @@
                     margin-left: 20px;
                     margin-right: 48px;
                 }
+
+                &.rtl .message {
+                    margin-left: 48px;
+                    margin-right: 20px;
+                }
             }
 
             &.out {
                 .message {
                     margin-right: 48px;
+                }
+
+                &.rtl .message {
+                    margin-left: 48px;
+                    margin-right: 20px;
                 }
             }
         }
@@ -85,6 +117,11 @@
             &.out {
                 .message {
                     margin-right: 48px;
+                }
+
+                &.rtl .message {
+                    margin-left: 48px;
+                    margin-right: 20px;
                 }
             }
         }
@@ -101,14 +138,4 @@
     &.last-in-group {
         padding-bottom: 2px;
     }
-}
-
-.message-controls {
-    position: absolute;
-    right: 6px;
-    top: 6px;
-    bottom: 6px;
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-    box-sizing: border-box;
 }

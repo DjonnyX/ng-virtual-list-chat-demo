@@ -36,6 +36,10 @@ export class NgVirtualListService {
   $focusedId = this._$focusedId.asObservable();
   get focusedId() { return this._$focusedId.getValue(); }
 
+  scrollBarSize: number = 0;
+
+  overlapScrollBarSize: number = 0;
+
   selectByClick: boolean = DEFAULT_SELECT_BY_CLICK;
 
   collapseByClick: boolean = DEFAULT_COLLAPSE_BY_CLICK;

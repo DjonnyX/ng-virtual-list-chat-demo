@@ -15,6 +15,7 @@ import { MethodsForSelectingTypes } from '../enums/method-for-selecting-types';
 import { validateBoolean } from '../utils/validation';
 import { FocusAlignments } from '../enums';
 import { IDisplayObjectConfig, IDisplayObjectMeasures } from '../models';
+import { LocalizationService } from '@shared/localization';
 
 const ATTR_AREA_SELECTED = 'area-selected', TABINDEX = 'ng-vl-index', POSITION = 'position', POSITION_ZERO = '0', ID = 'item-id',
   KEY_SPACE = " ", KEY_ARR_LEFT = "ArrowLeft", KEY_ARR_UP = "ArrowUp", KEY_ARR_RIGHT = "ArrowRight", KEY_ARR_DOWN = "ArrowDown",
@@ -48,6 +49,8 @@ export class NgVirtualListItemComponent extends BaseVirtualListItemComponent {
   }
 
   protected _service = inject(NgVirtualListService);
+
+  protected _localizationService = inject(LocalizationService);
 
   private _isSelected: boolean = false;
 
@@ -330,7 +333,7 @@ export class NgVirtualListItemComponent extends BaseVirtualListItemComponent {
       styles.zIndex = data.config.zIndex;
       if (data.config.snapped) {
         this._elementRef.nativeElement.setAttribute(POSITION, data.config.sticky === 1 ? POSITION_ZERO : `${data.config.isVertical ? data.measures.y : data.measures.x}`);
-        styles.transform = data.config.sticky === 1 ? ZEROS_TRANSLATE_3D : `${TRANSLATE_3D}(${data.config.isVertical ? 0 : data.measures.x}${PX}, ${data.config.isVertical ? data.measures.y : 0}${PX}, ${POSITION_ZERO})`;;
+        styles.transform = data.config.sticky === 1 ? `${TRANSLATE_3D}(${this._localizationService.textDirection === 'rtl' ? this._service.scrollBarSize : 0}${PX}, 0, 0)` : `${TRANSLATE_3D}(${data.config.isVertical ? 0 : data.measures.x}${PX}, ${data.config.isVertical ? data.measures.y : 0}${PX}, ${POSITION_ZERO})`;;
         if (!data.config.isSnappingMethodAdvanced) {
           styles.position = POSITION_STICKY;
         }
@@ -338,7 +341,7 @@ export class NgVirtualListItemComponent extends BaseVirtualListItemComponent {
         styles.position = POSITION_ABSOLUTE;
         if (regular) {
           this._elementRef.nativeElement.setAttribute(POSITION, POSITION_ZERO);
-          styles.transform = `${TRANSLATE_3D}(${data.config.isVertical ? 0 : data.measures.delta}${PX}, ${data.config.isVertical ? data.measures.delta : 0}${PX}, ${POSITION_ZERO})`;
+          styles.transform = `${TRANSLATE_3D}(${data.config.isVertical ? this._service.scrollBarSize : data.measures.delta}${PX}, ${data.config.isVertical ? data.measures.delta : 0}${PX}, ${POSITION_ZERO})`;
         } else {
           this._elementRef.nativeElement.setAttribute(POSITION, `${data.config.isVertical ? data.measures.y : data.measures.x}`);
           styles.transform = `${TRANSLATE_3D}(${data.config.isVertical ? 0 : data.measures.x}${PX}, ${data.config.isVertical ? data.measures.y : 0}${PX}, ${POSITION_ZERO})`;

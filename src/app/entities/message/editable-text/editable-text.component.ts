@@ -7,6 +7,7 @@ import { SearchHighlightDirective } from '@shared/directives';
 import { formatText } from '@shared/utils';
 import { ThemeService } from '@shared/theming';
 import { ITheme } from '@shared/theming';
+import { LocaleSensitiveDirective } from '@shared/localization';
 
 const DEFAULT_SEARCH_SUBSTRING_CLASS = 'search-substring',
   INITIAL = 'initial',
@@ -20,7 +21,7 @@ const DEFAULT_SEARCH_SUBSTRING_CLASS = 'search-substring',
  */
 @Component({
   selector: 'editable-text',
-  imports: [CommonModule, SearchHighlightDirective, CdkTextareaAutosize],
+  imports: [CommonModule, SearchHighlightDirective, LocaleSensitiveDirective, CdkTextareaAutosize],
   templateUrl: './editable-text.component.html',
   styleUrl: './editable-text.component.scss',
 })

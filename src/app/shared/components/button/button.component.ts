@@ -9,6 +9,7 @@ import { PressDirective } from '@shared/directives';
 import { SubstrateComponent, SubstarateMode, SubstarateStyle, SubstarateModes, SubstarateStyles } from '../substrate';
 import { ISize } from '../ng-virtual-list';
 import { formatCSSNumber } from '../utils';
+import { LocaleSensitiveDirective } from '@shared/localization';
 
 const DEFAULT_ROUND_CORNER: RoundedCorner = [8, 8, 8, 8],
   DEFAULT_STROKE_COLOR: GradientColor = ['rgba(186, 250, 255, 0)', 'rgb(183, 235, 255)'],
@@ -28,6 +29,7 @@ const DEFAULT_ROUND_CORNER: RoundedCorner = [8, 8, 8, 8],
     CommonModule,
     SubstrateComponent,
     PressDirective,
+    LocaleSensitiveDirective,
   ],
   templateUrl: './button.component.html',
   styleUrl: './button.component.scss',
