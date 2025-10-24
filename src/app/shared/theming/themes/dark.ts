@@ -1,4 +1,4 @@
-import { RoundedCorner } from "../../types";
+import { GradientColor, RoundedCorner } from "../../types";
 import { objectAsReadonly } from "../../utils/object";
 import { ITheme } from "./interfaces/theme";
 import { ButtonPresets, ContextMenuPresets, DialogPresets } from "./presets";
@@ -8,7 +8,11 @@ const BUTTON_ROUNDED_CORNER: RoundedCorner = [8, 8, 8, 8],
     CONTEXT_MENU_ROUNDED_CORNER: RoundedCorner = [12, 12, 12, 12],
     CONTEXT_MENU_PADDING = "8px 0px",
     DIALOG_ROUNDED_CORNER: RoundedCorner = [12, 12, 12, 12],
-    DIALOG_PADDING = "36px 52px";
+    DIALOG_PADDING = "36px 52px",
+    X_DEEP_RED_PLASMA_GRADIENT: GradientColor = ["rgba(107, 188, 255, 0)", "rgb(255, 122, 162)"],
+    X_LITE_RED_PLASMA_GRADIENT: GradientColor = ["rgba(192, 248, 255, 0)", "rgb(255, 218, 225)"],
+    X_LITE_BLUE_PLASMA_GRADIENT: GradientColor = ["rgba(255, 133, 133, 0)", "rgb(126, 219, 255)"],
+    X_LITE_CYAN_PLASMA_GRADIENT: GradientColor = ["rgba(117, 193, 255, 0)", "rgb(219, 156, 255)"];
 
 /**
  * @author Evgenii Grebennikov
@@ -50,7 +54,7 @@ const manifest: ITheme = {
                     borderColor: "rgb(34, 24, 51)",
                     color: "rgb(181, 158, 202)",
                     fontSize: "14px",
-                    fill: "rgb(181, 158, 202)",
+                    fill: "rgb(158, 173, 202)",
                     placeholder: {
                         color: "rgb(161, 138, 182)",
                         fontSize: "14px",
@@ -61,7 +65,7 @@ const manifest: ITheme = {
                     borderColor: "rgb(198, 244, 255)",
                     color: "rgb(181, 158, 202)",
                     fontSize: "14px",
-                    fill: "rgb(181, 158, 202)",
+                    fill: "rgb(158, 166, 202)",
                     placeholder: {
                         color: "rgb(161, 138, 182)",
                         fontSize: "14px",
@@ -147,12 +151,12 @@ const manifest: ITheme = {
                         color: "rgb(206, 191, 220)",
                     },
                     removal: {
-                        fill: ["rgb(167, 87, 111)", "rgb(167, 87, 111)"],
-                        color: "rgb(206, 191, 220)",
+                        fill: ["rgb(255, 134, 118)", "rgb(255, 117, 158)"],
+                        color: "rgb(255, 255, 255)",
                     },
                     removalSelected: {
-                        fill: ["rgb(167, 87, 111)", "rgb(167, 87, 111)"],
-                        color: "rgb(206, 191, 220)",
+                        fill: ["rgb(255, 134, 118)", "rgb(255, 117, 158)"],
+                        color: "rgb(255, 255, 255)",
                     }
                 },
                 controls: {
@@ -161,17 +165,17 @@ const manifest: ITheme = {
                         normal: {
                             fill: ["rgb(56, 43, 179)", "rgb(82, 32, 126)"],
                             iconFill: "rgb(206, 191, 220)",
-                            strokeGradientColor: ['rgba(255,255,255,0)', 'rgb(255, 255, 255)'],
+                            strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
                         },
                         pressed: {
                             fill: ["rgb(74, 61, 196)", "rgb(96, 44, 141)"],
                             iconFill: "rgb(206, 191, 220)",
-                            strokeGradientColor: ['rgba(255,255,255,0)', 'rgb(255, 255, 255)'],
+                            strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
                         },
                         disabled: {
                             fill: ["rgba(74, 61, 196, .25)", "rgba(96, 44, 141, .25)"],
                             iconFill: "rgba(206, 191, 220, .85)",
-                            strokeGradientColor: ['rgba(255,255,255,0)', 'rgb(255, 255, 255)'],
+                            strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
                         },
                     },
                     cancel: {
@@ -179,17 +183,17 @@ const manifest: ITheme = {
                         normal: {
                             fill: ["rgb(56, 43, 179)", "rgb(82, 32, 126)"],
                             iconFill: "rgb(206, 191, 220)",
-                            strokeGradientColor: ["rgba(255,255,255,0)", "rgb(219, 156, 255)"],
+                            strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
                         },
                         pressed: {
                             fill: ["rgb(74, 61, 196)", "rgb(96, 44, 141)"],
                             iconFill: "rgb(206, 191, 220)",
-                            strokeGradientColor: ["rgba(255,255,255,0)", "rgb(219, 156, 255)"],
+                            strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
                         },
                         disabled: {
                             fill: ["rgba(74, 61, 196, .25)", "rgba(96, 44, 141, .25)"],
                             iconFill: "rgba(240, 217, 255, .85)",
-                            strokeGradientColor: ["rgba(255,255,255,0)", "rgb(219, 156, 255)"],
+                            strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
                         },
                     },
                     send: {
@@ -197,31 +201,31 @@ const manifest: ITheme = {
                         normal: {
                             fill: ["rgb(23, 62, 146)", "rgb(32, 88, 126)"],
                             iconFill: "rgb(191, 211, 220)",
-                            strokeGradientColor: ["rgba(255,255,255,0)", "rgb(219, 156, 255)"],
+                            strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
                         },
                         pressed: {
                             fill: ["rgb(42, 86, 182)", "rgb(45, 108, 150)"],
                             iconFill: "rgb(191, 211, 220)",
-                            strokeGradientColor: ["rgba(255,255,255,0)", "rgb(219, 156, 255)"],
+                            strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
                         },
                         disabled: {
                             fill: ["rgba(43, 86, 179, .25)", "rgba(32, 88, 126, .25)"],
                             iconFill: "rgba(191, 211, 220, .85)",
-                            strokeGradientColor: ["rgba(255,255,255,0)", "rgb(219, 156, 255)"],
+                            strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
                         },
                     },
                 },
                 styles: {
                     longPress: {
-                        stroke: ["rgba(255,255,255,0)", "rgb(126, 219, 255)"],
+                        stroke: X_LITE_BLUE_PLASMA_GRADIENT,
                         strokeAnimationDuration: 500,
                     },
                     processing: {
-                        stroke: ["rgba(255,255,255,0)", "rgb(219, 156, 255)"],
+                        stroke: X_LITE_CYAN_PLASMA_GRADIENT,
                         strokeAnimationDuration: 1000,
                     },
                     removing: {
-                        stroke: ["rgba(0,188,212,0)", "rgb(255, 192, 205)"],
+                        stroke: X_LITE_RED_PLASMA_GRADIENT,
                         strokeAnimationDuration: 1000,
                     },
                 },
@@ -240,7 +244,7 @@ const manifest: ITheme = {
                 color: "rgb(240, 217, 255)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
-                strokeGradientColor: ["rgba(255,255,255,0)", "rgb(219, 156, 255)"],
+                strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
             },
             pressed: {
                 fill: ["rgb(68, 20, 146)", "rgb(89, 6, 114)"],
@@ -248,7 +252,7 @@ const manifest: ITheme = {
                 color: "rgb(240, 217, 255)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
-                strokeGradientColor: ["rgba(255,255,255,0)", "rgb(219, 156, 255)"],
+                strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
             },
             focused: {
                 fill: ["rgb(86, 22, 190)", "rgb(104, 0, 136)"],
@@ -257,7 +261,7 @@ const manifest: ITheme = {
                 color: "rgb(240, 217, 255)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
-                strokeGradientColor: ["rgba(255,255,255,0)", "rgb(219, 156, 255)"],
+                strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
             },
             disabled: {
                 fill: ["rgba(86, 22, 190, .25)", "rgba(104, 0, 136, .25)"],
@@ -265,7 +269,7 @@ const manifest: ITheme = {
                 color: "rgb(240, 217, 255)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
-                strokeGradientColor: ["rgba(255,255,255,0)", "rgb(219, 156, 255)"],
+                strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
             },
         },
         [ButtonPresets.SECONDARY]: {
@@ -474,7 +478,7 @@ const manifest: ITheme = {
             roundedCorner: DIALOG_ROUNDED_CORNER,
             padding: DIALOG_PADDING,
             strokeAnimationDuration: 10000,
-            strokeGradientColor: ["rgba(0, 71, 151, 0)", "rgb(255, 122, 162)"],
+            strokeGradientColor: X_DEEP_RED_PLASMA_GRADIENT,
             title: {
                 fontSize: 14,
                 fontWeight: "bold",
@@ -508,7 +512,7 @@ const manifest: ITheme = {
             roundedCorner: CONTEXT_MENU_ROUNDED_CORNER,
             padding: CONTEXT_MENU_PADDING,
             strokeAnimationDuration: 10000,
-            strokeGradientColor: ["rgba(0, 71, 151, 0)", "rgb(7, 247, 255)"],
+            strokeGradientColor: X_LITE_BLUE_PLASMA_GRADIENT,
             buttonPreset: ButtonPresets.CONTEXT_MENU_PRIMARY,
         },
         [ContextMenuPresets.SECONDARY]: {
@@ -516,7 +520,7 @@ const manifest: ITheme = {
             roundedCorner: CONTEXT_MENU_ROUNDED_CORNER,
             padding: CONTEXT_MENU_PADDING,
             strokeAnimationDuration: 10000,
-            strokeGradientColor: ["rgba(0, 71, 151, 0)", "rgb(255, 122, 162)"],
+            strokeGradientColor: X_DEEP_RED_PLASMA_GRADIENT,
             buttonPreset: ButtonPresets.CONTEXT_MENU_SECONDARY,
         },
     }

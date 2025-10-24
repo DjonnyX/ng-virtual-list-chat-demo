@@ -1,4 +1,4 @@
-import { RoundedCorner } from "../../types";
+import { GradientColor, RoundedCorner } from "../../types";
 import { objectAsReadonly } from "../../utils/object";
 import { ITheme } from "./interfaces/theme";
 import { ButtonPresets, ContextMenuPresets, DialogPresets } from "./presets";
@@ -8,7 +8,11 @@ const BUTTON_ROUNDED_CORNER: RoundedCorner = [8, 8, 8, 8],
     CONTEXT_MENU_ROUNDED_CORNER: RoundedCorner = [12, 12, 12, 12],
     CONTEXT_MENU_PADDING = "8px 0px",
     DIALOG_ROUNDED_CORNER: RoundedCorner = [12, 12, 12, 12],
-    DIALOG_PADDING = "36px 52px";
+    DIALOG_PADDING = "36px 52px",
+    X_DEEP_RED_PLASMA_GRADIENT: GradientColor = ["rgba(107, 188, 255, 0)", "rgb(255, 122, 162)"],
+    X_LITE_RED_PLASMA_GRADIENT: GradientColor = ["rgba(0,188,212,0)", "rgb(255, 192, 205)"],
+    X_BLUE_PLASMA_GRADIENT: GradientColor = ["rgba(255, 133, 133, 0)", "rgb(36, 193, 255)"],
+    X_LITE_CYAN_PLASMA_GRADIENT: GradientColor = ["rgba(117, 193, 255, 0)", "rgb(219, 156, 255)"];
 
 /**
  * @author Evgenii Grebennikov
@@ -161,17 +165,17 @@ const manifest: ITheme = {
                         normal: {
                             fill: ["rgb(255, 255, 255)", "rgb(185, 210, 233)"],
                             iconFill: "rgb(48, 44, 160)",
-                            strokeGradientColor: ['rgba(255,255,255,0)', 'rgb(85, 215, 255)'],
+                            strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
                         },
                         pressed: {
                             fill: ["rgb(226, 239, 245)", "rgb(156, 184, 209)"],
                             iconFill: "rgb(48, 44, 160)",
-                            strokeGradientColor: ['rgba(255,255,255,0)', 'rgb(85, 215, 255)'],
+                            strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
                         },
                         disabled: {
                             fill: ["rgba(255, 255, 255, .25)", "rgba(185, 210, 233, .25)"],
                             iconFill: "rgb(35, 32, 122)",
-                            strokeGradientColor: ['rgba(255,255,255,0)', 'rgb(85, 215, 255)'],
+                            strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
                         },
                     },
                     cancel: {
@@ -179,17 +183,17 @@ const manifest: ITheme = {
                         normal: {
                             fill: ["rgb(255, 255, 255)", "rgb(185, 210, 233)"],
                             iconFill: "rgb(48, 44, 160)",
-                            strokeGradientColor: ['rgba(255,255,255,0)', 'rgb(85, 215, 255)'],
+                            strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
                         },
                         pressed: {
                             fill: ["rgb(226, 239, 245)", "rgb(156, 184, 209)"],
                             iconFill: "rgb(48, 44, 160)",
-                            strokeGradientColor: ['rgba(255,255,255,0)', 'rgb(85, 215, 255)'],
+                            strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
                         },
                         disabled: {
                             fill: ["rgba(255, 255, 255, .25)", "rgba(185, 210, 233, .25)"],
                             iconFill: "rgb(35, 32, 122)",
-                            strokeGradientColor: ['rgba(255,255,255,0)', 'rgb(85, 215, 255)'],
+                            strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
                         },
                     },
                     send: {
@@ -197,31 +201,31 @@ const manifest: ITheme = {
                         normal: {
                             fill: ["rgb(49, 25, 182)", "rgb(0, 138, 202)"],
                             iconFill: "rgb(232, 217, 255)",
-                            strokeGradientColor: ['rgba(186, 250, 255, 0)', 'rgb(183, 235, 255)'],
+                            strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
                         },
                         pressed: {
                             fill: ["rgb(70, 44, 212)", "rgb(16, 156, 221)"],
                             iconFill: "rgb(232, 217, 255)",
-                            strokeGradientColor: ['rgba(186, 250, 255, 0)', 'rgb(183, 235, 255)'],
+                            strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
                         },
                         disabled: {
                             fill: ["rgba(28, 25, 182, .25)", "rgba(48, 0, 141, .25)"],
                             iconFill: "rgb(232, 217, 255, .5)",
-                            strokeGradientColor: ['rgba(186, 250, 255, 0)', 'rgb(183, 235, 255)'],
+                            strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
                         },
                     },
                 },
                 styles: {
                     longPress: {
-                        stroke: ["rgba(255,255,255,0)", "rgb(82, 186, 255)"],
+                        stroke: X_BLUE_PLASMA_GRADIENT,
                         strokeAnimationDuration: 500,
                     },
                     processing: {
-                        stroke: ["rgba(255,255,255,0)", "rgb(102, 108, 194)"],
+                        stroke: X_LITE_CYAN_PLASMA_GRADIENT,
                         strokeAnimationDuration: 1000,
                     },
                     removing: {
-                        stroke: ["rgba(0,188,212,0)", "rgba(255,100,133,1)"],
+                        stroke: X_DEEP_RED_PLASMA_GRADIENT,
                         strokeAnimationDuration: 1000,
                     },
                 },
@@ -239,14 +243,14 @@ const manifest: ITheme = {
                 iconFill: "rgb(232, 217, 255)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
-                strokeGradientColor: ['rgba(186, 250, 255, 0)', 'rgb(183, 235, 255)'],
+                strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
             },
             pressed: {
                 fill: ["rgb(25, 22, 150)", "rgb(43, 6, 117)"],
                 iconFill: "rgb(232, 217, 255)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
-                strokeGradientColor: ['rgba(186, 250, 255, 0)', 'rgb(183, 235, 255)'],
+                strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
             },
             focused: {
                 fill: ["rgb(25, 22, 150)", "rgb(43, 6, 117)"],
@@ -254,14 +258,14 @@ const manifest: ITheme = {
                 outline: "2px solid rgb(35, 6, 94)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
-                strokeGradientColor: ['rgba(186, 250, 255, 0)', 'rgb(183, 235, 255)'],
+                strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
             },
             disabled: {
                 fill: ["rgba(28, 25, 182, .25)", "rgba(48, 0, 141, .25)"],
                 iconFill: "rgb(232, 217, 255, .5)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
-                strokeGradientColor: ['rgba(186, 250, 255, 0)', 'rgb(183, 235, 255)'],
+                strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
             },
         },
         [ButtonPresets.SECONDARY]: {
@@ -270,12 +274,14 @@ const manifest: ITheme = {
                 iconFill: "rgb(48, 44, 160)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
             },
             pressed: {
                 fill: ["rgb(226, 239, 245)", "rgb(156, 184, 209)"],
                 iconFill: "rgb(48, 44, 160)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
             },
             focused: {
                 fill: ["rgb(226, 239, 245)", "rgb(156, 184, 209)"],
@@ -283,12 +289,14 @@ const manifest: ITheme = {
                 outline: "2px solid rgb(136, 171, 202)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
             },
             disabled: {
                 fill: ["rgba(255, 255, 255, .25)", "rgba(185, 210, 233, .25)"],
                 iconFill: "rgb(35, 32, 122)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
             },
         },
         [ButtonPresets.THRID]: {
@@ -298,12 +306,14 @@ const manifest: ITheme = {
                 iconFill: "rgb(232, 217, 255)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
             },
             pressed: {
                 fill: ["rgb(25, 22, 150)", "rgb(43, 6, 117)"],
                 iconFill: "rgb(232, 217, 255)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
             },
             focused: {
                 fill: ["rgb(25, 22, 150)", "rgb(43, 6, 117)"],
@@ -311,12 +321,14 @@ const manifest: ITheme = {
                 outline: "2px solid rgb(35, 6, 94)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
             },
             disabled: {
                 fill: ["rgba(28, 25, 182, .25)", "rgba(48, 0, 141, .25)"],
                 iconFill: "rgb(232, 217, 255, .5)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
             },
         },
         [ButtonPresets.SUCCESS]: {
@@ -327,6 +339,7 @@ const manifest: ITheme = {
                 color: "rgb(42, 79, 94)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
             },
             pressed: {
                 fill: ["rgb(120, 189, 235)", "rgb(136, 197, 238)"],
@@ -334,6 +347,7 @@ const manifest: ITheme = {
                 color: "rgb(58, 102, 119)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
             },
             focused: {
                 fill: ["rgb(148, 213, 255)", "rgb(160, 217, 255)"],
@@ -341,6 +355,7 @@ const manifest: ITheme = {
                 color: "rgb(42, 79, 94)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
             },
             disabled: {
                 fill: ["rgba(148, 213, 255, .25)", "rgba(160, 217, 255, .25)"],
@@ -348,6 +363,7 @@ const manifest: ITheme = {
                 color: "rgba(42, 79, 94, 0.45)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
             },
         },
         [ButtonPresets.CANCEL]: {
@@ -358,6 +374,7 @@ const manifest: ITheme = {
                 color: "rgb(27, 27, 36)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
             },
             pressed: {
                 fill: ["rgba(255, 255, 255, 0.08)", "rgba(255, 255, 255, 0.08)"],
@@ -365,6 +382,7 @@ const manifest: ITheme = {
                 color: "rgb(41, 41, 54)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
             },
             focused: {
                 fill: ["rgba(255, 255, 255, 0)", "rgba(255, 255, 255, 0)"],
@@ -372,6 +390,7 @@ const manifest: ITheme = {
                 color: "rgb(27, 27, 36)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
             },
             disabled: {
                 fill: ["rgba(255, 255, 255, 0)", "rgba(255, 255, 255, 0)"],
@@ -379,6 +398,7 @@ const manifest: ITheme = {
                 color: "rgba(27, 27, 36, 0.45)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
             },
         },
         [ButtonPresets.WARN]: {
@@ -387,12 +407,14 @@ const manifest: ITheme = {
                 iconFill: "rgb(138, 101, 85)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: X_LITE_RED_PLASMA_GRADIENT,
             },
             pressed: {
                 fill: ["rgb(247, 215, 215)", "rgb(230, 175, 159)"],
                 iconFill: "rgb(138, 101, 85)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: X_LITE_RED_PLASMA_GRADIENT,
             },
             focused: {
                 fill: ["rgb(247, 215, 215)", "rgb(230, 175, 159)"],
@@ -400,12 +422,14 @@ const manifest: ITheme = {
                 outline: "2px solid rgb(231, 185, 163)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: X_LITE_RED_PLASMA_GRADIENT,
             },
             disabled: {
                 fill: ["rgba(247, 215, 215, .25)", "rgba(230, 175, 159, .25)"],
                 iconFill: "rgb(167, 129, 113)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: X_LITE_RED_PLASMA_GRADIENT,
             },
         },
         [ButtonPresets.CONTEXT_MENU_PRIMARY]: {
@@ -467,7 +491,7 @@ const manifest: ITheme = {
             roundedCorner: DIALOG_ROUNDED_CORNER,
             padding: DIALOG_PADDING,
             strokeAnimationDuration: 10000,
-            strokeGradientColor: ["rgba(148, 213, 255, 0)", "rgb(148, 213, 255)"],
+            strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
             title: {
                 fontSize: 14,
                 fontWeight: "bold",
@@ -499,7 +523,7 @@ const manifest: ITheme = {
             roundedCorner: CONTEXT_MENU_ROUNDED_CORNER,
             padding: CONTEXT_MENU_PADDING,
             strokeAnimationDuration: 10000,
-            strokeGradientColor: ["rgba(148, 213, 255, 0)", "rgb(93, 190, 255)"],
+            strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
             buttonPreset: ButtonPresets.CONTEXT_MENU_PRIMARY,
         },
         [ContextMenuPresets.SECONDARY]: {
@@ -507,7 +531,7 @@ const manifest: ITheme = {
             roundedCorner: CONTEXT_MENU_ROUNDED_CORNER,
             padding: CONTEXT_MENU_PADDING,
             strokeAnimationDuration: 10000,
-            strokeGradientColor: ["rgba(148, 213, 255, 0)", "rgb(148, 213, 255)"],
+            strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
             buttonPreset: ButtonPresets.CONTEXT_MENU_SECONDARY,
         },
     }
