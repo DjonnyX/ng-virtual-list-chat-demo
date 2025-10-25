@@ -1,7 +1,7 @@
-import { DestroyRef, Directive, HostListener, inject, input, Input, output } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Subject, timer } from 'rxjs';
-import { delay, filter, switchMap, take, takeUntil, tap } from 'rxjs/operators';
+import { DestroyRef, Directive, ElementRef, inject, input, Input, output } from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { fromEvent, race, timer } from 'rxjs';
+import { delay, filter, switchMap, takeUntil, tap } from 'rxjs/operators';
 
 const DEFAULT_DURATION = 3000;
 
@@ -24,47 +24,45 @@ export class LongPressDirective {
 
     onLongPress = output<void>();
 
-    onLongPressActive = output<void>();
+    onLongPressActive = output<boolean>();
 
-    private _$pressed = new Subject<PointerEvent>();
-    private _$cancel = new Subject<PointerEvent>();
-
-    @HostListener('pointerdown', ['$event'])
-    onPress(e: PointerEvent) {
-        if (this.longPressDisabled()) {
-            return;
-        }
-        this._$pressed.next(e);
-    }
-
-    @HostListener('pointerup', ['$event'])
-    @HostListener('pointerleave', ['$event'])
-    onRelease(e: PointerEvent) {
-        this._$cancel.next(e);
-    }
+    private _elementRef = inject(ElementRef<HTMLElement>);
 
     private _destroyRef = inject(DestroyRef);
 
     constructor() {
-        const $pressed = this._$pressed.asObservable(),
-            $cancel = this._$cancel.asObservable();
+        const $disabled = toObservable(this.longPressDisabled).pipe(
+            filter(v => !!v),
+        ),
+            $pressed = fromEvent(this._elementRef.nativeElement, 'pointerdown'),
+            $cancel = race([
+                fromEvent(window, 'pointerup'),
+                fromEvent(window, 'pointermove'),
+                fromEvent(window, 'pointerleave'),
+            ]),
+            $release = fromEvent(this._elementRef.nativeElement, 'pointerup');
 
         $pressed.pipe(
             takeUntilDestroyed(),
-            filter(v => !!v),
             switchMap(() => {
                 return timer(this._duration).pipe(
                     takeUntilDestroyed(this._destroyRef),
+                    takeUntil($disabled),
                     takeUntil($cancel),
                     tap(() => {
-                        this.onLongPressActive.emit();
+                        this.onLongPressActive.emit(true);
                     }),
                     switchMap(() => {
-                        return $cancel.pipe(
+                        return $release.pipe(
                             takeUntilDestroyed(this._destroyRef),
-                            take(1),
+                            takeUntil($disabled),
+                            takeUntil($cancel.pipe(
+                                takeUntilDestroyed(this._destroyRef),
+                                tap(() => {
+                                    this.onLongPressActive.emit(false);
+                                }),
+                            )),
                             delay(1),
-                            takeUntilDestroyed(this._destroyRef),
                             tap(() => {
                                 this.onLongPress.emit();
                             }),

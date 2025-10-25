@@ -93,15 +93,15 @@ export const WHEEL = 'wheel';
 
 export const TOUCH_MOVE = 'touchmove';
 
-export const MOUSE_MOVE = 'mousemove';
+export const POINTER_MOVE = 'pointermove';
 
-export const MOUSE_UP = 'mouseup';
+export const POINTER_UP = 'pointerup';
 
-export const MOUSE_DOWN = 'mousedown';
+export const POINTER_DOWN = 'pointerdown';
 
-export const MOUSE_LEAVE = 'mouseleave';
+export const POINTER_LEAVE = 'pointerleave';
 
-export const MOUSE_OUT = 'mouseout';
+export const POINTER_OUT = 'pointerout';
 
 export const SCROLL = 'scroll';
 

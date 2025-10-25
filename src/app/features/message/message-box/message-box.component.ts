@@ -345,8 +345,8 @@ export class MessageBoxComponent {
     this.contextMenuFillPositions.set(fillPositions);
   }
 
-  onLongPressActive() {
-    this.longPressActive.set(true);
+  onLongPressActive(value: boolean) {
+    this.longPressActive.set(value);
   }
 
   openMenu() {

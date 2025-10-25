@@ -1,4 +1,4 @@
-import { Directive, effect, ElementRef, inject, input, output } from '@angular/core';
+import { DestroyRef, Directive, effect, ElementRef, inject, input, output } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { IDisplayObjectMeasures } from '@shared/components/ng-virtual-list';
 import { GradientColorPositions } from '@shared/types';
@@ -19,12 +19,15 @@ export class CalcFillPositionsDirective {
 
   private _elementRef = inject(ElementRef<HTMLDivElement>);
 
+  private _destroyRef = inject(DestroyRef);
+
   constructor() {
     const $measures = toObservable(this.measures);
 
     $measures.pipe(
       takeUntilDestroyed(),
       delay(0),
+      takeUntilDestroyed(this._destroyRef),
       tap(() => {
         this.calculate();
       }),

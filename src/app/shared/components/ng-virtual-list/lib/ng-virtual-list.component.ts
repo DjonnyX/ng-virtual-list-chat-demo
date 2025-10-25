@@ -17,7 +17,7 @@ import {
   HEIGHT_PROP_NAME, LEFT_PROP_NAME, MAX_SCROLL_TO_ITERATIONS, PX, SCROLL, SCROLL_END, TOP_PROP_NAME, TRACK_BY_PROPERTY_NAME, WIDTH_PROP_NAME,
   DEFAULT_MAX_BUFFER_SIZE, DEFAULT_SELECT_METHOD, DEFAULT_SELECT_BY_CLICK, DEFAULT_COLLAPSE_BY_CLICK, DEFAULT_COLLECTION_MODE,
   DEFAULT_SCREEN_READER_MESSAGE, BEHAVIOR_SMOOTH, DEFAULT_SNAP_TO_END_TRANSITION_INSTANT_OFFSET, DEFAULT_SNAP_SCROLLTO_BOTTOM,
-  WHEEL, TOUCH_MOVE, MOUSE_DOWN, MOUSE_UP, MOUSE_LEAVE, MOUSE_OUT,
+  WHEEL, TOUCH_MOVE, POINTER_DOWN, POINTER_UP, POINTER_LEAVE, POINTER_OUT,
 } from './const';
 import {
   IRenderVirtualListItem, IScrollEvent, IScrollOptions, IVirtualListCollection, IVirtualListItem, IVirtualListItemConfigMap,
@@ -1217,13 +1217,13 @@ export class NgVirtualListComponent implements OnInit, OnDestroy {
       }),
     ).subscribe();
 
-    const $docMouseUp = fromEvent(document, MOUSE_UP).pipe(
+    const $docMouseUp = fromEvent(document, POINTER_UP).pipe(
       take(1),
     ),
-      $docMouseLeave = fromEvent(document, MOUSE_LEAVE).pipe(
+      $docMouseLeave = fromEvent(document, POINTER_LEAVE).pipe(
         take(1),
       ),
-      $docMouseOut = fromEvent(document, MOUSE_OUT).pipe(
+      $docMouseOut = fromEvent(document, POINTER_OUT).pipe(
         take(1),
       ),
       $mouseMoveTakeUntil = race([$docMouseUp, $docMouseLeave, $docMouseOut]).pipe(
@@ -1234,7 +1234,7 @@ export class NgVirtualListComponent implements OnInit, OnDestroy {
     $container.pipe(
       distinctUntilChanged(),
       switchMap(container => {
-        return fromEvent(container, MOUSE_DOWN).pipe(
+        return fromEvent(container, POINTER_DOWN).pipe(
           takeUntilDestroyed(this._destroyRef),
           switchMap(e => {
             return fromEvent(container, SCROLL).pipe(
