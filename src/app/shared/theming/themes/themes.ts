@@ -4,14 +4,20 @@ import { ITheme } from "./interfaces/theme";
 import { THEME_LIGHT } from "./light";
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 type ThemeName = 'light' | 'dark' | string;
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 const manifest: { [name: string]: ITheme } = {
     light: THEME_LIGHT,
@@ -19,8 +25,11 @@ const manifest: { [name: string]: ITheme } = {
 };
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 const ThemeNames: Array<ThemeName> = ['auto'];
 
@@ -31,8 +40,11 @@ for (const themeName in manifest) {
 Object.freeze(ThemeNames);
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 const Themes = objectAsReadonly(manifest);
 

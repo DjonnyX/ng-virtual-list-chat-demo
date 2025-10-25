@@ -2,15 +2,18 @@ import { Component, effect, ElementRef, inject, input, OnDestroy, output, signal
 import { CommonModule } from '@angular/common';
 import { GradientColor, GradientColorPositions, RoundedCorner } from '@shared/types';
 import { SubstrateComponent, SubstarateMode, SubstarateStyle, SubstarateModes, SubstarateStyles } from '../substrate';
-import { ISize } from '../ng-virtual-list';
+import { ISize } from '../x-virtual-list';
 
 const DEFAULT_ROUND_CORNER: RoundedCorner = [8, 8, 8, 8],
   CLASS_CHECKED = 'checked',
   CLASS_DISABLED = 'disabled';
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 @Component({
   selector: 'x-check-box',

@@ -4,11 +4,11 @@
 
 <div class="wrapper" clickOutside (onClickOutside)="onClickOutside()">
     @if(loading) {
-        <groups-loading-indicator />
+        <x-groups-loading-indicator />
     }
 
-    <ng-virtual-list #list class="list" [items]="items" [itemRenderer]="itemRenderer" [itemSize]="40" methodForSelecting="select"
-    [selectByClick]="false" [dynamicSize]="true" [bufferSize]="2" [maxBufferSize]="10" [selectedIds]="initialSelectedId"></ng-virtual-list>
+    <x-virtual-list #list class="list" [items]="items" [itemRenderer]="itemRenderer" [itemSize]="40" methodForSelecting="select"
+    [selectByClick]="false" [dynamicSize]="true" [bufferSize]="2" [maxBufferSize]="10" [selectedIds]="initialSelectedId"></x-virtual-list>
 
     <ng-template #itemRenderer let-data="data" let-config="config">
         @if (data) {

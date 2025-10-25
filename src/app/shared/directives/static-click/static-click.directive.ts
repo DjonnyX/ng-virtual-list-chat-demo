@@ -4,16 +4,22 @@ import { Subject, timer } from 'rxjs';
 import { delay, filter, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 interface IPosition { x: number; y: number; }
 
 const DEFAULT_MAX_DISTANCE = 40;
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 @Directive({
     selector: '[staticClick]',

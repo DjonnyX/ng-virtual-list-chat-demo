@@ -1,15 +1,18 @@
 import { Injectable } from '@angular/core';
 import { delay, Observable, of, switchMap, throwError } from 'rxjs';
 import { generateMessageCollection } from '@mock/const/collection';
-import { Id, IVirtualListCollection, IVirtualListItem } from '@shared/components/ng-virtual-list';
+import { Id, IVirtualListCollection, IVirtualListItem } from '@shared/components/x-virtual-list';
 import { IMessageItemData } from '@shared/models/message';
 import { IMessagesChunkParams, MessagesService } from './messages.service';
 import { IGetMessagesAnswer, IGetMessagesData } from './model/messages';
 import { IMessage } from './model/message';
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 interface IDB {
     version: number;
@@ -22,7 +25,7 @@ interface IDB {
 }
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
  */
 export const db: IDB = {
@@ -31,7 +34,7 @@ export const db: IDB = {
 };
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
  */
 export const operations: {
@@ -45,7 +48,7 @@ const DEFAULT_CHUNK_NUMBER = 1,
 
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
  */
 const sortByDateTime = (a: IMessage, b: IMessage) => {
@@ -59,7 +62,7 @@ const sortByDateTime = (a: IMessage, b: IMessage) => {
 }
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
  */
 @Injectable({

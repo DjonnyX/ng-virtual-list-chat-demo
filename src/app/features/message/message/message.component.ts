@@ -9,7 +9,7 @@ import {
   MessageSubstrateComponent, MessageSubstarateMode, MessageSubstarateModes, MessageBottomBarComponent, EditableTextComponent,
   MessageSubstarateStyle, MessageSubstarateStyles,
 } from '@entities/message';
-import { IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/ng-virtual-list';
+import { IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/x-virtual-list';
 import { IMessageItemData } from "@shared/models/message";
 import { Color, GradientColor, GradientColorPositions } from '@shared/types';
 import { ThemeService } from '@shared/theming';
@@ -25,11 +25,14 @@ const DEFAULT_STROKE_ANIMATION_DURATION = 1000,
   CLASS_SELECTED = 'selected', CLASS_FOCUSED = 'focused';
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 @Component({
-  selector: 'message',
+  selector: 'x-message',
   imports: [CommonModule, EditableTextComponent, MessageSubstrateComponent, MessageBottomBarComponent],
   templateUrl: './message.component.html',
   styleUrl: './message.component.scss',

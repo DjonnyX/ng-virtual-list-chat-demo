@@ -5,7 +5,7 @@ import {
 } from '@angular/core';
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
  */
 @Directive({

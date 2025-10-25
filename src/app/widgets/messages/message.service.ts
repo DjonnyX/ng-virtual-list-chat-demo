@@ -1,17 +1,20 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, distinctUntilChanged } from 'rxjs';
-import { NgVirtualListComponent } from '@shared/components';
+import { XVirtualListComponent } from '@shared/components';
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 @Injectable({
   providedIn: 'root'
 })
 export class MessageService {
-  private _virtualList: NgVirtualListComponent | undefined;
-  set virtualList(v: NgVirtualListComponent | undefined) {
+  private _virtualList: XVirtualListComponent | undefined;
+  set virtualList(v: XVirtualListComponent | undefined) {
     if (this._virtualList !== v) {
       this._virtualList = v;
     }

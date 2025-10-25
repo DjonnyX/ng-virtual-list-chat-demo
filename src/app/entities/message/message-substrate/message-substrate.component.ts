@@ -22,11 +22,14 @@ const DEFAULT_STROKE_ANIMATION_DURATION = 1000,
   STROKE_GRADIENT_NAME = 'x-message-substrate-stroke-gradient';
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 @Component({
-  selector: 'message-substrate',
+  selector: 'x-message-substrate',
   imports: [CommonModule],
   templateUrl: './message-substrate.component.html',
   styleUrl: './message-substrate.component.scss',

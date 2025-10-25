@@ -12,7 +12,7 @@ import { ButtonGroupComponent } from '../button-group';
 import { IButtonGroupItem } from '../button-group/interfaces';
 import { formatCSSNumber } from '../utils';
 import { SubstarateMode, SubstarateModes, SubstarateStyle, SubstarateStyles, SubstrateComponent } from '../substrate';
-import { ISize } from '../ng-virtual-list';
+import { ISize } from '../x-virtual-list';
 import { LocaleSensitiveDirective } from '@shared/localization';
 
 const DEFAULT_ROUND_CORNER: RoundedCorner = [8, 8, 8, 8],
@@ -22,8 +22,11 @@ const DEFAULT_ROUND_CORNER: RoundedCorner = [8, 8, 8, 8],
   NONE = 'none';
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 @Component({
   selector: 'x-dialog',

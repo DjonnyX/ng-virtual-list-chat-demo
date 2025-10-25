@@ -8,16 +8,16 @@
 
 <div #wrapper class="wrapper">
     @if(loading || !prepared) {
-        <messages-loading-indicator class="loading-indicator" />
+        <x-messages-loading-indicator class="loading-indicator" />
     }
 
-    <ng-virtual-list #list class="list" [ngClass]="listClass" [items]="items" [itemRenderer]="itemRenderer"
+    <x-virtual-list #list class="list" [ngClass]="listClass" [items]="items" [itemRenderer]="itemRenderer"
         [snapScrollToBottom]="true" [itemSize]="40" [bufferSize]="5" [maxBufferSize]="15" collectionMode="lazy"
         [itemConfigMap]="itemsConfigMap" [dynamicSize]="true" [snap]="true" snappingMethod="advanced"
         methodForSelecting="multi-select" [selectedIds]="selectedItemIds" [snapToEndTransitionInstantOffset]="500"
         [selectByClick]="false" (onSelect)="onSelectItemHandler($event)"
         (onScrollReachStart)="onScrollReachStartHandler()">
-    </ng-virtual-list>
+    </x-virtual-list>
 
     <ng-template #itemRenderer let-index="index" let-data="data" let-prevData="prevData" let-nextData="nextData"
         let-measures="measures" let-config="config">
@@ -27,15 +27,15 @@
                 @switch (data.data.type) {
                     @case ("typing-indicator") {
                         @let class = {'animate': data.animate, 'deleted': data.deleted};
-                        <messages-typing-indicator [classes]="class" />
+                        <x-messages-typing-indicator [classes]="class" />
                     }
                     @case ("group") {
                         @let class = {'snapped': config.snapped, 'snapped-out': config.snappedOut, 'focused': config.focused,
                         'collapsed': config.collapsed};
-                        <message-group [classes]="class" [text]="data.data.text" [collapsed]="config.collapsed" />
+                        <x-message-group [classes]="class" [text]="data.data.text" [collapsed]="config.collapsed" />
                     }
                     @default {
-                        <message-box [data]="data" [config]="config" [measures]="measures" [prevData]="prevData"
+                        <x-message-box [data]="data" [config]="config" [measures]="measures" [prevData]="prevData"
                             [nextData]="nextData" [searchPattern]="searchedWords" (edited)="onChangeItemHandler($event)"
                             (editingCancel)="onEditingCancelHandler(data)" (edit)="onEditItemHandler($event)"
                             (delete)="onDeleteItemHandler($event, index)" (changeText)="onChangeMessageHandler($event)" />

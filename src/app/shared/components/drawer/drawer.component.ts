@@ -3,9 +3,14 @@ import { CommonModule } from '@angular/common';
 import { LocaleSensitiveDirective, LocalizationService } from '@shared/localization';
 import { toSignal } from '@angular/core/rxjs-interop';
 
+const DEFAULT_DOCK_SIZE = 140;
+
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 export enum DockMode {
   LEFT = 'left',
@@ -14,17 +19,23 @@ export enum DockMode {
 }
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 export type TDockMode = DockMode.LEFT | DockMode.RIGHT | DockMode.NONE | 'left' | 'right' | 'none';
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 @Component({
-  selector: 'app-drawer',
+  selector: 'x-drawer',
   imports: [CommonModule, LocaleSensitiveDirective],
   templateUrl: './drawer.component.html',
   styleUrl: './drawer.component.scss',
@@ -39,9 +50,9 @@ export class DrawerComponent {
 
   close = output<void>();
 
-  dockLeftSize = input<number>(140);
+  dockLeftSize = input<number>(DEFAULT_DOCK_SIZE);
 
-  dockRightSize = input<number>(140);
+  dockRightSize = input<number>(DEFAULT_DOCK_SIZE);
 
   styles: Signal<any>;
 

@@ -7,7 +7,7 @@ import { ButtonPresets, ThemeService } from '@shared/theming';
 import { ITheme } from '@shared/theming';
 import { PressDirective } from '@shared/directives';
 import { SubstrateComponent, SubstarateMode, SubstarateStyle, SubstarateModes, SubstarateStyles } from '../substrate';
-import { ISize } from '../ng-virtual-list';
+import { ISize } from '../x-virtual-list';
 import { formatCSSNumber } from '../utils';
 import { LocaleSensitiveDirective } from '@shared/localization';
 
@@ -20,8 +20,11 @@ const DEFAULT_ROUND_CORNER: RoundedCorner = [8, 8, 8, 8],
   UNSET = 'unset';
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 @Component({
   selector: 'x-button',

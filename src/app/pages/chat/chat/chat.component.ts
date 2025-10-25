@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { BehaviorSubject, } from 'rxjs';
 import { MenuButtonComponent, MessageSearchComponent } from '@entities/header';
-import { IRenderVirtualListItem, IVirtualListItem } from '@shared/components/ng-virtual-list';
+import { IRenderVirtualListItem, IVirtualListItem } from '@shared/components/x-virtual-list';
 import { DrawerComponent, DockMode } from "@shared/components";
 import { ClickOutsideService } from '@shared/directives';
 import { MessagesComponent } from "@widgets/messages/messages/messages.component";
@@ -17,11 +17,14 @@ import { IMessageItemData } from '@shared/models/message';
 import { LocaleSensitiveDirective } from '@shared/localization';
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 @Component({
-  selector: 'chat',
+  selector: 'x-chat',
   standalone: true,
   imports: [CommonModule, FormsModule, LocaleSensitiveDirective, MenuButtonComponent, MessageSearchComponent, DrawerComponent,
     MessagesComponent, GroupsComponent],

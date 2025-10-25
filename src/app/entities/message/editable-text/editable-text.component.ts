@@ -16,11 +16,14 @@ const DEFAULT_SEARCH_SUBSTRING_CLASS = 'search-substring',
   NONE = 'none';
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 @Component({
-  selector: 'editable-text',
+  selector: 'x-editable-text',
   imports: [CommonModule, SearchHighlightDirective, LocaleSensitiveDirective, CdkTextareaAutosize],
   templateUrl: './editable-text.component.html',
   styleUrl: './editable-text.component.scss',

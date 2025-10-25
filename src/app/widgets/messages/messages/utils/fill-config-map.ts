@@ -1,10 +1,13 @@
 import { IMessageItemData } from "@shared/models/message";
-import { IVirtualListItemConfigMap } from "@shared/components/ng-virtual-list";
+import { IVirtualListItemConfigMap } from "@shared/components/x-virtual-list";
 import { IProxyCollectionItem } from "./proxy-collection";
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 export const fillConfigMap = (config: IVirtualListItemConfigMap, collection: Array<IProxyCollectionItem<IMessageItemData>>): IVirtualListItemConfigMap => {
     if (!Array.isArray(collection)) {

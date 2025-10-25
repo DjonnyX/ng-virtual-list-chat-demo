@@ -15,19 +15,19 @@
         <div localeSensitive class="content">
             <div #container longPress class="message-container" [ngClass]="class" [longPress]="longPressDuration" [longPressDisabled]="messageConfig.selected"
                 (onLongPressActive)="onLongPressActive($event)" (onLongPress)="messageConfig.select(true); openMenu()">
-                <message #message class="message" [ngClass]="class" [data]="messageData" [config]="messageConfig"
+                <x-message #message class="message" [ngClass]="class" [data]="messageData" [config]="messageConfig"
                     [fillPositions]="gradientFillPositions" [measures]="messageMeasures" [classes]="class"
                     [longPressActive]="longPress" [params]="params()" [searchPattern]="searchPattern()"
                     (changeValue)="onMessageChangeValueHandler($event)" />
             </div>
             @if (messageConfig.selected) {
                 <div class="message-controls" [ngStyle]="{height: message.bounds().height}">
-                    <message-menu-button #menuButton [cdkMenuTriggerFor]="menuDisabled ? undefined : menu"
+                    <x-message-menu-button #menuButton [cdkMenuTriggerFor]="menuDisabled ? undefined : menu"
                         [fillPositions]="menuButtonFillPositions()" [disabled]="menuDisabled" calcFillPositions [measures]="messageMeasures"
                         (onFillPositions)="onMenuButtonFillPositionsHandler($event)" />
                     <div></div>
                     @if (edited) {
-                        <message-save-button [state]="sendButtonState" [valid]="isValid" [loading]="saving"
+                        <x-message-save-button [state]="sendButtonState" [valid]="isValid" [loading]="saving"
                             [fillPositions]="sendButtonFillPositions()" (onClick)="onSaveHandler($event, messageConfig, sendButtonState)"
                              calcFillPositions [measures]="messageMeasures" (onFillPositions)="onSendButtonFillPositionsHandler($event)" />
                     }

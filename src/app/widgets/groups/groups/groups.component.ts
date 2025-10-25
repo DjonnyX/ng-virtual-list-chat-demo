@@ -3,8 +3,8 @@ import { Component, effect, inject, input, output, signal, viewChild } from '@an
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { catchError, combineLatest, filter, of, switchMap, tap, throwError } from 'rxjs';
 import { GroupsLoadingIndicatorComponent } from '@entities/groups';
-import { Id, IVirtualListCollection, IVirtualListItem } from '@shared/components/ng-virtual-list';
-import { NgVirtualListComponent } from '@shared/components';
+import { Id, IVirtualListCollection, IVirtualListItem } from '@shared/components/x-virtual-list';
+import { XVirtualListComponent } from '@shared/components';
 import { environment } from '@environments/environment';
 import { GroupsService } from '../groups.service';
 import { GroupsMockService } from '../groups-mock.service';
@@ -14,12 +14,15 @@ import { ClickOutsideDirective } from '@shared/directives';
 import { LocaleSensitiveDirective } from '@shared/localization';
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 @Component({
   selector: 'groups',
-  imports: [CommonModule, NgVirtualListComponent, GroupsLoadingIndicatorComponent, ClickOutsideDirective, LocaleSensitiveDirective],
+  imports: [CommonModule, XVirtualListComponent, GroupsLoadingIndicatorComponent, ClickOutsideDirective, LocaleSensitiveDirective],
   providers: [
     { provide: GroupsService, useClass: environment.useMock ? GroupsMockService : GroupsWebsocketService },
   ],
@@ -27,7 +30,7 @@ import { LocaleSensitiveDirective } from '@shared/localization';
   styleUrl: './groups.component.scss'
 })
 export class GroupsComponent {
-  protected _list = viewChild('list', { read: NgVirtualListComponent });
+  protected _list = viewChild('list', { read: XVirtualListComponent });
 
   projectId = input<string>('');
 

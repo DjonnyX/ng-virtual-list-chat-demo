@@ -8,11 +8,11 @@ import { environment } from '@environments/environment';
 import { MessagesLoadingIndicatorComponent } from '@entities/messages';
 import { MessageGroupComponent, MessagesTypingIndicatorComponent } from '@entities/message';
 import { MessageBoxComponent } from '@features/message';
-import { NgVirtualListComponent } from '@shared/components';
+import { XVirtualListComponent } from '@shared/components';
 import {
   FocusAlignments, Id, IDisplayObjectConfig, ISize, IVirtualListItem, IVirtualListItemConfigMap,
-} from '@shared/components/ng-virtual-list';
-import { IRenderVirtualListItemConfig } from '@shared/components/ng-virtual-list/lib/models/render-item-config.model';
+} from '@shared/components/x-virtual-list';
+import { IRenderVirtualListItemConfig } from '@shared/components/x-virtual-list/lib/models/render-item-config.model';
 import { IMessageItemData } from "@shared/models/message";
 import { MessageTypes } from '@shared/enums';
 import { ThemeService } from '@shared/theming';
@@ -34,13 +34,16 @@ const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
   OPACITY_0 = '0', OPACITY_1 = '1', FADE_IN = `opacity 100ms ease-in`, MIN_ITEM_HEIGHT = 28;
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 @Component({
-  selector: 'messages',
+  selector: 'x-messages',
   imports: [
-    CommonModule, MessageBoxComponent, MessageGroupComponent, NgVirtualListComponent, MessagesTypingIndicatorComponent,
+    CommonModule, MessageBoxComponent, MessageGroupComponent, XVirtualListComponent, MessagesTypingIndicatorComponent,
     MessagesLoadingIndicatorComponent, StaticClickDirective,
   ],
   providers: [
@@ -53,7 +56,7 @@ const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
 export class MessagesComponent implements OnDestroy {
   protected _wrapper = viewChild<ElementRef<HTMLDivElement>>('wrapper');
 
-  protected _list = viewChild('list', { read: NgVirtualListComponent });
+  protected _list = viewChild('list', { read: XVirtualListComponent });
 
   search = input<string>();
 

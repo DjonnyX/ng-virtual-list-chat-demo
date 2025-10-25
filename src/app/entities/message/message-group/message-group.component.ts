@@ -6,11 +6,14 @@ import { ThemeService } from '@shared/theming';
 import { ITheme } from '@shared/theming';
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 @Component({
-  selector: 'message-group',
+  selector: 'x-message-group',
   imports: [CommonModule, LocaleSensitiveDirective],
   templateUrl: './message-group.component.html',
   styleUrl: './message-group.component.scss'

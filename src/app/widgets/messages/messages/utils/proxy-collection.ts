@@ -1,15 +1,21 @@
-import { Id } from "@shared/components/ng-virtual-list";
-import { EventEmitter } from "@shared/components/ng-virtual-list/lib/utils/event-emitter";
+import { Id } from "@shared/components/x-virtual-list";
+import { EventEmitter } from "@shared/components/x-virtual-list/lib/utils/event-emitter";
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 export type CollectionItem<D = any> = { id: Id, dateTime: number, version: number, __deleted__?: boolean } & D;
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 export interface IProxyCollectionItem<D = any> {
     id: Id;
@@ -26,7 +32,7 @@ export interface IProxyCollectionItem<D = any> {
 }
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
  */
 const createProxyItem = <D = any>(data: CollectionItem<D>
@@ -48,7 +54,7 @@ const createProxyItem = <D = any>(data: CollectionItem<D>
     });
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
  */
 const sortByDateTime = (a: IProxyCollectionItem<any>, b: IProxyCollectionItem<any>) => {
@@ -62,7 +68,7 @@ const sortByDateTime = (a: IProxyCollectionItem<any>, b: IProxyCollectionItem<an
 }
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
  */
 export enum ProxyCollectionEvents {
@@ -76,7 +82,7 @@ type TProxyCollectionChangeHandler = () => void;
 type TProxyCollectionEventHandlers = TProxyCollectionChangeHandler;
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
  */
 export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvents, TProxyCollectionEventHandlers> {

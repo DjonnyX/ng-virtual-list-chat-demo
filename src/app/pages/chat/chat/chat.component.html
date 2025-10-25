@@ -5,20 +5,20 @@
     <div class="container">
         <div #toolbar localeSensitive class="toolbar">
             <div>
-                <menu-button (onClick)="onOpenMenuHandler($event)" [opened]="menuOpened()" />
+                <x-menu-button (onClick)="onOpenMenuHandler($event)" [opened]="menuOpened()" />
             </div>
             <div #header class="title">{{groupTitle}}</div>
-            <message-search (search)="onSearchHandler($event)" />
+            <x-message-search (search)="onSearchHandler($event)" />
         </div>
 
         <div class="list-container">
             @let doc = dockMode();
-            <app-drawer [dock]="doc" [dockLeftSize]="240">
+            <x-drawer [dock]="doc" [dockLeftSize]="240">
                 <dock-left>
                     <groups (select)="onGroupSelectHandler($event)" (close)="onGroupsCloseHandler()" />
                 </dock-left>
-                <messages [search]="searchText" />
-            </app-drawer>
+                <x-messages [search]="searchText" />
+            </x-drawer>
         </div>
     </div>
 </div>

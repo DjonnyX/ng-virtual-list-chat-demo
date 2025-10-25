@@ -1,11 +1,11 @@
 {
-  "name": "chat-proto",
+  "name": "x-infinity-chat",
   "version": "0.0.1",
   "author": {
-    "name": "Evgenii Grebennikov",
+    "name": "Evgenii Alexandrovich Grebennikov",
     "email": "djonnyx@gmail.com"
   },
-  "license": "Copyright (c) 2025 Evgenii Grebennikov (djonnyx@gmail.com). Only for personal (Evgenii Grebennikov djonnyx@gmail.com) use. All rights reserved.",
+  "license": "Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx). Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use. All rights reserved.",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",

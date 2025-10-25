@@ -2,7 +2,7 @@ import { GradientColor, GradientColorPositions, RoundedCorner } from "@shared/ty
 import { SubstarateMode, SubstarateStyle } from "../../substrate/types";
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
  */
 export interface IButton {

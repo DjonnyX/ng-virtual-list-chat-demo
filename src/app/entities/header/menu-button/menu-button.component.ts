@@ -9,11 +9,14 @@ import { GradientColor, GradientColorPositions } from '@shared/types';
 const CLASS_ACTIVE = 'active';
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 @Component({
-  selector: 'menu-button',
+  selector: 'x-menu-button',
   imports: [CommonModule, ButtonComponent],
   templateUrl: './menu-button.component.html',
   styleUrl: './menu-button.component.scss'

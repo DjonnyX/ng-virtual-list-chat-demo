@@ -5,7 +5,7 @@ const SERVICE_WHITESPACE = '&__whitespace__;',
     LINEBREAK_PATTERN = /\r\n|\n|\r/gm;
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
  */
 export const formatText = async (str: string | undefined, loading: boolean) => {
@@ -26,8 +26,11 @@ export const formatText = async (str: string | undefined, loading: boolean) => {
 };
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 const checkImage = (url: string): Promise<boolean> => {
     return new Promise((resolve) => {
@@ -45,8 +48,11 @@ const checkImage = (url: string): Promise<boolean> => {
 };
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 const replaceURLs = async (src: string, loading: boolean) => {
     let result = src;

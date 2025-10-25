@@ -1,8 +1,8 @@
-import { Id } from "@shared/components/ng-virtual-list";
+import { Id } from "@shared/components/x-virtual-list";
 import { MessageTypes } from "@shared/enums";
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
  */
 export interface IMessageItemData {

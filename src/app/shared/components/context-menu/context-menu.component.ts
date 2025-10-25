@@ -7,7 +7,7 @@ import { ITheme } from '@shared/theming';
 import { ButtonPresets, ContextMenuPresets } from '@shared/theming/themes/presets';
 import { GradientColor, GradientColorPositions, RoundedCorner } from '@shared/types';
 import { IContextMenuCollection } from './interfaces/context-menu-collection.interface';
-import { Id, ISize } from '../ng-virtual-list';
+import { Id, ISize } from '../x-virtual-list';
 import { ButtonComponent } from '../button';
 import { SubstarateMode, SubstarateModes, SubstarateStyle, SubstarateStyles, SubstrateComponent } from '../substrate';
 import { formatCSSNumber } from '../utils';
@@ -20,8 +20,11 @@ const DEFAULT_CONTEXT_MENU_WIDTH = 20,
   UNSET = 'unset';
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 @Component({
   selector: 'x-context-menu',

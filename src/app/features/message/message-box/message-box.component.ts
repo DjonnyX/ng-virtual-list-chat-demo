@@ -5,9 +5,9 @@ import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-i
 import { filter, Subject, switchMap, take, tap } from 'rxjs';
 import { MessageButtonSaveState, MessageButtonSaveStates, MessageMenuButtonComponent, MessageSaveButtonComponent } from '@entities/message';
 import { CalcFillPositionsDirective, LongPressDirective } from '@shared/directives';
-import { Id, IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/ng-virtual-list';
+import { Id, IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/x-virtual-list';
 import { IMessageItemData } from "@shared/models/message";
-import { IS_FIREFOX } from '@shared/components/ng-virtual-list/lib/utils/browser';
+import { IS_FIREFOX } from '@shared/components/x-virtual-list/lib/utils/browser';
 import { ContextMenuComponent, IContextMenuCollection } from '@shared/components/context-menu';
 import { GradientColorPositions } from '@shared/types';
 import { DialogService } from '@shared/components/dialog/dialog.service';
@@ -70,11 +70,14 @@ interface IDeleteEventData {
 }
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 @Component({
-  selector: 'message-box',
+  selector: 'x-message-box',
   imports: [CommonModule, MessageComponent, LongPressDirective, CalcFillPositionsDirective, MessageMenuButtonComponent, MessageSaveButtonComponent,
     CdkMenuTrigger, ContextMenuComponent, LocaleSensitiveDirective],
   providers: [DialogService],

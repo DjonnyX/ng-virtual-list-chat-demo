@@ -1,11 +1,14 @@
-import { IVirtualListCollection } from "@shared/components/ng-virtual-list";
+import { IVirtualListCollection } from "@shared/components/x-virtual-list";
 import { MessageTypes } from "@shared/enums";
 import { IMessage } from "@widgets/messages";
 import { generateText, generateWord } from "../utils";
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 const generateChatCollection = () => {
   const items: IVirtualListCollection = [];
@@ -18,8 +21,11 @@ const generateChatCollection = () => {
 }
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 export const COLLECTION_PARAMS = {
   maxDate: Date.now(),
@@ -28,8 +34,11 @@ export const COLLECTION_PARAMS = {
 };
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 const testLinksText = () => {
   return `Test links:
@@ -40,8 +49,11 @@ http://eugene-grebennikov.pro/`;
 };
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 const generateMessageCollection = (number: number, size: number) => {
   const items: IVirtualListCollection<IMessage> = [];

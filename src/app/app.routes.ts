@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
  */
 export const routes: Routes = [

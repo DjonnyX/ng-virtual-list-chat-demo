@@ -9,11 +9,14 @@ import { combineLatest, filter, fromEvent, interval, map, Subject, switchMap, ta
 const INTERVAL_COUNT = 89, INTERVAL_TIMEOUT = 100, PERCENT = '%', ZERO_PERCENT = `0${PERCENT}`;
 
 /**
- * @author Evgenii Grebennikov
+ * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
+ * All rights reserved.
  */
 @Component({
-  selector: 'message-search',
+  selector: 'x-message-search',
   imports: [FormsModule, LocaleSensitiveDirective],
   templateUrl: './message-search.component.html',
   styleUrl: './message-search.component.scss'

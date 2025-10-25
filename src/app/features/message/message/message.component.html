@@ -10,22 +10,22 @@
 @let stroke = strokeColor();
 @let gradientFillPositions = fillPositions();
 @if (d && c && m) {
-    <message-substrate #substrate class="message-substrate" [type]="type" [width]="b.width" [height]="b.height" [mode]="substrMode"
-        [strokeColors]="stroke" [fillColors]="fillColors()" [fillPositions]="gradientFillPositions" [rippleColor]="rippleColor()"></message-substrate>
+    <x-message-substrate #substrate class="message-substrate" [type]="type" [width]="b.width" [height]="b.height" [mode]="substrMode"
+        [strokeColors]="stroke" [fillColors]="fillColors()" [fillPositions]="gradientFillPositions" [rippleColor]="rippleColor()"></x-message-substrate>
     <div #container class="message-container" [ngClass]="class" (pointerdown)="substrate.ripple($event)">
     @if (d?.['image']) {
         <div class="complex-message">
             <img [src]="d?.['image']" />
-            <editable-text class="text" [text]="d.data.text" [searchPattern]="searchedWords" [editing]="isEditing" [selectable]="c.selected"
+            <x-editable-text class="text" [text]="d.data.text" [searchPattern]="searchedWords" [editing]="isEditing" [selectable]="c.selected"
                 substringClass="search-substring" (textAreaClick)="onTextAreaClickHandler($event)"
                 (changeText)="onEditedTextHandler($event, d)" />
         </div>
-        <message-bottom-bar />
+        <x-message-bottom-bar />
     } @else {
-        <editable-text class="text" [text]="d.data.text" [searchPattern]="searchedWords" [editing]="isEditing" [selectable]="c.selected"
+        <x-editable-text class="text" [text]="d.data.text" [searchPattern]="searchedWords" [editing]="isEditing" [selectable]="c.selected"
             substringClass="search-substring" (textAreaClick)="onTextAreaClickHandler($event)"
             (changeText)="onEditedTextHandler($event, d)" />
-        <message-bottom-bar />
+        <x-message-bottom-bar />
     }
     </div>
 }
