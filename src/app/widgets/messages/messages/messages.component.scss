@@ -24,7 +24,7 @@
     overflow: hidden;
 
     &::part(scroller) {
-        scroll-behavior: auto;
+        scroll-behavior: unset;
 
         &::-webkit-scrollbar {
             width: 16px;

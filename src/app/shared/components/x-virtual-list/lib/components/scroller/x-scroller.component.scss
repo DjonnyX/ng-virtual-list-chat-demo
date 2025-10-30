@@ -1,0 +1,34 @@
+:host {
+    position: relative;
+    overflow: hidden;
+}
+
+:host(.horizontal) .xvl__list {
+    display: inline-flex;
+}
+
+:host(.horizontal) .xvl__scroller {
+    overflow: auto hidden;
+}
+
+:host(.vertical) .xvl__scroller {
+    overflow: hidden auto;
+}
+
+.xvl__scroller {
+    display: block;
+    position: relative;
+    overflow: auto;
+    width: 100%;
+    height: 100%;
+    scroll-behavior: unset;
+}
+
+.xvl__list {
+    position: absolute;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}

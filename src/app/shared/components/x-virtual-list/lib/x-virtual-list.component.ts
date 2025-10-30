@@ -1,10 +1,9 @@
 import {
-  ChangeDetectionStrategy, Component, ComponentRef, DestroyRef, ElementRef, inject, input,
-  OnDestroy, OnInit, output, signal, TemplateRef, ViewChild, viewChild, ViewContainerRef, ViewEncapsulation,
+  ChangeDetectionStrategy, Component, ComponentRef, computed, DestroyRef, ElementRef, inject, input,
+  OnDestroy, OnInit, output, Signal, signal, TemplateRef, ViewChild, viewChild, ViewContainerRef, ViewEncapsulation,
   WritableSignal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CdkScrollable } from '@angular/cdk/scrolling';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import {
   BehaviorSubject, combineLatest, debounceTime, delay, distinctUntilChanged, filter, fromEvent, map, Observable,
@@ -27,7 +26,6 @@ import { FocusAlignment, Id, IRect, ISize } from './types';
 import { IRenderVirtualListCollection } from './models/render-collection.model';
 import {
   CollectionMode, CollectionModes, Direction, Directions, FocusAlignments, MethodForSelecting, MethodsForSelecting, SnappingMethod,
-
 } from './enums';
 import { ScrollEvent, toggleClassName } from './utils';
 import { IGetItemPositionOptions, IUpdateCollectionOptions, TrackBoxEvents, TrackBox } from './utils/track-box';
@@ -46,6 +44,7 @@ import { validateArray, validateBoolean, validateFloat, validateInt, validateObj
 import { copyValueAsReadonly, objectAsReadonly } from './utils/object';
 import { isCollectionMode } from './utils/is-collection-mode';
 import { LocalizationService } from '@shared/localization';
+import { XScrollerComponent } from './components/scroller/x-scroller.component';
 
 interface IScrollParams {
   id: Id;
@@ -53,7 +52,7 @@ interface IScrollParams {
   iteration?: number;
   isLastIteration?: boolean;
   scrollCalled?: boolean;
-  container?: HTMLElement;
+  scroller?: HTMLElement;
   cb?: () => void;
 }
 
@@ -131,7 +130,7 @@ const formatScreenReaderMessage = (items: IRenderVirtualListCollection, messageP
  */
 @Component({
   selector: 'x-virtual-list',
-  imports: [CommonModule, CdkScrollable],
+  imports: [CommonModule, XScrollerComponent],
   templateUrl: './x-virtual-list.component.html',
   styleUrl: './x-virtual-list.component.scss',
   host: {
@@ -158,9 +157,11 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
   @ViewChild('snapRendererContainer', { read: ViewContainerRef })
   private _snapContainerRef: ViewContainerRef | undefined;
 
-  private _container = viewChild<ElementRef<HTMLDivElement>>('container');
+  private _scrollerComponent = viewChild<XScrollerComponent>('scroller');
 
-  private _list = viewChild<ElementRef<HTMLDivElement>>('list');
+  private _scroller: Signal<ElementRef<HTMLDivElement> | undefined>;
+
+  private _list: Signal<ElementRef<HTMLDivElement> | undefined>;
 
   /**
    * Fires when the list has been scrolled.
@@ -678,12 +679,12 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
   private _localizationService = inject(LocalizationService);
 
   private _resizeSnappedComponentHandler = () => {
-    const list = this._list(), container = this._container(), bounds = this._bounds(), snappedComponent = this._snapedDisplayComponent?.instance;
-    if (list && container && snappedComponent) {
+    const list = this._list(), scroller = this._scroller(), bounds = this._bounds(), snappedComponent = this._snapedDisplayComponent?.instance;
+    if (list && scroller && snappedComponent) {
       const isVertical = this._isVertical, listBounds = list.nativeElement.getBoundingClientRect(), listElement = list?.nativeElement,
         { width: lWidth, height: lHeight } = listElement?.getBoundingClientRect() ?? { width: 0, height: 0 },
         { width, height } = bounds ?? { width: 0, height: 0 },
-        isScrollable = isVertical ? container.nativeElement.scrollHeight > 0 : container.nativeElement.scrollWidth > 0;
+        isScrollable = isVertical ? scroller.nativeElement.scrollHeight > 0 : scroller.nativeElement.scrollWidth > 0;
 
       let scrollBarSize = isVertical ? width - lWidth : height - lHeight, isScrollBarOverlap = true, overlapScrollBarSize = 0;
       if (scrollBarSize === 0 && isScrollable) {
@@ -707,7 +708,7 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
 
       snappedComponent.regularLength = `${isVertical ? listBounds.width : listBounds.height}${PX}`;
       const { width: sWidth, height: sHeight } = snappedComponent.getBounds() ?? { width: 0, height: 0 },
-        containerElement = container.nativeElement, delta = snappedComponent.item?.measures.delta ?? 0;
+        scrollerElement = scroller.nativeElement, delta = snappedComponent.item?.measures.delta ?? 0;
 
       let left: number, right: number, top: number, bottom: number;
       if (isVertical) {
@@ -716,16 +717,16 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
         top = sHeight;
         bottom = height;
         if (langTextDir === 'rtl') {
-          containerElement.style.clipPath = `path("M 0 0 L 0 ${height} L ${width} ${height} L ${width} ${top + delta} L ${scrollBarSize} ${top + delta} L ${scrollBarSize} 0 Z")`;
+          scrollerElement.style.clipPath = `path("M 0 0 L 0 ${height} L ${width} ${height} L ${width} ${top + delta} L ${scrollBarSize} ${top + delta} L ${scrollBarSize} 0 Z")`;
         } else {
-          containerElement.style.clipPath = `path("M 0 ${top + delta} L 0 ${height} L ${width} ${height} L ${width} 0 L ${right} 0 L ${right} ${top + delta} Z")`;
+          scrollerElement.style.clipPath = `path("M 0 ${top + delta} L 0 ${height} L ${width} ${height} L ${width} 0 L ${right} 0 L ${right} ${top + delta} Z")`;
         }
       } else {
         left = sWidth;
         right = width;
         top = 0;
         bottom = height - scrollBarSize;
-        containerElement.style.clipPath = `path("M ${left + delta} 0 L ${left + delta} ${bottom} L 0 ${bottom} L 0 ${height} L ${width} ${height} L ${width} 0 Z")`;
+        scrollerElement.style.clipPath = `path("M ${left + delta} 0 L ${left + delta} ${bottom} L 0 ${bottom} L 0 ${height} L ${width} ${height} L ${width} 0 Z")`;
       }
     }
   };
@@ -737,7 +738,7 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
   });
 
   private _onResizeHandler = () => {
-    const bounds = this._container()?.nativeElement?.getBoundingClientRect();
+    const bounds = this._scroller()?.nativeElement?.getBoundingClientRect();
     if (bounds) {
       this._bounds.set({ x: bounds.x, y: bounds.y, width: bounds.width, height: bounds.height });
     } else {
@@ -750,8 +751,8 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
   }
 
   private itemToFocus = (element: HTMLElement, position: number, align: FocusAlignment = FocusAlignments.CENTER) => {
-    const container = this._container()?.nativeElement;
-    if (container) {
+    const scroller = this._scroller()?.nativeElement;
+    if (scroller) {
       const { width, height } = this._bounds()!, { width: elementWidth, height: elementHeight } = element.getBoundingClientRect(),
         isVertical = this._isVertical;
       let pos: number = Number.NaN;
@@ -776,7 +777,7 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
       if (!Number.isNaN(pos)) {
         this._trackBox.cancelScrollSnappingToEnd(true);
         const params: ScrollToOptions = { [this._isVertical ? TOP_PROP_NAME : LEFT_PROP_NAME]: pos, behavior: 'instant' };
-        container.scrollTo(params);
+        scroller.scrollTo(params);
       }
     }
   }
@@ -823,14 +824,14 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
     if (v) {
       this._isResetedReachStart = true;
 
-      const container = this._container()?.nativeElement;
-      if (container) {
+      const scroller = this._scroller()?.nativeElement;
+      if (scroller) {
         const params: ScrollToOptions = {
           [this._isVertical ? TOP_PROP_NAME : LEFT_PROP_NAME]: 0,
           behavior: BEHAVIOR_INSTANT,
         };
 
-        container.scrollTo(params);
+        scroller.scrollTo(params);
       }
     }
   };
@@ -851,6 +852,14 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
     this.$initialized = toObservable(this._initialized);
 
     this._trackBox.displayComponents = this._displayComponents;
+
+    this._scroller = computed(() => {
+      return this._scrollerComponent()?.scrollViewport();
+    });
+
+    this._list = computed(() => {
+      return this._scrollerComponent()?.scrollContent();
+    });
 
     this._service.$focusedId.pipe(
       takeUntilDestroyed(),
@@ -1092,11 +1101,11 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
       }),
       filter(v => v > 0),
       tap((v) => {
-        const container = this._container()?.nativeElement as HTMLElement;
-        if (container) {
+        const scroller = this._scrollerComponent();
+        if (scroller) {
           this._trackBox.cancelScrollSnappingToEnd(true);
-          const isVertical = this._isVertical, scrollSize = isVertical ? container.scrollTop : container.scrollLeft;
-          container.scrollTo({
+          const isVertical = this._isVertical, scrollSize = isVertical ? scroller.scrollTop : scroller.scrollLeft;
+          scroller.scrollTo({
             [isVertical ? TOP_PROP_NAME : LEFT_PROP_NAME]: scrollSize,
             behavior: BEHAVIOR_INSTANT as ScrollBehavior,
           });
@@ -1119,12 +1128,12 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
       ]) => {
         this._$update.next();
 
-        const container = this._container()?.nativeElement;
-        if (container) {
-          let actualScrollSize = (isVertical ? container.scrollTop ?? 0 : container.scrollLeft) ?? 0;
+        const scroller = this._scrollerComponent();
+        if (scroller) {
+          let actualScrollSize = (isVertical ? scroller.scrollTop ?? 0 : scroller.scrollLeft) ?? 0;
 
           const { width, height, x, y } = bounds, snapScrollToBottom = this.snapScrollToBottom(),
-            scrollLength = Math.round(isVertical ? container.scrollHeight ?? 0 : container.scrollWidth) ?? 0,
+            scrollLength = Math.round(isVertical ? scroller.scrollHeight ?? 0 : scroller.scrollWidth) ?? 0,
             actualScrollLength = Math.round(scrollLength === 0 ? 0 : scrollLength - (isVertical ? height : width)),
             roundedMaxPosition = Math.round(actualScrollLength),
             scrollPosition = Math.round(actualScrollSize);
@@ -1150,7 +1159,7 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
             }
           }
 
-          actualScrollSize = (this._isVertical ? container.scrollTop ?? 0 : container.scrollLeft) ?? 0;
+          actualScrollSize = (this._isVertical ? scroller.scrollTop ?? 0 : scroller.scrollLeft) ?? 0;
           const roundedActualScrollSize = Math.round(actualScrollSize),
             scrollPositionAfterUpdate = actualScrollSize + this._trackBox.delta,
             roundedScrollPositionAfterUpdate = Math.round(scrollPositionAfterUpdate),
@@ -1175,41 +1184,41 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
               snapToEndTransitionInstantOffset = this.snapToEndTransitionInstantOffset(),
               params: ScrollToOptions = {
                 [isVertical ? TOP_PROP_NAME : LEFT_PROP_NAME]: roundedMaxPositionAfterUpdate,
-                behavior: (IS_SCROLL_TO_END_ANIMATIONS_OVERLAY_ALLOW && diff <= snapToEndTransitionInstantOffset ?
+                behavior: (diff <= snapToEndTransitionInstantOffset ?
                   BEHAVIOR_SMOOTH : BEHAVIOR_INSTANT) as ScrollBehavior,
               };
             _$scrollToExecutor.next(() => {
-              container?.scrollTo?.(params);
+              scroller?.scrollTo?.(params);
             });
           } else if (roundedActualScrollSize !== roundedScrollPositionAfterUpdate) {
             const params: ScrollToOptions = {
               [isVertical ? TOP_PROP_NAME : LEFT_PROP_NAME]: scrollPositionAfterUpdate,
               behavior: BEHAVIOR_INSTANT as ScrollBehavior,
             };
-            container.scrollTo(params);
+            scroller.scrollTo(params);
           }
         }
       }),
     ).subscribe();
 
-    const $container = toObservable(this._container).pipe(
+    const $scroller = toObservable(this._scroller).pipe(
       filter(v => !!v),
       map(v => v.nativeElement),
       take(1),
     );
 
-    $container.pipe(
+    $scroller.pipe(
       distinctUntilChanged(),
-      switchMap(container => {
-        return fromEvent(container, WHEEL, { passive: true }).pipe(
+      switchMap(scroller => {
+        return fromEvent(scroller, WHEEL, { passive: true }).pipe(
           takeUntilDestroyed(this._destroyRef),
           filter(() => {
             return !!this._trackBox.isSnappedToEnd;
           }),
           map(e => {
-            const container = this._container()?.nativeElement as HTMLElement;
-            if (container) {
-              const isVertical = this._isVertical, scrollSize = isVertical ? container.scrollTop : container.scrollLeft;
+            const scroller = this._scrollerComponent();
+            if (scroller) {
+              const isVertical = this._isVertical, scrollSize = isVertical ? scroller.scrollTop : scroller.scrollLeft;
               return scrollSize;
             }
             return 0;
@@ -1221,38 +1230,38 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
       }),
     ).subscribe();
 
-    const $docMouseUp = fromEvent(document, POINTER_UP).pipe(
+    const $docPointerUp = fromEvent(document, POINTER_UP).pipe(
       take(1),
     ),
-      $docMouseLeave = fromEvent(document, POINTER_LEAVE).pipe(
+      $docPointerLeave = fromEvent(document, POINTER_LEAVE).pipe(
         take(1),
       ),
-      $docMouseOut = fromEvent(document, POINTER_OUT).pipe(
+      $docpointerOut = fromEvent(document, POINTER_OUT).pipe(
         take(1),
       ),
-      $mouseMoveTakeUntil = race([$docMouseUp, $docMouseLeave, $docMouseOut]).pipe(
+      $pointerMoveTakeUntil = race([$docPointerUp, $docPointerLeave, $docpointerOut]).pipe(
         takeUntilDestroyed(),
         take(1),
       );
 
-    $container.pipe(
+    $scroller.pipe(
       distinctUntilChanged(),
-      switchMap(container => {
-        return fromEvent(container, POINTER_DOWN).pipe(
+      switchMap(scroller => {
+        return fromEvent(scroller, POINTER_DOWN).pipe(
           takeUntilDestroyed(this._destroyRef),
           switchMap(e => {
-            return fromEvent(container, SCROLL).pipe(
+            return fromEvent(scroller, SCROLL).pipe(
               takeUntilDestroyed(this._destroyRef),
-              takeUntil($mouseMoveTakeUntil),
+              takeUntil($pointerMoveTakeUntil),
               filter(() => {
                 return !!this._trackBox.isSnappedToEnd;
               }),
             );
           }),
           map(e => {
-            const container = this._container()?.nativeElement as HTMLElement;
-            if (container) {
-              const isVertical = this._isVertical, scrollSize = isVertical ? container.scrollTop : container.scrollLeft;
+            const scroller = this._scrollerComponent();
+            if (scroller) {
+              const isVertical = this._isVertical, scrollSize = isVertical ? scroller.scrollTop : scroller.scrollLeft;
               return scrollSize;
             }
             return 0;
@@ -1264,10 +1273,10 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
       }),
     ).subscribe();
 
-    $container.pipe(
+    $scroller.pipe(
       distinctUntilChanged(),
-      switchMap(container => {
-        return fromEvent(container, TOUCH_MOVE).pipe(
+      switchMap(scroller => {
+        return fromEvent(scroller, TOUCH_MOVE).pipe(
           takeUntilDestroyed(this._destroyRef),
           tap(e => {
             _$scrollToEndDuringUpdateCanceller.next(1);
@@ -1276,22 +1285,22 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
       }),
     ).subscribe();
 
-    $container.pipe(
+    $scroller.pipe(
       distinctUntilChanged(),
-      switchMap(container => {
-        return fromEvent(container, SCROLL).pipe(
+      switchMap(scroller => {
+        return fromEvent(scroller, SCROLL).pipe(
           takeUntilDestroyed(this._destroyRef),
         );
       }),
       tap(e => {
-        const containerEl = this._container();
-        if (containerEl) {
-          const scrollSize = (this._isVertical ? containerEl.nativeElement.scrollTop : containerEl.nativeElement.scrollLeft),
+        const scrollerEl = this._scroller()?.nativeElement, scrollerComponent = this._scrollerComponent();
+        if (scrollerEl && scrollerComponent) {
+          const scrollSize = (this._isVertical ? scrollerComponent.scrollTop : scrollerComponent.scrollLeft),
             currentScollSize = this._scrollSize();
           this._trackBox.deltaDirection = currentScollSize > scrollSize ? -1 : currentScollSize < scrollSize ? 1 : 0;
 
           const event = new ScrollEvent({
-            direction: this._trackBox.scrollDirection, container: containerEl.nativeElement,
+            direction: this._trackBox.scrollDirection, container: scrollerEl,
             list: this._list()!.nativeElement, delta: this._trackBox.delta,
             scrollDelta: this._trackBox.scrollDelta, isVertical: this._isVertical,
           });
@@ -1301,22 +1310,22 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
       }),
     ).subscribe();
 
-    $container.pipe(
+    $scroller.pipe(
       distinctUntilChanged(),
-      switchMap(container => {
-        return fromEvent(container, SCROLL_END).pipe(
+      switchMap(scroller => {
+        return fromEvent(scroller, SCROLL_END).pipe(
           takeUntilDestroyed(this._destroyRef),
         );
       }),
       tap(e => {
-        const containerEl = this._container();
-        if (containerEl) {
-          const scrollSize = (this._isVertical ? containerEl.nativeElement.scrollTop : containerEl.nativeElement.scrollLeft),
+        const scrollerEl = this._scroller()?.nativeElement, scrollerComponent = this._scrollerComponent();
+        if (scrollerEl && scrollerComponent) {
+          const scrollSize = (this._isVertical ? scrollerComponent.scrollTop : scrollerComponent.scrollLeft),
             currentScollSize = this._scrollSize();
           this._trackBox.deltaDirection = currentScollSize > scrollSize ? -1 : 0;
 
           const event = new ScrollEvent({
-            direction: this._trackBox.scrollDirection, container: containerEl.nativeElement,
+            direction: this._trackBox.scrollDirection, container: scrollerEl,
             list: this._list()!.nativeElement, delta: this._trackBox.delta,
             scrollDelta: this._trackBox.scrollDelta, isVertical: this._isVertical,
           });
@@ -1326,18 +1335,18 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
       }),
     ).subscribe();
 
-    $container.pipe(
+    $scroller.pipe(
       distinctUntilChanged(),
-      switchMap(container => {
-        return fromEvent(container, SCROLL).pipe(
+      switchMap(scroller => {
+        return fromEvent(scroller, SCROLL).pipe(
           takeUntilDestroyed(this._destroyRef),
         );
       }),
       tap(e => {
-        const container = this._container()?.nativeElement;
-        if (container) {
-          const isVertical = this._isVertical, bounds = this._bounds(), scrollSize = (isVertical ? container.scrollTop : container.scrollLeft),
-            scrollLength = isVertical ? container.scrollHeight - (bounds?.height ?? 0) : container.scrollWidth - (bounds?.width ?? 0),
+        const scroller = this._scrollerComponent();
+        if (scroller) {
+          const isVertical = this._isVertical, bounds = this._bounds(), scrollSize = (isVertical ? scroller.scrollTop : scroller.scrollLeft),
+            scrollLength = isVertical ? scroller.scrollHeight - (bounds?.height ?? 0) : scroller.scrollWidth - (bounds?.width ?? 0),
             actualScrollSize = scrollSize;
 
           if (this._trackBox.isSnappedToEnd) {
@@ -1351,15 +1360,15 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
       }),
     ).subscribe();
 
-    $container.pipe(
+    $scroller.pipe(
       distinctUntilChanged(),
-      tap(container => {
+      tap(scroller => {
         if (this._resizeObserver) {
           this._resizeObserver.disconnect();
         }
 
         this._resizeObserver = new ResizeObserver(this._onResizeHandler);
-        this._resizeObserver.observe(container);
+        this._resizeObserver.observe(scroller);
 
         this._onResizeHandler();
       }),
@@ -1367,92 +1376,94 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
 
     const $scrollTo = this.$scrollTo;
 
-    combineLatest([$container, $trackBy, $scrollTo]).pipe(
+    combineLatest([$scroller, $trackBy, $scrollTo]).pipe(
       takeUntilDestroyed(),
-      filter(([container]) => container !== undefined),
-      map(([container, trackBy, event]) => ({ container: container, trackBy, event })),
-      switchMap(({ container, trackBy, event }) => {
-        const cnt = container!, { id, behavior = BEHAVIOR_INSTANT, iteration = 0, isLastIteration = false, scrollCalled = false, cb } = event;
-        const items = this._actualItems();
-        if (items && items.length) {
-          const dynamicSize = this.dynamicSize(), itemSize = this.itemSize();
+      filter(([scroller]) => scroller !== undefined),
+      map(([scroller, trackBy, event]) => ({ scroller: scroller, trackBy, event })),
+      switchMap(({ scroller, trackBy, event }) => {
+        const scrollerComponent = this._scrollerComponent(), { id, behavior = BEHAVIOR_INSTANT, iteration = 0, isLastIteration = false, scrollCalled = false, cb } = event;
+        if (scrollerComponent) {
+          const items = this._actualItems();
+          if (items && items.length) {
+            const dynamicSize = this.dynamicSize(), itemSize = this.itemSize();
 
-          if (dynamicSize) {
-            const { width, height, x, y } = this._bounds() || { x: 0, y: 0, width: DEFAULT_LIST_SIZE, height: DEFAULT_LIST_SIZE },
-              itemConfigMap = this.itemConfigMap(), items = this._actualItems(), isVertical = this._isVertical,
-              currentScollSize = (isVertical ? cnt.scrollTop : cnt.scrollLeft), delta = this._trackBox.delta,
-              opts: IGetItemPositionOptions<IVirtualListItem, IVirtualListCollection> = {
-                bounds: { width, height, x, y }, collection: items, dynamicSize, isVertical: this._isVertical, itemSize,
-                bufferSize: this.bufferSize(), maxBufferSize: this.maxBufferSize(),
-                scrollSize: (isVertical ? cnt.scrollTop : cnt.scrollLeft) + delta,
-                snap: this.snap(), fromItemId: id, enabledBufferOptimization: this.enabledBufferOptimization(),
-              },
-              scrollSize = this._trackBox.getItemPosition(id, itemConfigMap, opts),
-              params: ScrollToOptions = { [isVertical ? TOP_PROP_NAME : LEFT_PROP_NAME]: scrollSize, behavior: BEHAVIOR_INSTANT as ScrollBehavior };
+            if (dynamicSize) {
+              const { width, height, x, y } = this._bounds() || { x: 0, y: 0, width: DEFAULT_LIST_SIZE, height: DEFAULT_LIST_SIZE },
+                itemConfigMap = this.itemConfigMap(), items = this._actualItems(), isVertical = this._isVertical,
+                currentScollSize = (isVertical ? scrollerComponent.scrollTop : scrollerComponent.scrollLeft), delta = this._trackBox.delta,
+                opts: IGetItemPositionOptions<IVirtualListItem, IVirtualListCollection> = {
+                  bounds: { width, height, x, y }, collection: items, dynamicSize, isVertical: this._isVertical, itemSize,
+                  bufferSize: this.bufferSize(), maxBufferSize: this.maxBufferSize(),
+                  scrollSize: (isVertical ? scrollerComponent.scrollTop : scrollerComponent.scrollLeft) + delta,
+                  snap: this.snap(), fromItemId: id, enabledBufferOptimization: this.enabledBufferOptimization(),
+                },
+                scrollSize = this._trackBox.getItemPosition(id, itemConfigMap, opts),
+                params: ScrollToOptions = { [isVertical ? TOP_PROP_NAME : LEFT_PROP_NAME]: scrollSize, behavior: BEHAVIOR_INSTANT as ScrollBehavior };
 
-            if (scrollSize === -1) {
-              return of([true, { id, container: cnt, scrollCalled, cb }]);
-            }
+              if (scrollSize === -1) {
+                return of([true, { id, scroller: scrollerComponent, scrollCalled, cb }]);
+              }
 
-            this._trackBox.clearDelta();
+              this._trackBox.clearDelta();
 
-            const { displayItems, totalSize } = this._trackBox.updateCollection(items, itemConfigMap, {
-              ...opts, scrollSize, fromItemId: isLastIteration ? undefined : id,
-            }), delta1 = this._trackBox.delta;
+              const { displayItems, totalSize } = this._trackBox.updateCollection(items, itemConfigMap, {
+                ...opts, scrollSize, fromItemId: isLastIteration ? undefined : id,
+              }), delta1 = this._trackBox.delta;
 
-            this._service.collection = displayItems;
+              this._service.collection = displayItems;
 
-            this._trackBox.clearDelta();
+              this._trackBox.clearDelta();
 
-            let actualScrollSize = scrollSize + delta1;
+              let actualScrollSize = scrollSize + delta1;
 
-            this.resetBoundsSize(isVertical, totalSize);
+              this.resetBoundsSize(isVertical, totalSize);
 
-            this.createDisplayComponentsIfNeed(displayItems);
+              this.createDisplayComponentsIfNeed(displayItems);
 
-            this.tracking();
+              this.tracking();
 
-            const _scrollSize = this._trackBox.getItemPosition(id, itemConfigMap, { ...opts, scrollSize: actualScrollSize, fromItemId: id });
+              const _scrollSize = this._trackBox.getItemPosition(id, itemConfigMap, { ...opts, scrollSize: actualScrollSize, fromItemId: id });
 
-            if (_scrollSize === -1) {
-              return of([true, { id, container: cnt, scrollCalled, cb }]);
-            }
-            _$scrollToEndDuringUpdateCanceller.next(1);
-            const notChanged = actualScrollSize === currentScollSize;
-            cnt?.scrollTo?.(params);
-            if ((!notChanged && iteration < MAX_SCROLL_TO_ITERATIONS) || iteration < MAX_SCROLL_TO_ITERATIONS) {
-              this._$scrollTo.next(params as IScrollParams);
-              return of([false, {
-                id, behavior: BEHAVIOR_INSTANT as ScrollBehavior, container: cnt, iteration: iteration + 1,
-                isLastIteration: notChanged, scrollCalled: true, cb,
-              }]).pipe(
-                delay(1),
-              );
-            } else {
-              this._scrollSize.set(actualScrollSize);
-              return of([true, { id, container: cnt, scrollCalled, cb }]);
-            }
-          } else {
-            const index = items.findIndex(item => item[trackBy] === id);
-            if (index > -1) {
-              const isVertical = this._isVertical,
-                currentScollSize = (isVertical ? cnt.scrollTop : cnt.scrollLeft), scrollSize = index * this.itemSize();
-              if (currentScollSize !== scrollSize) {
-                _$scrollToEndDuringUpdateCanceller.next(1);
-                const params: ScrollToOptions = { [this._isVertical ? TOP_PROP_NAME : LEFT_PROP_NAME]: scrollSize, behavior };
-                _$scrollToExecutor.next(() => {
-                  cnt?.scrollTo?.(params);
-                });
-                return fromEvent(cnt, SCROLL_END).pipe(
-                  takeUntilDestroyed(this._destroyRef),
-                  take(1),
-                  switchMap(() => of([true, { id, container: cnt, cb }])),
+              if (_scrollSize === -1) {
+                return of([true, { id, scroller: scrollerComponent, scrollCalled, cb }]);
+              }
+              _$scrollToEndDuringUpdateCanceller.next(1);
+              const notChanged = actualScrollSize === currentScollSize;
+              scrollerComponent?.scrollTo?.(params);
+              if ((!notChanged && iteration < MAX_SCROLL_TO_ITERATIONS) || iteration < MAX_SCROLL_TO_ITERATIONS) {
+                this._$scrollTo.next(params as IScrollParams);
+                return of([false, {
+                  id, behavior: BEHAVIOR_INSTANT as ScrollBehavior, scroller: scrollerComponent, iteration: iteration + 1,
+                  isLastIteration: notChanged, scrollCalled: true, cb,
+                }]).pipe(
+                  delay(1),
                 );
+              } else {
+                this._scrollSize.set(actualScrollSize);
+                return of([true, { id, scroller: scrollerComponent, scrollCalled, cb }]);
+              }
+            } else {
+              const index = items.findIndex(item => item[trackBy] === id);
+              if (index > -1) {
+                const isVertical = this._isVertical,
+                  currentScollSize = (isVertical ? scrollerComponent.scrollTop : scrollerComponent.scrollLeft), scrollSize = index * this.itemSize();
+                if (currentScollSize !== scrollSize) {
+                  _$scrollToEndDuringUpdateCanceller.next(1);
+                  const params: ScrollToOptions = { [this._isVertical ? TOP_PROP_NAME : LEFT_PROP_NAME]: scrollSize, behavior };
+                  _$scrollToExecutor.next(() => {
+                    scrollerComponent?.scrollTo?.(params);
+                  });
+                  return fromEvent(scrollerComponent.scrollContent()!.nativeElement, SCROLL_END).pipe(
+                    takeUntilDestroyed(this._destroyRef),
+                    take(1),
+                    switchMap(() => of([true, { id, scroller: scrollerComponent, cb }])),
+                  );
+                }
               }
             }
           }
         }
-        return of([true, { id, container: cnt, cb }]);
+        return of([true, { id, scroller: scrollerComponent, cb }]);
       }),
       filter(params => !!params),
       takeUntilDestroyed(),
@@ -1466,8 +1477,8 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
 
         this._trackBox.cancelScrollSnappingToEnd(true);
 
-        const p = params as Pick<IScrollParams, 'cb' | 'scrollCalled' | 'container'>;
-        if (p.scrollCalled && p.container) {
+        const p = params as Pick<IScrollParams, 'cb' | 'scrollCalled' | 'scroller'>;
+        if (p.scrollCalled && p.scroller) {
           p.cb?.();
           return;
         }
@@ -1743,13 +1754,13 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
   }
 
   stopSnappingScrollToEnd() {
-    const container = this._container()?.nativeElement, isVertical = this._isVertical;
+    const scroller = this._scrollerComponent(), isVertical = this._isVertical;
     this._isScrollFinished.set(false);
     this._trackBox.cancelScrollSnappingToEnd(true);
-    if (container) {
+    if (scroller) {
       const { width, height } = this._bounds()!,
-        scrollSize = (isVertical ? container.scrollTop ?? 0 : container.scrollLeft) ?? 0,
-        scrollLength = Math.round(isVertical ? container.scrollHeight ?? 0 : container.scrollWidth) ?? 0,
+        scrollSize = (isVertical ? scroller.scrollTop ?? 0 : scroller.scrollLeft) ?? 0,
+        scrollLength = Math.round(isVertical ? scroller.scrollHeight ?? 0 : scroller.scrollWidth) ?? 0,
         actualScrollLength = Math.round(scrollLength === 0 ? 0 : scrollLength - (isVertical ? height : width)),
         roundedMaxPosition = Math.round(actualScrollLength),
         roundedScrollPosition = Math.round(scrollSize);
@@ -1760,7 +1771,7 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
           [isVertical ? TOP_PROP_NAME : LEFT_PROP_NAME]: position,
           behavior: BEHAVIOR_SMOOTH as ScrollBehavior,
         };
-        container.scrollTo(params);
+        scroller.scrollTo(params);
         this._scrollSize.set(position);
       }
     }

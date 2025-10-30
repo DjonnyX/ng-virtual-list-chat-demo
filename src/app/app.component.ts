@@ -21,8 +21,9 @@ export class AppComponent {
   private _themeService = inject(ThemeService);
 
   constructor() {
-    const appResizeHandler = () => document.body.style.height = `${document.documentElement.clientHeight}px`;
+    const appResizeHandler = () => document.body.style.height = `${window.innerHeight}px`;
     window.addEventListener('resize', appResizeHandler);
+    window.addEventListener('scroll', appResizeHandler);
     appResizeHandler();
 
     this._themeService.name = ThemeNames[0];

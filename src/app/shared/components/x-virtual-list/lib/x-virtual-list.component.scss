@@ -11,27 +11,9 @@
     height: 48px;
 }
 
-:host(.horizontal) .xvl__list {
-    display: inline-flex;
-}
-
-:host(.horizontal) .xvl__scroller {
-    overflow: auto hidden;
-}
-
-:host(.vertical) .xvl__scroller {
-    overflow: hidden auto;
-}
-
 :host(.vertical) {
     /* default */
     height: 320px;
-}
-
-.xvl__scroller {
-    overflow: auto;
-    width: 100%;
-    height: 100%;
 }
 
 .xvl__list-snapper {
@@ -42,15 +24,6 @@
     left: 0;
     top: 0;
     z-index: 1;
-}
-
-.xvl__list {
-    position: relative;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    height: 100%;
 }
 
 .xvl__screen-reader {

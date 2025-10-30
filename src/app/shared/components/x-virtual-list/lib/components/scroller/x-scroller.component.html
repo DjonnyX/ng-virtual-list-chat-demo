@@ -1,1 +1,10 @@
-<p>scroller works!</p>
+@let c = content();
+@let orientation = direction;
+<div #scrollViewport cdkScrollable part="scroller" class="xvl__scroller">
+    <div #scrollContent [attr.aria-orientation]="orientation" [attr.aria-activedescendant]="focusedElement()"
+        tabindex="0" part="list" class="xvl__list">
+        <ng-content>
+            {{c}}
+        </ng-content>
+    </div>
+</div>
