@@ -54,6 +54,8 @@
     cursor: pointer;
     border: none;
 
+    -webkit-user-select: none;
+    -moz-user-select: none;
     user-select: none;
     min-width: 64px;
     line-height: 36px;

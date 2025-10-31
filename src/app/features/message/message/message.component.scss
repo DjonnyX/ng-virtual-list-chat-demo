@@ -1,16 +1,4 @@
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
 :host {
-    opacity: 0;
-    animation: fadeIn 200ms ease-in-out 100ms 1 normal forwards;
     cursor: pointer;
     position: relative;
     max-width: calc(80%);

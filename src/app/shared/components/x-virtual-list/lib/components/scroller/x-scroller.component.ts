@@ -94,7 +94,7 @@ export class XScrollerComponent {
     ).subscribe();
   }
 
-  animate(startValue: number, endValue: number, duration = 150, easingFunction: Easing = easeLinear) {
+  animate(startValue: number, endValue: number, duration = 500, easingFunction: Easing = easeLinear) {
     if (this._animationCanceler !== undefined) {
       this._animationCanceler();
     }
@@ -112,30 +112,28 @@ export class XScrollerComponent {
         return;
       }
 
-      if ((isVertical && this._y >= startValue && this._y <= endValue) || (!isVertical && this._x >= startValue && this._x <= endValue)) {
+      if (isVertical) {
+        startValue = this._y;
+      } else {
+        startValue = this._x;
+      }
+
+      const elapsed = currentTime - startTime,
+        progress = Math.min(elapsed / duration, 1),
+        easedProgress = easingFunction(progress),
+        currentValue = startValue + (endValue - startValue) * easedProgress;
+
+      const scrollViewport = this.scrollViewport()?.nativeElement as HTMLDivElement;
+      if (scrollViewport) {
         if (isVertical) {
-          this._y = startValue;
+          scrollViewport.scrollTop = this._y = currentValue;
         } else {
-          this._x = startValue;
+          scrollViewport.scrollLeft = this._x = currentValue;
         }
+      }
 
-        const elapsed = currentTime - startTime,
-          progress = Math.min(elapsed / duration, 1),
-          easedProgress = easingFunction(progress),
-          currentValue = startValue + (endValue - startValue) * easedProgress;
-
-        const scrollViewport = this.scrollViewport()?.nativeElement as HTMLDivElement;
-        if (scrollViewport) {
-          if (isVertical) {
-            scrollViewport.scrollTop = this._y = currentValue;
-          } else {
-            scrollViewport.scrollLeft = this._x = currentValue;
-          }
-        }
-
-        if (progress < 1) {
-          requestAnimationFrame(step);
-        }
+      if (progress < 1) {
+        requestAnimationFrame(step);
       }
     }, canceler = () => {
       isCanceled = true;
@@ -167,7 +165,6 @@ export class XScrollerComponent {
 
     if (isVertical) {
       const prevY = this._y;
-      this._y = y;
       if (behavior === 'auto' || behavior === 'smooth') {
         this.animate(prevY, y);
       } else {
@@ -178,7 +175,6 @@ export class XScrollerComponent {
       }
     } else {
       const prevX = this._x;
-      this._x = x;
       if (behavior === 'auto' || behavior === 'smooth') {
         this.animate(prevX, x);
       } else {
@@ -188,5 +184,7 @@ export class XScrollerComponent {
         scrollViewport.scrollLeft = x;
       }
     }
+    this._x = x;
+    this._y = y;
   }
 }

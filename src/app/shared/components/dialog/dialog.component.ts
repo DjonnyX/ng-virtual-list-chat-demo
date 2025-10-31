@@ -98,6 +98,7 @@ export class DialogComponent implements AfterViewInit {
       filter(v => !!v),
       map(v => v.nativeElement),
       tap(container => {
+        
       }),
     ).subscribe();
 

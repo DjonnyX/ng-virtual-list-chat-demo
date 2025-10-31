@@ -1,7 +1,7 @@
 import { Component, computed, ElementRef, inject, input, output, Signal, signal, viewChild, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LocaleSensitiveDirective, LocalizationService } from '@shared/localization';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { LocaleSensitiveDirective, LocalizationService, TextDirections } from '@shared/localization';
 
 const DEFAULT_DOCK_SIZE = 140;
 
@@ -75,8 +75,8 @@ export class DrawerComponent {
       const loc = this.locale(), langTextDir = this._localizationService.textDirection, width = this._bounds()?.width ?? 0, dockMode = this.dock(), dockLeftSize = this.dockLeftSize(),
         dockRightSize = this.dockRightSize(),
         result = {
-          'grid-template-columns': langTextDir === 'rtl' ? `${dockLeftSize}px ${width}px ${dockRightSize}px` : `${dockLeftSize}px ${width}px ${dockRightSize}px`,
-          'transform': langTextDir === 'rtl'
+          'grid-template-columns': langTextDir === TextDirections.RTL ? `${dockLeftSize}px ${width}px ${dockRightSize}px` : `${dockLeftSize}px ${width}px ${dockRightSize}px`,
+          'transform': langTextDir === TextDirections.RTL
             ?
             (dockMode === 'left' ? `translate3d(0, 0, 0)` : dockMode === 'right'
               ? `translate3d(${-(dockLeftSize + dockRightSize)}px, 0, 0)` : `translate3d(${dockLeftSize}px, 0, 0)`)

@@ -1,4 +1,5 @@
 import { ILocalization } from "./interfaces/localization";
+import { TextDirections } from "./enums";
 import { enUS } from "./en-us";
 import { heIL } from "./he-il";
 import { ruRU } from "./ru-ru";
@@ -19,11 +20,11 @@ const RTL: Array<string> = [Locales.HE_IL];
 
 Object.freeze(RTL);
 
-const getTextDirectionByLocale = (locale: Locales | string): 'rtl' | 'ltr' => {
+const getTextDirectionByLocale = (locale: Locales | string): TextDirections => {
     if (RTL.includes(locale)) {
-        return 'rtl';
+        return TextDirections.RTL;
     }
-    return 'ltr';
+    return TextDirections.LTR;
 };
 
 Object.freeze(LocaleList);

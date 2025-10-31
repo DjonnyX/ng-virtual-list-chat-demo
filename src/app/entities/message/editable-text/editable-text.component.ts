@@ -12,6 +12,8 @@ import { LocaleSensitiveDirective } from '@shared/localization';
 const DEFAULT_SEARCH_SUBSTRING_CLASS = 'search-substring',
   INITIAL = 'initial',
   USER_SELECT = 'user-select',
+  WEBKIT_USER_SELECT = '-webkit-user-select',
+  MOZ_USER_SELECT = '-moz-user-select',
   AUTO = 'auto',
   NONE = 'none';
 
@@ -75,8 +77,8 @@ export class EditableTextComponent {
     this.theme = toSignal(this._themeService.$theme);
 
     this.readonlyStyles = computed(() => {
-      const selectable = this.selectable();
-      return { [USER_SELECT]: selectable ? AUTO : NONE };
+      const selectable = this.selectable(), val = selectable ? AUTO : NONE;
+      return { [USER_SELECT]: val, [WEBKIT_USER_SELECT]: val, [MOZ_USER_SELECT]: val };
     });
 
     effect(() => {

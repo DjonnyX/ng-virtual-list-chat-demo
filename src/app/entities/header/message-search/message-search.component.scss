@@ -14,13 +14,17 @@
     .search {
         outline: none;
         border-radius: 4px;
-        padding: 6px 6px 6px 0;
+        padding: 6px 0 6px 6px;
         border-width: 1px;
         border-style: solid;
         width: calc(100%);
         max-width: 32px;
         padding-right: 30px;
         transition: max-width 0.15s ease-in-out;
+
+        .trl {
+            padding: 6px 6px 6px 0;
+        }
 
         &::placeholder {
             color: var(--placeholder-color);

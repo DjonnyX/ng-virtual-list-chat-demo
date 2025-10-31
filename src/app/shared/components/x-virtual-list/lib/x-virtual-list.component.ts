@@ -9,6 +9,7 @@ import {
   BehaviorSubject, combineLatest, debounceTime, delay, distinctUntilChanged, filter, fromEvent, map, Observable,
   of, race, Subject, switchMap, take, takeUntil, tap,
 } from 'rxjs';
+import { LocalizationService, TextDirections } from '@shared/localization';
 import { NgVirtualListItemComponent } from './components/list-item/x-virtual-list-item.component';
 import {
   BEHAVIOR_INSTANT, CLASS_LIST_HORIZONTAL, CLASS_LIST_VERTICAL, DEFAULT_DIRECTION, DEFAULT_DYNAMIC_SIZE,
@@ -43,7 +44,6 @@ import { CMap } from './utils/cache-map';
 import { validateArray, validateBoolean, validateFloat, validateInt, validateObject, validateString } from './utils/validation';
 import { copyValueAsReadonly, objectAsReadonly } from './utils/object';
 import { isCollectionMode } from './utils/is-collection-mode';
-import { LocalizationService } from '@shared/localization';
 import { XScrollerComponent } from './components/scroller/x-scroller.component';
 
 interface IScrollParams {
@@ -700,7 +700,7 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
         scrollBarSize = overlapScrollBarSize = FIREFOX_SCROLLBAR_OVERLAP_SIZE;
       }
 
-      if (langTextDir === 'rtl') {
+      if (langTextDir === TextDirections.RTL) {
         snappedComponent.element.style.clipPath = `path("M ${overlapScrollBarSize} 0 L ${overlapScrollBarSize} ${snappedComponent.element.offsetHeight} L ${snappedComponent.element.offsetWidth - overlapScrollBarSize} ${snappedComponent.element.offsetHeight} L ${snappedComponent.element.offsetWidth - overlapScrollBarSize} 0 Z")`;
       } else {
         snappedComponent.element.style.clipPath = `path("M 0 0 L 0 ${snappedComponent.element.offsetHeight} L ${snappedComponent.element.offsetWidth - overlapScrollBarSize} ${snappedComponent.element.offsetHeight} L ${snappedComponent.element.offsetWidth - overlapScrollBarSize} 0 Z")`;
@@ -716,7 +716,7 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
         right = width - scrollBarSize;
         top = sHeight;
         bottom = height;
-        if (langTextDir === 'rtl') {
+        if (langTextDir === TextDirections.RTL) {
           scrollerElement.style.clipPath = `path("M 0 0 L 0 ${height} L ${width} ${height} L ${width} ${top + delta} L ${scrollBarSize} ${top + delta} L ${scrollBarSize} 0 Z")`;
         } else {
           scrollerElement.style.clipPath = `path("M 0 ${top + delta} L 0 ${height} L ${width} ${height} L ${width} 0 L ${right} 0 L ${right} ${top + delta} Z")`;

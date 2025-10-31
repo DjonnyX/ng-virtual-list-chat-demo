@@ -21,7 +21,7 @@
                     (changeValue)="onMessageChangeValueHandler($event)" />
             </div>
             @if (messageConfig.selected) {
-                <div class="message-controls" [ngStyle]="{height: message.bounds().height}">
+                <div class="message-controls" [ngStyle]="{height: container.offsetHeight}">
                     <x-message-menu-button #menuButton [cdkMenuTriggerFor]="menuDisabled ? undefined : menu"
                         [fillPositions]="menuButtonFillPositions()" [disabled]="menuDisabled" calcFillPositions [measures]="messageMeasures"
                         (onFillPositions)="onMenuButtonFillPositionsHandler($event)" />

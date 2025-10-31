@@ -7,14 +7,14 @@
 @let listClass = listClasses();
 
 <div #wrapper class="wrapper">
-    @if(loading || !prepared) {
+    @if (loading || !prepared) {
         <x-messages-loading-indicator class="loading-indicator" />
     }
 
     <x-virtual-list #list class="list" [ngClass]="listClass" [items]="items" [itemRenderer]="itemRenderer"
-        [snapScrollToBottom]="true" [itemSize]="40" [bufferSize]="5" [maxBufferSize]="15" collectionMode="lazy"
+        [snapScrollToBottom]="true" [itemSize]="40" [bufferSize]="2" [maxBufferSize]="50" collectionMode="lazy"
         [itemConfigMap]="itemsConfigMap" [dynamicSize]="true" [snap]="true" snappingMethod="advanced"
-        methodForSelecting="multi-select" [selectedIds]="selectedItemIds" [snapToEndTransitionInstantOffset]="500"
+        methodForSelecting="multi-select" [selectedIds]="selectedItemIds" [snapToEndTransitionInstantOffset]="1000"
         [selectByClick]="false" (onSelect)="onSelectItemHandler($event)"
         (onScrollReachStart)="onScrollReachStartHandler()">
     </x-virtual-list>

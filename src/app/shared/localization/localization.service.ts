@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { ILocalization } from './localizations/interfaces/localization';
 import { getTextDirectionByLocale, LocaleList, Localizations } from './localizations';
+import { TextDirections } from './localizations/enums';
 
-const DEFAULT_LOCALE: string = 'he-IL';
+const DEFAULT_LOCALE: string = 'en-US';
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -19,7 +20,7 @@ export class LocalizationService {
   private _$locale = new BehaviorSubject<string>(DEFAULT_LOCALE);
   readonly $locale = this._$locale.asObservable();
 
-  private _textDirection: 'rtl' | 'ltr' = getTextDirectionByLocale(this._$locale.getValue());
+  private _textDirection: TextDirections = getTextDirectionByLocale(this._$locale.getValue());
   get textDirection() { return this._textDirection; }
 
   private _$localization = new BehaviorSubject<ILocalization>(Localizations[DEFAULT_LOCALE.toString()]);

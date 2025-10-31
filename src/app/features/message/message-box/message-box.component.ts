@@ -14,15 +14,15 @@ import { DialogService } from '@shared/components/dialog/dialog.service';
 import { ButtonPresets, ThemeService } from '@shared/theming';
 import { ContextMenuPresets, DialogPresets } from '@shared/theming/themes/presets';
 import { ITheme } from '@shared/theming';
+import { ILocalization, LocalizationService, LocaleSensitiveDirective, TextDirections } from '@shared/localization';
 import { IProxyCollectionItem } from '@widgets/messages/messages/utils/proxy-collection';
+import { DialogDeleteContentComponent } from '@entities/message/dialog-delete-content/dialog-delete-content.component';
 import { MessageComponent } from '../message/message.component';
 import { IMessageParams } from '../message/interfaces';
-import { ILocalization, LocalizationService, LocaleSensitiveDirective } from '@shared/localization';
-import { DialogDeleteContentComponent } from '@entities/message/dialog-delete-content/dialog-delete-content.component';
 import { IDeleteEventData } from './interfaces';
 
 const CLASS_IN = 'in', CLASS_OUT = 'out', CLASS_SIMPLE = 'simple', CLASS_END_OF_MESSAGES = 'end-of-messages',
-  CLASS_REMOVAL = 'removal', CLASS_DELETED = 'deleted', CLASS_ANIMATE = 'animate', CLASS_EDITED = 'edited', CLASS_RTL = 'rtl',
+  CLASS_REMOVAL = 'removal', CLASS_DELETED = 'deleted', CLASS_ANIMATE = 'animate', CLASS_EDITED = 'edited', CLASS_RTL = TextDirections.RTL,
   CLASS_SELECTED = 'selected', CLASS_FOCUSED = 'focused', CLASS_FIRST_IN_GROUP = 'first-in-group', CLASS_FIREFOX = 'firefox',
   CLASS_LAST_IN_GROUP = 'last-in-group', CLASS_HAS_MULTICONTENT = 'has-multicontent', DATA_PROP_IMAGE = 'image',
   DATA_PROP_REMOVAL = 'removal', DATA_PROP_DELETED = 'deleted', DATA_PROP_ANIMATE = 'animate', CONFIG_PROP_SELECTED = 'selected',
@@ -176,7 +176,7 @@ export class MessageBoxComponent {
     this.params = computed(() => {
       const locale = this.locale(), data = this.data(), prevData = this.prevData(), nextData = this.nextData();
       return {
-        isRTL: this._localizationService.textDirection === 'rtl',
+        isRTL: this._localizationService.textDirection === TextDirections.RTL,
         isIncoming: data?.data?.incomType === 'in',
         isOutgoing: data?.data?.incomType === 'out',
         prevIsIncoming: prevData?.data?.incomType === 'in',
@@ -228,7 +228,7 @@ export class MessageBoxComponent {
         [CLASS_IN]: isIn, [CLASS_OUT]: isOut, [CLASS_SIMPLE]: (isIn && isPrevIn) || (isOut && isPrevOut), [CLASS_DELETED]: data?.[DATA_PROP_DELETED] == true,
         [CLASS_REMOVAL]: data?.[DATA_PROP_REMOVAL] == true, [CLASS_ANIMATE]: data?.[DATA_PROP_ANIMATE] == true, [CLASS_END_OF_MESSAGES]: (isIn && !isNextIn) || (isOut && !isNextOut),
         [CLASS_FIRST_IN_GROUP]: firstInGroup, [CLASS_LAST_IN_GROUP]: lastInGroup, [CLASS_EDITED]: data?.edited == true, [CLASS_FIREFOX]: IS_FIREFOX,
-        [CLASS_RTL]: this._localizationService.textDirection === 'rtl', [CLASS_SELECTED]: config?.[CONFIG_PROP_SELECTED], [CLASS_FOCUSED]: config?.[CONFIG_PROP_FOCUSED],
+        [CLASS_RTL]: this._localizationService.textDirection === TextDirections.RTL, [CLASS_SELECTED]: config?.[CONFIG_PROP_SELECTED], [CLASS_FOCUSED]: config?.[CONFIG_PROP_FOCUSED],
         [CLASS_HAS_MULTICONTENT]: data?.[DATA_PROP_IMAGE] !== undefined,
       };
     });
