@@ -1,5 +1,6 @@
 import { Id } from "@shared/components/x-virtual-list";
 import { EventEmitter } from "@shared/components/x-virtual-list/lib/utils/event-emitter";
+import { MessageTypes } from "@shared/enums";
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -64,7 +65,7 @@ const sortByDateTime = (a: IProxyCollectionItem<any>, b: IProxyCollectionItem<an
     if (a.data.dateTime < b.data.dateTime) {
         return -1;
     }
-    return 0;
+    return a.data.type === MessageTypes.GROUP && b.data.type !== MessageTypes.GROUP ? -1 : 0;
 }
 
 /**

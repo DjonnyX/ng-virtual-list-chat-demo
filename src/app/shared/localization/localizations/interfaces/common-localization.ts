@@ -6,5 +6,9 @@
  * All rights reserved.
  */
 export interface ICommonLocalization {
-
+    date: {
+        yesterday: string;
+        tooday: string;
+        tomorrow: string;
+    },
 }

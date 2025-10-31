@@ -29,6 +29,8 @@ import { MessagesNotificationWSService } from '../messages-notification-ws.servi
 import { generateTypingIndicator } from './utils/generate-typing-indicator';
 import { IProxyCollectionItem, ProxyCollection, ProxyCollectionEvents } from './utils/proxy-collection';
 import { StaticClickDirective } from '@shared/directives';
+import { createGroups } from './utils/create-groups';
+import { LocalizationService } from '@shared/localization';
 
 const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
   OPACITY_0 = '0', OPACITY_1 = '1', FADE_IN = `opacity 100ms ease-in`, MIN_ITEM_HEIGHT = 28;
@@ -113,6 +115,8 @@ export class MessagesComponent implements OnDestroy {
   private _elementRef = inject(ElementRef<HTMLDivElement>);
 
   private _themeService = inject(ThemeService);
+
+  private _localizationService = inject(LocalizationService);
 
   readonly maxStaticClickDistance = 40;
 
@@ -205,10 +209,11 @@ export class MessagesComponent implements OnDestroy {
       }),
     ).subscribe();
 
-    $chatId.pipe(
+    combineLatest([$chatId, this._localizationService.$locale, this._localizationService.$localization]).pipe(
       takeUntilDestroyed(),
-      filter(v => v !== undefined),
-      switchMap(chatId => {
+      debounceTime(0),
+      map(([chatId, locale, localization]) => ({ chatId, locale, localization })),
+      switchMap(({ chatId, locale, localization }) => {
         const timeStart = Date.now();
         let delayTime = 100;
         return of(chatId).pipe(
@@ -222,6 +227,7 @@ export class MessagesComponent implements OnDestroy {
               size: 100,
             }).pipe(
               takeUntilDestroyed(this._destroyRef),
+              switchMap(v => of(createGroups(v, locale, localization))),
             );
           }),
           catchError((err) => {
@@ -258,23 +264,26 @@ export class MessagesComponent implements OnDestroy {
       })
     ).subscribe();
 
-    $scrollReachStart.pipe(
+    combineLatest([$scrollReachStart, this._localizationService.$locale, this._localizationService.$localization]).pipe(
       takeUntilDestroyed(),
       debounceTime(250),
       skipWhile(() => this._chunkNumber === 0),
-      switchMap(() => $chatId.pipe(
+      map(([scrollReachStart, locale, localization]) => ({ scrollReachStart, locale, localization })),
+      switchMap(({ locale, localization }) => $chatId.pipe(
         takeUntilDestroyed(this._destroyRef),
         take(1),
+        filter(v => v !== undefined),
+        switchMap((chatId) => {
+          return this._messagesService.getMessages(chatId, {
+            number: this._chunkNumber + 1,
+            size: 100,
+          }).pipe(
+            takeUntilDestroyed(this._destroyRef),
+            switchMap(v => of(createGroups(v, locale, localization))),
+          );
+        }),
       )),
-      filter(v => v !== undefined),
-      switchMap((chatId) => {
-        return this._messagesService.getMessages(chatId, {
-          number: this._chunkNumber + 1,
-          size: 100,
-        }).pipe(
-          takeUntilDestroyed(this._destroyRef),
-        );
-      }),
+
       catchError((err) => {
         return throwError(() => {
           return `Get message chunk error: ${err}`;
@@ -298,15 +307,17 @@ export class MessagesComponent implements OnDestroy {
       }),
     ).subscribe();
 
-    $chatId.pipe(
+    combineLatest([$chatId, this._localizationService.$locale, this._localizationService.$localization]).pipe(
       takeUntilDestroyed(),
-      filter(v => v !== undefined),
-      switchMap(chatId => {
+      map(([chatId, locale, localization]) => ({ chatId: chatId as string, locale, localization })),
+      filter(({ chatId }) => chatId !== undefined),
+      switchMap(({ chatId, locale, localization }) => {
         return this._messageNotificationService.$messages.pipe(
           takeUntilDestroyed(this._destroyRef),
           switchMap(version => {
             return this._messagesService.getMessages(chatId).pipe(
               takeUntilDestroyed(this._destroyRef),
+              switchMap(v => of(createGroups(v, locale, localization))),
             );
           }),
         );

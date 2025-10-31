@@ -59,19 +59,16 @@ const generateMessageCollection = (number: number, size: number) => {
   const items: IVirtualListCollection<IMessage> = [];
 
   for (let i = 0, l = size; i < l; i++) {
-    const id = COLLECTION_PARAMS.index + 1, type = (number === 0 && i === 0) || i === l - 1 || Math.random() > .895 ? MessageTypes.GROUP : MessageTypes.ITEM,
+    const id = COLLECTION_PARAMS.index + 1,
       incomType = Math.random() > .5 ? 'in' : 'out';
 
     COLLECTION_PARAMS.index++;
 
-    if (type === MessageTypes.GROUP) {
-      COLLECTION_PARAMS.groupIndex++;
-    }
-    const isGroup = type === MessageTypes.GROUP, hasImage = isGroup ? false : Boolean(Math.round(Math.random() * 0.75));
+    const  hasImage = Boolean(Math.round(Math.random() * 0.75));
     items.push({
-      id, type,
+      id,
       version: 0,
-      dateTime: COLLECTION_PARAMS.maxDate - COLLECTION_PARAMS.index * 60000, text: isGroup ? `קבוצה ${COLLECTION_PARAMS.groupIndex}` : `${id}. ${[1, 2].includes(id) ? testLinksText() : generateText()}`,
+      dateTime: COLLECTION_PARAMS.maxDate - COLLECTION_PARAMS.index * 2000000, text: `${id}. ${[1, 2].includes(id) ? testLinksText() : generateText()}`,
       image: hasImage ? 'https://ng-virtual-list-chat-demo.eugene-grebennikov.pro/media/logo.png' : undefined, incomType,
     });
   }

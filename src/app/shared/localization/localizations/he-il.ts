@@ -38,7 +38,11 @@ export const localization: ILocalization = {
         }
     },
     common: {
-
+        date: {
+            yesterday: 'אֶתמוֹל',
+            tooday: 'הַיוֹם',
+            tomorrow: 'מָחָר',
+        },
     },
 };
 

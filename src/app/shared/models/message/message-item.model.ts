@@ -11,5 +11,5 @@ export interface IMessageItemData {
   text: string;
   edited?: boolean;
   incomType?: 'in' | 'out',
-  type: MessageTypes.ITEM | MessageTypes.GROUP | MessageTypes.TYPING_INDICATOR,
+  type?: MessageTypes.ITEM | MessageTypes.GROUP | MessageTypes.TYPING_INDICATOR,
 }

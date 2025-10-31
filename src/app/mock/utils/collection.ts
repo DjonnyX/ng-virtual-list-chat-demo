@@ -34,11 +34,10 @@ export const generateMessage = (): IVirtualListItem<IMessage> => {
     timeOffset++;
     const version = 0, id = COLLECTION_PARAMS.index + 1,
         type = MessageTypes.ITEM, incomType = Math.random() > .5 ? 'in' : 'out',
-        isGroup = false,
-        hasImage = isGroup ? false : Boolean(Math.round(Math.random() * .75));
+        hasImage = Boolean(Math.round(Math.random() * .75));
     COLLECTION_PARAMS.index++;
 
-    const dateTime = COLLECTION_PARAMS.maxDate + timeOffset * 60000;
+    const dateTime = COLLECTION_PARAMS.maxDate + timeOffset * 2000000;
     return {
         id, version, dateTime, type, text: `${id}. ${generateText()}`,
         image: hasImage ? 'https://ng-virtual-list-chat-demo.eugene-grebennikov.pro/media/logo.png' : undefined, incomType,

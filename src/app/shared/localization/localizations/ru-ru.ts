@@ -38,7 +38,11 @@ const localization: ILocalization = {
         }
     },
     common: {
-
+        date: {
+            yesterday: 'вчера',
+            tooday: 'сегодня',
+            tomorrow: 'завтра',
+        },
     },
 };
 
