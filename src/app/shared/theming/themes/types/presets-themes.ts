@@ -1,4 +1,5 @@
 import { PresetButtonsTheme } from "./preset-buttons-theme";
+import { PresetCheckboxesTheme } from "./preset-checkboxes-theme";
 import { PresetContextMenuTheme } from "./preset-context-menu-theme";
 import { PresetDialogsTheme } from "./preset-dialogs-theme";
 
@@ -9,4 +10,4 @@ import { PresetDialogsTheme } from "./preset-dialogs-theme";
  * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
  * All rights reserved.
  */
-export type PresetThemes = PresetButtonsTheme | PresetDialogsTheme | PresetContextMenuTheme;
+export type PresetThemes = PresetButtonsTheme | PresetCheckboxesTheme | PresetDialogsTheme | PresetContextMenuTheme;

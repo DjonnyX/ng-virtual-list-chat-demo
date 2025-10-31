@@ -1202,12 +1202,14 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
     ).subscribe();
 
     const $scroller = toObservable(this._scroller).pipe(
+      takeUntilDestroyed(),
       filter(v => !!v),
       map(v => v.nativeElement),
       take(1),
     );
 
     $scroller.pipe(
+      takeUntilDestroyed(),
       distinctUntilChanged(),
       switchMap(scroller => {
         return fromEvent(scroller, WHEEL, { passive: true }).pipe(
@@ -1245,6 +1247,7 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
       );
 
     $scroller.pipe(
+      takeUntilDestroyed(),
       distinctUntilChanged(),
       switchMap(scroller => {
         return fromEvent(scroller, POINTER_DOWN).pipe(
@@ -1274,6 +1277,7 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
     ).subscribe();
 
     $scroller.pipe(
+      takeUntilDestroyed(),
       distinctUntilChanged(),
       switchMap(scroller => {
         return fromEvent(scroller, TOUCH_MOVE).pipe(
@@ -1286,6 +1290,7 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
     ).subscribe();
 
     $scroller.pipe(
+      takeUntilDestroyed(),
       distinctUntilChanged(),
       switchMap(scroller => {
         return fromEvent(scroller, SCROLL).pipe(
@@ -1311,6 +1316,7 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
     ).subscribe();
 
     $scroller.pipe(
+      takeUntilDestroyed(),
       distinctUntilChanged(),
       switchMap(scroller => {
         return fromEvent(scroller, SCROLL_END).pipe(
@@ -1336,6 +1342,7 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
     ).subscribe();
 
     $scroller.pipe(
+      takeUntilDestroyed(),
       distinctUntilChanged(),
       switchMap(scroller => {
         return fromEvent(scroller, SCROLL).pipe(
@@ -1361,6 +1368,7 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
     ).subscribe();
 
     $scroller.pipe(
+      takeUntilDestroyed(),
       distinctUntilChanged(),
       tap(scroller => {
         if (this._resizeObserver) {
@@ -1465,8 +1473,8 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
         }
         return of([true, { id, scroller: scrollerComponent, cb }]);
       }),
-      filter(params => !!params),
       takeUntilDestroyed(),
+      filter(params => !!params),
       tap(([finished, params]) => {
         if (!finished) {
           if (params) {

@@ -21,6 +21,7 @@ export const localization: ILocalization = {
                     delete: {
                         title: 'Attention',
                         message: 'Are you sure you want to delete the message?',
+                        deleteAll: 'Delete from everyone',
                         cancel: 'cancel',
                         delete: 'delete',
                     },

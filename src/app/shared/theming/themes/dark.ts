@@ -1,7 +1,7 @@
 import { GradientColor, RoundedCorner } from "../../types";
 import { objectAsReadonly } from "../../utils/object";
 import { ITheme } from "./interfaces/theme";
-import { ButtonPresets, ContextMenuPresets, DialogPresets } from "./presets";
+import { ButtonPresets, CheckboxPresets, ContextMenuPresets, DialogPresets } from "./presets";
 
 const BUTTON_ROUNDED_CORNER: RoundedCorner = [8, 8, 8, 8],
     BUTTON_ROUNDED_RECT_PADDING = "4px 6px",
@@ -474,6 +474,77 @@ const manifest: ITheme = {
                 iconFill: "rgba(199, 186, 255, 0.45)",
                 color: "rgba(199, 186, 255, 0.45)",
                 padding: BUTTON_ROUNDED_RECT_PADDING,
+            },
+        },
+        [CheckboxPresets.PRIMARY]: {
+            rippleColor: "rgba(255, 255, 255, 0.2)",
+            normal: {
+                fill: ["rgb(86, 22, 190)", "rgb(104, 0, 136)"],
+                iconFill: "rgb(206, 191, 220)",
+                color: "rgb(240, 217, 255)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
+            },
+            pressed: {
+                fill: ["rgb(68, 20, 146)", "rgb(89, 6, 114)"],
+                iconFill: "rgb(206, 191, 220)",
+                color: "rgb(240, 217, 255)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
+            },
+            focused: {
+                fill: ["rgb(86, 22, 190)", "rgb(104, 0, 136)"],
+                iconFill: "rgb(206, 191, 220)",
+                outline: "2px solid rgba(227, 134, 255, 0.25)",
+                color: "rgb(240, 217, 255)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
+            },
+            disabled: {
+                fill: ["rgba(86, 22, 190, .25)", "rgba(104, 0, 136, .25)"],
+                iconFill: "rgb(206, 191, 220)",
+                color: "rgb(240, 217, 255)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
+            },
+        },
+        [CheckboxPresets.SECONDARY]: {
+            normal: {
+                fill: ["rgb(75, 65, 134)", "rgb(84, 71, 160)"],
+                iconFill: "rgb(159, 156, 253)",
+                color: "rgb(199, 186, 255)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
+            },
+            pressed: {
+                fill: ["rgb(89, 78, 151)", "rgb(100, 86, 177)"],
+                iconFill: "rgb(180, 178, 255)",
+                color: "rgb(172, 161, 223)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
+            },
+            focused: {
+                fill: ["rgb(89, 78, 151)", "rgb(100, 86, 177)"],
+                iconFill: "rgb(180, 178, 255)",
+                color: "rgb(172, 161, 223)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
+                outline: "2px solid rgb(136, 171, 202)",
+            },
+            disabled: {
+                fill: ["rgba(75, 65, 134, 0.45)", "rgba(84, 71, 160, 0.45)"],
+                iconFill: "rgba(159, 156, 253, 0.45)",
+                color: "rgba(199, 186, 255, 0.45)",
+                roundedCorner: BUTTON_ROUNDED_CORNER,
+                padding: BUTTON_ROUNDED_RECT_PADDING,
+                strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
             },
         },
         [DialogPresets.PRIMARY]: {

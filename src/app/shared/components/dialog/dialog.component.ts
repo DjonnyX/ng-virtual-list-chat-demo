@@ -1,13 +1,13 @@
-import { Component, computed, effect, ElementRef, inject, signal, Signal, viewChild } from '@angular/core';
+import { AfterViewInit, Component, ComponentRef, computed, DestroyRef, effect, ElementRef, inject, signal, Signal, ViewChild, viewChild, ViewContainerRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
-import { filter, map, tap } from 'rxjs';
+import { filter, map, Observable, tap } from 'rxjs';
 import { ThemeService } from '@shared/theming';
 import { ITheme } from '@shared/theming';
 import { IDialogTheme } from '@shared/theming/themes/interfaces/components/dialog';
 import { GradientColor, GradientColorPositions, RoundedCorner } from '@shared/types';
-import { IDialogData } from './interfaces';
+import { IDialogData, IDialogOutput } from './interfaces';
 import { ButtonGroupComponent } from '../button-group';
 import { IButtonGroupItem } from '../button-group/interfaces';
 import { formatCSSNumber } from '../utils';
@@ -34,7 +34,10 @@ const DEFAULT_ROUND_CORNER: RoundedCorner = [8, 8, 8, 8],
   templateUrl: './dialog.component.html',
   styleUrl: './dialog.component.scss'
 })
-export class DialogComponent {
+export class DialogComponent implements AfterViewInit {
+  @ViewChild('contentTemplate', { read: ViewContainerRef })
+  contentTemplate!: ViewContainerRef;
+
   container = viewChild<ElementRef<HTMLDivElement>>('container');
 
   content = viewChild<ElementRef<HTMLDivElement>>('content');
@@ -43,7 +46,7 @@ export class DialogComponent {
 
   message = viewChild<ElementRef<HTMLHeadingElement>>('message');
 
-  private _dialogRef = inject<DialogRef<IDialogData>>(DialogRef<IDialogData>);
+  private _dialogRef = inject<DialogRef<IDialogData, IDialogOutput>>(DialogRef<IDialogData>);
 
   data = inject<IDialogData>(DIALOG_DATA);
 
@@ -69,11 +72,15 @@ export class DialogComponent {
 
   theme: Signal<ITheme | undefined>;
 
+  private _componentData: any;
+
   private _resizeObserer: ResizeObserver;
 
   private _elementRef = inject(ElementRef<HTMLDivElement>);
 
   private _themeService = inject(ThemeService);
+
+  private _destroyRef = inject(DestroyRef);
 
   private _onResizeHandler = () => {
     const el = this._elementRef.nativeElement as HTMLDivElement,
@@ -151,11 +158,25 @@ export class DialogComponent {
     });
   }
 
+  ngAfterViewInit(): void {
+    const data = this.data, contentTemplate = this.contentTemplate;
+    if (contentTemplate && data.content !== undefined) {
+      contentTemplate.clear();
+      const componentRef: ComponentRef<{ $changes: Observable<any> }> = contentTemplate.createComponent(data.content);
+      componentRef.instance.$changes.pipe(
+        takeUntilDestroyed(this._destroyRef),
+        tap(v => {
+          this._componentData = v;
+        }),
+      ).subscribe();
+    }
+  }
+
   close(data?: any) {
     this._dialogRef.close(data);
   }
 
   onButtonClickHandler(item: IButtonGroupItem & { data?: any }) {
-    this.close(item.data);
+    this.close({ data: item.data, componentData: this._componentData });
   }
 }

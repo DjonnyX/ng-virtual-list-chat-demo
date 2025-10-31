@@ -7,7 +7,7 @@ import {
 import { environment } from '@environments/environment';
 import { MessagesLoadingIndicatorComponent } from '@entities/messages';
 import { MessageGroupComponent, MessagesTypingIndicatorComponent } from '@entities/message';
-import { MessageBoxComponent } from '@features/message';
+import { IDeleteEventData, MessageBoxComponent } from '@features/message';
 import { XVirtualListComponent } from '@shared/components';
 import {
   FocusAlignments, Id, IDisplayObjectConfig, ISize, IVirtualListItem, IVirtualListItemConfigMap,
@@ -77,7 +77,7 @@ export class MessagesComponent implements OnDestroy {
 
   isPreparedToShowing = signal<boolean>(false);
 
-  private _$delete = new Subject<[IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, IRenderVirtualListItemConfig, ISize, number]>();
+  private _$delete = new Subject<[IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, IRenderVirtualListItemConfig, ISize, boolean]>();
   protected $delete = this._$delete.asObservable();
 
   private _$edit = new Subject<{
@@ -185,15 +185,19 @@ export class MessagesComponent implements OnDestroy {
         host.style.transition = FADE_IN;
       }),
       switchMap(list => $isLoading.pipe(
+        takeUntilDestroyed(this._destroyRef),
         filter(v => !v),
         switchMap(() => of(list)),
       )),
+      takeUntilDestroyed(this._destroyRef),
       switchMap(list => {
         return list.$update.pipe(
+          takeUntilDestroyed(this._destroyRef),
           debounceTime(250),
           switchMap(() => of(list)),
         );
       }),
+      takeUntilDestroyed(this._destroyRef),
       tap(list => {
         const host = list.host.nativeElement as HTMLElement;
         host.style.opacity = OPACITY_1;
@@ -208,6 +212,7 @@ export class MessagesComponent implements OnDestroy {
         const timeStart = Date.now();
         let delayTime = 100;
         return of(chatId).pipe(
+          takeUntilDestroyed(this._destroyRef),
           tap(() => {
             this.isLoading.set(true);
           }),
@@ -224,6 +229,7 @@ export class MessagesComponent implements OnDestroy {
               return `Get message chunk error: ${err}`;
             });
           }),
+          takeUntilDestroyed(this._destroyRef),
           switchMap(res => {
             const items = Array.isArray(res.items) ? res.items : [];
             this._chunkNumber++;
@@ -239,6 +245,7 @@ export class MessagesComponent implements OnDestroy {
             return of(items);
           }),
           delay(delayTime),
+          takeUntilDestroyed(this._destroyRef),
           tap(() => {
             this.isLoading.set(false);
           }),
@@ -256,6 +263,7 @@ export class MessagesComponent implements OnDestroy {
       debounceTime(250),
       skipWhile(() => this._chunkNumber === 0),
       switchMap(() => $chatId.pipe(
+        takeUntilDestroyed(this._destroyRef),
         take(1),
       )),
       filter(v => v !== undefined),
@@ -361,10 +369,10 @@ export class MessagesComponent implements OnDestroy {
       switchMap(chatId => {
         return $delete.pipe(
           takeUntilDestroyed(this._destroyRef),
-          switchMap(([item, config, measures]) => {
+          switchMap(([item, config, measures, deleteAll]) => {
             this._proxyCollection.setParams(item.id, { removal: true, });
             const id = item.id;
-            return this._messagesService.deleteMessage(chatId, id).pipe(
+            return this._messagesService.deleteMessage(chatId, id, { deleteAll }).pipe(
               takeUntilDestroyed(this._destroyRef),
               catchError((err) => {
                 this._proxyCollection.setParams(item.id, { removal: false, });
@@ -386,10 +394,12 @@ export class MessagesComponent implements OnDestroy {
             }
           }),
           delay(0),
+          takeUntilDestroyed(this._destroyRef),
           tap(({ item }) => {
             this._proxyCollection.setParams(item.id, { deleted: true, });
           }),
           delay(150),
+          takeUntilDestroyed(this._destroyRef),
           tap(({ item }) => {
             this._proxyCollection.delete(item.id);
           }),
@@ -470,6 +480,7 @@ export class MessagesComponent implements OnDestroy {
         }
         return of({ id: undefined, list: undefined });
       }),
+      takeUntilDestroyed(this._destroyRef),
       tap(({ id, list }) => {
         if (id !== undefined && list) {
           list!.scrollTo(id);
@@ -506,6 +517,7 @@ export class MessagesComponent implements OnDestroy {
         this.collectionConfigMap.set(config);
       }),
       delay(1),
+      takeUntilDestroyed(this._destroyRef),
       tap(() => {
         const collection = this.collection();
         let newItems = [...collection], config = { ...this.collectionConfigMap() };
@@ -525,6 +537,7 @@ export class MessagesComponent implements OnDestroy {
         this.collectionConfigMap.set(config);
       }),
       delay(100),
+      takeUntilDestroyed(this._destroyRef),
       tap(() => {
         const collection = this.collection();
         let newItems = [...collection], config = { ...this.collectionConfigMap() };
@@ -566,12 +579,13 @@ export class MessagesComponent implements OnDestroy {
     this._messageService.stopSnappingScrollToEnd();
   }
 
-  onDeleteItemHandler({ nativeEvent, item, config, measures }:
+  onDeleteItemHandler({ data, componentData }:
     {
-      nativeEvent: Event, item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, config: IRenderVirtualListItemConfig, measures: ISize,
+      data: IDeleteEventData | undefined;
+      componentData: boolean;
     }, index: number) {
-    if (item) {
-      this._$delete.next([item, config, measures, index]);
+    if (data && data.item) {
+      this._$delete.next([data.item, data.config, data.measures, componentData]);
     }
   }
 

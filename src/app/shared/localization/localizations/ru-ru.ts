@@ -21,6 +21,7 @@ const localization: ILocalization = {
                     delete: {
                         title: 'Внимание',
                         message: 'Вы уверены, что хотите удалить сообщение?',
+                        deleteAll: 'Удалить у всех',
                         cancel: 'отменить',
                         delete: 'удалить',
                     },

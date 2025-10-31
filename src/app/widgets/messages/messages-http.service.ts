@@ -31,7 +31,7 @@ export class MessagesHttpService implements MessagesService {
     throw new Error('Method not implemented.');
   }
 
-  deleteMessage(chatId: Id, messageId: Id): Observable<number | undefined> {
+  deleteMessage(chatId: Id, messageId: Id, params: { deleteAll: boolean; }): Observable<number | undefined> {
     throw new Error('Method not implemented.');
   }
 }

@@ -1,0 +1,5 @@
+<div localeSensitive class="content">
+    <x-check-box [checked]="false" type="stroke" str (onCheck)="onCheckHandler($event)" preset="x-checkbox-secondary">
+        {{localization()?.chat?.messages?.message?.dialog?.delete?.deleteAll}}
+    </x-check-box>
+</div>

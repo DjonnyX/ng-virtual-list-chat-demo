@@ -1,4 +1,4 @@
-import { Component, DestroyRef, effect, ElementRef, inject, input, OnDestroy, output, Signal, signal, viewChild } from '@angular/core';
+import { AfterViewInit, Component, DestroyRef, effect, ElementRef, inject, input, OnDestroy, output, Signal, signal, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { delay, filter, fromEvent, map, Subject, switchMap, tap } from 'rxjs';
@@ -37,7 +37,7 @@ const DEFAULT_ROUND_CORNER: RoundedCorner = [8, 8, 8, 8],
   templateUrl: './button.component.html',
   styleUrl: './button.component.scss',
 })
-export class ButtonComponent implements OnDestroy {
+export class ButtonComponent implements AfterViewInit, OnDestroy {
   button = viewChild<ElementRef<HTMLButtonElement>>('button');
 
   mode = input<SubstarateMode>(SubstarateModes.ROUNDED_RECTANGLE);
@@ -165,6 +165,10 @@ export class ButtonComponent implements OnDestroy {
     effect(() => {
       this.applyStyles();
     });
+  }
+
+  ngAfterViewInit(): void {
+    this._onResizeHandler();
   }
 
   private applyStyles(currentPreset?: string) {

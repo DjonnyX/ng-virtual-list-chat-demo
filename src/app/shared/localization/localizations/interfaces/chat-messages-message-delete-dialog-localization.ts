@@ -8,6 +8,7 @@
 export interface IChatMessagesMessageDeleteDialogLocalizataion {
     title: string;
     message: string;
+    deleteAll: string;
     cancel: string;
     delete: string;
 }

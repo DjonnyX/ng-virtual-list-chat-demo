@@ -168,7 +168,8 @@ export class MessagesMockService implements MessagesService {
         });
     }
 
-    deleteMessage(chatId: Id, messageId: Id): Observable<number | undefined> {
+    deleteMessage(chatId: Id, messageId: Id, params: { deleteAll: boolean; }): Observable<number | undefined> {
+        console.info(params.deleteAll)
         const items = db.chats[chatId].messages ?? [];
         const index = items.findIndex(({ id }) => id == messageId);
         if (index > -1) {

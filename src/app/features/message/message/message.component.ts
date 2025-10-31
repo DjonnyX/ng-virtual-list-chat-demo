@@ -209,6 +209,7 @@ export class MessageComponent implements AfterViewInit, OnDestroy {
     if (container) {
       this._resizeObserver.observe(container);
     }
+    this._onContainerResizeHandler();
   }
 
   onTextAreaClickHandler(e: Event) {

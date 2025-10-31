@@ -21,6 +21,7 @@ export const localization: ILocalization = {
                     delete: {
                         title: 'תְשׁוּמַת לֵב',
                         message: `האם אתה בטוח שאתה רוצה למחוק את ההודעה?`,
+                        deleteAll: 'מחיקה מכולם',
                         cancel: 'לְבַטֵל',
                         delete: 'לִמְחוֹק',
                     },

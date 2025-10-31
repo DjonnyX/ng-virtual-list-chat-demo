@@ -21,6 +21,8 @@
         @if (messageValue) {
             <p #message localeSensitive class="message">{{ messageValue }}</p>
         }
+        <ng-template #contentTemplate>
+        </ng-template>
         @if (actions) {
             <div localeSensitive class="actions">
                 <x-button-group class="button-group" [ngStyle]="s" [items]="actions"

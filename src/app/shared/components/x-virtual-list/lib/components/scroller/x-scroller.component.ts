@@ -1,4 +1,4 @@
-import { Component, ElementRef, input, viewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, inject, input, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { ScrollerDirection } from './enums';
@@ -63,6 +63,8 @@ export class XScrollerComponent {
 
   private _animationCanceler: Function | undefined;
 
+  private _destroyRef = inject(DestroyRef);
+
   get scrollLeft() {
     return (this.scrollViewport()?.nativeElement.scrollLeft ?? 0);
   }
@@ -79,9 +81,11 @@ export class XScrollerComponent {
       filter(v => !!v),
       map(v => v.nativeElement),
       switchMap(scrollViewport => {
-        return fromEvent<Event>(scrollViewport, 'scroll');
+        return fromEvent<Event>(scrollViewport, 'scroll').pipe(
+          takeUntilDestroyed(this._destroyRef),
+        );
       }),
-      tap(e => {
+      tap(() => {
         const x = this.scrollLeft, y = this.scrollTop;
         if (this._x !== x || this._y !== y) {
           this.scrollTo({ left: x, top: y });

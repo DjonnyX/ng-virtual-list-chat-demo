@@ -18,6 +18,8 @@ import { IProxyCollectionItem } from '@widgets/messages/messages/utils/proxy-col
 import { MessageComponent } from '../message/message.component';
 import { IMessageParams } from '../message/interfaces';
 import { ILocalization, LocalizationService, LocaleSensitiveDirective } from '@shared/localization';
+import { DialogDeleteContentComponent } from '@entities/message/dialog-delete-content/dialog-delete-content.component';
+import { IDeleteEventData } from './interfaces';
 
 const CLASS_IN = 'in', CLASS_OUT = 'out', CLASS_SIMPLE = 'simple', CLASS_END_OF_MESSAGES = 'end-of-messages',
   CLASS_REMOVAL = 'removal', CLASS_DELETED = 'deleted', CLASS_ANIMATE = 'animate', CLASS_EDITED = 'edited', CLASS_RTL = 'rtl',
@@ -62,13 +64,6 @@ const getContextMenuNormal = (localization: ILocalization | undefined): IContext
     },
   ];
 
-interface IDeleteEventData {
-  nativeEvent: Event;
-  item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>;
-  config: IDisplayObjectConfig;
-  measures: ISize;
-}
-
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
@@ -109,7 +104,7 @@ export class MessageBoxComponent {
 
   changeText = output<string | undefined>();
 
-  delete = output<IDeleteEventData>();
+  delete = output<{ data: IDeleteEventData | undefined, componentData: boolean; }>();
 
   private tmpValue = signal<string | undefined>(undefined);
 
@@ -143,7 +138,7 @@ export class MessageBoxComponent {
 
   localization: Signal<ILocalization | undefined>;
 
-  locale: Signal<string| undefined>;
+  locale: Signal<string | undefined>;
 
   readonly longPressDuration = 1000;
 
@@ -259,9 +254,10 @@ export class MessageBoxComponent {
 
   onDeleteItemHandler(nativeEvent: Event, item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, config: IDisplayObjectConfig, measures: ISize) {
     const data: IDeleteEventData = { nativeEvent, item: item!, config: config!, measures: measures! };
-    this._dialogService.open<IDeleteEventData | undefined>({
+    this._dialogService.open<{ data: IDeleteEventData | undefined, componentData: boolean }>({
       title: this._localizationService.localization.chat.messages.message.dialog.delete.title,
       message: this._localizationService.localization.chat.messages.message.dialog.delete.message,
+      content: DialogDeleteContentComponent,
       actions: [
         {
           action: "cancel",
@@ -279,9 +275,9 @@ export class MessageBoxComponent {
       preset: DialogPresets.PRIMARY,
     }).pipe(
       takeUntilDestroyed(this._destroyRef),
-      filter(data => !!data),
-      tap(data => {
-        this.delete.emit(data);
+      filter((data) => !!data),
+      tap(({ data, componentData }) => {
+        this.delete.emit({ data: data, componentData: componentData });
       }),
     ).subscribe();
   }

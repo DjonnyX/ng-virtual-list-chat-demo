@@ -30,5 +30,5 @@ export abstract class MessagesService {
 
     abstract updateMessage(chatId: Id, messageId: Id, message: Partial<Omit<IVirtualListItem<IMessageItemData>, 'id'>>): Observable<IVirtualListItem<IMessage>>;
 
-    abstract deleteMessage(chatId: Id, messageId: Id): Observable<number | undefined>;
+    abstract deleteMessage(chatId: Id, messageId: Id, params: { deleteAll: boolean; }): Observable<number | undefined>;
 }
