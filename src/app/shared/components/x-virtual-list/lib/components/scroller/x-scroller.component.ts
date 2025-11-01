@@ -1,6 +1,8 @@
-import { Component, ElementRef, input, viewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, inject, input, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CdkScrollable } from '@angular/cdk/scrolling';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { filter, fromEvent, map, Subject, switchMap, tap } from 'rxjs';
 import { ScrollerDirection } from './enums';
 import { ScrollBox } from './utils';
 import { ScrollerDirections } from './enums';
@@ -43,6 +45,12 @@ export class XScrollerComponent {
 
   classes = input<{ [cName: string]: boolean }>({});
 
+  private _$scroll = new Subject<void>();
+  readonly $scroll = this._$scroll.asObservable();
+
+  private _$scrollEnd = new Subject<void>();
+  readonly $scrollEnd = this._$scrollEnd.asObservable();
+
   private _scrollBox = new ScrollBox();
 
   get host() {
@@ -57,6 +65,8 @@ export class XScrollerComponent {
     return (this.scrollViewport()?.nativeElement.scrollHeight ?? 0);
   }
 
+  private _destroyRef = inject(DestroyRef);
+
   private _x: number = 0;
 
   private _y: number = 0;
@@ -69,6 +79,24 @@ export class XScrollerComponent {
 
   get scrollTop() {
     return (this.scrollViewport()?.nativeElement.scrollTop ?? 0);
+  }
+
+  constructor() {
+    const $scroller = toObservable(this.scrollViewport);
+
+    $scroller.pipe(
+      takeUntilDestroyed(),
+      filter(v => !!v),
+      map(v => v.nativeElement),
+      switchMap(scroller => {
+        return fromEvent(scroller, 'scroll', { passive: true }).pipe(
+          takeUntilDestroyed(this._destroyRef),
+          tap(e => {
+            this._$scroll.next();
+          }),
+        );
+      }),
+    ).subscribe();
   }
 
   animate(startValue: number, endValue: number, duration = 500, easingFunction: Easing = easeLinear) {
@@ -103,14 +131,18 @@ export class XScrollerComponent {
       const scrollViewport = this.scrollViewport()?.nativeElement as HTMLDivElement;
       if (scrollViewport) {
         if (isVertical) {
-          scrollViewport.scrollTop = this._y = currentValue;
+          this._y = currentValue;
+          scrollViewport.scrollTop = currentValue;
         } else {
-          scrollViewport.scrollLeft = this._x = currentValue;
+          this._x = currentValue;
+          scrollViewport.scrollLeft = currentValue;
         }
       }
 
       if (progress < 1) {
         requestAnimationFrame(step);
+      } else {
+        this._$scrollEnd.next();
       }
     }, canceler = () => {
       isCanceled = true;

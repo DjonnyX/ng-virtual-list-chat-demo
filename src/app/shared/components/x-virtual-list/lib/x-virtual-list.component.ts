@@ -1240,6 +1240,18 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
       map(v => v.nativeElement),
       take(1),
     ),
+      $scrollerScroll = toObservable(this._scrollerComponent).pipe(
+        takeUntilDestroyed(),
+        filter(v => !!v),
+        take(1),
+        switchMap(scroller => scroller.$scroll),
+      ),
+      $scrollerScrollEnd = toObservable(this._scrollerComponent).pipe(
+        takeUntilDestroyed(),
+        filter(v => !!v),
+        take(1),
+        switchMap(scroller => scroller.$scrollEnd),
+      ),
       $list = toObservable(this._list).pipe(
         takeUntilDestroyed(),
         filter(v => !!v),
@@ -1271,13 +1283,13 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
       }),
     ).subscribe();
 
-    const $docPointerUp = fromEvent(document, POINTER_UP).pipe(
+    const $docPointerUp = fromEvent(document, POINTER_UP, { passive: true }).pipe(
       take(1),
     ),
-      $docPointerLeave = fromEvent(document, POINTER_LEAVE).pipe(
+      $docPointerLeave = fromEvent(document, POINTER_LEAVE, { passive: true }).pipe(
         take(1),
       ),
-      $docpointerOut = fromEvent(document, POINTER_OUT).pipe(
+      $docpointerOut = fromEvent(document, POINTER_OUT, { passive: true }).pipe(
         take(1),
       ),
       $pointerMoveTakeUntil = race([$docPointerUp, $docPointerLeave, $docpointerOut]).pipe(
@@ -1289,10 +1301,10 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
       takeUntilDestroyed(),
       distinctUntilChanged(),
       switchMap(scroller => {
-        return fromEvent(scroller, POINTER_DOWN).pipe(
+        return fromEvent(scroller, POINTER_DOWN, { passive: true }).pipe(
           takeUntilDestroyed(this._destroyRef),
           switchMap(e => {
-            return fromEvent(scroller, SCROLL).pipe(
+            return $scrollerScroll.pipe(
               takeUntilDestroyed(this._destroyRef),
               takeUntil($pointerMoveTakeUntil),
               filter(() => {
@@ -1319,7 +1331,7 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
       takeUntilDestroyed(),
       distinctUntilChanged(),
       switchMap(scroller => {
-        return fromEvent(scroller, TOUCH_MOVE).pipe(
+        return fromEvent(scroller, TOUCH_MOVE, { passive: true }).pipe(
           takeUntilDestroyed(this._destroyRef),
           tap(e => {
             _$scrollToEndDuringUpdateCanceller.next(1);
@@ -1332,7 +1344,7 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
       takeUntilDestroyed(),
       distinctUntilChanged(),
       switchMap(scroller => {
-        return fromEvent(scroller, SCROLL).pipe(
+        return $scrollerScroll.pipe(
           takeUntilDestroyed(this._destroyRef),
         );
       }),
@@ -1358,7 +1370,7 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
       takeUntilDestroyed(),
       distinctUntilChanged(),
       switchMap(scroller => {
-        return fromEvent(scroller, SCROLL_END).pipe(
+        return $scrollerScrollEnd.pipe(
           takeUntilDestroyed(this._destroyRef),
         );
       }),
@@ -1384,7 +1396,7 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
       takeUntilDestroyed(),
       distinctUntilChanged(),
       switchMap(scroller => {
-        return fromEvent(scroller, SCROLL).pipe(
+        return $scrollerScroll.pipe(
           takeUntilDestroyed(this._destroyRef),
         );
       }),
