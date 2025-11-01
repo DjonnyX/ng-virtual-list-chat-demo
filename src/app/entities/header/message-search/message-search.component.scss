@@ -19,11 +19,12 @@
         border-style: solid;
         width: calc(100%);
         max-width: 32px;
-        padding-right: 30px;
+        padding-right: 20px;
         transition: max-width 0.15s ease-in-out;
 
         .trl {
             padding: 6px 6px 6px 0;
+            padding-right: 30px;
         }
 
         &::placeholder {

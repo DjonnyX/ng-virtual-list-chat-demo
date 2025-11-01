@@ -1,12 +1,12 @@
 import { Component, DestroyRef, effect, ElementRef, inject, input, signal, viewChild, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { delay, filter, map, switchMap, tap } from 'rxjs';
+import { debounceTime, delay, filter, map, switchMap, tap } from 'rxjs';
+import { Color, GradientColor, GradientColorPositions } from '@shared/types';
 import { MessageSubstarateMode } from './types/message-substrate-mode';
 import { MessageSubstarateModes } from './enums/message-substrate-modes';
 import { MessageSubstarateStyle } from './types';
 import { MessageSubstarateStyles } from './enums';
-import { Color, GradientColor, GradientColorPositions } from '@shared/types';
 
 const DEFAULT_STROKE_ANIMATION_DURATION = 1000,
   LEFT_WIDTH = 17.5,
@@ -94,6 +94,10 @@ export class MessageSubstrateComponent {
 
   rippleEnabled = signal<boolean>(false);
 
+  prepared = signal<boolean>(false);
+
+  classes = signal<{ [cName: string]: boolean }>({});
+
   private _destroyRef = inject(DestroyRef);
 
   private _elementRef = inject(ElementRef<HTMLDivElement>);
@@ -101,9 +105,20 @@ export class MessageSubstrateComponent {
   constructor() {
     this._id = MessageSubstrateComponent.nextId;
 
+    const $prepared = toObservable(this.prepared);
+
+    $prepared.pipe(
+      takeUntilDestroyed(),
+      debounceTime(50),
+      tap((prepared) => {
+        this.classes.set({ prepared });
+      }),
+    ).subscribe();
+
     effect(() => {
       const fillColors = this.fillColors();
       if (Array.isArray(fillColors) && fillColors.length === 2) {
+        this.prepared.set(true);
         const fillGradientColor1 = this.fillGradientColor1(), fillGradientColor2 = this.fillGradientColor2();
         if (fillGradientColor1 && fillGradientColor2) {
           fillGradientColor1.nativeElement.setAttribute(GRADIENT_COLOR_NAME, `${fillColors[0]}`);
@@ -119,9 +134,9 @@ export class MessageSubstrateComponent {
         if (shape) {
           shape.setAttribute('fill', `inherit`);
         }
+        this.prepared.set(false);
       }
     });
-
 
     effect(() => {
       const fillColorPositions = this.fillPositions();

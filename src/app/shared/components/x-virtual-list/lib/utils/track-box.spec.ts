@@ -40,7 +40,22 @@ const generateItem = (id: Id): IRenderVirtualListItem => {
     return {
         id,
         index: 0,
-        measures: { x: 0, y: 0, width: 0, height: 0, delta: 0, absolutePosition: 0 },
+        measures: {
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0,
+            delta: 0,
+            positionOffset: 0,
+            position: 0,
+            scrollSize: 0,
+            size: 0,
+            boundsSize: 0,
+            absoluteStartPosition: 0,
+            absoluteStartPositionPercent: 0,
+            absoluteEndPosition: 0,
+            absoluteEndPositionPercent: 0
+        },
         data: { id },
         config: {
             new: false,
@@ -90,7 +105,12 @@ describe('TrackBox', () => {
         }
         const trackBox = new TrackBoxTested(trackBy);
         trackBox.updateCollection(collection, {}, {
-            bounds: { width: 0, height: 0 },
+            bounds: {
+                width: 0,
+                height: 0,
+                x: 0,
+                y: 0
+            },
             isVertical: true,
             itemSize: 40,
             bufferSize: 1,
@@ -212,7 +232,9 @@ describe('TrackBox', () => {
                 totalLength: 0,
                 totalSize: 0,
                 typicalItemSize: itemSize,
-                isFromItemIdFound: false
+                isFromItemIdFound: false,
+                offsetX: 0,
+                offsetY: 0
             };
             return metric;
         }

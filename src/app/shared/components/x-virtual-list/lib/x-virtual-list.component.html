@@ -7,6 +7,6 @@
     <ng-container #snapRendererContainer></ng-container>
   </div>
 }
-<x-scroller #scroller [focusedElement]="focusedElement()">
+<x-scroller #scroller [classes]="classes()" [focusedElement]="focusedElement()">
   <ng-container #renderersContainer></ng-container>
 </x-scroller>

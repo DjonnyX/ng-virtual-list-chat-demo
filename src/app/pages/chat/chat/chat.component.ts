@@ -15,6 +15,7 @@ import { ThemeService } from '@shared/theming';
 import { generateChatCollection } from '@mock/const';
 import { IMessageItemData } from '@shared/models/message';
 import { LocaleSensitiveDirective } from '@shared/localization';
+import { MessaageCreatorComponent } from '@widgets/message/messaage-creator/messaage-creator.component';
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -27,7 +28,7 @@ import { LocaleSensitiveDirective } from '@shared/localization';
   selector: 'x-chat',
   standalone: true,
   imports: [CommonModule, FormsModule, LocaleSensitiveDirective, MenuButtonComponent, MessageSearchComponent, DrawerComponent,
-    MessagesComponent, GroupsComponent],
+    MessagesComponent, GroupsComponent, MessaageCreatorComponent],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

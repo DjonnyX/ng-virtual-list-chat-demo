@@ -1,8 +1,9 @@
 <svg #svg style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
     <defs>
-        <linearGradient class="fill" #fillGradient y1="50%" y2="50%" gradientTransform="rotate(90)">
-            <stop class="g1" #fillGradientColor1 offset="0%" stop-color="#fff" />
-            <stop class="g2" #fillGradientColor2 offset="100%" stop-color="#fff" />
+        @let class = classes();
+        <linearGradient class="fill" [ngClass]="class" #fillGradient y1="50%" y2="50%" gradientTransform="rotate(90)">
+            <stop class="g1" [ngClass]="class" #fillGradientColor1 offset="0%" stop-color="#fff" />
+            <stop class="g2" [ngClass]="class" #fillGradientColor2 offset="100%" stop-color="#fff" />
         </linearGradient>
         <radialGradient #strokeGradient cx="0%" cy="0%" r="125%" fx="0" fy="0" gradientTransform="rotate(45)">
             <stop #strokeGradientColor1 offset="80%" stop-color="#fff" />

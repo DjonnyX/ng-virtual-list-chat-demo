@@ -36,10 +36,14 @@
 }
 
 .fill {
-    transition: all 200ms ease-out;
+    &.prepared {
+        transition: all 200ms ease-out;
+    }
 }
 
 .g1,
 .g2 {
-    transition: stop-color 200ms ease-out, offset 200ms ease-out;
+    &.prepared {
+        transition: stop-color 200ms ease-out, offset 200ms ease-out;
+    }
 }

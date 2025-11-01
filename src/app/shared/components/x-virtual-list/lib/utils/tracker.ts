@@ -91,7 +91,7 @@ export class Tracker<C extends BaseVirtualListItemComponent = any> {
                         });
                         if (indexByUntrackedItems > -1) {
                             if (snapedComponent) {
-                                if (item['config']['snapped'] || item['config']['snappedOut']) {
+                                if (item.config.snapped || item.config.snappedOut) {
                                     isRegularSnapped = true;
                                     snapedComponent.instance.item = item;
                                     snapedComponent.instance.show();
@@ -99,7 +99,7 @@ export class Tracker<C extends BaseVirtualListItemComponent = any> {
                             }
 
                             if (snapedComponent) {
-                                if (item['config']['snapped'] || item['config']['snappedOut']) {
+                                if (item.config.snapped || item.config.snappedOut) {
                                     comp.instance.item = null;
                                     comp.instance.hide();
                                 } else {
@@ -131,14 +131,14 @@ export class Tracker<C extends BaseVirtualListItemComponent = any> {
 
                 if (comp) {
                     if (snapedComponent) {
-                        if (item['config']['snapped'] || item['config']['snappedOut']) {
+                        if (item.config.snapped || item.config.snappedOut) {
                             isRegularSnapped = true;
                             snapedComponent.instance.item = item;
                             snapedComponent.instance.show();
                         }
                     }
                     if (snapedComponent) {
-                        if (item['config']['snapped'] || item['config']['snappedOut']) {
+                        if (item.config.snapped || item.config.snappedOut) {
                             comp.instance.item = null;
                             comp.instance.hide();
                         } else {

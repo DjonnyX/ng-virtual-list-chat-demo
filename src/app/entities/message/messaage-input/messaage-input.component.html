@@ -1,0 +1,10 @@
+@let value = tmpValue();
+@let sendButtonState = editingState();
+@let isValid = isMessageValid();
+@let saving = isSaving();
+<div class="container">
+    <textarea #textarea localeSensitive cdkTextareaAutosize class="editor" [value]="value"
+        (input)="onInputHandler($event)"></textarea>
+    <x-message-send-button [state]="sendButtonState" [valid]="isValid" [loading]="saving"
+        (onClick)="onSaveHandler($event, sendButtonState)" calcFillPositions />
+</div>

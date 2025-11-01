@@ -1,12 +1,10 @@
-import { Component, DestroyRef, ElementRef, inject, input, viewChild } from '@angular/core';
+import { Component, ElementRef, input, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { ScrollerDirection } from './enums';
 import { ScrollBox } from './utils';
 import { ScrollerDirections } from './enums';
 import { Id } from '../../types';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { filter, fromEvent, map, switchMap, tap } from 'rxjs';
 import { Easing } from './types';
 import { easeLinear } from './utils/ease';
 
@@ -43,6 +41,8 @@ export class XScrollerComponent {
 
   content = input<HTMLElement>();
 
+  classes = input<{ [cName: string]: boolean }>({});
+
   private _scrollBox = new ScrollBox();
 
   get host() {
@@ -63,35 +63,12 @@ export class XScrollerComponent {
 
   private _animationCanceler: Function | undefined;
 
-  private _destroyRef = inject(DestroyRef);
-
   get scrollLeft() {
     return (this.scrollViewport()?.nativeElement.scrollLeft ?? 0);
   }
 
   get scrollTop() {
     return (this.scrollViewport()?.nativeElement.scrollTop ?? 0);
-  }
-
-  constructor() {
-    const $scrollViewport = toObservable(this.scrollViewport);
-
-    $scrollViewport.pipe(
-      takeUntilDestroyed(),
-      filter(v => !!v),
-      map(v => v.nativeElement),
-      switchMap(scrollViewport => {
-        return fromEvent<Event>(scrollViewport, 'scroll').pipe(
-          takeUntilDestroyed(this._destroyRef),
-        );
-      }),
-      tap(() => {
-        const x = this.scrollLeft, y = this.scrollTop;
-        if (this._x !== x || this._y !== y) {
-          this.scrollTo({ left: x, top: y });
-        }
-      }),
-    ).subscribe();
   }
 
   animate(startValue: number, endValue: number, duration = 500, easingFunction: Easing = easeLinear) {
@@ -163,28 +140,36 @@ export class XScrollerComponent {
       positionX: posX, positionY: posY,
     });
 
-    if (isVertical) {
-      const prevY = this._y;
-      if (behavior === 'auto' || behavior === 'smooth') {
-        this.animate(prevY, y);
-      } else {
-        if (this._animationCanceler !== undefined) {
-          this._animationCanceler();
-        }
-        scrollViewport.scrollTop = y;
-      }
-    } else {
-      const prevX = this._x;
-      if (behavior === 'auto' || behavior === 'smooth') {
-        this.animate(prevX, x);
-      } else {
-        if (this._animationCanceler !== undefined) {
-          this._animationCanceler();
-        }
-        scrollViewport.scrollLeft = x;
-      }
-    }
+    const prevX = this._x;
+    const prevY = this._y;
     this._x = x;
     this._y = y;
+    if (behavior === 'auto' || behavior === 'smooth') {
+      if (isVertical) {
+        if (prevY !== y) {
+          this.animate(prevY, y);
+        }
+      } else {
+        if (prevX !== x) {
+          this.animate(prevX, x);
+        }
+      }
+    } else {
+      if (isVertical) {
+        if (prevY !== y) {
+          if (this._animationCanceler !== undefined) {
+            this._animationCanceler();
+          }
+          scrollViewport.scrollTop = y;
+        }
+      } else {
+        if (prevX !== x) {
+          if (this._animationCanceler !== undefined) {
+            this._animationCanceler();
+          }
+          scrollViewport.scrollLeft = x;
+        }
+      }
+    }
   }
 }

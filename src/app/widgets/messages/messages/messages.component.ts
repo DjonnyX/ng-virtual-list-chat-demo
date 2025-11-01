@@ -197,7 +197,7 @@ export class MessagesComponent implements OnDestroy {
       switchMap(list => {
         return list.$update.pipe(
           takeUntilDestroyed(this._destroyRef),
-          debounceTime(250),
+          debounceTime(500),
           switchMap(() => of(list)),
         );
       }),

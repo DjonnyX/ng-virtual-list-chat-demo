@@ -1,6 +1,7 @@
 @let d = data();
 @let c = config();
 @let m = measures();
+@let b = bounds();
 @let isEditing = editing();
 @let substrMode = substarateMode();
 @let searchedWords = searchPattern();
@@ -9,9 +10,7 @@
 @let stroke = strokeColor();
 @let gradientFillPositions = fillPositions();
 @if (d && c && m) {
-    @let w = container.offsetWidth;
-    @let h = container.offsetHeight;
-    <x-message-substrate #substrate class="message-substrate" [type]="type" [width]="w" [height]="h" [mode]="substrMode"
+    <x-message-substrate #substrate class="message-substrate" [type]="type" [width]="b.width" [height]="b.height" [mode]="substrMode"
         [strokeColors]="stroke" [fillColors]="fillColors()" [fillPositions]="gradientFillPositions"
         [rippleColor]="rippleColor()"></x-message-substrate>
     <div #container class="message-container" [ngClass]="class" (pointerdown)="substrate.ripple($event)">

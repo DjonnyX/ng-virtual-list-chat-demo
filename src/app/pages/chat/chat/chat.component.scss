@@ -40,3 +40,10 @@
     width: calc(100%);
     overflow: hidden;
 }
+
+.viewer-container {
+    height: calc(100%);
+    width: calc(100%);
+    display: grid;
+    grid-template-rows: 1fr auto;
+}

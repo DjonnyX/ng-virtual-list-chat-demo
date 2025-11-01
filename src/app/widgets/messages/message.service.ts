@@ -32,8 +32,8 @@ export class MessageService {
   }
 
   stopSnappingScrollToEnd() {
-    if (this._virtualList) {
-      this._virtualList.stopSnappingScrollToEnd();
-    }
+    // if (this._virtualList) {
+    //   this._virtualList.stopSnappingScrollToEnd();
+    // }
   }
 }

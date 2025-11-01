@@ -20,6 +20,7 @@ export type CollectionItem<D = any> = { id: Id, dateTime: number, version: numbe
  */
 export interface IProxyCollectionItem<D = any> {
     id: Id;
+    new: boolean;
     version: number;
     edited: boolean;
     selected: boolean;
@@ -40,6 +41,7 @@ const createProxyItem = <D = any>(data: CollectionItem<D>
     , params: Partial<Omit<IProxyCollectionItem<D>, 'id' | 'data'>> = {}):
     CollectionItem<IProxyCollectionItem<D>> => ({
         version: -1,
+        new: true,
         edited: false,
         selected: false,
         animate: false,
