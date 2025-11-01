@@ -22,7 +22,7 @@ import {
 import { IRenderVirtualListItem, IScrollEvent, IScrollOptions, IVirtualListCollection, IVirtualListItem, IVirtualListItemConfigMap, } from './models';
 import { FocusAlignment, Id, IRect, ISize } from './types';
 import { IRenderVirtualListCollection } from './models/render-collection.model';
-import { CollectionMode, CollectionModes, Direction, Directions, FocusAlignments, MethodForSelecting, MethodsForSelecting, SnappingMethod, } from './enums';
+import { CollectionMode, CollectionModes, Direction, Directions, FocusAlignments, MethodForSelecting, MethodsForSelecting, SnappingMethod, SnappingMethods, } from './enums';
 import { ScrollEvent, toggleClassName } from './utils';
 import { IGetItemPositionOptions, IUpdateCollectionOptions, TrackBoxEvents, TrackBox } from './utils/track-box';
 import { isSnappingMethodAdvenced } from './utils/snapping-method';
@@ -575,9 +575,9 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
 
   private _snappingMethodOptions = {
     transform: (v: SnappingMethod) => {
-      const valid = validateString(v) && (v === 'normal' || v === 'advanced');
+      const valid = validateString(v) && (v === 'normal' || v === 'advanced' || 'chat');
       if (!valid) {
-        console.error('The "snappingMethod" parameter must have the value `normal` or `advanced`.');
+        console.error('The "snappingMethod" parameter must have the value `normal`, `advanced` or `chat`.');
         return DEFAULT_SNAPPING_METHOD;
       }
       return v;
@@ -588,6 +588,7 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
    * Snapping method.
    * 'default' - Normal group rendering.
    * 'advanced' - The group is rendered on a transparent background. List items below the group are not rendered.
+   * 'chat' - The chat rendering mode.
    */
   snappingMethod = input<SnappingMethod>(DEFAULT_SNAPPING_METHOD, { ...this._snappingMethodOptions });
 
@@ -725,7 +726,8 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
 
       snappedComponent.regularLength = `${isVertical ? listBounds.width : listBounds.height}${PX}`;
       const { width: sWidth, height: sHeight } = snappedComponent.getBounds() ?? { width: 0, height: 0 },
-        scrollerElement = scroller.nativeElement, delta = snappedComponent.item?.measures.delta ?? 0;
+        scrollerElement = scroller.nativeElement, delta = snappedComponent.item?.measures.delta ?? 0,
+        snappingMethod = this.snappingMethod();
 
       let left: number, right: number, top: number, bottom: number;
       if (isVertical) {
@@ -733,17 +735,21 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
         right = width - scrollBarSize;
         top = sHeight;
         bottom = height;
-        if (langTextDir === TextDirections.RTL) {
-          scrollerElement.style.clipPath = `path("M 0 0 L 0 ${height} L ${width} ${height} L ${width} ${top + delta} L ${scrollBarSize} ${top + delta} L ${scrollBarSize} 0 Z")`;
-        } else {
-          scrollerElement.style.clipPath = `path("M 0 ${top + delta} L 0 ${height} L ${width} ${height} L ${width} 0 L ${right} 0 L ${right} ${top + delta} Z")`;
+        if (snappingMethod === SnappingMethods.NORMAL || snappingMethod === SnappingMethods.ADVANCED) {
+          if (langTextDir === TextDirections.RTL) {
+            scrollerElement.style.clipPath = `path("M 0 0 L 0 ${height} L ${width} ${height} L ${width} ${top + delta} L ${scrollBarSize} ${top + delta} L ${scrollBarSize} 0 Z")`;
+          } else {
+            scrollerElement.style.clipPath = `path("M 0 ${top + delta} L 0 ${height} L ${width} ${height} L ${width} 0 L ${right} 0 L ${right} ${top + delta} Z")`;
+          }
         }
       } else {
         left = sWidth;
         right = width;
         top = 0;
         bottom = height - scrollBarSize;
-        scrollerElement.style.clipPath = `path("M ${left + delta} 0 L ${left + delta} ${bottom} L 0 ${bottom} L 0 ${height} L ${width} ${height} L ${width} 0 Z")`;
+        if (snappingMethod === SnappingMethods.NORMAL || snappingMethod === SnappingMethods.ADVANCED) {
+          scrollerElement.style.clipPath = `path("M ${left + delta} 0 L ${left + delta} ${bottom} L 0 ${bottom} L 0 ${height} L ${width} ${height} L ${width} 0 Z")`;
+        }
       }
     }
   };

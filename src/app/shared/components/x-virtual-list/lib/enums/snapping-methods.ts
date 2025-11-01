@@ -17,4 +17,8 @@ export enum SnappingMethods {
      * The group is rendered on a transparent background. List items below the group are not rendered.
      */
     ADVANCED = 'advanced',
+    /**
+     * The group is rendered on a background.
+     */
+    CHAT = 'chat',
 }

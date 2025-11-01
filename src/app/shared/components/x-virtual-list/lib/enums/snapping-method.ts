@@ -11,4 +11,4 @@ import { SnappingMethods } from "./snapping-methods";
  * The commertial fork https://github.com/djonnyx/ng-virtual-list
  * All rights reserved.
  */
-export type SnappingMethod = SnappingMethods | 'normal' | 'advanced';
+export type SnappingMethod = SnappingMethods | 'normal' | 'advanced' | 'chat';

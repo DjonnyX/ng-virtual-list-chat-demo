@@ -26,6 +26,16 @@
     z-index: 1;
 }
 
+.xvl__list-scroller {
+    -webkit-tap-highlight-color: transparent;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
 .xvl__screen-reader {
     position: absolute;
     width: 1px;
