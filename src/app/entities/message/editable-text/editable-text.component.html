@@ -3,13 +3,18 @@
 @let formattedValue = formattedText();
 @let substringClass = searchSubstringClass();
 @let searchedWords = searchPattern();
+@let scroll = scrolled();
 @if (isEditing) {
-    <textarea #textarea localeSensitive cdkTextareaAutosize name="editable-text" class="editor-editable" [value]="value"
-        (keydown)="onKeyDownHandler($event)" (click)="onTextAreaClickHandler($event)" (input)="onInputHandler($event)"></textarea>
+    <div #editor class="editor" [ngClass]="{scroll}">
+        <textarea #textarea localeSensitive cdkTextareaAutosize name="editable-text" class="editor-editable"
+            [value]="value" (keydown)="onKeyDownHandler($event)"
+            (click)="onTextAreaClickHandler($event)" (input)="onInputHandler($event)"></textarea>
+    </div>
 } @else {
-    <p #readonlyText localeSensitive [style.--link-normal-color]="linkNormalColor()" [style.--link-visited-color]="linkVisitedColor()"
-        [ngStyle]="readonlyStyles()" [style.--link-hover-color]="linkHoverColor()"
-        [style.--link-active-color]="linkActiveColor()" [style.--search-substring-background]="searchSubstringBackground()"
-        searchHighlight class="editor-readonly" [substringClass]="substringClass" [text]="formattedValue"
-        [searchedWords]="searchedWords" (click)="onTextClickHandler($event)"></p>
+    <p #readonlyText localeSensitive [style.--link-normal-color]="linkNormalColor()"
+        [style.--link-visited-color]="linkVisitedColor()" [ngStyle]="readonlyStyles()"
+        [style.--link-hover-color]="linkHoverColor()" [style.--link-active-color]="linkActiveColor()"
+        [style.--search-substring-background]="searchSubstringBackground()" searchHighlight class="editor-readonly"
+        [substringClass]="substringClass" [text]="formattedValue" [searchedWords]="searchedWords"
+        (click)="onTextClickHandler($event)"></p>
 }

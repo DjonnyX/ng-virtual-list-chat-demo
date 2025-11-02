@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, DestroyRef, effect, ElementRef, inject, input, OnDestroy, output, Signal, signal, viewChild } from '@angular/core';
+import { AfterViewInit, Component, computed, DestroyRef, effect, ElementRef, inject, input, OnDestroy, output, Signal, signal, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { delay, filter, fromEvent, map, Subject, switchMap, tap } from 'rxjs';
@@ -51,6 +51,12 @@ export class CheckBoxComponent implements AfterViewInit, OnDestroy {
   content = input<string | undefined>();
 
   checked = input<boolean>(false);
+
+  indicatorFadeOut = signal<boolean>(false);
+
+  indicatorHide = signal<boolean>(false);
+
+  indicatorClasses: Signal<{ [cName: string]: boolean }>;
 
   onCheck = output<boolean>();
 
@@ -124,7 +130,8 @@ export class CheckBoxComponent implements AfterViewInit, OnDestroy {
       this.onCheck.emit(value);
     });
 
-    const $pressed = this.$pressed;
+    const $pressed = this.$pressed,
+      $value = toObservable(this.value);
 
     $pressed.pipe(
       takeUntilDestroyed(),
@@ -133,6 +140,25 @@ export class CheckBoxComponent implements AfterViewInit, OnDestroy {
       tap(v => {
         this.pressed.set(v);
         this.onPress.emit(v);
+      }),
+    ).subscribe();
+
+    $value.pipe(
+      takeUntilDestroyed(),
+      tap(v => {
+        if (!!v) {
+          this.indicatorHide.set(false);
+          this.indicatorFadeOut.set(false);
+        } else {
+          this.indicatorFadeOut.set(true);
+          this.indicatorHide.set(false);
+        }
+      }),
+      filter(v => v === false),
+      delay(150),
+      takeUntilDestroyed(this._destroyRef),
+      tap(() => {
+        this.indicatorHide.set(true);
       }),
     ).subscribe();
 
@@ -161,6 +187,11 @@ export class CheckBoxComponent implements AfterViewInit, OnDestroy {
         );
       }),
     ).subscribe();
+
+    this.indicatorClasses = computed(() => {
+      const hide = this.indicatorHide(), fadeout = this.indicatorFadeOut();
+      return { hide, fadeout };
+    });
 
     effect(() => {
       const pressed = this.pressed(), focused = this.focused(), disabled = this.disabled();

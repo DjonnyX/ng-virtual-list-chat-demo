@@ -1,25 +1,70 @@
+@keyframes gradientRotate {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    100% {
+        background-position: 100% 50%;
+    }
+}
+
 .container {
     padding: 14px 20px;
     box-sizing: border-box;
     display: grid;
     grid-template-columns: 1fr auto;
     gap: 12px;
+    background: var(--background);
+    background-size: 200% 200%;
+    animation: gradientRotate 5s linear infinite alternate;
 
     .editor {
-        font-family: inherit;
-        letter-spacing: inherit;
-        font-size: inherit;
-        resize: none;
         width: 100%;
-        min-height: 40px;
-        outline: none;
-        border: none;
+        padding: 8px 12px;
         border-radius: 5px;
-        color: inherit;
-        padding: 1px;
-        margin: 0;
-        box-sizing: content-box;
-        transition: width 150ms ease-out;
-        max-height: 320px;
+        box-sizing: border-box;
+
+        &.scroll {
+            padding: 8px 0 8px 12px;
+        }
+
+        .textarea {
+            font-family: inherit;
+            letter-spacing: 0.5px;
+            font-size: 14px;
+            resize: none;
+            width: 100%;
+            outline: none;
+            border: none;
+            padding: 0;
+            margin: 0;
+            box-sizing: content-box;
+            transition: width 150ms ease-out;
+            height: 100%;
+            min-height: 16px;
+            max-height: 320px;
+            background-color: transparent;
+
+            &::-webkit-scrollbar {
+                width: 16px;
+                height: 16px;
+            }
+
+            &::-webkit-scrollbar-track {
+                background-color: transparent;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background-color: #b6b3d7;
+                border-radius: 20px;
+                border: 6px solid transparent;
+                background-clip: content-box;
+                min-height: 60px;
+            }
+
+            &::-webkit-scrollbar-thumb:hover {
+                background-color: #908cbd;
+            }
+        }
     }
 }

@@ -1,6 +1,7 @@
 import { IChatHeaderTheme } from "./chat-header-theme";
 import { IChatMessagesTheme } from "./chat-messages/messages-theme";
 import { IChatsTheme } from "./chats";
+import { IMessageCreatorTheme } from "./message-creator";
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -11,6 +12,7 @@ import { IChatsTheme } from "./chats";
  */
 export interface IChatTheme {
     header: IChatHeaderTheme;
+    messageCreator: IMessageCreatorTheme;
     messages: IChatMessagesTheme;
     chats: IChatsTheme;
 }

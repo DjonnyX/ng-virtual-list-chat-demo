@@ -2,6 +2,7 @@
 @let messageConfig = config();
 @let messageMeasures = measures();
 @let sendButtonState = editingState();
+@let b = bounds();
 @let saving = isSaving();
 @let deleting = isDeleting();
 @let isValid = isMessageValid();
@@ -21,7 +22,7 @@
                     (changeValue)="onMessageChangeValueHandler($event)" />
             </div>
             @if (messageConfig.selected) {
-                <div class="message-controls" [ngStyle]="{height: container.offsetHeight}">
+                <div class="message-controls" [ngStyle]="{height: b.height}">
                     <x-message-menu-button #menuButton [cdkMenuTriggerFor]="menuDisabled ? undefined : menu"
                         [fillPositions]="menuButtonFillPositions()" [disabled]="menuDisabled" calcFillPositions [measures]="messageMeasures"
                         (onFillPositions)="onMenuButtonFillPositionsHandler($event)" />

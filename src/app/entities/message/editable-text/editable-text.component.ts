@@ -1,19 +1,23 @@
-import { Component, computed, DestroyRef, effect, ElementRef, inject, input, output, Signal, signal, viewChild } from '@angular/core';
+import { Component, computed, DestroyRef, effect, ElementRef, inject, input, OnDestroy, output, Signal, signal, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { from, switchMap, tap } from 'rxjs';
+import { filter, from, fromEvent, map, switchMap, tap } from 'rxjs';
 import { SearchHighlightDirective } from '@shared/directives';
 import { formatText } from '@shared/utils';
 import { ThemeService } from '@shared/theming';
 import { ITheme } from '@shared/theming';
 import { LocaleSensitiveDirective } from '@shared/localization';
+import { ISize } from '@shared/components/x-virtual-list';
 
 const DEFAULT_SEARCH_SUBSTRING_CLASS = 'search-substring',
   INITIAL = 'initial',
   USER_SELECT = 'user-select',
   WEBKIT_USER_SELECT = '-webkit-user-select',
   MOZ_USER_SELECT = '-moz-user-select',
+  DEFAULT_TEXTAREA_SIZE = 16,
+  MAX_TEXTAREA_HEIGHT = 320,
+  HIDDEN = 'hidden',
   AUTO = 'auto',
   NONE = 'none';
 
@@ -30,8 +34,10 @@ const DEFAULT_SEARCH_SUBSTRING_CLASS = 'search-substring',
   templateUrl: './editable-text.component.html',
   styleUrl: './editable-text.component.scss',
 })
-export class EditableTextComponent {
+export class EditableTextComponent implements OnDestroy {
   readonlyText = viewChild<ElementRef<HTMLSpanElement>>('readonlyText');
+
+  editor = viewChild<ElementRef<HTMLDivElement>>('editor');
 
   textarea = viewChild<ElementRef<HTMLTextAreaElement>>('textarea');
 
@@ -71,14 +77,81 @@ export class EditableTextComponent {
 
   searchSubstringBackground = signal<string>(INITIAL);
 
+  focused = signal<boolean>(false);
+
+  scrolled = signal<boolean>(false);
+
   readonlyStyles: Signal<{ [sName: string]: string }>;
 
+  private _resizeObserver: ResizeObserver;
+
+  bounds = signal<ISize>({
+    width: this.textarea()?.nativeElement?.offsetWidth || DEFAULT_TEXTAREA_SIZE,
+    height: this.textarea()?.nativeElement?.offsetHeight || DEFAULT_TEXTAREA_SIZE,
+  });
+
+  private _onContainerResizeHandler = () => {
+    const el = this.textarea()?.nativeElement as HTMLTextAreaElement;
+    if (el && el.offsetWidth && el.offsetHeight) {
+      this.bounds.set({ width: el.offsetWidth || DEFAULT_TEXTAREA_SIZE, height: el.offsetHeight || DEFAULT_TEXTAREA_SIZE });
+    }
+  }
+
   constructor() {
+    this._resizeObserver = new ResizeObserver(this._onContainerResizeHandler);
+
+    const $textarea = toObservable(this.textarea).pipe(
+      takeUntilDestroyed(),
+      filter(v => !!v),
+      map(v => v.nativeElement),
+    );
+
+    $textarea.pipe(
+      takeUntilDestroyed(),
+      tap(textarea => {
+        this._resizeObserver.observe(textarea, { box: "border-box" });
+        this._onContainerResizeHandler();
+      }),
+    ).subscribe();
+
+    $textarea.pipe(
+      takeUntilDestroyed(),
+      switchMap(textarea => {
+        return fromEvent(textarea, 'focus').pipe(
+          takeUntilDestroyed(this._destroyRef),
+          tap(() => {
+            this.focused.set(true);
+          }),
+        );
+      }),
+    ).subscribe();
+
+    $textarea.pipe(
+      takeUntilDestroyed(),
+      switchMap(textarea => {
+        return fromEvent(textarea, 'blur').pipe(
+          takeUntilDestroyed(this._destroyRef),
+          tap(() => {
+            this.focused.set(false);
+          }),
+        );
+      }),
+    ).subscribe();
+
     this.theme = toSignal(this._themeService.$theme);
 
     this.readonlyStyles = computed(() => {
       const selectable = this.selectable(), val = selectable ? AUTO : NONE;
       return { [USER_SELECT]: val, [WEBKIT_USER_SELECT]: val, [MOZ_USER_SELECT]: val };
+    });
+
+    effect(() => {
+      const bounds = this.bounds(), textarea = this.textarea()?.nativeElement as HTMLTextAreaElement;
+      if (bounds && textarea) {
+        textarea.style.overflow = bounds.height < MAX_TEXTAREA_HEIGHT ? HIDDEN : AUTO;
+
+        this.scrolled.set(bounds.height >= MAX_TEXTAREA_HEIGHT);
+      }
     });
 
     effect(() => {
@@ -105,11 +178,12 @@ export class EditableTextComponent {
     });
 
     effect(() => {
-      const theme = this.theme(), textarea = this.textarea()?.nativeElement;
-      if (theme && textarea) {
+      const theme = this.theme(), editor = this.editor()?.nativeElement, focus = this.focused();
+      if (theme && editor) {
         const preset = this._themeService.getPreset(theme.chat.messages.message.content);
         if (preset) {
-          textarea.style.backgroundColor = preset.editingTextBackground;
+          editor.style.backgroundColor = preset.editingTextBackground;
+          editor.style.outline = focus ? preset.editingTextFocusedOutline : 'none';
         }
       }
     });
@@ -154,5 +228,11 @@ export class EditableTextComponent {
   onInputHandler(e: Event) {
     const textarea = this.textarea(), value = textarea?.nativeElement.value;
     this.changeText.emit(value);
+  }
+
+  ngOnDestroy(): void {
+    if (this._resizeObserver) {
+      this._resizeObserver.disconnect();
+    }
   }
 }

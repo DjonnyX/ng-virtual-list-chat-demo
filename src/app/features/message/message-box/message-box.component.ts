@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, DestroyRef, effect, ElementRef, inject, input, output, signal, Signal, viewChild } from '@angular/core';
+import { Component, computed, DestroyRef, effect, ElementRef, inject, input, OnDestroy, output, signal, Signal, viewChild } from '@angular/core';
 import { CdkMenuTrigger } from '@angular/cdk/menu';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { filter, Subject, switchMap, take, tap } from 'rxjs';
+import { delay, distinctUntilChanged, filter, map, of, Subject, switchMap, take, tap } from 'rxjs';
 import { MessageButtonSaveState, MessageButtonSaveStates, MessageMenuButtonComponent, MessageSaveButtonComponent } from '@entities/message';
 import { CalcFillPositionsDirective, LongPressDirective } from '@shared/directives';
 import { Id, IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/x-virtual-list';
@@ -21,10 +21,11 @@ import { MessageComponent } from '../message/message.component';
 import { IMessageParams } from '../message/interfaces';
 import { IDeleteEventData } from './interfaces';
 
-const CLASS_NEW = 'new', CLASS_IN = 'in', CLASS_OUT = 'out', CLASS_SIMPLE = 'simple', CLASS_END_OF_MESSAGES = 'end-of-messages',
+const DEFAULT_SIZE = 200,
+  CLASS_NEW = 'new', CLASS_IN = 'in', CLASS_OUT = 'out', CLASS_SIMPLE = 'simple', CLASS_END_OF_MESSAGES = 'end-of-messages',
   CLASS_REMOVAL = 'removal', CLASS_DELETED = 'deleted', CLASS_ANIMATE = 'animate', CLASS_EDITED = 'edited', CLASS_RTL = TextDirections.RTL,
-  CLASS_SELECTED = 'selected', CLASS_FOCUSED = 'focused', CLASS_FIRST_IN_GROUP = 'first-in-group', CLASS_FIREFOX = 'firefox',
-  CLASS_LAST_IN_GROUP = 'last-in-group', CLASS_HAS_MULTICONTENT = 'has-multicontent', DATA_PROP_IMAGE = 'image',
+  CLASS_SELECTED = 'selected', CLASS_FOCUSED = 'focused', CLASS_FIRST_IN_GROUP = 'first-in-group', CLASS_FIREFOX = 'firefox', CLASS_FADEIN = 'fadein',
+  CLASS_FADEOUT = 'fadeout', CLASS_LAST_IN_GROUP = 'last-in-group', CLASS_HAS_MULTICONTENT = 'has-multicontent', DATA_PROP_IMAGE = 'image',
   DATA_PROP_REMOVAL = 'removal', DATA_PROP_DELETED = 'deleted', DATA_PROP_ANIMATE = 'animate', CONFIG_PROP_SELECTED = 'selected',
   CONFIG_PROP_FOCUSED = 'focused';
 
@@ -79,7 +80,7 @@ const getContextMenuNormal = (localization: ILocalization | undefined): IContext
   templateUrl: './message-box.component.html',
   styleUrl: './message-box.component.scss'
 })
-export class MessageBoxComponent {
+export class MessageBoxComponent implements OnDestroy {
   private _container = viewChild<ElementRef<HTMLDivElement>>('container');
 
   private _menuButton = viewChild<MessageMenuButtonComponent>('menuButton');
@@ -93,6 +94,8 @@ export class MessageBoxComponent {
   config = input<IDisplayObjectConfig & { [prop: string]: any } | null>(null);
 
   measures = input<IDisplayObjectMeasures | null>(null);
+
+  reseted = input<boolean>(false);
 
   searchPattern = input<Array<string>>([]);
 
@@ -134,6 +137,8 @@ export class MessageBoxComponent {
 
   contextMenuFillPositions = signal<GradientColorPositions>([0, 1]);
 
+  fadeOut = signal<boolean>(false);
+
   isMessageValid: Signal<boolean>;
 
   localization: Signal<ILocalization | undefined>;
@@ -153,10 +158,52 @@ export class MessageBoxComponent {
   private _$menuOpen = new Subject<void>();
   protected $menuOpen = this._$menuOpen.asObservable();
 
+  private _resizeObserver: ResizeObserver;
+
+  bounds = signal<ISize>({
+    width: this._container()?.nativeElement?.offsetWidth || DEFAULT_SIZE,
+    height: this._container()?.nativeElement?.offsetHeight || DEFAULT_SIZE,
+  });
+
+  private _onContainerResizeHandler = () => {
+    const el = this._container()?.nativeElement as HTMLDivElement;
+    if (el && el.offsetWidth && el.offsetHeight) {
+      this.bounds.set({ width: el.offsetWidth || DEFAULT_SIZE, height: el.offsetHeight || DEFAULT_SIZE });
+    }
+  }
+
   constructor() {
     this.localization = toSignal(this._localizationService.$localization);
     this.locale = toSignal(this._localizationService.$locale);
-    const $menuOpen = this.$menuOpen, $menuButton = toObservable(this._menuButton);
+    const $menuOpen = this.$menuOpen, $menuButton = toObservable(this._menuButton),
+      $container = toObservable(this._container), $data = toObservable(this.data);
+
+    this._resizeObserver = new ResizeObserver(this._onContainerResizeHandler);
+
+    $container.pipe(
+      takeUntilDestroyed(),
+      filter(v => !!v),
+      map(v => v.nativeElement),
+      tap(container => {
+        this._resizeObserver.observe(container, { box: "border-box" });
+        this._onContainerResizeHandler();
+      }),
+    ).subscribe();
+
+    $data.pipe(
+      takeUntilDestroyed(),
+      filter(v => !!v),
+      switchMap(data => of(data.id)),
+      distinctUntilChanged(),
+      tap(() => {
+        this.fadeOut.set(true);
+      }),
+      delay(1),
+      takeUntilDestroyed(this._destroyRef),
+      tap(() => {
+        this.fadeOut.set(false);
+      }),
+    ).subscribe();
 
     $menuOpen.pipe(
       takeUntilDestroyed(),
@@ -220,7 +267,12 @@ export class MessageBoxComponent {
     });
 
     this.classes = computed(() => {
-      const params = this.params(), data = this.data(), config = this.config() as any,
+      const reseted = this.reseted();
+      if (reseted) {
+        return {} as any;
+      }
+
+      const params = this.params(), data = this.data(), config = this.config() as any, fadeOut = this.fadeOut(),
         isIn = params.isIncoming, isOut = params.isOutgoing, isPrevIn = params.prevIsIncoming, isPrevOut = params.prevIsOutgoing,
         isNextIn = params.nextIsIncoming, isNextOut = params.nextIsOutgoing, firstInGroup = params.prevType !== params.type,
         lastInGroup = params.nextType !== params.type;
@@ -229,7 +281,7 @@ export class MessageBoxComponent {
         [CLASS_REMOVAL]: data?.[DATA_PROP_REMOVAL] == true, [CLASS_ANIMATE]: data?.[DATA_PROP_ANIMATE] == true, [CLASS_END_OF_MESSAGES]: (isIn && !isNextIn) || (isOut && !isNextOut),
         [CLASS_FIRST_IN_GROUP]: firstInGroup, [CLASS_LAST_IN_GROUP]: lastInGroup, [CLASS_EDITED]: data?.edited == true, [CLASS_FIREFOX]: IS_FIREFOX,
         [CLASS_RTL]: this._localizationService.textDirection === TextDirections.RTL, [CLASS_SELECTED]: config?.[CONFIG_PROP_SELECTED], [CLASS_FOCUSED]: config?.[CONFIG_PROP_FOCUSED],
-        [CLASS_HAS_MULTICONTENT]: data?.[DATA_PROP_IMAGE] !== undefined,
+        [CLASS_HAS_MULTICONTENT]: data?.[DATA_PROP_IMAGE] !== undefined, [CLASS_FADEOUT]: fadeOut, [CLASS_FADEIN]: !fadeOut,
       };
     });
 
@@ -351,5 +403,11 @@ export class MessageBoxComponent {
   openMenu() {
     this.longPressActive.set(false);
     this._$menuOpen.next();
+  }
+
+  ngOnDestroy(): void {
+    if (this._resizeObserver) {
+      this._resizeObserver.disconnect();
+    }
   }
 }

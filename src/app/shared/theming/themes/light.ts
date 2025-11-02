@@ -76,33 +76,41 @@ const manifest: ITheme = {
                 }
             },
         },
+        messageCreator: {
+            background: 'linear-gradient(245deg, rgb(70 167 207) 0%, rgb(53 146 184) 50%, rgb(70 167 207) 100%)',
+            input: {
+                background: 'rgba(255, 255, 255, 0.35)',
+                color: 'rgb(31, 45, 61)',
+                outline: '1px solid rgba(255, 255, 255, 0.5)',
+            }
+        },
         messages: {
             background: "linear-gradient(180deg, rgb(80, 42, 155) 0%, rgb(53, 147, 184) 100%)",
             backgroundImage: "url(background_infinity.png)",
             group: {
                 normal: {
-                    background: "rgba(255, 255, 255, 0.361)",
+                    background: "rgba(44, 0, 165, 0.6)",
                     color: "rgb(255, 255, 255)",
                     fill: "rgb(255, 255, 255)",
                     borderColor: "transparent",
                 },
                 selected: {
-                    background: "rgba(255, 255, 255, 0.4)",
+                    background: "rgba(84, 41, 202, 0.6)",
                     color: "rgb(255, 255, 255)",
                     fill: "rgb(255, 255, 255)",
                     borderColor: "transparent",
                 },
                 focused: {
-                    background: "rgba(255, 255, 255, 0.438)",
+                    background: "rgba(84, 41, 202, 0.6)",
                     color: "rgb(255, 255, 255)",
                     fill: "rgb(255, 255, 255)",
-                    borderColor: "rgba(255, 240, 185, 0.643)",
+                    borderColor: "rgba(141, 108, 233, 0.64)",
                 },
                 focusedSelected: {
-                    background: "rgba(255, 255, 255, 0.47)",
+                    background: "rgba(84, 41, 202, 0.6)",
                     color: "rgb(255, 255, 255)",
                     fill: "rgb(255, 255, 255)",
-                    borderColor: "rgba(255, 244, 206, 0.64)",
+                    borderColor: "rgba(141, 108, 233, 0.47)",
                 },
             },
             message: {
@@ -137,6 +145,7 @@ const manifest: ITheme = {
                     rippleColor: "rgba(28, 133, 165, 0.15)",
                     searchSubstringColor: "rgba(255, 0, 191, 0.23)",
                     editingTextBackground: "rgba(255, 240, 185, 0.151)",
+                    editingTextFocusedOutline: "1px solid rgb(24, 90, 151, 0.15)",
                     normal: {
                         fill: ["rgb(255, 255, 255)", "rgb(185, 210, 233)"],
                         color: "rgb(25, 34, 37)",

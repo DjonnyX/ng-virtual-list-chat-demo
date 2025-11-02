@@ -3,14 +3,14 @@
 @let _part = part();
 @let _measures = measures();
 @let renderer = itemRenderer();
-
+@let isReseted = reseted();
 @if (item && item.data) {
     <div [part]="_part" [attr.ng-vl-index]="_config.tabIndex || -1" tabindex="0" class="xvl-item__container"
         [ngClass]="{'snapped': item.config.snapped, 'snapped-out': item.config.snappedOut, 'focus': focused()}" (click)="onClickHandler()">
         @if (renderer) {
             <ng-container [ngTemplateOutlet]="renderer"
                 [ngTemplateOutletContext]="{data: item.data, prevData: item.previouseData, nextData: item.nextData, measures: _measures,
-                    config: _config, index: item.index}" />
+                    config: _config, reseted: isReseted, index: item.index}" />
         }
     </div>
 }

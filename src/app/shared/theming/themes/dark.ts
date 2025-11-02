@@ -76,6 +76,14 @@ const manifest: ITheme = {
                 }
             },
         },
+        messageCreator: {
+            background: 'linear-gradient(245deg, rgb(32, 20, 37) 0%, rgb(4 16 20) 50%, rgb(24, 17, 34) 100%)',
+            input: {
+                background: 'rgba(166, 117, 255, 0.14)',
+                color: 'rgb(234, 225, 243)',
+                outline: '1px solid rgba(166, 117, 255, 0.25)',
+            }
+        },
         messages: {
             background: "linear-gradient(180deg, rgb(8, 4, 15) 0%, rgb(4, 16, 20) 100%)",
             backgroundImage: "url(background_infinity-dark.png)",
@@ -137,6 +145,7 @@ const manifest: ITheme = {
                     rippleColor: "rgba(255, 255, 255, 0.15)",
                     searchSubstringColor: "rgba(139, 0, 86, 0.84)",
                     editingTextBackground: "rgba(0, 0, 0, 0.1)",
+                    editingTextFocusedOutline: "1px solid rgb(255, 255, 255, 0.15)",
                     normal: {
                         fill: ["rgb(56, 43, 179)", "rgb(82, 32, 126)"],
                         color: "rgb(206, 191, 220)",

@@ -73,8 +73,40 @@
         color: inherit;
     }
 
+    @keyframes indicatorFadeIn {
+        0% {
+            opacity: 0;
+            transform: scale(0.7);
+        }
+
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes indicatorFadeOut {
+        0% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        100% {
+            opacity: 0;
+            transform: scale(0.7);
+        }
+    }
+
     .indicator {
         z-index: 1;
         display: flex;
+
+        svg {
+            animation: indicatorFadeIn 100ms ease-out 0s 1 normal forwards;
+
+            &.fadeout {
+                animation: indicatorFadeOut 100ms ease-out 0s 1 normal forwards;
+            }
+        }
     }
 }

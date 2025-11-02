@@ -12,7 +12,7 @@
     }
 
     <x-virtual-list #list class="list" [ngClass]="listClass" [items]="items" [itemRenderer]="itemRenderer"
-        [snapScrollToBottom]="true" [itemSize]="38" [bufferSize]="2" [maxBufferSize]="5" collectionMode="lazy"
+        [snapScrollToBottom]="true" [itemSize]="38" [bufferSize]="5" [maxBufferSize]="5" collectionMode="lazy"
         [itemConfigMap]="itemsConfigMap" [dynamicSize]="true" [snap]="true" snappingMethod="chat"
         methodForSelecting="multi-select" [selectedIds]="selectedItemIds" [snapToEndTransitionInstantOffset]="1000"
         [selectByClick]="false" [prepared]="prepared" (onSelect)="onSelectItemHandler($event)"
@@ -20,7 +20,7 @@
     </x-virtual-list>
 
     <ng-template #itemRenderer let-index="index" let-data="data" let-prevData="prevData" let-nextData="nextData"
-        let-measures="measures" let-config="config">
+        let-measures="measures" let-config="config" let-reseted="reseted">
         <div staticClick [maxStaticClickDistance]="maxStaticClickDistance" class="message-template"
             (onStaticClick)="config.select(data.edited ? true : undefined)">
             @if (data) {
@@ -35,7 +35,7 @@
                         <x-message-group [classes]="class" [text]="data.data.text" [collapsed]="config.collapsed" />
                     }
                     @default {
-                        <x-message-box [data]="data" [config]="config" [measures]="measures" [prevData]="prevData"
+                        <x-message-box [reseted]="reseted" [data]="data" [config]="config" [measures]="measures" [prevData]="prevData"
                             [nextData]="nextData" [searchPattern]="searchedWords" (edited)="onChangeItemHandler($event)"
                             (editingCancel)="onEditingCancelHandler(data)" (edit)="onEditItemHandler($event)"
                             (delete)="onDeleteItemHandler($event, index)" (changeText)="onChangeMessageHandler($event)" />

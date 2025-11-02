@@ -348,26 +348,23 @@ export class MessagesComponent implements OnDestroy {
         return this._messageNotificationService.$writing.pipe(
           takeUntilDestroyed(this._destroyRef),
           debounceTime(10),
-          switchMap(userId => {
+          tap(() => {
+            const indicator = generateTypingIndicator();
+            this._proxyCollection.set(indicator.item.id, indicator.item);
+            const configMap = { ...this.collectionConfigMap() };
+            configMap[indicator.item.id] = indicator.config;
+            this.collectionConfigMap.set(configMap);
+          }),
+          switchMap(() => {
+            return this._messageNotificationService.$messages.pipe(
+              takeUntilDestroyed(this._destroyRef),
+            );
+          }),
+          delay(1),
+          takeUntilDestroyed(this._destroyRef),
+          switchMap(() => {
             return this.deleteWritingIndicator(chatId).pipe(
               takeUntilDestroyed(this._destroyRef),
-              tap(() => {
-                const indicator = generateTypingIndicator();
-                this._proxyCollection.set(indicator.item.id, indicator.item);
-                const configMap = { ...this.collectionConfigMap() };
-                configMap[indicator.item.id] = indicator.config;
-                this.collectionConfigMap.set(configMap);
-              }),
-              switchMap(() => {
-                return this._messageNotificationService.$messages.pipe(
-                  takeUntilDestroyed(this._destroyRef),
-                );
-              }),
-              switchMap(() => {
-                return this.deleteWritingIndicator(chatId).pipe(
-                  takeUntilDestroyed(this._destroyRef),
-                );
-              }),
             );
           }),
         );

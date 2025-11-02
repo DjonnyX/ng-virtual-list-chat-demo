@@ -4,7 +4,7 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { filter, map, tap } from 'rxjs';
+import { delay, filter, map, tap } from 'rxjs';
 import {
   MessageSubstrateComponent, MessageSubstarateMode, MessageSubstarateModes, MessageBottomBarComponent, EditableTextComponent,
   MessageSubstarateStyle, MessageSubstarateStyles,
@@ -116,7 +116,7 @@ export class MessageComponent implements OnDestroy {
       filter(v => !!v),
       map(v => v.nativeElement),
       tap(container => {
-        this._resizeObserver.observe(container);
+        this._resizeObserver.observe(container, { box: "border-box" });
         this._onContainerResizeHandler();
       }),
     ).subscribe();

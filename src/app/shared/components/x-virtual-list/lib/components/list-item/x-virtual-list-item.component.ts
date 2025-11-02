@@ -66,6 +66,8 @@ export class NgVirtualListItemComponent extends BaseVirtualListItemComponent {
 
   focused = signal<boolean>(false);
 
+  reseted = signal<boolean>(false);
+
   part = signal<string>(PART_DEFAULT_ITEM);
 
   regular: boolean = false;
@@ -90,7 +92,6 @@ export class NgVirtualListItemComponent extends BaseVirtualListItemComponent {
 
       this.data.set(v);
     }
-
   }
 
   private _regularLength: string = SIZE_100_PERSENT;
@@ -391,6 +392,8 @@ export class NgVirtualListItemComponent extends BaseVirtualListItemComponent {
   }
 
   show() {
+    this.reseted.set(false);
+
     const el = this._elementRef.nativeElement as HTMLElement,
       styles = el.style;
     if (this.regular) {
@@ -410,6 +413,8 @@ export class NgVirtualListItemComponent extends BaseVirtualListItemComponent {
   }
 
   hide() {
+    this.reseted.set(true);
+
     const el = this._elementRef.nativeElement as HTMLElement,
       styles = el.style;
     if (this.regular) {

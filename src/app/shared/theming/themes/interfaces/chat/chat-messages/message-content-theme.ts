@@ -14,6 +14,7 @@ export interface IMessageContentTheme {
     rippleColor: Color;
     searchSubstringColor: string;
     editingTextBackground: string;
+    editingTextFocusedOutline: string;
     normal: IMessageStateTheme;
     selected: IMessageStateTheme;
     focused: IMessageStateTheme;
