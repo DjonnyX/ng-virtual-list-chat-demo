@@ -143,8 +143,8 @@ export class MessageSubstrateComponent {
       if (Array.isArray(fillColorPositions) && fillColorPositions.length === 2) {
         const fillGradient = this.fillGradient();
         if (fillGradient) {
-          fillGradient.nativeElement.setAttribute('x1', `${fillColorPositions[0]}px`);
-          fillGradient.nativeElement.setAttribute('x2', `${fillColorPositions[1]}px`);
+          fillGradient.nativeElement.setAttribute('x1', `${fillColorPositions[0] || 0}px`);
+          fillGradient.nativeElement.setAttribute('x2', `${fillColorPositions[1] || 0}px`);
         }
       }
     });

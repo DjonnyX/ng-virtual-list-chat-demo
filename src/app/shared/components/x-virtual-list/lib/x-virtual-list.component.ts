@@ -14,15 +14,17 @@ import { NgVirtualListItemComponent } from './components/list-item/x-virtual-lis
 import {
   BEHAVIOR_INSTANT, CLASS_LIST_HORIZONTAL, CLASS_LIST_VERTICAL, DEFAULT_DIRECTION, DEFAULT_DYNAMIC_SIZE,
   DEFAULT_ENABLED_BUFFER_OPTIMIZATION, DEFAULT_ITEM_SIZE, DEFAULT_BUFFER_SIZE, DEFAULT_LIST_SIZE, DEFAULT_SNAP, DEFAULT_SNAPPING_METHOD,
-  HEIGHT_PROP_NAME, LEFT_PROP_NAME, MAX_SCROLL_TO_ITERATIONS, PX, SCROLL, SCROLL_END, TOP_PROP_NAME, TRACK_BY_PROPERTY_NAME, WIDTH_PROP_NAME,
+  HEIGHT_PROP_NAME, LEFT_PROP_NAME, MAX_SCROLL_TO_ITERATIONS, PX, SCROLL_END, TOP_PROP_NAME, TRACK_BY_PROPERTY_NAME, WIDTH_PROP_NAME,
   DEFAULT_MAX_BUFFER_SIZE, DEFAULT_SELECT_METHOD, DEFAULT_SELECT_BY_CLICK, DEFAULT_COLLAPSE_BY_CLICK, DEFAULT_COLLECTION_MODE,
   DEFAULT_SCREEN_READER_MESSAGE, BEHAVIOR_SMOOTH, DEFAULT_SNAP_TO_END_TRANSITION_INSTANT_OFFSET, DEFAULT_SNAP_SCROLLTO_BOTTOM,
-  WHEEL, TOUCH_MOVE, POINTER_DOWN, POINTER_UP, POINTER_LEAVE, POINTER_OUT,
+  WHEEL, MOUSE_DOWN, MOUSE_UP, MOUSE_LEAVE, MOUSE_OUT, TOUCH_END, TOUCH_LEAVE, TOUCH_OUT, TOUCH_START,
 } from './const';
 import { IRenderVirtualListItem, IScrollEvent, IScrollOptions, IVirtualListCollection, IVirtualListItem, IVirtualListItemConfigMap, } from './models';
 import { FocusAlignment, Id, IRect, ISize } from './types';
 import { IRenderVirtualListCollection } from './models/render-collection.model';
-import { CollectionMode, CollectionModes, Direction, Directions, FocusAlignments, MethodForSelecting, MethodsForSelecting, SnappingMethod, SnappingMethods, } from './enums';
+import {
+  CollectionMode, CollectionModes, Direction, Directions, FocusAlignments, MethodForSelecting, MethodsForSelecting, SnappingMethod, SnappingMethods,
+} from './enums';
 import { ScrollEvent, toggleClassName } from './utils';
 import { IGetItemPositionOptions, IUpdateCollectionOptions, TrackBoxEvents, TrackBox } from './utils/track-box';
 import { isSnappingMethodAdvenced } from './utils/snapping-method';
@@ -37,7 +39,7 @@ import { CMap } from './utils/cache-map';
 import { validateArray, validateBoolean, validateFloat, validateInt, validateObject, validateString } from './utils/validation';
 import { copyValueAsReadonly, objectAsReadonly } from './utils/object';
 import { isCollectionMode } from './utils/is-collection-mode';
-import { XScrollerComponent } from './components/scroller/x-scroller.component';
+import { IScrollToParams, XScrollerComponent } from './components/scroller/x-scroller.component';
 
 interface IScrollParams {
   id: Id;
@@ -1141,6 +1143,7 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
           scroller.scrollTo({
             [isVertical ? TOP_PROP_NAME : LEFT_PROP_NAME]: scrollSize,
             behavior: BEHAVIOR_INSTANT as ScrollBehavior,
+            blending: false,
           });
         }
       }),
@@ -1149,14 +1152,14 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
       }),
     ).subscribe();
 
-    combineLatest([this.$initialized, $bounds, $actualItems, $itemConfigMap, $scrollSize, $itemSize,
+    combineLatest([this.$initialized, $bounds, $listBounds, $actualItems, $itemConfigMap, $scrollSize, $itemSize,
       $bufferSize, $maxBufferSize, $snap, $isVertical, $dynamicSize, $enabledBufferOptimization, $cacheVersion,
     ]).pipe(
       takeUntilDestroyed(),
       distinctUntilChanged(),
       filter(([initialized]) => !!initialized),
       tap(([,
-        bounds, items, itemConfigMap, scrollSize, itemSize,
+        bounds, listBounds, items, itemConfigMap, scrollSize, itemSize,
         bufferSize, maxBufferSize, snap, isVertical, dynamicSize, enabledBufferOptimization, cacheVersion,
       ]) => {
         this._$update.next();
@@ -1195,8 +1198,8 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
           }
 
           actualScrollSize = (isVertical ? scroller.scrollTop ?? 0 : scroller.scrollLeft) ?? 0;
-          const roundedActualScrollSize = Math.round(actualScrollSize),
-            scrollPositionAfterUpdate = actualScrollSize + this._trackBox.delta,
+          const delta = this._trackBox.delta, roundedActualScrollSize = Math.round(actualScrollSize),
+            scrollPositionAfterUpdate = actualScrollSize + delta,
             roundedScrollPositionAfterUpdate = Math.round(scrollPositionAfterUpdate),
             roundedMaxPositionAfterUpdate = Math.round(totalSize - (isVertical ? height : width));
 
@@ -1224,7 +1227,7 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
               };
             scroller?.scrollTo?.(params);
           } else if (roundedActualScrollSize !== roundedScrollPositionAfterUpdate) {
-            const params: ScrollToOptions = {
+            const params: IScrollToParams = {
               [isVertical ? TOP_PROP_NAME : LEFT_PROP_NAME]: scrollPositionAfterUpdate,
               behavior: BEHAVIOR_INSTANT as ScrollBehavior,
             };
@@ -1257,7 +1260,7 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
         filter(v => !!v),
         map(v => v.nativeElement),
         take(1),
-      );;
+      );
 
     $scroller.pipe(
       takeUntilDestroyed(),
@@ -1283,16 +1286,16 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
       }),
     ).subscribe();
 
-    const $docPointerUp = fromEvent(document, POINTER_UP, { passive: true }).pipe(
+    const $docPointerUp = fromEvent(document, MOUSE_UP, { passive: true }).pipe(
       take(1),
     ),
-      $docPointerLeave = fromEvent(document, POINTER_LEAVE, { passive: true }).pipe(
+      $docPointerLeave = fromEvent(document, MOUSE_LEAVE, { passive: true }).pipe(
         take(1),
       ),
-      $docpointerOut = fromEvent(document, POINTER_OUT, { passive: true }).pipe(
+      $docPointerOut = fromEvent(document, MOUSE_OUT, { passive: true }).pipe(
         take(1),
       ),
-      $pointerMoveTakeUntil = race([$docPointerUp, $docPointerLeave, $docpointerOut]).pipe(
+      $pointerMoveTakeUntil = race([$docPointerUp, $docPointerLeave, $docPointerOut]).pipe(
         takeUntilDestroyed(),
         take(1),
       );
@@ -1301,7 +1304,7 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
       takeUntilDestroyed(),
       distinctUntilChanged(),
       switchMap(scroller => {
-        return fromEvent(scroller, POINTER_DOWN, { passive: true }).pipe(
+        return fromEvent(scroller, MOUSE_DOWN, { passive: true }).pipe(
           takeUntilDestroyed(this._destroyRef),
           switchMap(e => {
             return $scrollerScroll.pipe(
@@ -1327,13 +1330,44 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
       }),
     ).subscribe();
 
+    const $docTouchUp = fromEvent(document, TOUCH_END, { passive: true }).pipe(
+      take(1),
+    ),
+      $docTouchLeave = fromEvent(document, TOUCH_LEAVE, { passive: true }).pipe(
+        take(1),
+      ),
+      $docTouchOut = fromEvent(document, TOUCH_OUT, { passive: true }).pipe(
+        take(1),
+      ),
+      $touchMoveTakeUntil = race([$docTouchUp, $docTouchLeave, $docTouchOut]).pipe(
+        takeUntilDestroyed(),
+        take(1),
+      );
+
     $scroller.pipe(
       takeUntilDestroyed(),
       distinctUntilChanged(),
       switchMap(scroller => {
-        return fromEvent(scroller, TOUCH_MOVE, { passive: true }).pipe(
+        return fromEvent(scroller, TOUCH_START, { passive: true }).pipe(
           takeUntilDestroyed(this._destroyRef),
-          tap(e => {
+          switchMap(e => {
+            return $scrollerScroll.pipe(
+              takeUntilDestroyed(this._destroyRef),
+              takeUntil($touchMoveTakeUntil),
+              filter(() => {
+                return !!this._trackBox.isSnappedToEnd;
+              }),
+            );
+          }),
+          map(e => {
+            const scroller = this._scrollerComponent();
+            if (scroller) {
+              const isVertical = this._isVertical, scrollSize = isVertical ? scroller.scrollTop : scroller.scrollLeft;
+              return scrollSize;
+            }
+            return 0;
+          }),
+          tap(() => {
             _$scrollToEndDuringUpdateCanceller.next(1);
           }),
         );

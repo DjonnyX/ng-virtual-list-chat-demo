@@ -18,10 +18,10 @@
 .xvl__scroller {
     display: block;
     position: relative;
-    overflow: auto;
+    overflow: hidden;
     width: 100%;
     height: 100%;
-    scroll-behavior: unset;
+    scroll-behavior: none;
 }
 
 .xvl__list {

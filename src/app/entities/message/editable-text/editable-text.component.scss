@@ -12,6 +12,8 @@
     }
 
     .editor-editable {
+        -webkit-user-drag: none;
+        -moz-user-drag: none;
         font-family: inherit;
         letter-spacing: inherit;
         font-size: inherit;
@@ -53,9 +55,20 @@
 }
 
 .editor-readonly {
+    -webkit-user-drag: none;
+    -moz-user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
     padding: 2px;
     margin: 0;
     transition: width 150ms ease-out;
+
+    &.selectable {
+        user-select: auto;
+        -moz-user-select: auto;
+        -webkit-user-select: auto;
+    }
 
     ::ng-deep .search-substring {
         background-color: var(--search-substring-background);
@@ -63,7 +76,15 @@
         padding: 0 2px;
     }
 
+    ::ng-deep .message-editor-image {
+        -webkit-user-drag: none;
+        -moz-user-drag: none;
+    }
+
     ::ng-deep .message-editor-link {
+        -webkit-user-drag: none;
+        -moz-user-drag: none;
+
         color: var(--link-normal-color);
 
         &:visited {

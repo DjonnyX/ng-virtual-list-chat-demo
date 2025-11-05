@@ -1,20 +1,44 @@
-import { Component, DestroyRef, ElementRef, inject, input, viewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, inject, input, OnDestroy, signal, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { filter, fromEvent, map, Subject, switchMap, tap } from 'rxjs';
+import { delay, filter, fromEvent, map, of, race, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { ScrollerDirection } from './enums';
 import { ScrollBox } from './utils';
 import { ScrollerDirections } from './enums';
-import { Id } from '../../types';
+import { Id, ISize } from '../../types';
 import { Easing } from './types';
-import { easeLinear } from './utils/ease';
+import { easeLinear, easeOutQuad } from './utils/ease';
 
-interface IScrollToParams {
+const TOP = 'top',
+  LEFT = 'left',
+  INSTANT = 'instant',
+  AUTO = 'auto',
+  SMOOTH = 'smooth',
+  VERTICAL = 'vertical',
+  DURATION = 2000,
+  MAX_DURATION = 3000,
+  MASS = 0.005,
+  MAX_DIST = 8000,
+  MIN_TIMESTAMP = 10;
+
+const calculateDirection = (buffer: Array<[number, number]>) => {
+  for (let i = buffer.length - 1, l = 0; i >= l; i--) {
+    const v = buffer[i];
+    if (v[0] === 0) {
+      continue;
+    }
+    return Math.sign(v[0]);
+  }
+  return 1;
+}
+
+export interface IScrollToParams {
   x?: number;
   y?: number;
   left?: number;
   top?: number;
+  blending?: boolean;
   behavior?: ScrollBehavior;
 }
 
@@ -32,7 +56,7 @@ interface IScrollToParams {
   templateUrl: './x-scroller.component.html',
   styleUrl: './x-scroller.component.scss'
 })
-export class XScrollerComponent {
+export class XScrollerComponent implements OnDestroy {
   scrollContent = viewChild<ElementRef<HTMLDivElement>>('scrollContent');
 
   scrollViewport = viewChild<ElementRef<HTMLDivElement>>('scrollViewport');
@@ -57,46 +81,302 @@ export class XScrollerComponent {
     return this.scrollViewport()?.nativeElement;
   }
 
-  get scrollWidth() {
-    return (this.scrollViewport()?.nativeElement.scrollWidth ?? 0);
-  }
-
-  get scrollHeight() {
-    return (this.scrollViewport()?.nativeElement.scrollHeight ?? 0);
-  }
-
   private _destroyRef = inject(DestroyRef);
 
+  private _scrollLeftPersent = 0;
+
+  private _scrollTopPersent = 0;
+
   private _x: number = 0;
+  set x(v: number) {
+    this._x = v;
+    this._scrollLeftPersent = v !== 0 ? this.scrollWidth / v : 0;
+  }
+  get x() { return this._x; }
 
   private _y: number = 0;
+  set y(v: number) {
+    this._y = v;
+    this._scrollTopPersent = v !== 0 ? this.scrollHeight / v : 0;
+  }
+  get y() { return this._y; }
 
   private _animationCanceler: Function | undefined;
 
   get scrollLeft() {
-    return (this.scrollViewport()?.nativeElement.scrollLeft ?? 0);
+    return this._x;
   }
 
   get scrollTop() {
-    return (this.scrollViewport()?.nativeElement.scrollTop ?? 0);
+    return this._y;
+  }
+
+  get scrollWidth() {
+    const { width: viewportWidth } = this.viewportBounds(),
+      { width: contentWidth } = this.contentBounds();
+    return contentWidth < viewportWidth ? 0 : (contentWidth - viewportWidth);
+  }
+
+  get scrollHeight() {
+    const { height: viewportHeight } = this.viewportBounds(),
+      { height: contentHeight } = this.contentBounds();
+    return contentHeight < viewportHeight ? 0 : (contentHeight - viewportHeight);
+  }
+
+  private _velocity: number = 0;
+
+  readonly viewportBounds = signal<ISize>({ width: 0, height: 0 });
+
+  readonly contentBounds = signal<ISize>({ width: 0, height: 0 });
+
+  private _viewportResizeObserver: ResizeObserver;
+
+  private _onResizeViewportHandler = () => {
+    const viewport = this.scrollViewport()?.nativeElement;
+    if (viewport) {
+      this.viewportBounds.set({ width: viewport.offsetWidth, height: viewport.offsetHeight });
+    }
+  }
+
+  private _contentResizeObserver: ResizeObserver;
+
+  private _onResizeContentHandler = () => {
+    const content = this.scrollContent()?.nativeElement;
+    if (content) {
+      this.contentBounds.set({ width: content.offsetWidth, height: content.offsetHeight });
+    }
   }
 
   constructor() {
-    const $scroller = toObservable(this.scrollViewport);
+    this._viewportResizeObserver = new ResizeObserver(this._onResizeViewportHandler);
+    this._contentResizeObserver = new ResizeObserver(this._onResizeContentHandler);
 
-    $scroller.pipe(
+    const $viewport = toObservable(this.scrollViewport).pipe(
       takeUntilDestroyed(),
       filter(v => !!v),
       map(v => v.nativeElement),
-      switchMap(scroller => {
-        return fromEvent(scroller, 'scroll', { passive: true }).pipe(
+    ),
+      $content = toObservable(this.scrollContent).pipe(
+        takeUntilDestroyed(),
+        filter(v => !!v),
+        map(v => v.nativeElement),
+      );
+
+    $viewport.pipe(
+      takeUntilDestroyed(),
+      tap(viewport => {
+        this._viewportResizeObserver.observe(viewport);
+        this._onResizeViewportHandler();
+      }),
+    ).subscribe();
+
+    $content.pipe(
+      takeUntilDestroyed(),
+      tap(content => {
+        this._contentResizeObserver.observe(content);
+        this._onResizeContentHandler();
+      }),
+    ).subscribe();
+
+    const isVertical = this.direction() === VERTICAL;
+
+    $content.pipe(
+      takeUntilDestroyed(),
+      switchMap(content => {
+        return fromEvent<WheelEvent>(content, 'wheel', { passive: true }).pipe(
           takeUntilDestroyed(this._destroyRef),
           tap(e => {
-            this._$scroll.next();
+            const scrollSize = isVertical ? this.scrollHeight : this.scrollWidth,
+              startPos = isVertical ? this.y : this.x,
+              delta = isVertical ? e.deltaY : e.deltaX, dp = startPos + delta, position = dp < 0 ? 0 : dp > scrollSize ? scrollSize : dp;
+            this.scrollTo({ [isVertical ? TOP : LEFT]: position, behavior: INSTANT });
           }),
         );
       }),
     ).subscribe();
+
+    const $mouseUp = fromEvent<MouseEvent>(window, 'mouseup', { passive: true }).pipe(
+      takeUntilDestroyed(),
+    ),
+      $mouseLeave = fromEvent<MouseEvent>(window, 'mouseleave', { passive: true }).pipe(
+        takeUntilDestroyed(),
+      ),
+      $mouseDragCancel = race([$mouseUp, $mouseLeave]).pipe(
+        takeUntilDestroyed(),
+        delay(0),
+      );
+
+    $content.pipe(
+      takeUntilDestroyed(),
+      switchMap(content => {
+        return fromEvent<MouseEvent>(content, 'mousedown', { passive: true }).pipe(
+          takeUntilDestroyed(this._destroyRef),
+          switchMap(e => {
+            const target = e.target as HTMLElement;
+            if (target.classList.contains('interactive')) {
+              return of(undefined);
+            }
+            const startPos = isVertical ? this.y : this.x;
+            let prevPos = startPos, prevClientPosition = 0, startPosDelta = 0;
+            const startClientPos = isVertical ? e.clientY : e.clientX,
+              offsets = new Array<[number, number]>(), velocities = new Array<[number, number]>();
+            let startTime = performance.now();
+            return fromEvent<MouseEvent>(window, 'mousemove', { passive: false }).pipe(
+              takeUntilDestroyed(this._destroyRef),
+              takeUntil($mouseDragCancel),
+              switchMap(e => {
+                e.preventDefault();
+                const cPos = isVertical ? this.y : this.x;
+                if (cPos !== prevPos) {
+                  startPosDelta += cPos - prevPos;
+                }
+                const currentPos = isVertical ? e.clientY : e.clientX,
+                  scrollSize = isVertical ? this.scrollHeight : this.scrollWidth, delta = startClientPos - currentPos,
+                  dp = startPos + startPosDelta + delta, position = Math.round(dp < 0 ? 0 : dp > scrollSize ? scrollSize : dp), endTime = performance.now(),
+                  timestamp = endTime - startTime, scrollDelta = prevClientPosition === 0 ? 0 : prevClientPosition - currentPos,
+                  { v0 } = this.calculateVelocity(offsets, scrollDelta, timestamp);
+                this.calculateAcceleration(velocities, v0, timestamp);
+                prevClientPosition = currentPos;
+                prevPos = position;
+                this.move(isVertical, position);
+                startTime = endTime;
+                return fromEvent(window, 'mouseup').pipe(
+                  takeUntilDestroyed(this._destroyRef),
+                  tap(e => {
+                    const endTime = performance.now(),
+                      timestamp = endTime - startTime,
+                      { v0 } = this.calculateVelocity(offsets, scrollDelta, timestamp),
+                      { a0 } = this.calculateAcceleration(velocities, v0, timestamp);
+                    this.moveWithAcceleration(isVertical, position, this._velocity, v0, a0);
+                  }),
+                );
+              }),
+            );
+          })
+        );
+      }),
+    ).subscribe();
+
+    const $touchUp = fromEvent<TouchEvent>(window, 'touchend', { passive: true }).pipe(
+      takeUntilDestroyed(),
+    ),
+      $touchCanceler = $touchUp.pipe(
+        takeUntilDestroyed(this._destroyRef),
+        delay(0),
+      );
+
+    $content.pipe(
+      takeUntilDestroyed(),
+      switchMap(content => {
+        return fromEvent<TouchEvent>(content, 'touchstart', { passive: true }).pipe(
+          takeUntilDestroyed(this._destroyRef),
+          switchMap(e => {
+            const target = e.target as HTMLElement;
+            if (target.classList.contains('interactive')) {
+              return of(undefined);
+            }
+            const startPos = isVertical ? this.y : this.x;
+            let prevPos = startPos, prevClientPosition = 0, startPosDelta = 0;
+            const startClientPos = isVertical ? e.touches[e.touches.length - 1].clientY : e.touches[e.touches.length - 1].clientX,
+              offsets = new Array<[number, number]>(), velocities = new Array<[number, number]>();
+            let startTime = performance.now();
+            return fromEvent<TouchEvent>(window, 'touchmove', { passive: false }).pipe(
+              takeUntilDestroyed(this._destroyRef),
+              takeUntil($touchCanceler),
+              switchMap(e => {
+                e.preventDefault();
+                const cPos = isVertical ? this.y : this.x;
+                if (cPos !== prevPos) {
+                  startPosDelta += cPos - prevPos;
+                }
+                const currentPos = isVertical ? e.touches[e.touches.length - 1].clientY : e.touches[e.touches.length - 1].clientX,
+                  scrollSize = isVertical ? this.scrollHeight : this.scrollWidth, delta = startClientPos - currentPos,
+                  dp = startPos + startPosDelta + delta, position = Math.round(dp < 0 ? 0 : dp > scrollSize ? scrollSize : dp), endTime = performance.now(),
+                  timestamp = endTime - startTime, scrollDelta = prevClientPosition === 0 ? 0 : prevClientPosition - currentPos,
+                  { v0 } = this.calculateVelocity(offsets, scrollDelta, timestamp);
+                this.calculateAcceleration(velocities, v0, timestamp);
+                prevClientPosition = currentPos;
+                prevPos = position;
+                this.move(isVertical, position);
+                startTime = endTime;
+                return fromEvent(window, 'touchend').pipe(
+                  takeUntilDestroyed(this._destroyRef),
+                  tap(e => {
+                    const endTime = performance.now(),
+                      timestamp = endTime - startTime,
+                      { v0 } = this.calculateVelocity(offsets, scrollDelta, timestamp),
+                      { a0 } = this.calculateAcceleration(velocities, v0, timestamp);
+                    this.moveWithAcceleration(isVertical, position, this._velocity, v0, a0);
+                  }),
+                );
+              }),
+            );
+          })
+        );
+      }),
+    ).subscribe();
+  }
+
+  private calculateVelocity(offsets: Array<[number, number]>, delta: number, timestamp: number, indexOffset: number = 5) {
+    offsets.push([delta, timestamp < MIN_TIMESTAMP ? MIN_TIMESTAMP : timestamp]);
+
+    const len = offsets.length, startIndex = len > indexOffset ? len - indexOffset : 0, lastVSign = calculateDirection(offsets);
+    let vSum = 0;
+    for (let i = startIndex, l = offsets.length; i < l; i++) {
+      const p0 = offsets[i];
+      if (lastVSign !== Math.sign(p0[0])) {
+        continue;
+      }
+
+      const v0 = (p0[1] !== 0 ? lastVSign * Math.abs(p0[0] / p0[1]) : 0);
+      vSum += v0;
+    }
+
+    const l = Math.min(offsets.length, indexOffset), v0 = l > 0 ? (vSum / l) : 0;
+    return { v0 };
+  }
+
+  private calculateAcceleration(velocities: Array<[number, number]>, delta: number, timestamp: number, indexOffset: number = 5) {
+    velocities.push([delta, timestamp < MIN_TIMESTAMP ? MIN_TIMESTAMP : timestamp]);
+    const len = velocities.length, startIndex = len > indexOffset ? len - indexOffset : 0;
+    let aSum = 0, prevV0: [number, number] | undefined, prevA0 = 0, iteration = 0, lastVSign = calculateDirection(velocities);
+    for (let i = startIndex, l = velocities.length; i < l; i++) {
+      const v00 = prevV0, v01 = velocities[i];
+      if (lastVSign !== Math.sign(v01[0])) {
+        continue;
+      }
+      if (v00) {
+        const a0 = timestamp < 100 ? ((lastVSign * Math.abs(Math.abs(v01[0]) - Math.abs(v00[0]))) / Math.abs(v00[1])) : 0;
+        aSum += a0;
+        prevA0 = a0;
+        prevV0 = v01;
+      }
+      prevV0 = v01;
+      iteration++;
+    }
+
+    const l = Math.min(velocities.length, indexOffset), a0 = l > 0 ? (aSum / l) : 0;
+    return { a0 };
+  }
+
+  private move(isVertical: boolean, position: number, blending: boolean = false) {
+    this.scrollTo({ [isVertical ? TOP : LEFT]: position, behavior: INSTANT, blending });
+  }
+
+  private moveWithAcceleration(isVertical: boolean, position: number, v0: number, v: number, a0: number) {
+    if (a0 !== 0) {
+      const dvSign = Math.sign(v), v00 = Math.sign(v0) !== dvSign ? 0 : v0,
+        dv = (dvSign * Math.abs(Math.abs(v) - Math.abs(v00))),
+        duration = DURATION, maxDuration = MAX_DURATION,
+        maxDistance = dvSign * MAX_DIST, s = (dvSign * Math.abs((a0 * Math.pow(duration, 2)) * .5) / 1000) / MASS,
+        distance = Math.abs(s) < MAX_DIST ? s : maxDistance, scrollSize = isVertical ? this.scrollHeight : this.scrollWidth,
+        pv = position + distance, positionWithVelocity = pv < 0 ? 0 : pv > scrollSize ? scrollSize : pv,
+        ds = Math.abs(Math.abs(positionWithVelocity) - Math.abs(pv)), k = s !== 0 && positionWithVelocity !== pv ? (ds / Math.abs(s)) : 1,
+        ad = Math.abs(dv / a0) * k * .1 / MASS,
+        aDuration = ad < maxDuration ? ad : maxDuration,
+        startPosition = isVertical ? this.y : this.x;
+      this.animate(startPosition, Math.round(positionWithVelocity), aDuration, easeOutQuad);
+    }
   }
 
   animate(startValue: number, endValue: number, duration = 500, easingFunction: Easing = easeLinear) {
@@ -104,12 +384,12 @@ export class XScrollerComponent {
       this._animationCanceler();
     }
     const startTime = performance.now(), isVertical = this.direction() === ScrollerDirection.VERTICAL;
-    let isCanceled = false;
+    let isCanceled = false, prevPos = startValue, startPosDelta = 0, delta = 0, prevTime = performance.now();
 
     if (isVertical) {
-      this._y = startValue;
+      this.y = startValue;
     } else {
-      this._x = startValue;
+      this.x = startValue;
     }
 
     const step = (currentTime: number) => {
@@ -117,29 +397,44 @@ export class XScrollerComponent {
         return;
       }
 
-      if (isVertical) {
-        startValue = this._y;
-      } else {
-        startValue = this._x;
+      const cPos = isVertical ? this.y : this.x;
+      let scrollDelta = 0;
+      if (cPos !== prevPos) {
+        scrollDelta = cPos - prevPos;
+        startPosDelta += scrollDelta;
       }
 
       const elapsed = currentTime - startTime,
         progress = Math.min(elapsed / duration, 1),
         easedProgress = easingFunction(progress),
-        currentValue = startValue + (endValue - startValue) * easedProgress;
+        val = Math.round(startPosDelta + startValue + (endValue - startValue) * easedProgress),
+        scrollSize = isVertical ? this.scrollHeight : this.scrollWidth,
+        currentValue = val < 0 ? 0 : val > scrollSize ? scrollSize : val,
+        t = performance.now(),
+        isFinished = currentValue === endValue;
 
-      const scrollViewport = this.scrollViewport()?.nativeElement as HTMLDivElement;
-      if (scrollViewport) {
+      delta = currentValue - scrollDelta - prevPos;
+
+      const ts = t - prevTime, timestamp = ts < MIN_TIMESTAMP ? MIN_TIMESTAMP : ts;
+      this._velocity = delta / timestamp;
+
+      prevTime = t;
+      prevPos = currentValue;
+
+      const scrollContent = this.scrollContent()?.nativeElement as HTMLDivElement;
+      if (scrollContent) {
         if (isVertical) {
-          this._y = currentValue;
-          scrollViewport.scrollTop = currentValue;
+          this.y = currentValue;
+          scrollContent.style.transform = `translate3d(0, ${-currentValue}px, 0)`;
+          this._$scroll.next();
         } else {
-          this._x = currentValue;
-          scrollViewport.scrollLeft = currentValue;
+          this.x = currentValue;
+          scrollContent.style.transform = `translate3d(${-currentValue}px, 0, 0)`;
+          this._$scroll.next();
         }
       }
 
-      if (progress < 1) {
+      if (!isFinished && progress < 1) {
         requestAnimationFrame(step);
       } else {
         this._$scrollEnd.next();
@@ -156,7 +451,8 @@ export class XScrollerComponent {
   scrollTo(params: IScrollToParams) {
     const posX = params.x || params.left || 0,
       posY = params.y || params.top || 0,
-      behavior = params.behavior ?? 'instant',
+      behavior = params.behavior ?? INSTANT,
+      blending = params.blending ?? true,
       direction = this.direction(),
       scrollContent = this.scrollContent()?.nativeElement as HTMLDivElement,
       scrollViewport = this.scrollViewport()?.nativeElement as HTMLDivElement,
@@ -172,36 +468,53 @@ export class XScrollerComponent {
       positionX: posX, positionY: posY,
     });
 
-    const prevX = this._x;
-    const prevY = this._y;
-    this._x = x;
-    this._y = y;
-    if (behavior === 'auto' || behavior === 'smooth') {
+    const xx = Math.round(x < 0 ? 0 : x > this.scrollWidth ? this.scrollWidth : x),
+      yy = Math.round(y < 0 ? 0 : y > this.scrollHeight ? this.scrollHeight : y),
+      prevX = this.x,
+      prevY = this.y;
+    this.x = xx;
+    this.y = yy;
+    if (behavior === AUTO || behavior === SMOOTH) {
       if (isVertical) {
-        if (prevY !== y) {
-          this.animate(prevY, y);
+        if (prevY !== yy) {
+          this.animate(prevY, yy);
         }
       } else {
-        if (prevX !== x) {
-          this.animate(prevX, x);
+        if (prevX !== xx) {
+          this.animate(prevX, xx);
         }
       }
     } else {
       if (isVertical) {
-        if (prevY !== y) {
-          if (this._animationCanceler !== undefined) {
-            this._animationCanceler();
+        if (prevY !== yy) {
+          if (!blending) {
+            if (this._animationCanceler !== undefined) {
+              this._animationCanceler();
+            }
           }
-          scrollViewport.scrollTop = y;
+          scrollContent.style.transform = `translate3d(0, ${-yy}px, 0)`;
+          this._$scroll.next();
         }
       } else {
-        if (prevX !== x) {
-          if (this._animationCanceler !== undefined) {
-            this._animationCanceler();
+        if (prevX !== xx) {
+          if (!blending) {
+            if (this._animationCanceler !== undefined) {
+              this._animationCanceler();
+            }
           }
-          scrollViewport.scrollLeft = x;
+          scrollContent.style.transform = `translate3d(${-xx}px, 0, 0)`;
+          this._$scroll.next();
         }
       }
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this._viewportResizeObserver) {
+      this._viewportResizeObserver.disconnect();
+    }
+    if (this._contentResizeObserver) {
+      this._contentResizeObserver.disconnect();
     }
   }
 }

@@ -6,6 +6,8 @@
     box-sizing: border-box;
     overflow: hidden;
     -webkit-tap-highlight-color: transparent;
+    -webkit-user-drag: none;
+    -moz-user-drag: none;
 }
 
 .xvl-item__container {

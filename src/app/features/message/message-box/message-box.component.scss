@@ -5,6 +5,9 @@
     padding: 0 4px;
     background-color: transparent;
     box-sizing: border-box;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
 
     @media (min-width: 600px) {
         margin: 0 0 6px 0;
@@ -103,6 +106,10 @@
     }
 
     &.selected {
+        user-select: auto;
+        -moz-user-select: auto;
+        -webkit-user-select: auto;
+
         .message-container {
             &.in {
                 .message {

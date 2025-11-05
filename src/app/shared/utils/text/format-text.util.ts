@@ -69,11 +69,11 @@ const replaceURLs = async (src: string, loading: boolean) => {
             if (isImage) {
                 const index = withoutWhiteSpaceAndLineBreak.indexOf(url);
                 result = result.replace(url, `${SERVICE_COMPILED_URL}${i}`);
-                compiledURLs.push([i, (`<img${SERVICE_WHITESPACE}src="${url}"${SERVICE_WHITESPACE}width="100%"${SERVICE_WHITESPACE}style="display:block;max-height:250px;object-fit:cover;margin:2px${SERVICE_WHITESPACE}auto;border-radius:6px;"/>`), index, url.length]);
+                compiledURLs.push([i, (`<img${SERVICE_WHITESPACE}src="${url}"${SERVICE_WHITESPACE}class="message-editor-image"${SERVICE_WHITESPACE}width="100%"${SERVICE_WHITESPACE}style="display:block;max-height:250px;object-fit:cover;margin:2px${SERVICE_WHITESPACE}auto;border-radius:6px;"/>`), index, url.length]);
             } else {
                 const index = withoutWhiteSpaceAndLineBreak.indexOf(url);
                 result = result.replace(url, `${SERVICE_COMPILED_URL}${i}`);
-                compiledURLs.push([i, (`<a${SERVICE_WHITESPACE}href="${url}"${SERVICE_WHITESPACE}class="message-editor-link">${url}</a>`), index, url.length]);
+                compiledURLs.push([i, (`<a${SERVICE_WHITESPACE}href="${url}"${SERVICE_WHITESPACE}class="message-editor-link${SERVICE_WHITESPACE}interactive">${url}</a>`), index, url.length]);
             }
         }
         if (compiledURLs) {

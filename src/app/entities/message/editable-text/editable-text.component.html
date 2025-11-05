@@ -4,14 +4,15 @@
 @let substringClass = searchSubstringClass();
 @let searchedWords = searchPattern();
 @let scroll = scrolled();
+@let canselectable = selectable();
 @if (isEditing) {
     <div #editor class="editor" [ngClass]="{scroll}">
-        <textarea #textarea localeSensitive cdkTextareaAutosize name="editable-text" class="editor-editable"
-            [value]="value" (keydown)="onKeyDownHandler($event)"
-            (click)="onTextAreaClickHandler($event)" (input)="onInputHandler($event)"></textarea>
+        <textarea #textarea localeSensitive cdkTextareaAutosize name="editable-text" class="editor-editable interactive" [value]="value"
+            (keydown)="onKeyDownHandler($event)" (click)="onTextAreaClickHandler($event)"
+            (input)="onInputHandler($event)"></textarea>
     </div>
 } @else {
-    <p #readonlyText localeSensitive [style.--link-normal-color]="linkNormalColor()"
+    <p #readonlyText localeSensitive [ngClass]="{selectable: canselectable, interactive: canselectable}" [style.--link-normal-color]="linkNormalColor()"
         [style.--link-visited-color]="linkVisitedColor()" [ngStyle]="readonlyStyles()"
         [style.--link-hover-color]="linkHoverColor()" [style.--link-active-color]="linkActiveColor()"
         [style.--search-substring-background]="searchSubstringBackground()" searchHighlight class="editor-readonly"
