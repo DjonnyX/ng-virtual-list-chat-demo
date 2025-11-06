@@ -1,5 +1,5 @@
-import { Component, effect, ElementRef, inject, input, output, signal, Signal, viewChild } from '@angular/core';
-import { CdkMenu, CdkMenuItem } from '@angular/cdk/menu';
+import { Component, effect, ElementRef, inject, input, output, signal, Signal, ViewChild, viewChild } from '@angular/core';
+import { CdkMenu } from '@angular/cdk/menu';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { delay, Subject, tap } from 'rxjs';
 import { ThemeService } from '@shared/theming';
@@ -28,12 +28,15 @@ const DEFAULT_CONTEXT_MENU_WIDTH = 20,
  */
 @Component({
   selector: 'x-context-menu',
-  imports: [CdkMenu, CdkMenuItem, SubstrateComponent, ButtonComponent],
+  imports: [CdkMenu, SubstrateComponent, ButtonComponent],
   templateUrl: './context-menu.component.html',
   styleUrl: './context-menu.component.scss'
 })
 export class ContextMenuComponent {
   contextMenu = viewChild<ElementRef<HTMLDivElement>>('contextMenu');
+
+  @ViewChild('contextMenu', { read: CdkMenu })
+  cMenu: CdkMenu | undefined = undefined;
 
   content = viewChild<ElementRef<HTMLDivElement>>('content');
 
@@ -98,9 +101,9 @@ export class ContextMenuComponent {
     $click.pipe(
       takeUntilDestroyed(),
       delay(300),
-      takeUntilDestroyed(),
       tap(e => {
         this.onClick.emit(e);
+        this.cMenu?.menuStack?.closeAll();
       }),
     ).subscribe();
 
@@ -160,7 +163,6 @@ export class ContextMenuComponent {
   }
 
   onItemClickHandler(event: Event, id: Id) {
-    event.stopImmediatePropagation();
     this._$click.next({ event, id });
   }
 }

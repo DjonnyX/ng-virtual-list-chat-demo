@@ -17,9 +17,9 @@ const TOP = 'top',
   SMOOTH = 'smooth',
   VERTICAL = 'vertical',
   DURATION = 2000,
-  MAX_DURATION = 3000,
+  MAX_DURATION = 4000,
   MASS = 0.005,
-  MAX_DIST = 8000,
+  MAX_DIST = 15000,
   MIN_TIMESTAMP = 10;
 
 const calculateDirection = (buffer: Array<[number, number]>) => {
@@ -212,6 +212,7 @@ export class XScrollerComponent implements OnDestroy {
         return fromEvent<MouseEvent>(content, 'mousedown', { passive: true }).pipe(
           takeUntilDestroyed(this._destroyRef),
           switchMap(e => {
+            this.stopScrolling();
             const target = e.target as HTMLElement;
             if (target.classList.contains('interactive')) {
               return of(undefined);
@@ -271,6 +272,7 @@ export class XScrollerComponent implements OnDestroy {
         return fromEvent<TouchEvent>(content, 'touchstart', { passive: true }).pipe(
           takeUntilDestroyed(this._destroyRef),
           switchMap(e => {
+            this.stopScrolling();
             const target = e.target as HTMLElement;
             if (target.classList.contains('interactive')) {
               return of(undefined);
@@ -339,7 +341,7 @@ export class XScrollerComponent implements OnDestroy {
   private calculateAcceleration(velocities: Array<[number, number]>, delta: number, timestamp: number, indexOffset: number = 5) {
     velocities.push([delta, timestamp < MIN_TIMESTAMP ? MIN_TIMESTAMP : timestamp]);
     const len = velocities.length, startIndex = len > indexOffset ? len - indexOffset : 0;
-    let aSum = 0, prevV0: [number, number] | undefined, prevA0 = 0, iteration = 0, lastVSign = calculateDirection(velocities);
+    let aSum = 0, prevV0: [number, number] | undefined, iteration = 0, lastVSign = calculateDirection(velocities);
     for (let i = startIndex, l = velocities.length; i < l; i++) {
       const v00 = prevV0, v01 = velocities[i];
       if (lastVSign !== Math.sign(v01[0])) {
@@ -348,7 +350,6 @@ export class XScrollerComponent implements OnDestroy {
       if (v00) {
         const a0 = timestamp < 100 ? ((lastVSign * Math.abs(Math.abs(v01[0]) - Math.abs(v00[0]))) / Math.abs(v00[1])) : 0;
         aSum += a0;
-        prevA0 = a0;
         prevV0 = v01;
       }
       prevV0 = v01;
@@ -357,6 +358,12 @@ export class XScrollerComponent implements OnDestroy {
 
     const l = Math.min(velocities.length, indexOffset), a0 = l > 0 ? (aSum / l) : 0;
     return { a0 };
+  }
+
+  stopScrolling() {
+    if (this._animationCanceler !== undefined) {
+      this._animationCanceler();
+    }
   }
 
   private move(isVertical: boolean, position: number, blending: boolean = false) {
@@ -369,10 +376,8 @@ export class XScrollerComponent implements OnDestroy {
         dv = (dvSign * Math.abs(Math.abs(v) - Math.abs(v00))),
         duration = DURATION, maxDuration = MAX_DURATION,
         maxDistance = dvSign * MAX_DIST, s = (dvSign * Math.abs((a0 * Math.pow(duration, 2)) * .5) / 1000) / MASS,
-        distance = Math.abs(s) < MAX_DIST ? s : maxDistance, scrollSize = isVertical ? this.scrollHeight : this.scrollWidth,
-        pv = position + distance, positionWithVelocity = pv < 0 ? 0 : pv > scrollSize ? scrollSize : pv,
-        ds = Math.abs(Math.abs(positionWithVelocity) - Math.abs(pv)), k = s !== 0 && positionWithVelocity !== pv ? (ds / Math.abs(s)) : 1,
-        ad = Math.abs(dv / a0) * k * .1 / MASS,
+        distance = Math.abs(s) < MAX_DIST ? s : maxDistance, positionWithVelocity = position + distance,
+        ad = Math.abs(Math.sqrt(Math.max(Math.abs(v0), Math.abs(v)))) * 10 / MASS,
         aDuration = ad < maxDuration ? ad : maxDuration,
         startPosition = isVertical ? this.y : this.x;
       this.animate(startPosition, Math.round(positionWithVelocity), aDuration, easeOutQuad);

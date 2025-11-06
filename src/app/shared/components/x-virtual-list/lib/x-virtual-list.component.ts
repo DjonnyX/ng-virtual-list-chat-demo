@@ -1865,29 +1865,14 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
     this._trackBox.resetPositions();
   }
 
-  // stopSnappingScrollToEnd() {
-  //   const scroller = this._scrollerComponent(), isVertical = this._isVertical;
-  //   this._isScrollFinished.set(false);
-  //   this._trackBox.cancelScrollSnappingToEnd(true);
-  //   if (scroller) {
-  //     const { width, height } = this._bounds()!,
-  //       scrollSize = (isVertical ? scroller.scrollTop ?? 0 : scroller.scrollLeft) ?? 0,
-  //       scrollLength = Math.round(isVertical ? scroller.scrollHeight ?? 0 : scroller.scrollWidth) ?? 0,
-  //       actualScrollLength = Math.round(scrollLength === 0 ? 0 : scrollLength - (isVertical ? height : width)),
-  //       roundedMaxPosition = Math.round(actualScrollLength),
-  //       roundedScrollPosition = Math.round(scrollSize);
-
-  //     if (roundedScrollPosition >= roundedMaxPosition) {
-  //       const position = roundedMaxPosition - 100;
-  //       const params: ScrollToOptions = {
-  //         [isVertical ? TOP_PROP_NAME : LEFT_PROP_NAME]: position,
-  //         behavior: BEHAVIOR_SMOOTH as ScrollBehavior,
-  //       };
-  //       scroller.scrollTo(params);
-  //       this._scrollSize.set(position);
-  //     }
-  //   }
-  // }
+  stopSnappingScrollToEnd() {
+    const scroller = this._scrollerComponent();
+    this._isScrollFinished.set(false);
+    this._trackBox.cancelScrollSnappingToEnd(true);
+    if (scroller) {
+      scroller.stopScrolling();
+    }
+  }
 
   ngOnDestroy(): void {
     this.dispose();
