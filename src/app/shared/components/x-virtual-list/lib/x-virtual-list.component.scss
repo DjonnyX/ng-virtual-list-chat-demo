@@ -16,6 +16,11 @@
     height: 320px;
 }
 
+.xvl__snapped-container {
+    position: relative;
+    width: 100%;
+}
+
 .xvl__list-snapper {
     -webkit-tap-highlight-color: transparent;
     pointer-events: none;

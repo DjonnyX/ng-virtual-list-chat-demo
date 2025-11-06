@@ -51,7 +51,8 @@
             pointer-events: none;
             position: absolute;
             right: 10px;
-            top: 4px;
+            top: 5px;
+            box-sizing: border-box;
         }
 
         &search+svg {

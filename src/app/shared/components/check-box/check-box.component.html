@@ -15,7 +15,8 @@
         (onPress)="onPressHandler($event)">
         <x-substrate #substrate class="substrate" [fillColors]="gradientFillColors" [rippleColor]="rippleColor"
             [fillColorPositions]="gradientFillPositions" [width]="b.width" [height]="b.height" [roundCorner]="corner"
-            [mode]="m" [type]="t" [strokeColors]="stroke" [strokeAnimationDuration]="10000" />
+            [mode]="m" [type]="t" [strokeColors]="stroke" [strokeAnimationDuration]="10000"
+            [strokeWidth]="strokeWidth()" />
         <span #indicator class="indicator">
             @if (val || !hide) {
                 <svg [ngClass]="indicatorClass" width="16px" height="16px" viewBox="0 0 32 32" version="1.1"

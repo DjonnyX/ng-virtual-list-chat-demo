@@ -33,7 +33,9 @@ import { createGroups } from './utils/create-groups';
 import { LocalizationService } from '@shared/localization';
 
 const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
-  OPACITY_0 = '0', OPACITY_1 = '1', FADE_IN = `opacity 100ms ease-in`, MIN_ITEM_HEIGHT = 28;
+  OPACITY_0 = '0', OPACITY_1 = '1',
+  FADE_IN = `opacity 100ms ease-in`, MIN_ITEM_HEIGHT = 28,
+  CHUNK_SIZE = 100;
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -61,6 +63,10 @@ export class MessagesComponent implements OnDestroy {
   protected _list = viewChild('list', { read: XVirtualListComponent });
 
   search = input<string>();
+
+  scrollStartOffset = input<number>(0);
+
+  scrollEndOffset = input<number>(0);
 
   searchedPattern = signal<Array<string>>([]);
 
@@ -224,7 +230,7 @@ export class MessagesComponent implements OnDestroy {
           switchMap(chatId => {
             return this._messagesService.getMessages(chatId!, {
               number: this._chunkNumber,
-              size: 100,
+              size: CHUNK_SIZE,
             }).pipe(
               takeUntilDestroyed(this._destroyRef),
               switchMap(v => of(createGroups(v, locale, localization))),
@@ -276,7 +282,7 @@ export class MessagesComponent implements OnDestroy {
         switchMap((chatId) => {
           return this._messagesService.getMessages(chatId, {
             number: this._chunkNumber + 1,
-            size: 100,
+            size: CHUNK_SIZE,
           }).pipe(
             takeUntilDestroyed(this._destroyRef),
             switchMap(v => of(createGroups(v, locale, localization))),
@@ -472,7 +478,7 @@ export class MessagesComponent implements OnDestroy {
       filter(({ list }) => !!list),
       debounceTime(250),
       tap(({ search }) => {
-        this.searchedPattern.set(search.split(' '));
+        this.searchedPattern.set(search.split?.(' ') ?? []);
       }),
       filter(({ search }) => search !== ''),
       switchMap(({ list, collection, search }) => {

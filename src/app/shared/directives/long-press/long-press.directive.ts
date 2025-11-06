@@ -1,9 +1,10 @@
 import { DestroyRef, Directive, ElementRef, inject, input, Input, output } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { fromEvent, race, timer } from 'rxjs';
+import { fromEvent, of, race, timer } from 'rxjs';
 import { delay, filter, switchMap, takeUntil, tap } from 'rxjs/operators';
 
-const DEFAULT_DURATION = 3000;
+const DEFAULT_DURATION = 3000,
+    MAX_CANCEL_DIST = 20;
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -37,40 +38,126 @@ export class LongPressDirective {
         const $disabled = toObservable(this.longPressDisabled).pipe(
             filter(v => !!v),
         ),
-            $pressed = fromEvent(this._elementRef.nativeElement, 'pointerdown'),
-            $cancel = race([
-                fromEvent(window, 'pointerup'),
-                fromEvent(window, 'pointermove'),
-                fromEvent(window, 'pointerleave'),
+            $mousePressed = fromEvent<MouseEvent>(this._elementRef.nativeElement, 'mousedown'),
+            $mouseCancel = race([
+                fromEvent(window, 'mouseup'),
+                fromEvent<MouseEvent>(window, 'mouseleave'),
             ]),
-            $release = fromEvent(this._elementRef.nativeElement, 'pointerup');
+            $mouseRelease = fromEvent<MouseEvent>(this._elementRef.nativeElement, 'mouseup'),
 
-        $pressed.pipe(
+            $touchPressed = fromEvent<TouchEvent>(this._elementRef.nativeElement, 'touchstart'),
+            $touchCancel = race([
+                fromEvent(window, 'touchend'),
+                fromEvent<TouchEvent>(window, 'touchleave'),
+            ]),
+            $touchRelease = fromEvent<TouchEvent>(this._elementRef.nativeElement, 'touchend');
+
+        $mousePressed.pipe(
             takeUntilDestroyed(),
-            switchMap(() => {
+            switchMap(e => {
+                const x = Math.abs(e.clientX),
+                    y = Math.abs(e.clientY);
                 return timer(this._duration).pipe(
                     takeUntilDestroyed(this._destroyRef),
                     takeUntil($disabled),
-                    takeUntil($cancel),
+                    takeUntil($mouseCancel),
                     tap(() => {
                         this.onLongPressActive.emit(true);
                     }),
                     switchMap(() => {
-                        return $release.pipe(
+                        return $mouseRelease.pipe(
                             takeUntilDestroyed(this._destroyRef),
-                            takeUntil($disabled),
-                            takeUntil($cancel.pipe(
-                                takeUntilDestroyed(this._destroyRef),
-                                tap(() => {
-                                    this.onLongPressActive.emit(false);
-                                }),
-                            )),
+                            takeUntil(
+                                race([
+                                    $disabled,
+                                    $mouseCancel.pipe(
+                                        takeUntilDestroyed(this._destroyRef),
+                                        tap(() => {
+                                            this.onLongPressActive.emit(false);
+                                        }),
+
+                                    ),
+                                    fromEvent<MouseEvent>(window, 'mousemove').pipe(
+                                        takeUntilDestroyed(this._destroyRef),
+                                        switchMap(e => {
+                                            const xx = x - Math.abs(e.clientX),
+                                                yy = y - Math.abs(e.clientY),
+                                                dist = Math.sqrt(Math.pow(xx, 2) + Math.pow(yy, 2));
+
+                                            if (dist > MAX_CANCEL_DIST) {
+                                                return of(true);
+                                            }
+
+                                            return of(false);
+                                        }),
+                                        filter(v => !!v),
+                                        tap(() => {
+                                            this.onLongPressActive.emit(false);
+                                        }),
+                                    ),
+                                ])
+                            ),
                             delay(1),
                             tap(() => {
                                 this.onLongPress.emit();
                             }),
                         );
+                    })
+                );
+            }),
+        ).subscribe();
+
+        $touchPressed.pipe(
+            takeUntilDestroyed(),
+            switchMap(e => {
+                const x = Math.abs(e.touches[e.touches.length - 1].clientX),
+                    y = Math.abs(e.touches[e.touches.length - 1].clientY);
+                return timer(this._duration).pipe(
+                    takeUntilDestroyed(this._destroyRef),
+                    takeUntil($disabled),
+                    takeUntil($touchCancel),
+                    tap(() => {
+                        this.onLongPressActive.emit(true);
                     }),
+                    switchMap(() => {
+                        return $touchRelease.pipe(
+                            takeUntilDestroyed(this._destroyRef),
+                            takeUntil(
+                                race([
+                                    $disabled,
+                                    $touchCancel.pipe(
+                                        takeUntilDestroyed(this._destroyRef),
+                                        tap(() => {
+                                            this.onLongPressActive.emit(false);
+                                        }),
+
+                                    ),
+                                    fromEvent<TouchEvent>(window, 'touchmove').pipe(
+                                        takeUntilDestroyed(this._destroyRef),
+                                        switchMap(e => {
+                                            const xx = x - Math.abs(e.touches[e.touches.length - 1].clientX),
+                                                yy = y - Math.abs(e.touches[e.touches.length - 1].clientY),
+                                                dist = Math.sqrt(Math.pow(xx, 2) + Math.pow(yy, 2));
+
+                                            if (dist > MAX_CANCEL_DIST) {
+                                                return of(true);
+                                            }
+
+                                            return of(false);
+                                        }),
+                                        filter(v => !!v),
+                                        tap(() => {
+                                            this.onLongPressActive.emit(false);
+                                        }),
+                                    ),
+                                ])
+                            ),
+                            delay(1),
+                            tap(() => {
+                                this.onLongPress.emit();
+                            }),
+                        );
+                    })
                 );
             }),
         ).subscribe();

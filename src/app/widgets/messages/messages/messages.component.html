@@ -12,8 +12,9 @@
     }
 
     <x-virtual-list #list class="list" [ngClass]="listClass" [items]="items" [itemRenderer]="itemRenderer"
-        [snapScrollToBottom]="true" [itemSize]="38" [bufferSize]="2" [maxBufferSize]="2" collectionMode="lazy"
+        [snapScrollToBottom]="true" [itemSize]="38" [bufferSize]="5" [maxBufferSize]="5" collectionMode="lazy"
         [itemConfigMap]="itemsConfigMap" [dynamicSize]="true" [snap]="true" snappingMethod="chat"
+        [scrollStartOffset]="scrollStartOffset()" [scrollEndOffset]="scrollEndOffset()"
         methodForSelecting="multi-select" [selectedIds]="selectedItemIds" [snapToEndTransitionInstantOffset]="1000"
         [selectByClick]="false" [prepared]="prepared" (onSelect)="onSelectItemHandler($event)"
         (onScrollReachStart)="onScrollReachStartHandler()">

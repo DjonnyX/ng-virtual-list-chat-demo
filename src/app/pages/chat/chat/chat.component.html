@@ -15,11 +15,13 @@
             @let doc = dockMode();
             <x-drawer [dock]="doc" [dockLeftSize]="240">
                 <dock-left>
-                    <groups (select)="onGroupSelectHandler($event)" (close)="onGroupsCloseHandler()" />
+                    <x-groups [scrollStartOffset]="toolbarBounds().height" (select)="onGroupSelectHandler($event)" (close)="onGroupsCloseHandler()" />
                 </dock-left>
                 <div class="viewer-container">
-                    <x-messages [search]="searchText" />
-                    <x-messaage-creator></x-messaage-creator>
+                    <x-messages [search]="searchText" [scrollStartOffset]="toolbarBounds().height" [scrollEndOffset]="messageCreatorBounds().height" />
+                    <div #messageCreator class="message-creator">
+                        <x-messaage-creator></x-messaage-creator>
+                    </div>
                 </div>
             </x-drawer>
         </div>

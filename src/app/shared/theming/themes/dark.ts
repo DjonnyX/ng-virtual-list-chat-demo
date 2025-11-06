@@ -24,24 +24,24 @@ const BUTTON_ROUNDED_CORNER: RoundedCorner = [8, 8, 8, 8],
 const manifest: ITheme = {
     chat: {
         header: {
-            background: "rgb(10, 8, 17)",
-            color: "rgb(181, 158, 202)",
+            background: "rgba(10, 8, 17, 0.75)",
+            color: "rgba(255, 255, 255, 1)",
             fontSize: "14px",
             menuButton: {
                 normal: {
                     color: "none",
                     fill: ["rgba(0,0,0,0)", "rgba(0,0,0,0)"],
-                    iconFill: "rgb(181, 158, 202)",
+                    iconFill: "rgba(255, 255, 255, 1)",
                 },
                 pressed: {
                     color: "none",
                     fill: ["rgba(0,0,0,0)", "rgba(0,0,0,0)"],
-                    iconFill: "rgb(181, 158, 202)",
+                    iconFill: "rgba(165, 158, 202, 1)",
                 },
                 focused: {
                     color: "none",
                     fill: ["rgba(0,0,0,0)", "rgba(0,0,0,0)"],
-                    iconFill: "rgb(212, 196, 228)",
+                    iconFill: "rgba(165, 158, 202, 1)",
                     outline: `2px solid rgba(212, 196, 228, 0.25)`,
                 },
                 disabled: {
@@ -53,31 +53,31 @@ const manifest: ITheme = {
             search: {
                 timeoutIndicatorColor: "rgba(255, 255, 255, 0.05)",
                 normal: {
-                    background: "rgb(9, 5, 19)",
-                    borderColor: "rgb(34, 24, 51)",
-                    color: "rgb(181, 158, 202)",
+                    background: "rgba(9, 5, 19, 0.15)",
+                    borderColor: "rgba(51, 51, 51, 0.75)",
+                    color: "rgba(255, 255, 255, 1)",
                     fontSize: "14px",
                     fill: "rgb(158, 173, 202)",
                     placeholder: {
-                        color: "rgb(161, 138, 182)",
+                        color: "rgba(151, 138, 182, 1)",
                         fontSize: "14px",
                     },
                 },
                 focused: {
-                    background: "rgb(35, 15, 56)",
-                    borderColor: "rgb(198, 244, 255)",
-                    color: "rgb(181, 158, 202)",
+                    background: "rgba(35, 15, 56, 0.15)",
+                    borderColor: "rgba(255, 255, 255, 0.75)",
+                    color: "rgba(255, 255, 255, 1)",
                     fontSize: "14px",
                     fill: "rgb(158, 166, 202)",
                     placeholder: {
-                        color: "rgb(161, 138, 182)",
+                        color: "rgba(151, 138, 182, 1)",
                         fontSize: "14px",
                     },
                 }
             },
         },
         messageCreator: {
-            background: 'linear-gradient(245deg, rgb(32, 20, 37) 0%, rgb(4 16 20) 50%, rgb(24, 17, 34) 100%)',
+            background: 'linear-gradient(245deg, rgba(32, 20, 37, 0.75) 0%, rgba(4, 16, 20, 0.75) 50%, rgba(24, 17, 34, 0.75) 100%)',
             input: {
                 background: 'rgba(166, 117, 255, 0.14)',
                 color: 'rgb(234, 225, 243)',
@@ -489,7 +489,7 @@ const manifest: ITheme = {
             rippleColor: "rgba(255, 255, 255, 0.2)",
             normal: {
                 fill: ["rgb(86, 22, 190)", "rgb(104, 0, 136)"],
-                iconFill: "rgb(206, 191, 220)",
+                iconFill: "rgb(255, 221, 239)",
                 color: "rgb(240, 217, 255)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
@@ -497,7 +497,7 @@ const manifest: ITheme = {
             },
             pressed: {
                 fill: ["rgb(68, 20, 146)", "rgb(89, 6, 114)"],
-                iconFill: "rgb(206, 191, 220)",
+                iconFill: "rgb(255, 221, 239)",
                 color: "rgb(240, 217, 255)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
@@ -505,7 +505,7 @@ const manifest: ITheme = {
             },
             focused: {
                 fill: ["rgb(86, 22, 190)", "rgb(104, 0, 136)"],
-                iconFill: "rgb(206, 191, 220)",
+                iconFill: "rgb(255, 221, 239)",
                 outline: "2px solid rgba(227, 134, 255, 0.25)",
                 color: "rgb(240, 217, 255)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
@@ -514,7 +514,7 @@ const manifest: ITheme = {
             },
             disabled: {
                 fill: ["rgba(86, 22, 190, .25)", "rgba(104, 0, 136, .25)"],
-                iconFill: "rgb(206, 191, 220)",
+                iconFill: "rgb(255, 221, 239)",
                 color: "rgb(240, 217, 255)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
@@ -524,7 +524,7 @@ const manifest: ITheme = {
         [CheckboxPresets.SECONDARY]: {
             normal: {
                 fill: ["rgb(75, 65, 134)", "rgb(84, 71, 160)"],
-                iconFill: "rgb(159, 156, 253)",
+                iconFill: "rgb(255, 221, 239)",
                 color: "rgb(199, 186, 255)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
@@ -532,7 +532,7 @@ const manifest: ITheme = {
             },
             pressed: {
                 fill: ["rgb(89, 78, 151)", "rgb(100, 86, 177)"],
-                iconFill: "rgb(180, 178, 255)",
+                iconFill: "rgb(255, 221, 239)",
                 color: "rgb(172, 161, 223)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
@@ -540,7 +540,7 @@ const manifest: ITheme = {
             },
             focused: {
                 fill: ["rgb(89, 78, 151)", "rgb(100, 86, 177)"],
-                iconFill: "rgb(180, 178, 255)",
+                iconFill: "rgb(255, 221, 239)",
                 color: "rgb(172, 161, 223)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,
@@ -549,7 +549,7 @@ const manifest: ITheme = {
             },
             disabled: {
                 fill: ["rgba(75, 65, 134, 0.45)", "rgba(84, 71, 160, 0.45)"],
-                iconFill: "rgba(159, 156, 253, 0.45)",
+                iconFill: "rgb(255, 221, 239)",
                 color: "rgba(199, 186, 255, 0.45)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
                 padding: BUTTON_ROUNDED_RECT_PADDING,

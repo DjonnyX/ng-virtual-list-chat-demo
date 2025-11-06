@@ -216,6 +216,22 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
         return this._isScrollEnd || this._isScrollSnapToEnd > 0;
     }
 
+    protected _scrollStartOffset: number = 0;
+    set scrollStartOffset(v: number) {
+        this._scrollStartOffset = v;
+    }
+    get scrollStartOffset() {
+        return this._scrollStartOffset;
+    }
+
+    protected _scrollEndOffset: number = 0;
+    set scrollEndOffset(v: number) {
+        this._scrollEndOffset = v;
+    }
+    get scrollEndOffset() {
+        return this._scrollEndOffset;
+    }
+
     constructor(trackingPropertyName: string) {
         super();
 
@@ -552,7 +568,7 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
             size = isVertical ? height : width, totalLength = collection.length, typicalItemSize = itemSize,
             w = isVertical ? width : typicalItemSize, h = isVertical ? typicalItemSize : height,
             map = this._map, snapshot = this._snapshot, checkOverscrollItemsLimit = Math.ceil(size / typicalItemSize),
-            snippedPos = Math.floor(scrollSize), leftItemsWeights: Array<number> = [],
+            snippedPos = Math.floor(scrollSize) + this._scrollStartOffset, leftItemsWeights: Array<number> = [],
             isFromId = fromItemId !== undefined && (typeof fromItemId === 'number' && fromItemId > -1)
                 || (typeof fromItemId === 'string' && fromItemId > '-1');
 
@@ -587,11 +603,11 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
             leftSizeOfUpdatedItems = 0,
             leftSizeOfDeletedItems = 0,
             itemById: I | undefined = undefined,
-            itemByIdPos: number = 0,
+            itemByIdPos: number = this._scrollStartOffset,
             targetDisplayItemIndex: number = -1,
             isTargetInOverscroll: boolean = false,
             actualScrollSize = itemByIdPos,
-            totalSize = 0,
+            totalSize = this._scrollStartOffset + this._scrollEndOffset,
             startIndex: number,
             isFromItemIdFound = false,
             deltaFromStartCreation = 0;
@@ -614,7 +630,7 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                 }
             }
 
-            let y = 0, stickyCollectionItem: I | undefined = undefined, stickyComponentSize = 0;
+            let y = this._scrollStartOffset, stickyCollectionItem: I | undefined = undefined, stickyComponentSize = 0;
             for (let i = 0, l = collection.length; i < l; i++) {
                 const ii = i + 1, collectionItem = collection[i], id = collectionItem[trackBy];
 
@@ -682,7 +698,7 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                                 const { num } = this.getElementNumToEnd(i, collection, map, typicalItemSize, size, isVertical);
                                 if (num > 0) {
                                     isTargetInOverscroll = true;
-                                    y -= size - componentSize - stickyComponentSize;
+                                    y -= size - this._scrollEndOffset - componentSize - stickyComponentSize;
                                 }
                             }
                             itemById = collectionItem;
@@ -833,10 +849,14 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
 
         const itemsOnDisplayWeight = totalItemsToDisplayEndWeight - leftItemsWeight,
             itemsOnDisplayLength = itemsFromStartToDisplayEnd - itemsFromStartToScrollEnd,
-            startPosition = leftHiddenItemsWeight - leftItemsWeight,
+            startPosition = this._scrollStartOffset + leftHiddenItemsWeight - leftItemsWeight,
             renderItems = itemsOnDisplayLength + leftItemLength + rightItemLength,
             startCreationDelta = deltaFromStartCreation > 0 ? deltaFromStartCreation : 0,
             delta = leftSizeOfUpdatedItems + leftSizeOfAddedItems - leftSizeOfDeletedItems + startCreationDelta;
+
+        if (isFromId && !isTargetInOverscroll) {
+            actualScrollSize -= this._scrollStartOffset;
+        }
 
         const metrics: IMetrics = {
             delta,
@@ -919,7 +939,7 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
         if (items.length) {
             const trackBy = this._trackingPropertyName, actualSnippedPosition = snippedPos,
                 isSnappingMethodAdvanced = this.isSnappingMethodAdvanced,
-                boundsSize = isVertical ? height : width, actualEndSnippedPosition = boundsSize,
+                boundsSize = isVertical ? height : width, actualEndSnippedPosition = boundsSize + this._scrollStartOffset,
                 positionOffset = isVertical ? offsetY : offsetX;
             let pos = startPosition,
                 renderItems = renderItemsLength,
@@ -943,8 +963,8 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                     if (sticky === 1) {
                         const isOdd = i % 2 != 0,
                             measures = {
-                                x: isVertical ? 0 : actualSnippedPosition,
-                                y: isVertical ? actualSnippedPosition : 0,
+                                x: isVertical ? startPosition : actualSnippedPosition,
+                                y: isVertical ? actualSnippedPosition : startPosition,
                                 width: isVertical ? normalizedItemWidth : size,
                                 height: isVertical ? size : normalizedItemHeight,
                                 size,
@@ -1076,7 +1096,7 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                         sticky = itemConfigMap[id]?.sticky ?? 0,
                         selectable = itemConfigMap[id]?.selectable ?? true,
                         collapsable = itemConfigMap[id]?.collapsable ?? false,
-                        snapped = snap && (sticky === 1 && pos <= scrollSize || sticky === 2 && pos >= scrollSize + boundsSize - size),
+                        snapped = snap && (sticky === 1 && (pos <= scrollSize + this._scrollStartOffset) || sticky === 2 && (pos >= scrollSize + boundsSize - size)),
                         absoluteStartPosition = pos - (scrollSize - size) - size, ratio = boundsSize / size, absoluteStartPositionPercent = -(absoluteStartPosition / boundsSize) * ratio,
                         absoluteEndPosition = boundsSize - (absoluteStartPositionPercent + size),
                         absoluteEndPositionPercent = (absoluteStartPositionPercent + ((absoluteEndPosition + size) / boundsSize) * ratio),
@@ -1124,7 +1144,7 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                         index: i, id, measures, data: itemData, previouseData: i > 0 ? items[i - 1] : null,
                         nextData: i < totalLength ? items[i + 1] : null, config,
                     };
-                    if (!nextSticky && stickyItemIndex < i && sticky === 1 && (pos <= scrollSize + size + stickyItemSize)) {
+                    if (!nextSticky && stickyItemIndex < i && sticky === 1 && (pos <= scrollSize + this._scrollStartOffset + size + stickyItemSize)) {
                         item.measures.x = isVertical ? 0 : snapped ? actualSnippedPosition : pos;
                         item.measures.y = isVertical ? snapped ? actualSnippedPosition : pos : 0;
                         nextSticky = item;
@@ -1151,9 +1171,9 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
 
             const axis = isVertical ? Y_PROP_NAME : X_PROP_NAME;
 
-            if (nextSticky && stickyItem && nextSticky.measures[axis] <= scrollSize + stickyItemSize) {
-                if (nextSticky.measures[axis] > scrollSize) {
-                    stickyItem.measures[axis] = nextSticky.measures[axis] - stickyItemSize;
+            if (nextSticky && stickyItem && nextSticky.measures[axis] <= scrollSize + this._scrollStartOffset + stickyItemSize) {
+                if (nextSticky.measures[axis] > scrollSize + this._scrollStartOffset) {
+                    stickyItem.measures[axis] = nextSticky.measures[axis] - this._scrollStartOffset - stickyItemSize;
                     stickyItem.config.snapped = nextSticky.config.snapped = false;
                     stickyItem.config.snappedOut = true;
                     stickyItem.config.sticky = 1;

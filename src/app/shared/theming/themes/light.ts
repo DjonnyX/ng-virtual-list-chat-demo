@@ -24,7 +24,7 @@ const BUTTON_ROUNDED_CORNER: RoundedCorner = [8, 8, 8, 8],
 const manifest: ITheme = {
     chat: {
         header: {
-            background: "rgb(67, 33, 139)",
+            background: "rgba(67, 33, 139, 0.75)",
             color: "rgb(161, 153, 219)",
             fontSize: "14px",
             menuButton: {
@@ -53,8 +53,8 @@ const manifest: ITheme = {
             search: {
                 timeoutIndicatorColor: "rgba(255, 255, 255, 0.1)",
                 normal: {
-                    background: "rgb(79, 46, 156)",
-                    borderColor: "rgb(84, 76, 177)",
+                    background: "rgba(79, 46, 156, 0.15)",
+                    borderColor: "rgba(84, 76, 177, 0.75)",
                     color: "rgb(190, 214, 235)",
                     fontSize: "14px",
                     fill: "rgb(214, 209, 255)",
@@ -64,8 +64,8 @@ const manifest: ITheme = {
                     },
                 },
                 focused: {
-                    background: "rgb(79, 46, 156)",
-                    borderColor: "rgb(198, 244, 255)",
+                    background: "rgba(79, 46, 156, 0.15)",
+                    borderColor: "rgba(198, 244, 255, 0.75)",
                     color: "rgb(190, 214, 235)",
                     fontSize: "14px",
                     fill: "rgb(214, 209, 255)",
@@ -77,7 +77,7 @@ const manifest: ITheme = {
             },
         },
         messageCreator: {
-            background: 'linear-gradient(245deg, rgb(70 167 207) 0%, rgb(53 146 184) 50%, rgb(70 167 207) 100%)',
+            background: 'linear-gradient(245deg, rgba(70, 167, 207, 0.75) 0%, rgba(53, 146, 184, 0.75) 50%, rgba(70, 167, 207, 0.75) 100%)',
             input: {
                 background: 'rgba(255, 255, 255, 0.35)',
                 color: 'rgb(31, 45, 61)',

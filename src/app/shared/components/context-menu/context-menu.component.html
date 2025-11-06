@@ -10,8 +10,8 @@
 @let collection = items();
 <div #contextMenu cdkMenu class="context-menu">
     <x-substrate class="substrate" [mode]="m" [type]="t" [width]="b.width" [height]="b.height" [roundCorner]="corner"
-        [fillColors]="gradientFillColors" [strokeColors]="stroke" [strokeAnimationDuration]="animationStrokeDuration"
-        [fillColorPositions]="gradientFillPositions"></x-substrate>
+        [fillColors]="gradientFillColors" [strokeColors]="stroke" [strokeWidth]="1.5"
+        [strokeAnimationDuration]="animationStrokeDuration" [fillColorPositions]="gradientFillPositions"></x-substrate>
     <div #content class="content">
         @for (item of collection; track item.id) {
             <x-button class="context-menu__item" mode="rectangle" [preset]="buttonPreset"

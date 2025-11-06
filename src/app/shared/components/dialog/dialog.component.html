@@ -13,7 +13,7 @@
 <div class="container">
     <x-substrate class="substrate" [fillColors]="gradientFillColors" [fillColorPositions]="gradientFillPositions"
         [width]="b.width" [height]="b.height" [roundCorner]="corner" [mode]="m" [type]="t" [strokeColors]="stroke"
-        [strokeAnimationDuration]="animationStrokeDuration" />
+        [strokeAnimationDuration]="animationStrokeDuration" [strokeWidth]="1.5" />
     <div #content class="content">
         @if (titleValue) {
             <h2 #title localeSensitive class="title">{{ titleValue }}</h2>

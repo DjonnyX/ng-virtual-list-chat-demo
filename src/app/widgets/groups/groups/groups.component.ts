@@ -21,7 +21,7 @@ import { LocaleSensitiveDirective } from '@shared/localization';
  * All rights reserved.
  */
 @Component({
-  selector: 'groups',
+  selector: 'x-groups',
   imports: [CommonModule, XVirtualListComponent, GroupsLoadingIndicatorComponent, ClickOutsideDirective, LocaleSensitiveDirective],
   providers: [
     { provide: GroupsService, useClass: environment.useMock ? GroupsMockService : GroupsWebsocketService },
@@ -33,6 +33,8 @@ export class GroupsComponent {
   protected _list = viewChild('list', { read: XVirtualListComponent });
 
   projectId = input<string>('');
+
+  scrollStartOffset = input<number>(0);
 
   select = output<IVirtualListItem>();
 

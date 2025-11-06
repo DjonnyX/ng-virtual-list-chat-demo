@@ -8,11 +8,11 @@
 }
 
 :host(.horizontal) .xvl__scroller {
-    overflow: auto hidden;
+    overflow: hidden;
 }
 
 :host(.vertical) .xvl__scroller {
-    overflow: hidden auto;
+    overflow: hidden;
 }
 
 .xvl__scroller {
@@ -21,7 +21,6 @@
     overflow: hidden;
     width: 100%;
     height: 100%;
-    scroll-behavior: none;
 }
 
 .xvl__list {

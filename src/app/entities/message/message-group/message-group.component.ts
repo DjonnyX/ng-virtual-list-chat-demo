@@ -16,7 +16,7 @@ import { ITheme } from '@shared/theming';
   selector: 'x-message-group',
   imports: [CommonModule, LocaleSensitiveDirective],
   templateUrl: './message-group.component.html',
-  styleUrl: './message-group.component.scss'
+  styleUrl: './message-group.component.scss',
 })
 export class MessageGroupComponent {
   private _name = viewChild<ElementRef<HTMLSpanElement>>('name');

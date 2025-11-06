@@ -36,6 +36,8 @@ export class XVirtualListService {
   $focusedId = this._$focusedId.asObservable();
   get focusedId() { return this._$focusedId.getValue(); }
 
+  scrollStartOffset: number = 0;
+
   scrollBarSize: number = 0;
 
   overlapScrollBarSize: number = 0;

@@ -152,6 +152,8 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
   @ViewChild('snapRendererContainer', { read: ViewContainerRef })
   private _snapContainerRef: ViewContainerRef | undefined;
 
+  private _snappedContainer = viewChild<ElementRef<HTMLDivElement>>('snappedContainer');
+
   private _scrollerComponent = viewChild<XScrollerComponent>('scroller');
 
   private _scroller: Signal<ElementRef<HTMLDivElement> | undefined>;
@@ -371,6 +373,40 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
    * Sets the offset value; if the scroll area value is exceeded, the scroll animation will be disabled. Default value is "0".
    */
   snapToEndTransitionInstantOffset = input<number>(DEFAULT_SNAP_TO_END_TRANSITION_INSTANT_OFFSET, { ...this._snapToEndTransitionInstantOffsetOptions });
+
+  private _scrollStartOffsetOptions = {
+    transform: (v: number) => {
+      const valid = validateFloat(v, true);
+
+      if (!valid) {
+        console.error('The "scrollStartOffset" parameter must be of type `number`.');
+        return 0;
+      }
+      return v;
+    },
+  } as any;
+
+  /**
+   * Sets the scroll start offset value; Default value is "0".
+   */
+  scrollStartOffset = input<number>(0, { ...this._scrollStartOffsetOptions });
+
+  private _scrollEndOffsetOptions = {
+    transform: (v: number) => {
+      const valid = validateFloat(v, true);
+
+      if (!valid) {
+        console.error('The "scrollEndOffset" parameter must be of type `number`.');
+        return 0;
+      }
+      return v;
+    },
+  } as any;
+
+  /**
+   * Sets the scroll end offset value; Default value is "0".
+   */
+  scrollEndOffset = input<number>(0, { ...this._scrollEndOffsetOptions });
 
   private _snapScrollToBottomOptions = {
     transform: (v: boolean) => {
@@ -720,16 +756,18 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
         scrollBarSize = overlapScrollBarSize = FIREFOX_SCROLLBAR_OVERLAP_SIZE;
       }
 
-      if (langTextDir === TextDirections.RTL) {
-        snappedComponent.element.style.clipPath = `path("M ${overlapScrollBarSize} 0 L ${overlapScrollBarSize} ${snappedComponent.element.offsetHeight} L ${snappedComponent.element.offsetWidth - overlapScrollBarSize} ${snappedComponent.element.offsetHeight} L ${snappedComponent.element.offsetWidth - overlapScrollBarSize} 0 Z")`;
-      } else {
-        snappedComponent.element.style.clipPath = `path("M 0 0 L 0 ${snappedComponent.element.offsetHeight} L ${snappedComponent.element.offsetWidth - overlapScrollBarSize} ${snappedComponent.element.offsetHeight} L ${snappedComponent.element.offsetWidth - overlapScrollBarSize} 0 Z")`;
+      const snappingMethod = this.snappingMethod();
+      if (snappingMethod === SnappingMethods.NORMAL || snappingMethod === SnappingMethods.ADVANCED) {
+        if (langTextDir === TextDirections.RTL) {
+          snappedComponent.element.style.clipPath = `path("M ${overlapScrollBarSize} 0 L ${overlapScrollBarSize} ${snappedComponent.element.offsetHeight} L ${snappedComponent.element.offsetWidth - overlapScrollBarSize} ${snappedComponent.element.offsetHeight} L ${snappedComponent.element.offsetWidth - overlapScrollBarSize} 0 Z")`;
+        } else {
+          snappedComponent.element.style.clipPath = `path("M 0 0 L 0 ${snappedComponent.element.offsetHeight} L ${snappedComponent.element.offsetWidth - overlapScrollBarSize} ${snappedComponent.element.offsetHeight} L ${snappedComponent.element.offsetWidth - overlapScrollBarSize} 0 Z")`;
+        }
       }
 
       snappedComponent.regularLength = `${isVertical ? listBounds.width : listBounds.height}${PX}`;
       const { width: sWidth, height: sHeight } = snappedComponent.getBounds() ?? { width: 0, height: 0 },
-        scrollerElement = scroller.nativeElement, delta = snappedComponent.item?.measures.delta ?? 0,
-        snappingMethod = this.snappingMethod();
+        scrollerElement = scroller.nativeElement, delta = snappedComponent.item?.measures.delta ?? 0;
 
       let left: number, right: number, top: number, bottom: number;
       if (isVertical) {
@@ -919,7 +957,40 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
       $selectByClick = toObservable(this.selectByClick),
       $collapseByClick = toObservable(this.collapseByClick),
       $isScrollStart = toObservable(this._isScrollStart),
-      $isScrollFinished = toObservable(this._isScrollFinished);
+      $isScrollFinished = toObservable(this._isScrollFinished),
+      $scrollStartOffset = toObservable(this.scrollStartOffset),
+      $scrollEndOffset = toObservable(this.scrollEndOffset),
+      $isVertical = toObservable(this.direction).pipe(
+        map(v => this.getIsVertical(v || DEFAULT_DIRECTION)),
+      ),
+      $snappedContainer = toObservable(this._snappedContainer).pipe(
+        takeUntilDestroyed(),
+        filter(v => !!v),
+        map(v => v.nativeElement),
+      );
+
+    combineLatest([$snappedContainer, $scrollStartOffset, $isVertical]).pipe(
+      tap(([container, offset, isVertical]) => {
+        container.style[isVertical ? 'marginTop' : 'marginLeft'] = `${offset}px`;
+      }),
+    ).subscribe();
+
+    $scrollStartOffset.pipe(
+      takeUntilDestroyed(),
+      distinctUntilChanged(),
+      tap(v => {
+        this._trackBox.scrollStartOffset = v;
+        this._service.scrollStartOffset = v;
+      }),
+    ).subscribe();
+
+    $scrollEndOffset.pipe(
+      takeUntilDestroyed(),
+      distinctUntilChanged(),
+      tap(v => {
+        this._trackBox.scrollEndOffset = v;
+      }),
+    ).subscribe();
 
     $isScrollStart.pipe(
       takeUntilDestroyed(),
@@ -988,9 +1059,6 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
         map(v => !v ? {} : v),
       ),
       $snap = toObservable(this.snap),
-      $isVertical = toObservable(this.direction).pipe(
-        map(v => this.getIsVertical(v || DEFAULT_DIRECTION)),
-      ),
       $isLazy = toObservable(this.collectionMode).pipe(
         map(v => this.getIsLazy(v || DEFAULT_COLLECTION_MODE)),
       ),
@@ -1152,14 +1220,14 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
       }),
     ).subscribe();
 
-    combineLatest([this.$initialized, $bounds, $listBounds, $actualItems, $itemConfigMap, $scrollSize, $itemSize,
+    combineLatest([this.$initialized, $bounds, $listBounds, $scrollEndOffset, $actualItems, $itemConfigMap, $scrollSize, $itemSize,
       $bufferSize, $maxBufferSize, $snap, $isVertical, $dynamicSize, $enabledBufferOptimization, $cacheVersion,
     ]).pipe(
       takeUntilDestroyed(),
       distinctUntilChanged(),
       filter(([initialized]) => !!initialized),
       tap(([,
-        bounds, listBounds, items, itemConfigMap, scrollSize, itemSize,
+        bounds, listBounds, scrollEndOffset, items, itemConfigMap, scrollSize, itemSize,
         bufferSize, maxBufferSize, snap, isVertical, dynamicSize, enabledBufferOptimization, cacheVersion,
       ]) => {
         this._$update.next();
@@ -1179,6 +1247,8 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
             bufferSize, maxBufferSize, scrollSize: actualScrollSize, snap, enabledBufferOptimization,
           },
             { displayItems, totalSize } = this._trackBox.updateCollection(items, itemConfigMap, opts);
+
+          scroller.totalSize = totalSize;
 
           this._totalSize.set(totalSize);
 
@@ -1218,11 +1288,11 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
               this._isScrollFinished.set(true);
             }
             this._trackBox.isScrollEnd = true;
-            const diff = roundedMaxPositionAfterUpdate - roundedScrollPositionAfterUpdate,
+            const prepared = this.prepared(), diff = roundedMaxPositionAfterUpdate - roundedScrollPositionAfterUpdate,
               snapToEndTransitionInstantOffset = this.snapToEndTransitionInstantOffset(),
               params: ScrollToOptions = {
                 [isVertical ? TOP_PROP_NAME : LEFT_PROP_NAME]: roundedMaxPositionAfterUpdate,
-                behavior: (diff <= snapToEndTransitionInstantOffset ?
+                behavior: (prepared && diff <= snapToEndTransitionInstantOffset ?
                   BEHAVIOR_SMOOTH : BEHAVIOR_INSTANT) as ScrollBehavior,
               };
             scroller?.scrollTo?.(params);
@@ -1522,6 +1592,8 @@ export class XVirtualListComponent implements OnInit, OnDestroy {
               const { displayItems, totalSize } = this._trackBox.updateCollection(items, itemConfigMap, {
                 ...opts, scrollSize, fromItemId: isLastIteration ? undefined : id,
               }), delta1 = this._trackBox.delta;
+
+              scrollerComponent.totalSize = totalSize;
 
               this._service.collection = displayItems;
 

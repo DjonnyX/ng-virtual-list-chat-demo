@@ -9,6 +9,7 @@ import { SubstarateStyles } from './enums';
 import { getShapeMinSize } from '@shared/utils';
 
 const DEFAULT_STROKE_ANIMATION_DURATION = 1000,
+  DEFAULT_STROKE_WIDTH = 3,
   RIPPLE_ANIMATE_CLASS = 'animate',
   DEFAULT_RIPPLE_COLOR = "rgba(0,0,0,0.1)",
   SHAPE_NAME = 'x-substrate-shape',
@@ -106,6 +107,8 @@ export class SubstrateComponent {
 
   strokeColors = input<GradientColor>();
 
+  strokeWidth = input<number>(DEFAULT_STROKE_WIDTH);
+
   strokeAnimationDuration = input<number>(DEFAULT_STROKE_ANIMATION_DURATION);
 
   rippleColor = input<Color | undefined>(DEFAULT_RIPPLE_COLOR);
@@ -141,6 +144,27 @@ export class SubstrateComponent {
         if (shape) {
           shape.setAttribute('fill', `inherit`);
         }
+      }
+    });
+
+    effect(() => {
+      const strokeWidth = this.strokeWidth(), shape = this.shape()?.nativeElement;
+      if (shape) {
+        shape.setAttribute('stroke-width', `${strokeWidth}`);
+      }
+    });
+
+    effect(() => {
+      const strokeWidth = this.strokeWidth(), path = this.path()?.nativeElement;
+      if (path) {
+        path.setAttribute('stroke-width', `${strokeWidth * 2}`);
+      }
+    });
+
+    effect(() => {
+      const strokeWidth = this.strokeWidth(), hilight = this.hilight()?.nativeElement;
+      if (hilight) {
+        hilight.setAttribute('stroke-width', `${strokeWidth * 2}`);
       }
     });
 

@@ -1,4 +1,4 @@
-import { Component, DestroyRef, ElementRef, inject, input, OnDestroy, signal, viewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, inject, input, OnDestroy, signal, ViewChild, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
@@ -17,10 +17,13 @@ const TOP = 'top',
   SMOOTH = 'smooth',
   VERTICAL = 'vertical',
   DURATION = 2000,
+  FRICTION_FORCE = 0.035,
   MAX_DURATION = 4000,
   MASS = 0.005,
   MAX_DIST = 15000,
-  MIN_TIMESTAMP = 10;
+  MIN_TIMESTAMP = 20,
+  MAX_VELOCITY_TIMESTAMP = 100,
+  SPEED_SCALE = 5;
 
 const calculateDirection = (buffer: Array<[number, number]>) => {
   for (let i = buffer.length - 1, l = 0; i >= l; i--) {
@@ -42,6 +45,8 @@ export interface IScrollToParams {
   behavior?: ScrollBehavior;
 }
 
+const SCROLL_EVENT = new Event('scroll');
+
 /**
  * The scroller for the XVirtualList item component
  * @author Evgenii Alexandrovich Grebennikov
@@ -59,6 +64,9 @@ export interface IScrollToParams {
 export class XScrollerComponent implements OnDestroy {
   scrollContent = viewChild<ElementRef<HTMLDivElement>>('scrollContent');
 
+  @ViewChild('scrollViewport', { read: CdkScrollable })
+  cdkScrollable: CdkScrollable | undefined;
+
   scrollViewport = viewChild<ElementRef<HTMLDivElement>>('scrollViewport');
 
   direction = input<ScrollerDirections>(ScrollerDirection.VERTICAL);
@@ -68,6 +76,10 @@ export class XScrollerComponent implements OnDestroy {
   content = input<HTMLElement>();
 
   classes = input<{ [cName: string]: boolean }>({});
+
+  scrollStartOffset = input<number>(0);
+
+  scrollEndOffset = input<number>(0);
 
   private _$scroll = new Subject<void>();
   readonly $scroll = this._$scroll.asObservable();
@@ -82,6 +94,8 @@ export class XScrollerComponent implements OnDestroy {
   }
 
   private _destroyRef = inject(DestroyRef);
+
+  private _isMoving = false;
 
   private _scrollLeftPersent = 0;
 
@@ -103,6 +117,16 @@ export class XScrollerComponent implements OnDestroy {
 
   private _animationCanceler: Function | undefined;
 
+  private _totalSize: number = 0;
+  set totalSize(v: number) {
+    this._totalSize = v;
+  }
+
+  private _actualScrollSize: number = 0;
+  set actualScrollSize(v: number) {
+    this._actualScrollSize = v;
+  }
+
   get scrollLeft() {
     return this._x;
   }
@@ -120,7 +144,7 @@ export class XScrollerComponent implements OnDestroy {
   get scrollHeight() {
     const { height: viewportHeight } = this.viewportBounds(),
       { height: contentHeight } = this.contentBounds();
-    return contentHeight < viewportHeight ? 0 : (contentHeight - viewportHeight);
+    return contentHeight < viewportHeight ? 0 : (contentHeight - (viewportHeight - this.scrollEndOffset()));
   }
 
   private _velocity: number = 0;
@@ -204,6 +228,9 @@ export class XScrollerComponent implements OnDestroy {
       $mouseDragCancel = race([$mouseUp, $mouseLeave]).pipe(
         takeUntilDestroyed(),
         delay(0),
+        tap(() => {
+          this._isMoving = false;
+        }),
       );
 
     $content.pipe(
@@ -217,6 +244,7 @@ export class XScrollerComponent implements OnDestroy {
             if (target.classList.contains('interactive')) {
               return of(undefined);
             }
+            this._isMoving = true;
             const startPos = isVertical ? this.y : this.x;
             let prevPos = startPos, prevClientPosition = 0, startPosDelta = 0;
             const startClientPos = isVertical ? e.clientY : e.clientX,
@@ -248,7 +276,8 @@ export class XScrollerComponent implements OnDestroy {
                       timestamp = endTime - startTime,
                       { v0 } = this.calculateVelocity(offsets, scrollDelta, timestamp),
                       { a0 } = this.calculateAcceleration(velocities, v0, timestamp);
-                    this.moveWithAcceleration(isVertical, position, this._velocity, v0, a0);
+                    this.moveWithAcceleration(isVertical, position, 0, v0, a0);
+                    this._isMoving = false;
                   }),
                 );
               }),
@@ -264,6 +293,9 @@ export class XScrollerComponent implements OnDestroy {
       $touchCanceler = $touchUp.pipe(
         takeUntilDestroyed(this._destroyRef),
         delay(0),
+        tap(() => {
+          this._isMoving = false;
+        }),
       );
 
     $content.pipe(
@@ -277,6 +309,7 @@ export class XScrollerComponent implements OnDestroy {
             if (target.classList.contains('interactive')) {
               return of(undefined);
             }
+            this._isMoving = true;
             const startPos = isVertical ? this.y : this.x;
             let prevPos = startPos, prevClientPosition = 0, startPosDelta = 0;
             const startClientPos = isVertical ? e.touches[e.touches.length - 1].clientY : e.touches[e.touches.length - 1].clientX,
@@ -309,6 +342,7 @@ export class XScrollerComponent implements OnDestroy {
                       { v0 } = this.calculateVelocity(offsets, scrollDelta, timestamp),
                       { a0 } = this.calculateAcceleration(velocities, v0, timestamp);
                     this.moveWithAcceleration(isVertical, position, this._velocity, v0, a0);
+                    this._isMoving = false;
                   }),
                 );
               }),
@@ -319,7 +353,7 @@ export class XScrollerComponent implements OnDestroy {
     ).subscribe();
   }
 
-  private calculateVelocity(offsets: Array<[number, number]>, delta: number, timestamp: number, indexOffset: number = 5) {
+  private calculateVelocity(offsets: Array<[number, number]>, delta: number, timestamp: number, indexOffset: number = 10) {
     offsets.push([delta, timestamp < MIN_TIMESTAMP ? MIN_TIMESTAMP : timestamp]);
 
     const len = offsets.length, startIndex = len > indexOffset ? len - indexOffset : 0, lastVSign = calculateDirection(offsets);
@@ -330,15 +364,15 @@ export class XScrollerComponent implements OnDestroy {
         continue;
       }
 
-      const v0 = (p0[1] !== 0 ? lastVSign * Math.abs(p0[0] / p0[1]) : 0);
-      vSum += v0;
+      const v0 = (p0[1] !== 0 ? lastVSign * Math.abs(p0[0] / p0[1]) * SPEED_SCALE : 0);
+      vSum += Math.sign(v0) * Math.pow(v0, 4) * .003;
     }
 
     const l = Math.min(offsets.length, indexOffset), v0 = l > 0 ? (vSum / l) : 0;
     return { v0 };
   }
 
-  private calculateAcceleration(velocities: Array<[number, number]>, delta: number, timestamp: number, indexOffset: number = 5) {
+  private calculateAcceleration(velocities: Array<[number, number]>, delta: number, timestamp: number, indexOffset: number = 10) {
     velocities.push([delta, timestamp < MIN_TIMESTAMP ? MIN_TIMESTAMP : timestamp]);
     const len = velocities.length, startIndex = len > indexOffset ? len - indexOffset : 0;
     let aSum = 0, prevV0: [number, number] | undefined, iteration = 0, lastVSign = calculateDirection(velocities);
@@ -348,7 +382,7 @@ export class XScrollerComponent implements OnDestroy {
         continue;
       }
       if (v00) {
-        const a0 = timestamp < 100 ? ((lastVSign * Math.abs(Math.abs(v01[0]) - Math.abs(v00[0]))) / Math.abs(v00[1])) : 0;
+        const a0 = timestamp < MAX_VELOCITY_TIMESTAMP ? ((lastVSign * Math.abs(Math.abs(v01[0]) - Math.abs(v00[0]))) / Math.abs(v00[1])) : 0;
         aSum += a0;
         prevV0 = v01;
       }
@@ -356,7 +390,7 @@ export class XScrollerComponent implements OnDestroy {
       iteration++;
     }
 
-    const l = Math.min(velocities.length, indexOffset), a0 = l > 0 ? (aSum / l) : 0;
+    const a0 = aSum * FRICTION_FORCE;
     return { a0 };
   }
 
@@ -416,7 +450,7 @@ export class XScrollerComponent implements OnDestroy {
         scrollSize = isVertical ? this.scrollHeight : this.scrollWidth,
         currentValue = val < 0 ? 0 : val > scrollSize ? scrollSize : val,
         t = performance.now(),
-        isFinished = currentValue === endValue;
+        isFinished = currentValue === endValue || ((currentValue === (scrollSize - this.scrollStartOffset() - this.scrollEndOffset())) || (currentValue === 0));
 
       delta = currentValue - scrollDelta - prevPos;
 
@@ -431,10 +465,16 @@ export class XScrollerComponent implements OnDestroy {
         if (isVertical) {
           this.y = currentValue;
           scrollContent.style.transform = `translate3d(0, ${-currentValue}px, 0)`;
+          if (this.cdkScrollable) {
+            this.cdkScrollable.getElementRef().nativeElement.dispatchEvent(SCROLL_EVENT);
+          }
           this._$scroll.next();
         } else {
           this.x = currentValue;
           scrollContent.style.transform = `translate3d(${-currentValue}px, 0, 0)`;
+          if (this.cdkScrollable) {
+            this.cdkScrollable.getElementRef().nativeElement.dispatchEvent(SCROLL_EVENT);
+          }
           this._$scroll.next();
         }
       }
@@ -473,6 +513,18 @@ export class XScrollerComponent implements OnDestroy {
       positionX: posX, positionY: posY,
     });
 
+    if (this._isMoving) {
+      if (isVertical) {
+        if (y < 0 || y > this._totalSize - this.viewportBounds().height) {
+          return;
+        }
+      } else {
+        if (x < 0 || x > this._totalSize - this.viewportBounds().width) {
+          return;
+        }
+      }
+    }
+
     const xx = Math.round(x < 0 ? 0 : x > this.scrollWidth ? this.scrollWidth : x),
       yy = Math.round(y < 0 ? 0 : y > this.scrollHeight ? this.scrollHeight : y),
       prevX = this.x,
@@ -482,10 +534,12 @@ export class XScrollerComponent implements OnDestroy {
     if (behavior === AUTO || behavior === SMOOTH) {
       if (isVertical) {
         if (prevY !== yy) {
+          this._actualScrollSize = y;
           this.animate(prevY, yy);
         }
       } else {
         if (prevX !== xx) {
+          this._actualScrollSize = x;
           this.animate(prevX, xx);
         }
       }
@@ -497,7 +551,11 @@ export class XScrollerComponent implements OnDestroy {
               this._animationCanceler();
             }
           }
+          this._actualScrollSize = y;
           scrollContent.style.transform = `translate3d(0, ${-yy}px, 0)`;
+          if (this.cdkScrollable) {
+            this.cdkScrollable.getElementRef().nativeElement.dispatchEvent(SCROLL_EVENT);
+          }
           this._$scroll.next();
         }
       } else {
@@ -507,7 +565,11 @@ export class XScrollerComponent implements OnDestroy {
               this._animationCanceler();
             }
           }
+          this._actualScrollSize = x;
           scrollContent.style.transform = `translate3d(${-xx}px, 0, 0)`;
+          if (this.cdkScrollable) {
+            this.cdkScrollable.getElementRef().nativeElement.dispatchEvent(SCROLL_EVENT);
+          }
           this._$scroll.next();
         }
       }

@@ -3,10 +3,13 @@
 </div>
 
 @if (snap()) {
-  <div #snapped part="snapped-item" class="xvl__list-snapper">
-    <ng-container #snapRendererContainer></ng-container>
+  <div #snappedContainer class="xvl__snapped-container">
+    <div #snapped part="snapped-item" class="xvl__list-snapper">
+      <ng-container #snapRendererContainer></ng-container>
+    </div>
   </div>
 }
-<x-scroller class="xvl__list-scroller" #scroller [classes]="classes()" [focusedElement]="focusedElement()">
+<x-scroller class="xvl__list-scroller" #scroller [classes]="classes()" [scrollStartOffset]="scrollStartOffset()"
+  [scrollEndOffset]="scrollEndOffset()" [focusedElement]="focusedElement()">
   <ng-container #renderersContainer></ng-container>
 </x-scroller>

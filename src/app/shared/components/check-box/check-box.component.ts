@@ -12,7 +12,7 @@ import { formatCSSNumber } from '../utils';
 import { LocaleSensitiveDirective } from '@shared/localization';
 
 const DEFAULT_ROUND_CORNER: RoundedCorner = [8, 8, 8, 8],
-  DEFAULT_STROKE_COLOR: GradientColor = ['rgba(186, 250, 255, 0)', 'rgb(183, 235, 255)'],
+  DEFAULT_STROKE_WIDTH = 3,
   CLASS_PRESSED = 'pressed',
   CLASS_FOCUSED = 'focused',
   CLASS_DISABLED = 'disabled',
@@ -61,6 +61,8 @@ export class CheckBoxComponent implements AfterViewInit, OnDestroy {
   onCheck = output<boolean>();
 
   strokeColor = input<GradientColor | undefined>(undefined);
+
+  strokeWidth = input<number>(DEFAULT_STROKE_WIDTH);
 
   roundCorner = input<RoundedCorner | undefined>(DEFAULT_ROUND_CORNER);
 

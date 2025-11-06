@@ -38,8 +38,6 @@ export class DialogComponent implements AfterViewInit {
   @ViewChild('contentTemplate', { read: ViewContainerRef })
   contentTemplate!: ViewContainerRef;
 
-  container = viewChild<ElementRef<HTMLDivElement>>('container');
-
   content = viewChild<ElementRef<HTMLDivElement>>('content');
 
   title = viewChild<ElementRef<HTMLHeadingElement>>('title');
@@ -89,18 +87,9 @@ export class DialogComponent implements AfterViewInit {
   };
 
   constructor() {
-    const el = this._elementRef.nativeElement as HTMLDivElement, $container = toObservable(this.container);
+    const el = this._elementRef.nativeElement as HTMLDivElement;
     this._resizeObserer = new ResizeObserver(this._onResizeHandler);
     this._resizeObserer.observe(el);
-
-    $container.pipe(
-      takeUntilDestroyed(),
-      filter(v => !!v),
-      map(v => v.nativeElement),
-      tap(container => {
-        
-      }),
-    ).subscribe();
 
     this.theme = toSignal(this._themeService.$theme);
 

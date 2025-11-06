@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, effect, ElementRef, inject, Signal, signal, viewChild, ViewEncapsulation } from '@angular/core';
+import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, effect, ElementRef, inject, OnDestroy, Signal, signal, viewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { BehaviorSubject, } from 'rxjs';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { BehaviorSubject, filter, map, tap, } from 'rxjs';
 import { MenuButtonComponent, MessageSearchComponent } from '@entities/header';
-import { IRenderVirtualListItem, IVirtualListItem } from '@shared/components/x-virtual-list';
+import { IRenderVirtualListItem, ISize, IVirtualListItem } from '@shared/components/x-virtual-list';
 import { DrawerComponent, DockMode } from "@shared/components";
 import { ClickOutsideService } from '@shared/directives';
 import { MessagesComponent } from "@widgets/messages/messages/messages.component";
@@ -35,8 +35,10 @@ import { MessaageCreatorComponent } from '@widgets/message/messaage-creator/mess
   providers: [ClickOutsideService, MessageService],
   encapsulation: ViewEncapsulation.Emulated,
 })
-export class ChatComponent {
+export class ChatComponent implements OnDestroy {
   protected _toolbar = viewChild<ElementRef<HTMLDivElement>>('toolbar');
+
+  protected _messageCreator = viewChild<ElementRef<HTMLDivElement>>('messageCreator');
 
   protected _header = viewChild<ElementRef<HTMLDivElement>>('header');
 
@@ -61,7 +63,63 @@ export class ChatComponent {
 
   private _themeService = inject(ThemeService);
 
+  private _messageCreatorResizeObserver: ResizeObserver;
+
+  messageCreatorBounds = signal<ISize>({
+    width: this._messageCreator()?.nativeElement?.offsetWidth || 0,
+    height: this._messageCreator()?.nativeElement?.offsetHeight || 0,
+  });
+
+  private _onMessageCreatorResizeHandler = () => {
+    const el = this._messageCreator()?.nativeElement as HTMLDivElement;
+    if (el && el.offsetWidth && el.offsetHeight) {
+      this.messageCreatorBounds.set({ width: el.offsetWidth || 0, height: el.offsetHeight || 0 });
+    }
+  }
+
+  private _toolbarResizeObserver: ResizeObserver;
+
+  toolbarBounds = signal<ISize>({
+    width: this._toolbar()?.nativeElement?.offsetWidth || 0,
+    height: this._toolbar()?.nativeElement?.offsetHeight || 0,
+  });
+
+  private _onToolbarResizeHandler = () => {
+    const el = this._toolbar()?.nativeElement as HTMLDivElement;
+    if (el && el.offsetWidth && el.offsetHeight) {
+      this.toolbarBounds.set({ width: el.offsetWidth || 0, height: el.offsetHeight || 0 });
+    }
+  }
+
   constructor() {
+    this._messageCreatorResizeObserver = new ResizeObserver(this._onMessageCreatorResizeHandler);
+
+    this._toolbarResizeObserver = new ResizeObserver(this._onToolbarResizeHandler);
+
+    const $messageCreator = toObservable(this._messageCreator).pipe(
+      takeUntilDestroyed(),
+      filter(v => !!v),
+      map(v => v.nativeElement),
+    ), $toolbar = toObservable(this._toolbar).pipe(
+      takeUntilDestroyed(),
+      filter(v => !!v),
+      map(v => v.nativeElement),
+    );
+
+    $toolbar.pipe(
+      takeUntilDestroyed(),
+      tap(toolbar => {
+        this._toolbarResizeObserver.observe(toolbar);
+      }),
+    ).subscribe();
+
+    $messageCreator.pipe(
+      takeUntilDestroyed(),
+      tap(messageCreator => {
+        this._messageCreatorResizeObserver.observe(messageCreator);
+      }),
+    ).subscribe();
+
     this.theme = toSignal(this._themeService.$theme);
 
     effect(() => {
@@ -124,5 +182,14 @@ export class ChatComponent {
   onInfo(params: Array<any>) {
     const [param1, param2, param3] = params;
     this.title.set(`${param1}, ${param2}, ${param3}`)
+  }
+
+  ngOnDestroy(): void {
+    if (this._messageCreatorResizeObserver) {
+      this._messageCreatorResizeObserver.disconnect();
+    }
+    if (this._toolbarResizeObserver) {
+      this._toolbarResizeObserver.disconnect();
+    }
   }
 }

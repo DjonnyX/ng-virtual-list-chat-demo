@@ -14,13 +14,16 @@ import {
 export class PressDirective {
     onPress = output<boolean>();
 
-    @HostListener('pointerdown', ['$event'])
+    @HostListener('mousedown', ['$event'])
+    @HostListener('touchstart', ['$event'])
     onPressHandler() {
         this.onPress.emit(true);
     }
 
-    @HostListener('pointerup', ['$event'])
-    @HostListener('pointerleave', ['$event'])
+    @HostListener('mouseup', ['$event'])
+    @HostListener('mouseleave', ['$event'])
+    @HostListener('touchend', ['$event'])
+    @HostListener('touchleave', ['$event'])
     onRelease() {
         this.onPress.emit(false);
     }

@@ -52,10 +52,14 @@ export class MessageMenuButtonComponent {
     return this._elementRef.nativeElement as HTMLDivElement;
   }
 
+  @HostListener('mouseup', ['$event'])
+  @HostListener('mousedown', ['$event'])
+  @HostListener('touchstart', ['$event'])
+  @HostListener('touchend', ['$event'])
   @HostListener('pointerup', ['$event'])
   @HostListener('pointerdown', ['$event'])
   @HostListener('click', ['$event'])
-  onPointerEvent(e: PointerEvent) {
+  onPointerEvent(e: MouseEvent | TouchEvent) {
     e.stopImmediatePropagation();
   }
 
