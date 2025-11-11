@@ -89,25 +89,25 @@ const manifest: ITheme = {
             backgroundImage: "url(background_infinity-dark.png)",
             group: {
                 normal: {
-                    background: "rgba(20, 6, 36, 0.74)",
+                    background: ["rgba(37, 26, 138, 0.54)", "rgba(71, 3, 116, 0.54)"],
                     color: "rgb(206, 191, 220)",
                     fill: "rgb(206, 191, 220)",
                     borderColor: "transparent",
                 },
                 selected: {
-                    background: "rgba(45, 15, 73, 0.57)",
+                    background: ["rgba(86, 71, 216, 0.54)", "rgba(132, 19, 207, 0.54)"],
                     color: "rgb(206, 191, 220)",
                     fill: "rgb(206, 191, 220)",
                     borderColor: "transparent",
                 },
                 focused: {
-                    background: "rgba(57, 23, 90, 0.57)",
+                    background: ["rgba(86, 71, 216, 0.54)", "rgba(132, 19, 207, 0.54)"],
                     color: "rgb(206, 191, 220)",
                     fill: "rgb(206, 191, 220)",
                     borderColor: "rgba(206, 191, 220, 0.1)",
                 },
                 focusedSelected: {
-                    background: "rgba(70, 32, 107, 0.57)",
+                    background: ["rgba(86, 71, 216, 0.54)", "rgba(132, 19, 207, 0.54)"],
                     color: "rgb(206, 191, 220)",
                     fill: "rgb(206, 191, 220)",
                     borderColor: "rgba(206, 191, 220, 0.14)",

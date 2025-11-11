@@ -1,3 +1,5 @@
+import { GradientColor } from "@shared/types";
+
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
@@ -6,7 +8,7 @@
  * All rights reserved.
  */
 export interface IGroupStateTheme {
-    background?: string;
+    background?: GradientColor;
     fill?: string;
     color?: string;
     borderColor?: string;

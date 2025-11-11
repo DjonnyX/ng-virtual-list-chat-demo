@@ -9,9 +9,10 @@ import { SubstarateStyles } from './enums';
 import { getShapeMinSize } from '@shared/utils';
 
 const DEFAULT_STROKE_ANIMATION_DURATION = 1000,
+  DEFAULT_FILL_COLORS: GradientColor = ["rgba(0, 0, 0, .1)", "rgba(0, 0, 0, .1)"],
   DEFAULT_STROKE_WIDTH = 3,
   RIPPLE_ANIMATE_CLASS = 'animate',
-  DEFAULT_RIPPLE_COLOR = "rgba(0,0,0,0.1)",
+  DEFAULT_RIPPLE_COLOR = "rgba(0, 0, 0, .1)",
   SHAPE_NAME = 'x-substrate-shape',
   CLIP_NAME = 'x-substrate-clip',
   GRADIENT_COLOR_NAME = 'stop-color',
@@ -113,7 +114,7 @@ export class SubstrateComponent {
 
   rippleColor = input<Color | undefined>(DEFAULT_RIPPLE_COLOR);
 
-  fillColors = input<GradientColor | undefined>(undefined);
+  fillColors = input<GradientColor | undefined>(DEFAULT_FILL_COLORS);
 
   fillColorPositions = input<GradientColorPositions | undefined>(undefined);
 

@@ -1,9 +1,21 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, ElementRef, inject, input, Signal, viewChild } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { Component, computed, effect, ElementRef, inject, input, OnDestroy, signal, Signal, viewChild } from '@angular/core';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { SubstrateComponent } from '@shared/components/substrate';
+import { IDisplayObjectMeasures, ISize } from '@shared/components/x-virtual-list';
+import { PressDirective } from '@shared/directives';
 import { LocaleSensitiveDirective } from '@shared/localization';
 import { ThemeService } from '@shared/theming';
 import { ITheme } from '@shared/theming';
+import { Color, GradientColor, GradientColorPositions, RoundedCorner } from '@shared/types';
+import { filter, map, Subject, tap } from 'rxjs';
+
+const FOCUSED = 'focused',
+  SELECTED = 'selected',
+  DEFAULT_SIZE = 28,
+  DEFAUTL_RIPPLE_COLOR: Color = "rgba(0, 0, 0, 0)",
+  DEFAULT_FILL_COLOR: GradientColor = ["rgba(0, 0, 0, 0)", "rgba(0, 0, 0, 0)"],
+  DEFAULT_ROUND_CORNER: RoundedCorner = [14, 14, 14, 14];
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -14,12 +26,12 @@ import { ITheme } from '@shared/theming';
  */
 @Component({
   selector: 'x-message-group',
-  imports: [CommonModule, LocaleSensitiveDirective],
+  imports: [CommonModule, LocaleSensitiveDirective, PressDirective, SubstrateComponent],
   templateUrl: './message-group.component.html',
   styleUrl: './message-group.component.scss',
 })
-export class MessageGroupComponent {
-  private _name = viewChild<ElementRef<HTMLSpanElement>>('name');
+export class MessageGroupComponent implements OnDestroy {
+  private _container = viewChild<ElementRef<HTMLSpanElement>>('container');
 
   private _indicator = viewChild<ElementRef<HTMLSpanElement>>('indicator');
 
@@ -29,35 +41,95 @@ export class MessageGroupComponent {
 
   collapsed = input<boolean>(false);
 
+  measures = input<IDisplayObjectMeasures | null>(null);
+
+  roundCorner = signal<RoundedCorner | undefined>(DEFAULT_ROUND_CORNER);
+
+  strokeGradientColor = signal<GradientColor | undefined>(undefined);
+
+  fillPositions: Signal<GradientColorPositions | undefined>;
+
+  fillGradientColors = signal<GradientColor | undefined>(DEFAULT_FILL_COLOR);
+
+  shapeRoundCorner = signal<[number, number, number, number] | undefined>(this.roundCorner());
+
+  rippleEffectColor = signal<Color | undefined>(DEFAUTL_RIPPLE_COLOR);
+
   theme: Signal<ITheme | undefined>;
+
+  private _$pressed = new Subject<boolean>();
+  protected $pressed = this._$pressed.asObservable();
 
   private _themeService = inject(ThemeService);
 
+  private _resizeObserver: ResizeObserver;
+
+  bounds = signal<ISize>({
+    width: this._container()?.nativeElement?.offsetWidth || DEFAULT_SIZE,
+    height: this._container()?.nativeElement?.offsetHeight || DEFAULT_SIZE,
+  });
+
+  private _onContainerResizeHandler = () => {
+    const el = this._container()?.nativeElement as HTMLDivElement;
+    if (el && el.offsetWidth && el.offsetHeight) {
+      this.bounds.set({ width: el.offsetWidth || DEFAULT_SIZE, height: el.offsetHeight || DEFAULT_SIZE });
+    }
+  }
+
   constructor() {
+    this._resizeObserver = new ResizeObserver(this._onContainerResizeHandler);
+
+    const $container = toObservable(this._container);
+
+    $container.pipe(
+      takeUntilDestroyed(),
+      filter(v => !!v),
+      map(v => v.nativeElement),
+      tap(container => {
+        this._resizeObserver.observe(container, { box: "border-box" });
+        this._onContainerResizeHandler();
+      }),
+    ).subscribe();
+
     this.theme = toSignal(this._themeService.$theme);
 
+    this.fillPositions = computed(() => {
+      const measures = this.measures();
+      return [`${measures?.absoluteStartPositionPercent ?? 0}`, `${(measures?.absoluteEndPositionPercent ?? 0)}`];
+    });
+
     effect(() => {
-      const theme = this.theme(), classes = this.classes(), nameElement = this._name()?.nativeElement, indicatorElement = this._indicator()?.nativeElement;
+      const theme = this.theme();
+      if (theme) {
+        const preset = this._themeService.getPreset(theme.chat.messages.group);
+        if (preset) {
+          this.rippleEffectColor.set(preset.rippleColor);
+        }
+      }
+    });
+
+    effect(() => {
+      const theme = this.theme(), classes = this.classes(), nameElement = this._container()?.nativeElement, indicatorElement = this._indicator()?.nativeElement;
       if (theme && nameElement && indicatorElement && classes) {
         const preset = this._themeService.getPreset(theme.chat.messages.group);
         if (preset) {
-          if (classes['focused'] && classes['selected']) {
-            nameElement.style.backgroundColor = preset.focusedSelected.background;
+          if (classes[FOCUSED] && classes[SELECTED]) {
+            this.fillGradientColors.set(preset.focusedSelected.background ?? DEFAULT_FILL_COLOR);
             nameElement.style.color = preset.focusedSelected.color;
             nameElement.style.borderColor = preset.focusedSelected.borderColor;
             indicatorElement.style.fill = preset.focusedSelected.fill;
-          } else if (classes['focused']) {
-            nameElement.style.backgroundColor = preset.focused.background;
+          } else if (classes[FOCUSED]) {
+            this.fillGradientColors.set(preset.focused.background ?? DEFAULT_FILL_COLOR);
             nameElement.style.color = preset.focused.color;
             nameElement.style.borderColor = preset.focused.borderColor;
             indicatorElement.style.fill = preset.focused.fill;
-          } else if (classes['selected']) {
-            nameElement.style.backgroundColor = preset.selected.background;
+          } else if (classes[SELECTED]) {
+            this.fillGradientColors.set(preset.selected.background ?? DEFAULT_FILL_COLOR);
             nameElement.style.color = preset.selected.color;
             nameElement.style.borderColor = preset.selected.borderColor;
             indicatorElement.style.fill = preset.selected.fill;
           } else {
-            nameElement.style.backgroundColor = preset.normal.background;
+            this.fillGradientColors.set(preset.normal.background ?? DEFAULT_FILL_COLOR);
             nameElement.style.color = preset.normal.color;
             nameElement.style.borderColor = preset.normal.borderColor;
             indicatorElement.style.fill = preset.normal.fill;
@@ -65,5 +137,15 @@ export class MessageGroupComponent {
         }
       }
     });
+  }
+
+  onPressHandler(pressed: boolean) {
+    this._$pressed.next(pressed);
+  }
+
+  ngOnDestroy(): void {
+    if (this._resizeObserver) {
+      this._resizeObserver.disconnect();
+    }
   }
 }

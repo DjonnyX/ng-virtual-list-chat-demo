@@ -11,24 +11,38 @@
     align-items: center;
     justify-content: center;
 
-    .content {
-        display: flex;
-        gap: 8px;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        user-select: none;
-        font-size: 10px;
-        height: auto;
-        padding: 6px 14px;
-        border-radius: 14px;
-        border-width: 1px;
-        border-style: solid;
-        backdrop-filter: blur(4px);
-        z-index: 1;
+    .wrapper {
+        position: relative;
 
-        .text {
-            margin: 0;
-            padding: 0;
+        .substrate {
+            position: absolute;
+            z-index: 0;
+        }
+
+        .content {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+            font-size: 10px;
+            height: 28px;
+            padding: 6px 12px;
+            border-radius: 14px;
+            border-width: 0px;
+            border-style: solid;
+            backdrop-filter: blur(6px);
+            box-sizing: border-box;
+            background: transparent;
+            z-index: 1;
+
+            .text {
+                margin: 0;
+                padding: 0;
+            }
         }
     }
 }
