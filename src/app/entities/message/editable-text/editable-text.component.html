@@ -13,7 +13,7 @@
     </div>
 } @else {
     <p #readonlyText localeSensitive [ngClass]="{selectable: canselectable, interactive: canselectable}" [style.--link-normal-color]="linkNormalColor()"
-        [style.--link-visited-color]="linkVisitedColor()" [ngStyle]="readonlyStyles()"
+        [style.--link-visited-color]="linkVisitedColor()" [style.--message-status-color]="messageStatusColor()" [ngStyle]="readonlyStyles()"
         [style.--link-hover-color]="linkHoverColor()" [style.--link-active-color]="linkActiveColor()"
         [style.--search-substring-background]="searchSubstringBackground()" searchHighlight class="editor-readonly"
         [substringClass]="substringClass" [text]="formattedValue" [searchedWords]="searchedWords"

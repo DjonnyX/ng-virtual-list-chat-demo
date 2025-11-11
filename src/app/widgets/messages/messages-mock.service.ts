@@ -97,7 +97,7 @@ export class MessagesMockService implements MessagesService {
         } else {
             listChunk = [];
             const dbMessages = db.chats[chatId].messages;
-            let num = 1, chunkSize = size;
+            let num = 1, chunkSize = Math.min(db.chats[chatId].messages.length, size);
             while (num <= chunkSize && dbMessages.length - num > -1) {
                 const i = dbMessages.length - num, message = dbMessages[i];
                 if ((message as any).__deleted__) {
@@ -108,7 +108,7 @@ export class MessagesMockService implements MessagesService {
                 num++;
             }
         }
-        for (let i = 0, l = size; i < l; i++) {
+        for (let i = 0, l = Math.min(db.chats[chatId].messages.length, size); i < l; i++) {
             const msg = listChunk[i];
             items.push(msg);
         }

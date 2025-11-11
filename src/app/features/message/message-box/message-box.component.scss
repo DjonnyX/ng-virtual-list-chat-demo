@@ -42,19 +42,6 @@
         transition: grid-template-columns 100ms ease-out;
     }
 
-    &.fadeout {
-        .message-container {
-            opacity: 0;
-        }
-    }
-
-    &.fadein {
-        .message-container {
-            opacity: 1;
-            transition: opacity 50ms ease-out;
-        }
-    }
-
     &.animate {
         .message-container {
             height: var(--deleted-item-height);
@@ -65,7 +52,7 @@
 
     &.deleted {
         .message-container {
-            height: 18px;
+            height: 0px;
             opacity: 0;
             transition: height 150ms ease-out, opacity 150ms ease-out;
         }

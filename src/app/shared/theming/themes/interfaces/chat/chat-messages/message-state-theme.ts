@@ -9,5 +9,6 @@ import { GradientColor } from "../../../../../types";
  */
 export interface IMessageStateTheme {
     fill: GradientColor;
+    strokeWidth: number;
     color: string;
 }

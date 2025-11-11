@@ -75,11 +75,11 @@ export class NgVirtualListItemComponent extends BaseVirtualListItemComponent {
   data = signal<IRenderVirtualListItem | undefined>(undefined);
   private _data: IRenderVirtualListItem | undefined = undefined;
   set item(v: IRenderVirtualListItem | undefined) {
-    if (this._data === v) {
+    if (this._data === v || this._data?.id === -1 && !v) {
       return;
     }
 
-    if (v !== null) {
+    if (v) {
       this._data = v;
 
       this.updatePartStr(v, this._isSelected, this._isCollapsed);

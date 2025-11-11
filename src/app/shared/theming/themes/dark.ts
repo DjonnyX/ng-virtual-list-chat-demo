@@ -25,13 +25,13 @@ const manifest: ITheme = {
     chat: {
         header: {
             background: "rgba(10, 8, 17, 0.75)",
-            color: "rgba(255, 255, 255, 1)",
+            color: "rgb(206, 191, 220)",
             fontSize: "14px",
             menuButton: {
                 normal: {
                     color: "none",
                     fill: ["rgba(0,0,0,0)", "rgba(0,0,0,0)"],
-                    iconFill: "rgba(255, 255, 255, 1)",
+                    iconFill: "rgb(206, 191, 220)",
                 },
                 pressed: {
                     color: "none",
@@ -54,8 +54,8 @@ const manifest: ITheme = {
                 timeoutIndicatorColor: "rgba(255, 255, 255, 0.05)",
                 normal: {
                     background: "rgba(9, 5, 19, 0.15)",
-                    borderColor: "rgba(51, 51, 51, 0.75)",
-                    color: "rgba(255, 255, 255, 1)",
+                    borderColor: "rgba(206, 191, 220, 0.2)",
+                    color: "rgb(206, 191, 220)",
                     fontSize: "14px",
                     fill: "rgb(158, 173, 202)",
                     placeholder: {
@@ -65,7 +65,7 @@ const manifest: ITheme = {
                 },
                 focused: {
                     background: "rgba(35, 15, 56, 0.15)",
-                    borderColor: "rgba(255, 255, 255, 0.75)",
+                    borderColor: "rgba(206, 191, 220, 0.35)",
                     color: "rgba(255, 255, 255, 1)",
                     fontSize: "14px",
                     fill: "rgb(158, 166, 202)",
@@ -142,32 +142,39 @@ const manifest: ITheme = {
                             },
                         }
                     },
+                    statusColor: "rgba(148, 196, 218, 0.68)",
                     rippleColor: "rgba(255, 255, 255, 0.15)",
                     searchSubstringColor: "rgba(139, 0, 86, 0.84)",
                     editingTextBackground: "rgba(0, 0, 0, 0.1)",
                     editingTextFocusedOutline: "1px solid rgb(255, 255, 255, 0.15)",
                     normal: {
-                        fill: ["rgb(56, 43, 179)", "rgb(82, 32, 126)"],
+                        fill: ["rgb(56, 43, 179)", "rgba(101, 0, 168, 1)"],
+                        strokeWidth: 3,
                         color: "rgb(206, 191, 220)",
                     },
                     selected: {
-                        fill: ["rgb(74, 61, 196)", "rgb(96, 44, 141)"],
+                        fill: ["rgb(74, 61, 196)", "rgba(113, 0, 189, 1)"],
+                        strokeWidth: 3,
                         color: "rgb(206, 191, 220)",
                     },
                     focused: {
-                        fill: ["rgb(87, 74, 204)", "rgb(106, 55, 151)"],
+                        fill: ["rgb(87, 74, 204)", "rgba(113, 0, 189, 1)"],
+                        strokeWidth: 3,
                         color: "rgb(206, 191, 220)",
                     },
                     focusedSelected: {
-                        fill: ["rgb(87, 74, 204)", "rgb(106, 55, 151)"],
+                        fill: ["rgb(87, 74, 204)", "rgba(113, 0, 189, 1)"],
+                        strokeWidth: 3,
                         color: "rgb(206, 191, 220)",
                     },
                     removal: {
                         fill: ["rgb(255, 134, 118)", "rgb(255, 117, 158)"],
+                        strokeWidth: 1.5,
                         color: "rgb(255, 255, 255)",
                     },
                     removalSelected: {
                         fill: ["rgb(255, 134, 118)", "rgb(255, 117, 158)"],
+                        strokeWidth: 1.5,
                         color: "rgb(255, 255, 255)",
                     }
                 },
@@ -523,7 +530,7 @@ const manifest: ITheme = {
         },
         [CheckboxPresets.SECONDARY]: {
             normal: {
-                fill: ["rgb(75, 65, 134)", "rgb(84, 71, 160)"],
+                fill: ["rgba(66, 5, 153, 1)", "rgba(82, 18, 173, 1)"],
                 iconFill: "rgb(255, 221, 239)",
                 color: "rgb(199, 186, 255)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
@@ -557,7 +564,7 @@ const manifest: ITheme = {
             },
         },
         [DialogPresets.PRIMARY]: {
-            fill: ["rgb(59, 44, 99)", "rgb(59, 44, 99)"],
+            fill: ["rgba(59, 30, 112, 1)", "rgba(59, 30, 112, 1)"],
             roundedCorner: DIALOG_ROUNDED_CORNER,
             padding: DIALOG_PADDING,
             strokeAnimationDuration: 10000,
@@ -575,7 +582,7 @@ const manifest: ITheme = {
             },
         },
         [DialogPresets.SECONDARY]: {
-            fill: ["rgb(47, 40, 92)", "rgb(47, 40, 92)"],
+            fill: ["rgba(59, 30, 112, 1)", "rgba(59, 30, 112, 1)"],
             roundedCorner: DIALOG_ROUNDED_CORNER,
             padding: DIALOG_PADDING,
             strokeAnimationDuration: 10000,
@@ -591,7 +598,7 @@ const manifest: ITheme = {
             },
         },
         [ContextMenuPresets.PRIMARY]: {
-            fill: ["rgb(44, 49, 99)", "rgb(84, 43, 117)"],
+            fill: ["rgba(45, 30, 112, 1)", "rgba(59, 30, 112, 1)"],
             roundedCorner: CONTEXT_MENU_ROUNDED_CORNER,
             padding: CONTEXT_MENU_PADDING,
             strokeAnimationDuration: 10000,
@@ -599,7 +606,7 @@ const manifest: ITheme = {
             buttonPreset: ButtonPresets.CONTEXT_MENU_PRIMARY,
         },
         [ContextMenuPresets.SECONDARY]: {
-            fill: ["rgb(59, 44, 99)", "rgb(59, 44, 99)"],
+            fill: ["rgba(45, 30, 112, 1)", "rgba(59, 30, 112, 1)"],
             roundedCorner: CONTEXT_MENU_ROUNDED_CORNER,
             padding: CONTEXT_MENU_PADDING,
             strokeAnimationDuration: 10000,

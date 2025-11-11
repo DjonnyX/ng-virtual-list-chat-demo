@@ -25,52 +25,52 @@ const manifest: ITheme = {
     chat: {
         header: {
             background: "rgba(67, 33, 139, 0.75)",
-            color: "rgb(161, 153, 219)",
+            color: "rgb(255, 255, 255)",
             fontSize: "14px",
             menuButton: {
                 normal: {
                     color: "none",
                     fill: ["rgba(0,0,0,0)", "rgba(0,0,0,0)"],
-                    iconFill: "rgb(161, 153, 219)",
+                    iconFill: "rgb(255, 255, 255)",
                 },
                 pressed: {
                     color: "none",
                     fill: ["rgba(0,0,0,0)", "rgba(0,0,0,0)"],
-                    iconFill: "rgb(161, 153, 219)",
+                    iconFill: "rgb(255, 255, 255)",
                 },
                 focused: {
                     color: "none",
                     fill: ["rgba(0,0,0,0)", "rgba(0,0,0,0)"],
-                    iconFill: "rgb(161, 153, 219)",
+                    iconFill: "rgb(255, 255, 255))",
                     outline: `2px solid rgba(161, 153, 219, 0.25)`,
                 },
                 disabled: {
                     color: "none",
                     fill: ["rgba(0,0,0,0)", "rgba(0,0,0,0)"],
-                    iconFill: "rgb(161, 153, 219)",
+                    iconFill: "rgb(255, 255, 255)",
                 },
             },
             search: {
                 timeoutIndicatorColor: "rgba(255, 255, 255, 0.1)",
                 normal: {
                     background: "rgba(79, 46, 156, 0.15)",
-                    borderColor: "rgba(84, 76, 177, 0.75)",
-                    color: "rgb(190, 214, 235)",
+                    borderColor: "rgba(255, 255, 255, 0.25)",
+                    color: "rgb(255, 255, 255)",
                     fontSize: "14px",
-                    fill: "rgb(214, 209, 255)",
+                    fill: "rgb(255, 255, 255)",
                     placeholder: {
-                        color: "rgb(145, 169, 190)",
+                        color: "rgba(255, 255, 255, .75)",
                         fontSize: "14px",
                     },
                 },
                 focused: {
                     background: "rgba(79, 46, 156, 0.15)",
-                    borderColor: "rgba(198, 244, 255, 0.75)",
-                    color: "rgb(190, 214, 235)",
+                    borderColor: "rgb(255, 255, 255)",
+                    color: "rgb(255, 255, 255)",
                     fontSize: "14px",
-                    fill: "rgb(214, 209, 255)",
+                    fill: "rgb(255, 255, 255)",
                     placeholder: {
-                        color: "rgb(145, 169, 190)",
+                        color: "rgba(255, 255, 255, .75)",
                         fontSize: "14px",
                     },
                 }
@@ -89,25 +89,25 @@ const manifest: ITheme = {
             backgroundImage: "url(background_infinity.png)",
             group: {
                 normal: {
-                    background: "rgba(44, 0, 165, 0.6)",
+                    background: "rgba(94, 52, 209, 0.6)",
                     color: "rgb(255, 255, 255)",
                     fill: "rgb(255, 255, 255)",
                     borderColor: "transparent",
                 },
                 selected: {
-                    background: "rgba(84, 41, 202, 0.6)",
+                    background: "rgba(138, 98, 248, 0.6)",
                     color: "rgb(255, 255, 255)",
                     fill: "rgb(255, 255, 255)",
                     borderColor: "transparent",
                 },
                 focused: {
-                    background: "rgba(84, 41, 202, 0.6)",
+                    background: "rgba(138, 98, 248, 0.6)",
                     color: "rgb(255, 255, 255)",
                     fill: "rgb(255, 255, 255)",
                     borderColor: "rgba(141, 108, 233, 0.64)",
                 },
                 focusedSelected: {
-                    background: "rgba(84, 41, 202, 0.6)",
+                    background: "rgba(138, 98, 248, 0.6)",
                     color: "rgb(255, 255, 255)",
                     fill: "rgb(255, 255, 255)",
                     borderColor: "rgba(141, 108, 233, 0.47)",
@@ -142,32 +142,39 @@ const manifest: ITheme = {
                             },
                         }
                     },
+                    statusColor: "rgba(62, 111, 174, 1)",
                     rippleColor: "rgba(28, 133, 165, 0.15)",
                     searchSubstringColor: "rgba(255, 0, 191, 0.23)",
                     editingTextBackground: "rgba(255, 240, 185, 0.151)",
                     editingTextFocusedOutline: "1px solid rgb(24, 90, 151, 0.15)",
                     normal: {
-                        fill: ["rgb(255, 255, 255)", "rgb(185, 210, 233)"],
+                        fill: ["rgb(255, 255, 255)", "rgba(233, 245, 255, 1)"],
+                        strokeWidth: 3,
                         color: "rgb(25, 34, 37)",
                     },
                     selected: {
-                        fill: ["rgb(230, 255, 255)", "rgb(171, 209, 245)"],
+                        fill: ["rgba(236, 255, 255, 1)", "rgba(229, 242, 255, 1)"],
+                        strokeWidth: 3,
                         color: "rgb(25, 34, 37)",
                     },
                     focused: {
-                        fill: ["rgb(255, 255, 255)", "rgb(234, 245, 255)"],
+                        fill: ["rgba(236, 255, 255, 1)", "rgba(229, 242, 255, 1)"],
+                        strokeWidth: 3,
                         color: "rgb(25, 34, 37)",
                     },
                     focusedSelected: {
-                        fill: ["rgb(238, 252, 255)", "rgb(218, 237, 255)"],
+                        fill: ["rgba(236, 255, 255, 1)", "rgba(229, 242, 255, 1)"],
+                        strokeWidth: 3,
                         color: "rgb(25, 34, 37)",
                     },
                     removal: {
                         fill: ["rgb(255, 230, 238)", "rgb(255, 171, 198)"],
+                        strokeWidth: 1.5,
                         color: "rgb(25, 34, 37)",
                     },
                     removalSelected: {
                         fill: ["rgb(255, 230, 238)", "rgb(255, 171, 198)"],
+                        strokeWidth: 1.5,
                         color: "rgb(25, 34, 37)",
                     }
                 },

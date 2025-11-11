@@ -2,7 +2,7 @@ import { Component, DestroyRef, effect, ElementRef, inject, input, OnDestroy, Si
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import {
-  catchError, combineLatest, debounceTime, delay, filter, map, of, skipWhile, Subject, switchMap, take, tap, throwError,
+  catchError, combineLatest, debounceTime, delay, filter, map, of, Subject, switchMap, tap, throwError,
 } from 'rxjs';
 import { environment } from '@environments/environment';
 import { MessagesLoadingIndicatorComponent } from '@entities/messages';
@@ -26,15 +26,14 @@ import { MessageService } from '../message.service';
 import { MessagesNotificationService } from '../messages-notification.service';
 import { MessagesNotificationMockService } from '../messages-notification-mock.service';
 import { MessagesNotificationWSService } from '../messages-notification-ws.service';
-import { generateTypingIndicator } from './utils/generate-typing-indicator';
+import { generateTypingIndicator, TYPING_INDICATOR_INDEX } from './utils/generate-typing-indicator';
 import { IProxyCollectionItem, ProxyCollection, ProxyCollectionEvents } from './utils/proxy-collection';
 import { StaticClickDirective } from '@shared/directives';
 import { createGroups } from './utils/create-groups';
-import { LocalizationService } from '@shared/localization';
+import { ILocalization, LocalizationService } from '@shared/localization';
 
 const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
-  OPACITY_0 = '0', OPACITY_1 = '1',
-  FADE_IN = `opacity 100ms ease-in`, MIN_ITEM_HEIGHT = 28,
+  MIN_ITEM_HEIGHT = 28,
   CHUNK_SIZE = 100;
 
 /**
@@ -83,7 +82,14 @@ export class MessagesComponent implements OnDestroy {
 
   isLoading = signal<boolean>(true);
 
-  isPreparedToShowing = signal<boolean>(false);
+  defaultItemValue = signal<IVirtualListItem<IMessageItemData>>({
+    dateTime: 0,
+    text: '',
+    edited: false,
+    incomType: 'in',
+    type: MessageTypes.ITEM,
+    id: '-1',
+  });
 
   private _$delete = new Subject<[IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, IRenderVirtualListItemConfig, ISize, boolean]>();
   protected $delete = this._$delete.asObservable();
@@ -128,6 +134,23 @@ export class MessagesComponent implements OnDestroy {
 
   constructor() {
     this.theme = toSignal(this._themeService.$theme);
+
+    let locale: string | undefined,
+      localization: ILocalization | undefined;
+
+    this._localizationService.$locale.pipe(
+      takeUntilDestroyed(),
+      tap(v => {
+        locale = v;
+      }),
+    ).subscribe();
+
+    this._localizationService.$localization.pipe(
+      takeUntilDestroyed(),
+      tap(v => {
+        localization = v;
+      }),
+    ).subscribe();
 
     effect(() => {
       const theme = this.theme(), host = this._elementRef.nativeElement as HTMLDivElement;
@@ -180,46 +203,23 @@ export class MessagesComponent implements OnDestroy {
 
     combineLatest([$virtualList, $chatId]).pipe(
       takeUntilDestroyed(),
-      map(([list]) => list),
-      filter(list => !!list),
-      tap(list => {
+      map(([list, chatId]) => ({ list, chatId })),
+      filter(({ list, chatId }) => !!list && chatId !== undefined),
+      tap(({ list }) => {
         // reset
-        this._chunkNumber = 1;
-        this._list()?.cacheClean();
-        this._proxyCollection.from([]);
-        this.selectedIds.set([]);
-        this.isPreparedToShowing.set(false);
         this.isLoading.set(true);
-        const host = list.host.nativeElement as HTMLElement;
-        host.style.opacity = OPACITY_0;
-        host.style.transition = FADE_IN;
-      }),
-      switchMap(list => $isLoading.pipe(
-        takeUntilDestroyed(this._destroyRef),
-        filter(v => !v),
-        switchMap(() => of(list)),
-      )),
-      takeUntilDestroyed(this._destroyRef),
-      switchMap(list => {
-        return list.$update.pipe(
-          takeUntilDestroyed(this._destroyRef),
-          debounceTime(500),
-          switchMap(() => of(list)),
-        );
-      }),
-      takeUntilDestroyed(this._destroyRef),
-      tap(list => {
-        const host = list.host.nativeElement as HTMLElement;
-        host.style.opacity = OPACITY_1;
-        this.isPreparedToShowing.set(true);
+        if (this._proxyCollection.collection.length > 0) {
+          this._proxyCollection.from([]);
+        }
+        this.selectedIds.set([]);
+        this._chunkNumber = 1;
       }),
     ).subscribe();
 
-    combineLatest([$chatId, this._localizationService.$locale, this._localizationService.$localization]).pipe(
+    $chatId.pipe(
       takeUntilDestroyed(),
-      debounceTime(0),
-      map(([chatId, locale, localization]) => ({ chatId, locale, localization })),
-      switchMap(({ chatId, locale, localization }) => {
+      filter(v => v !== undefined),
+      switchMap(chatId => {
         const timeStart = Date.now();
         let delayTime = 100;
         return of(chatId).pipe(
@@ -233,7 +233,7 @@ export class MessagesComponent implements OnDestroy {
               size: CHUNK_SIZE,
             }).pipe(
               takeUntilDestroyed(this._destroyRef),
-              switchMap(v => of(createGroups(v, locale, localization))),
+              switchMap(v => of(createGroups(v, locale!, localization!))),
             );
           }),
           catchError((err) => {
@@ -244,7 +244,6 @@ export class MessagesComponent implements OnDestroy {
           takeUntilDestroyed(this._destroyRef),
           switchMap(res => {
             const items = Array.isArray(res.items) ? res.items : [];
-            this._chunkNumber++;
             const time = 2000 - (Date.now() - timeStart);
             delayTime = time < 0 ? 0 : time;
             validateCollection(items);
@@ -266,64 +265,60 @@ export class MessagesComponent implements OnDestroy {
             this.isLoading.set(false);
             return of(undefined);
           }),
-        )
-      })
-    ).subscribe();
-
-    combineLatest([$scrollReachStart, this._localizationService.$locale, this._localizationService.$localization]).pipe(
-      takeUntilDestroyed(),
-      debounceTime(250),
-      skipWhile(() => this._chunkNumber === 0),
-      map(([scrollReachStart, locale, localization]) => ({ scrollReachStart, locale, localization })),
-      switchMap(({ locale, localization }) => $chatId.pipe(
-        takeUntilDestroyed(this._destroyRef),
-        take(1),
-        filter(v => v !== undefined),
-        switchMap((chatId) => {
-          return this._messagesService.getMessages(chatId, {
-            number: this._chunkNumber + 1,
-            size: CHUNK_SIZE,
-          }).pipe(
-            takeUntilDestroyed(this._destroyRef),
-            switchMap(v => of(createGroups(v, locale, localization))),
-          );
-        }),
-      )),
-
-      catchError((err) => {
-        return throwError(() => {
-          return `Get message chunk error: ${err}`;
-        });
-      }),
-      tap(res => {
-        const items = Array.isArray(res.items) ? res.items : [];
-        this._chunkNumber += 1;
-        validateCollection(items);
-
-        this._proxyCollection.from(items, true);
-        const configMap = {};
-        fillConfigMap(configMap, this._proxyCollection.collection);
-        this.collectionConfigMap.set(configMap);
-
-        this._list()?.normalizePositions();
-      }),
-      catchError((err) => {
-        console.error(err);
-        return of(undefined);
+        );
       }),
     ).subscribe();
 
-    combineLatest([$chatId, this._localizationService.$locale, this._localizationService.$localization]).pipe(
+    $chatId.pipe(
       takeUntilDestroyed(),
-      map(([chatId, locale, localization]) => ({ chatId: chatId as string, locale, localization })),
-      filter(({ chatId }) => chatId !== undefined),
-      switchMap(({ chatId, locale, localization }) => {
+      filter(v => v !== undefined),
+      switchMap(chatId => {
+        return $scrollReachStart.pipe(
+          takeUntilDestroyed(this._destroyRef),
+          filter(() => !this.isLoading()),
+          debounceTime(250),
+          switchMap(() => {
+            return this._messagesService.getMessages(chatId, {
+              number: this._chunkNumber + 1,
+              size: CHUNK_SIZE,
+            }).pipe(
+              takeUntilDestroyed(this._destroyRef),
+              switchMap(v => of(createGroups(v, locale!, localization!))),
+            );
+          }),
+          catchError((err) => {
+            return throwError(() => {
+              return `Get message chunk error: ${err}`;
+            });
+          }),
+          tap(res => {
+            const items = Array.isArray(res.items) ? res.items : [];
+            this._chunkNumber++;
+            validateCollection(items);
+
+            this._proxyCollection.from(items, true);
+            const configMap = {};
+            fillConfigMap(configMap, this._proxyCollection.collection);
+            this.collectionConfigMap.set(configMap);
+          }),
+          catchError((err) => {
+            console.error(err);
+            return of(undefined);
+          }),
+        );
+      }),
+    ).subscribe();
+
+    $chatId.pipe(
+      takeUntilDestroyed(),
+      filter(v => v !== undefined),
+      switchMap(chatId => {
         return this._messageNotificationService.$messages.pipe(
           takeUntilDestroyed(this._destroyRef),
           switchMap(version => {
             return this._messagesService.getMessages(chatId).pipe(
               takeUntilDestroyed(this._destroyRef),
-              switchMap(v => of(createGroups(v, locale, localization))),
+              switchMap(v => of(createGroups(v, locale!, localization!))),
             );
           }),
         );
@@ -353,20 +348,27 @@ export class MessagesComponent implements OnDestroy {
       switchMap(chatId => {
         return this._messageNotificationService.$writing.pipe(
           takeUntilDestroyed(this._destroyRef),
-          debounceTime(10),
           tap(() => {
+            if (this._proxyCollection.has(TYPING_INDICATOR_INDEX)) {
+              return;
+            }
             const indicator = generateTypingIndicator();
             this._proxyCollection.set(indicator.item.id, indicator.item);
             const configMap = { ...this.collectionConfigMap() };
             configMap[indicator.item.id] = indicator.config;
             this.collectionConfigMap.set(configMap);
           }),
-          switchMap(() => {
-            return this._messageNotificationService.$messages.pipe(
-              takeUntilDestroyed(this._destroyRef),
-            );
-          }),
-          delay(1),
+        );
+      }),
+    ).subscribe();
+
+
+
+    $chatId.pipe(
+      takeUntilDestroyed(),
+      filter(v => v !== undefined),
+      switchMap(chatId => {
+        return this._messageNotificationService.$messages.pipe(
           takeUntilDestroyed(this._destroyRef),
           switchMap(() => {
             return this.deleteWritingIndicator(chatId).pipe(
@@ -477,6 +479,7 @@ export class MessagesComponent implements OnDestroy {
       map(([list, collection, search]) => ({ list, collection, search: search ?? '' })),
       filter(({ list }) => !!list),
       debounceTime(250),
+      takeUntilDestroyed(this._destroyRef),
       tap(({ search }) => {
         this.searchedPattern.set(search.split?.(' ') ?? []);
       }),
@@ -501,6 +504,7 @@ export class MessagesComponent implements OnDestroy {
         }
       }),
       debounceTime(2000),
+      takeUntilDestroyed(this._destroyRef),
       tap(({ id, list }) => {
         if (id !== undefined && list) {
           list.focus(id, FocusAlignments.NONE);

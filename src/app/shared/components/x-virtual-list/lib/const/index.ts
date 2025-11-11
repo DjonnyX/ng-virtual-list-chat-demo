@@ -87,6 +87,10 @@ export const WIDTH_PROP_NAME = 'width';
 
 export const HEIGHT_PROP_NAME = 'height';
 
+export const MARGIN_TOP = 'marginTop';
+
+export const MARGIN_LEFT = 'marginLeft';
+
 export const PX = 'px';
 
 export const WHEEL = 'wheel';

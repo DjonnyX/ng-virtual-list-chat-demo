@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { Subject, tap } from 'rxjs';
 import { TrackBox } from './utils/track-box';
-import { IRenderVirtualListItem } from './models';
+import { IRenderVirtualListItem, IVirtualListItem } from './models';
 import { IRenderVirtualListCollection } from './models/render-collection.model';
 import { FocusAlignments } from './enums';
 import { MethodsForSelectingTypes } from './enums/method-for-selecting-types';
@@ -45,6 +45,12 @@ export class XVirtualListService {
   selectByClick: boolean = DEFAULT_SELECT_BY_CLICK;
 
   collapseByClick: boolean = DEFAULT_COLLAPSE_BY_CLICK;
+
+  defaultItemValue: IVirtualListItem | null = null;
+
+  isVertical: boolean = true;
+
+  dynamic: boolean = true;
 
   private _trackBox: TrackBox | undefined;
 

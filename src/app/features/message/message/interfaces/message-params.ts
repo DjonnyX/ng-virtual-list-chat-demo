@@ -4,6 +4,7 @@
  * All rights reserved.
  */
 export interface IMessageParams {
+    reseted: boolean;
     isRTL: boolean;
     type: string | undefined;
     prevType: string | undefined;

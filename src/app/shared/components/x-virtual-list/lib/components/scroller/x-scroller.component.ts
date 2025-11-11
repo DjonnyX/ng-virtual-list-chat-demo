@@ -36,6 +36,12 @@ const calculateDirection = (buffer: Array<[number, number]>) => {
   return 1;
 }
 
+interface IAnimation {
+  finished: () => boolean;
+  to: (value: number) => void;
+  cancel: () => void;
+}
+
 export interface IScrollToParams {
   x?: number;
   y?: number;
@@ -77,10 +83,6 @@ export class XScrollerComponent implements OnDestroy {
 
   classes = input<{ [cName: string]: boolean }>({});
 
-  scrollStartOffset = input<number>(0);
-
-  scrollEndOffset = input<number>(0);
-
   private _$scroll = new Subject<void>();
   readonly $scroll = this._$scroll.asObservable();
 
@@ -97,34 +99,47 @@ export class XScrollerComponent implements OnDestroy {
 
   private _isMoving = false;
 
-  private _scrollLeftPersent = 0;
-
-  private _scrollTopPersent = 0;
-
   private _x: number = 0;
   set x(v: number) {
-    this._x = v;
-    this._scrollLeftPersent = v !== 0 ? this.scrollWidth / v : 0;
+    this._x = this._actualX = v;
   }
   get x() { return this._x; }
 
   private _y: number = 0;
   set y(v: number) {
-    this._y = v;
-    this._scrollTopPersent = v !== 0 ? this.scrollHeight / v : 0;
+    this._y = this._actualY = v;
   }
   get y() { return this._y; }
 
-  private _animationCanceler: Function | undefined;
+  private _currentAnimation: IAnimation | undefined;
 
   private _totalSize: number = 0;
   set totalSize(v: number) {
     this._totalSize = v;
   }
 
-  private _actualScrollSize: number = 0;
-  set actualScrollSize(v: number) {
-    this._actualScrollSize = v;
+  get actualScrollHeight() {
+    const { height: viewportHeight } = this.viewportBounds(),
+      totalSize = this._totalSize,
+      isVertical = this.direction() === VERTICAL;
+    return isVertical ? totalSize < viewportHeight ? 0 : totalSize - viewportHeight : this.scrollHeight;
+  }
+
+  get actualScrollWidth() {
+    const { width: viewportWidth } = this.viewportBounds(),
+      totalSize = this._totalSize,
+      isVertical = this.direction() === VERTICAL;
+    return isVertical ? this.scrollWidth : totalSize < viewportWidth ? 0 : totalSize - viewportWidth;
+  }
+
+  private _actualX: number = 0;
+  get actualScrollLeft() {
+    return this._actualX;
+  }
+
+  private _actualY: number = 0;
+  get actualScrollTop() {
+    return this._actualY;
   }
 
   get scrollLeft() {
@@ -137,14 +152,16 @@ export class XScrollerComponent implements OnDestroy {
 
   get scrollWidth() {
     const { width: viewportWidth } = this.viewportBounds(),
+      actualViewportWidth = viewportWidth,
       { width: contentWidth } = this.contentBounds();
-    return contentWidth < viewportWidth ? 0 : (contentWidth - viewportWidth);
+    return contentWidth < actualViewportWidth ? 0 : (contentWidth - actualViewportWidth);
   }
 
   get scrollHeight() {
     const { height: viewportHeight } = this.viewportBounds(),
+      actualViewportHeight = viewportHeight,
       { height: contentHeight } = this.contentBounds();
-    return contentHeight < viewportHeight ? 0 : (contentHeight - (viewportHeight - this.scrollEndOffset()));
+    return contentHeight < actualViewportHeight ? 0 : (contentHeight - actualViewportHeight);
   }
 
   private _velocity: number = 0;
@@ -213,7 +230,7 @@ export class XScrollerComponent implements OnDestroy {
             const scrollSize = isVertical ? this.scrollHeight : this.scrollWidth,
               startPos = isVertical ? this.y : this.x,
               delta = isVertical ? e.deltaY : e.deltaX, dp = startPos + delta, position = dp < 0 ? 0 : dp > scrollSize ? scrollSize : dp;
-            this.scrollTo({ [isVertical ? TOP : LEFT]: position, behavior: INSTANT });
+            this.scrollTo({ [TOP]: position, behavior: INSTANT });
           }),
         );
       }),
@@ -239,6 +256,24 @@ export class XScrollerComponent implements OnDestroy {
         return fromEvent<MouseEvent>(content, 'mousedown', { passive: true }).pipe(
           takeUntilDestroyed(this._destroyRef),
           switchMap(e => {
+            return fromEvent<MouseEvent>(window, 'mousemove', { passive: false }).pipe(
+              takeUntilDestroyed(this._destroyRef),
+              takeUntil($mouseUp),
+              tap(e => {
+                e.preventDefault();
+              }),
+            );
+          }),
+        );
+      }),
+    ).subscribe();
+
+    $content.pipe(
+      takeUntilDestroyed(),
+      switchMap(content => {
+        return fromEvent<MouseEvent>(content, 'mousedown', { passive: true }).pipe(
+          takeUntilDestroyed(this._destroyRef),
+          switchMap(e => {
             this.stopScrolling();
             const target = e.target as HTMLElement;
             if (target.classList.contains('interactive')) {
@@ -250,11 +285,10 @@ export class XScrollerComponent implements OnDestroy {
             const startClientPos = isVertical ? e.clientY : e.clientX,
               offsets = new Array<[number, number]>(), velocities = new Array<[number, number]>();
             let startTime = performance.now();
-            return fromEvent<MouseEvent>(window, 'mousemove', { passive: false }).pipe(
+            return fromEvent<MouseEvent>(window, 'mousemove', { passive: true }).pipe(
               takeUntilDestroyed(this._destroyRef),
               takeUntil($mouseDragCancel),
               switchMap(e => {
-                e.preventDefault();
                 const cPos = isVertical ? this.y : this.x;
                 if (cPos !== prevPos) {
                   startPosDelta += cPos - prevPos;
@@ -304,6 +338,24 @@ export class XScrollerComponent implements OnDestroy {
         return fromEvent<TouchEvent>(content, 'touchstart', { passive: true }).pipe(
           takeUntilDestroyed(this._destroyRef),
           switchMap(e => {
+            return fromEvent<TouchEvent>(window, 'touchmove', { passive: false }).pipe(
+              takeUntilDestroyed(this._destroyRef),
+              takeUntil($touchUp),
+              tap(e => {
+                e.preventDefault();
+              }),
+            );
+          }),
+        );
+      }),
+    ).subscribe();
+
+    $content.pipe(
+      takeUntilDestroyed(),
+      switchMap(content => {
+        return fromEvent<TouchEvent>(content, 'touchstart', { passive: true }).pipe(
+          takeUntilDestroyed(this._destroyRef),
+          switchMap(e => {
             this.stopScrolling();
             const target = e.target as HTMLElement;
             if (target.classList.contains('interactive')) {
@@ -315,11 +367,10 @@ export class XScrollerComponent implements OnDestroy {
             const startClientPos = isVertical ? e.touches[e.touches.length - 1].clientY : e.touches[e.touches.length - 1].clientX,
               offsets = new Array<[number, number]>(), velocities = new Array<[number, number]>();
             let startTime = performance.now();
-            return fromEvent<TouchEvent>(window, 'touchmove', { passive: false }).pipe(
+            return fromEvent<TouchEvent>(window, 'touchmove', { passive: true }).pipe(
               takeUntilDestroyed(this._destroyRef),
               takeUntil($touchCanceler),
               switchMap(e => {
-                e.preventDefault();
                 const cPos = isVertical ? this.y : this.x;
                 if (cPos !== prevPos) {
                   startPosDelta += cPos - prevPos;
@@ -395,8 +446,9 @@ export class XScrollerComponent implements OnDestroy {
   }
 
   stopScrolling() {
-    if (this._animationCanceler !== undefined) {
-      this._animationCanceler();
+    if (this._currentAnimation !== undefined) {
+      this._currentAnimation.cancel();
+      this._currentAnimation = undefined;
     }
   }
 
@@ -419,9 +471,8 @@ export class XScrollerComponent implements OnDestroy {
   }
 
   animate(startValue: number, endValue: number, duration = 500, easingFunction: Easing = easeLinear) {
-    if (this._animationCanceler !== undefined) {
-      this._animationCanceler();
-    }
+    this.stopScrolling();
+
     const startTime = performance.now(), isVertical = this.direction() === ScrollerDirection.VERTICAL;
     let isCanceled = false, prevPos = startValue, startPosDelta = 0, delta = 0, prevTime = performance.now();
 
@@ -430,6 +481,9 @@ export class XScrollerComponent implements OnDestroy {
     } else {
       this.x = startValue;
     }
+
+    let finishedValue = endValue,
+      isFinished = false;
 
     const step = (currentTime: number) => {
       if (!!isCanceled) {
@@ -446,11 +500,13 @@ export class XScrollerComponent implements OnDestroy {
       const elapsed = currentTime - startTime,
         progress = Math.min(elapsed / duration, 1),
         easedProgress = easingFunction(progress),
-        val = Math.round(startPosDelta + startValue + (endValue - startValue) * easedProgress),
+        val = startPosDelta + startValue + (finishedValue - startValue) * easedProgress,
         scrollSize = isVertical ? this.scrollHeight : this.scrollWidth,
         currentValue = val < 0 ? 0 : val > scrollSize ? scrollSize : val,
         t = performance.now(),
-        isFinished = currentValue === endValue || ((currentValue === (scrollSize - this.scrollStartOffset() - this.scrollEndOffset())) || (currentValue === 0));
+        roundedCurrentValue = Math.round(currentValue);
+
+      isFinished = (roundedCurrentValue === 0) || progress === 1;
 
       delta = currentValue - scrollDelta - prevPos;
 
@@ -479,18 +535,25 @@ export class XScrollerComponent implements OnDestroy {
         }
       }
 
-      if (!isFinished && progress < 1) {
-        requestAnimationFrame(step);
-      } else {
+      if (isFinished) {
+        this.stopScrolling();
         this._$scrollEnd.next();
+      } else {
+        requestAnimationFrame(step);
       }
-    }, canceler = () => {
+    }, cancel = () => {
       isCanceled = true;
-    };
+    }, to = (value: number) => {
+      finishedValue = value;
+    }, finished = () => { return isFinished; };
 
     requestAnimationFrame(step);
 
-    this._animationCanceler = canceler;
+    this._currentAnimation = {
+      cancel,
+      to,
+      finished,
+    };
   }
 
   scrollTo(params: IScrollToParams) {
@@ -515,18 +578,18 @@ export class XScrollerComponent implements OnDestroy {
 
     if (this._isMoving) {
       if (isVertical) {
-        if (y < 0 || y > this._totalSize - this.viewportBounds().height) {
+        if (y < 0 || y > this.scrollHeight) {
           return;
         }
       } else {
-        if (x < 0 || x > this._totalSize - this.viewportBounds().width) {
+        if (x < 0 || x > this.scrollWidth) {
           return;
         }
       }
     }
 
-    const xx = Math.round(x < 0 ? 0 : x > this.scrollWidth ? this.scrollWidth : x),
-      yy = Math.round(y < 0 ? 0 : y > this.scrollHeight ? this.scrollHeight : y),
+    const xx = x,
+      yy = y,
       prevX = this.x,
       prevY = this.y;
     this.x = xx;
@@ -534,12 +597,10 @@ export class XScrollerComponent implements OnDestroy {
     if (behavior === AUTO || behavior === SMOOTH) {
       if (isVertical) {
         if (prevY !== yy) {
-          this._actualScrollSize = y;
           this.animate(prevY, yy);
         }
       } else {
         if (prevX !== xx) {
-          this._actualScrollSize = x;
           this.animate(prevX, xx);
         }
       }
@@ -547,11 +608,8 @@ export class XScrollerComponent implements OnDestroy {
       if (isVertical) {
         if (prevY !== yy) {
           if (!blending) {
-            if (this._animationCanceler !== undefined) {
-              this._animationCanceler();
-            }
+            this.stopScrolling();
           }
-          this._actualScrollSize = y;
           scrollContent.style.transform = `translate3d(0, ${-yy}px, 0)`;
           if (this.cdkScrollable) {
             this.cdkScrollable.getElementRef().nativeElement.dispatchEvent(SCROLL_EVENT);
@@ -561,11 +619,8 @@ export class XScrollerComponent implements OnDestroy {
       } else {
         if (prevX !== xx) {
           if (!blending) {
-            if (this._animationCanceler !== undefined) {
-              this._animationCanceler();
-            }
+            this.stopScrolling();
           }
-          this._actualScrollSize = x;
           scrollContent.style.transform = `translate3d(${-xx}px, 0, 0)`;
           if (this.cdkScrollable) {
             this.cdkScrollable.getElementRef().nativeElement.dispatchEvent(SCROLL_EVENT);
@@ -577,6 +632,7 @@ export class XScrollerComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.stopScrolling();
     if (this._viewportResizeObserver) {
       this._viewportResizeObserver.disconnect();
     }

@@ -18,7 +18,7 @@ export const generateLetter = () => {
  * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
  * All rights reserved.
  */
-export const generateWord = (max = 50, firstLatterAsCap = false) => {
+export const generateWord = (max = 10, firstLatterAsCap = false) => {
   const length = 5 + Math.floor(Math.random() * max), result = [];
   while (result.length < length) {
     result.push(generateLetter());
@@ -37,7 +37,7 @@ export const generateWord = (max = 50, firstLatterAsCap = false) => {
  * All rights reserved.
  */
 export const generateText = () => {
-  const length = 1 + Math.floor(Math.random() * 20), result = [];
+  const length = 1 + Math.floor(Math.random() * 15), result = [];
   while (result.length < length) {
     result.push(generateWord());
   }

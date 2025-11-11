@@ -1,6 +1,6 @@
 import { IVirtualListItem, IVirtualListItemConfig } from "@shared/components/x-virtual-list";
 
-const INDICATOR_INDEX = Number.MAX_SAFE_INTEGER - 1;
+export const TYPING_INDICATOR_INDEX = Number.MAX_SAFE_INTEGER - 1;
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -10,9 +10,9 @@ const INDICATOR_INDEX = Number.MAX_SAFE_INTEGER - 1;
  * All rights reserved.
  */
 export const generateTypingIndicator = (): { item: IVirtualListItem<any>, config: IVirtualListItemConfig } => {
-    const id = INDICATOR_INDEX, type = 'typing-indicator';
+    const id = TYPING_INDICATOR_INDEX, type = 'typing-indicator';
 
-    const dateTime = INDICATOR_INDEX;
+    const dateTime = TYPING_INDICATOR_INDEX;
 
     return {
         item: {

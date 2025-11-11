@@ -2,7 +2,7 @@ import { Component, computed, DestroyRef, effect, ElementRef, inject, input, OnD
 import { CommonModule } from '@angular/common';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { filter, from, fromEvent, map, switchMap, tap } from 'rxjs';
+import { combineLatest, filter, from, fromEvent, map, switchMap, tap } from 'rxjs';
 import { SearchHighlightDirective } from '@shared/directives';
 import { formatText } from '@shared/utils';
 import { ThemeService } from '@shared/theming';
@@ -45,6 +45,8 @@ export class EditableTextComponent implements OnDestroy {
 
   text = input<string>();
 
+  time = input<string | undefined>();
+
   searchSubstringClass = input<string>(DEFAULT_SEARCH_SUBSTRING_CLASS);
 
   searchPattern = input<Array<string>>();
@@ -76,6 +78,8 @@ export class EditableTextComponent implements OnDestroy {
   linkActiveColor = signal<string>(INITIAL);
 
   searchSubstringBackground = signal<string>(INITIAL);
+
+  messageStatusColor = signal<string>(INITIAL);
 
   focused = signal<boolean>(false);
 
@@ -167,6 +171,16 @@ export class EditableTextComponent implements OnDestroy {
     effect(() => {
       const theme = this.theme();
       if (theme) {
+        const preset = this._themeService.getPreset(theme.chat.messages.message.content);
+        if (preset) {
+          this.messageStatusColor.set(preset.statusColor);
+        }
+      }
+    });
+
+    effect(() => {
+      const theme = this.theme();
+      if (theme) {
         const preset = this._themeService.getPreset(theme.chat.messages.message.content.textEditor.link);
         if (preset) {
           this.linkNormalColor.set(preset.normal.color);
@@ -188,18 +202,26 @@ export class EditableTextComponent implements OnDestroy {
       }
     });
 
-    const $text = toObservable(this.text);
+    const $text = toObservable(this.text),
+      $time = toObservable(this.time),
+      $selectable = toObservable(this.selectable);
 
-    $text.pipe(
+    combineLatest([$selectable, $text, $time]).pipe(
       takeUntilDestroyed(),
-      switchMap(text => {
-        return from(formatText(text, true)).pipe(
+      switchMap(([selectable, text, time]) => {
+        return from(formatText(text, time, {
+          selectable,
+          loading: true,
+        })).pipe(
           takeUntilDestroyed(this._destroyRef),
           tap(v => {
             this.formattedText.set(v);
           }),
           switchMap(() => {
-            return from(formatText(text, false)).pipe(
+            return from(formatText(text, time, {
+              selectable,
+              loading: false,
+            })).pipe(
               takeUntilDestroyed(this._destroyRef),
             );
           }),

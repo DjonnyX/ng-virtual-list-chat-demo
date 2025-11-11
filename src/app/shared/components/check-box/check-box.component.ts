@@ -223,7 +223,7 @@ export class CheckBoxComponent implements AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this._onResizeHandler();
   }
-  // rgb(128,120,236);
+
   private applyStyles(currentPreset?: string) {
     const preset = currentPreset ?? this.preset(), theme = this.theme(), strokeColor = this.strokeColor(), roundedCorner = this.roundCorner(),
       fillColors = this.fillColors(), rippleColor = this.rippleColor();

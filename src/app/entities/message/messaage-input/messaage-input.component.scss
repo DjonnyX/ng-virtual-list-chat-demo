@@ -15,7 +15,7 @@
     grid-template-columns: 1fr auto;
     gap: 12px;
     background: var(--background);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(20px);
     background-size: 200% 200%;
     animation: gradientRotate 5s linear infinite alternate;
 

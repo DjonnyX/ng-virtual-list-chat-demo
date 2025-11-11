@@ -15,6 +15,7 @@ import { debounce } from "./debounce";
 
 export enum TrackBoxEvents {
     CHANGE = 'change',
+    PREPARE = 'prepare',
     RESET = 'reset',
 }
 
@@ -76,24 +77,31 @@ export interface IGetItemPositionOptions<I extends IItem, C extends Array<I>>
 export interface IUpdateCollectionOptions<I extends IItem, C extends Array<I>>
     extends Omit<IRecalculateMetricsOptions<I, C>, 'collection' | 'previousTotalSize' | 'crudDetected' | 'deletedItemsMap'> { }
 
-export type CacheMapEvents = TrackBoxEvents.CHANGE | TrackBoxEvents.RESET;
+export type CacheMapEvents = TrackBoxEvents.CHANGE | TrackBoxEvents.RESET | TrackBoxEvents.PREPARE;
 
 export type OnChangeEventListener = (version: number) => void;
 
 export type OnResetEventListener = (reseted: boolean) => void;
 
-export type CacheMapListeners = OnChangeEventListener | OnResetEventListener;
+export type OnPrepareEventListener = (prepared: boolean) => void;
+
+export type CacheMapListeners = OnChangeEventListener | OnResetEventListener | OnPrepareEventListener;
 
 export enum ItemDisplayMethods {
     CREATE,
     UPDATE,
     DELETE,
     NOT_CHANGED,
-    SNAPSHOT,
 }
 
 export interface IUpdateCollectionReturns {
     displayItems: IRenderVirtualListCollection;
+    totalSize: number;
+    delta: number;
+    crudDetected: boolean;
+}
+
+export interface IGetMetricsReturns {
     totalSize: number;
     delta: number;
     crudDetected: boolean;
@@ -107,7 +115,7 @@ const DEFAULT_BUFFER_EXTREMUM_THRESHOLD = 15,
     DEFAULT_MAX_BUFFER_SEQUENCE_LENGTH = 30,
     DEFAULT_RESET_BUFFER_SIZE_TIMEOUT = 10000,
     IS_NEW = 'isNew',
-    SCROLL_SNAP_TO_START_ITERATIONS = 5,
+    SCROLL_SNAP_TO_START_ITERATIONS = 10,
     SCROLL_SNAP_TO_END_ITERATIONS = 5;
 
 type Cache = ISize & { method?: ItemDisplayMethods } & IItem;
@@ -297,6 +305,10 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
 
     protected _isReseted: boolean = true;
 
+    protected _prepared: boolean = false;
+
+    get prepared() { return this._prepared; }
+
     protected override lifeCircle() {
         this.fireChangeIfNeed();
 
@@ -314,10 +326,15 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
             return;
         }
 
-        const reseted = !((!!this._previousCollection && this._previousCollection.length > 0) &&
+        const reseted = ((!this._previousCollection || this._previousCollection.length === 0) &&
             (!!currentCollection && currentCollection.length > 0));
 
         this._isReseted = reseted;
+
+        if (reseted) {
+            this._prepared = false;
+            this.dispatch(TrackBoxEvents.PREPARE, false);
+        }
 
         this.dispatch(TrackBoxEvents.RESET, reseted);
 
@@ -443,6 +460,27 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
     /**
      * Updates the collection of display objects
      */
+    getMetrics<I extends IItem, C extends Array<I>>(items: C, itemConfigMap: IVirtualListItemConfigMap,
+        options: IUpdateCollectionOptions<I, C>): IGetMetricsReturns {
+        const opt = { itemConfigMap, ...options }, dynamicSize = opt.dynamicSize, crudDetected = this._crudDetected,
+            deletedItemsMap = this._deletedItemsMap;
+        this._defaultBufferSize = opt.bufferSize;
+        this._maxBufferSize = opt.maxBufferSize;
+
+        const metrics = this.recalculateMetrics({
+            ...opt,
+            collection: items,
+            previousTotalSize: this._previousTotalSize,
+            crudDetected: this._crudDetected,
+            deletedItemsMap,
+        });
+
+        return { totalSize: metrics.totalSize, delta: metrics.delta, crudDetected };
+    }
+
+    /**
+     * Updates the collection of display objects
+     */
     updateCollection<I extends IItem, C extends Array<I>>(items: C, itemConfigMap: IVirtualListItemConfigMap,
         options: IUpdateCollectionOptions<I, C>): IUpdateCollectionReturns {
         const opt = { itemConfigMap, ...options }, dynamicSize = opt.dynamicSize, crudDetected = this._crudDetected,
@@ -461,18 +499,14 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
             deletedItemsMap,
         });
 
-        if ((this._isScrollStart || (this._isScrollSnapToStart > 0)) && crudDetected) {
-            if (this._isScrollStart && !this._isScrollSnapToStart) {
-                this._isScrollSnapToStart = SCROLL_SNAP_TO_START_ITERATIONS;
-            } else {
+        if (this.isSnappedToStart) {
+            if (this._isScrollSnapToStart) {
                 this._isScrollSnapToStart--;
             }
         }
 
-        if ((this._isScrollEnd || (this._isScrollSnapToEnd > 0)) && crudDetected) {
-            if (this._isScrollEnd && !this._isScrollSnapToEnd) {
-                this._isScrollSnapToEnd = SCROLL_SNAP_TO_END_ITERATIONS;
-            } else {
+        if (this.isSnappedToEnd) {
+            if (this._isScrollSnapToEnd) {
                 this._isScrollSnapToEnd--;
             }
         }
@@ -480,6 +514,11 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
         this._delta += metrics.delta;
 
         this.updateAdaptiveBufferParams(metrics, items.length);
+
+        if (!this._prepared && !this._crudDetected) {
+            this._prepared = true;
+            this.dispatch(TrackBoxEvents.PREPARE, true);
+        }
 
         this._previousTotalSize = metrics.totalSize;
 
@@ -492,6 +531,10 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
 
         if (opt.dynamicSize) {
             this.snapshot();
+        }
+
+        if (this.isScrollStart || this.isScrollEnd) {
+            this.bumpVersion();
         }
 
         const displayItems = this.generateDisplayCollection(items, itemConfigMap, { ...metrics, });
@@ -613,19 +656,19 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
             deltaFromStartCreation = 0;
 
         const isStart = ((roundedScrollSize === 0) || this.isSnappedToStart);
-        let styckyItemId: Id | undefined, isNew = !this._isReseted && isStart;
+        let stickyItemId: Id | undefined, isNew = false;
 
         // If the list is dynamic or there are new elements in the collection, then it switches to the long algorithm.
         if (dynamicSize) {
             if (isFromId) {
-                for (let styckyId: Id | undefined = undefined, i = 0, l = collection.length; i < l; i++) {
+                for (let stickyId: Id | undefined = undefined, i = 0, l = collection.length; i < l; i++) {
                     const item = collection[i], id = item?.[trackBy];
-                    if (styckyId !== undefined && !itemConfigMap[id]?.sticky && id === fromItemId) {
-                        styckyItemId = styckyId;
+                    if (stickyId !== undefined && !itemConfigMap[id]?.sticky && id === fromItemId) {
+                        stickyItemId = stickyId;
                         break;
                     }
                     if (itemConfigMap[id]?.sticky === 1) {
-                        styckyId = id;
+                        stickyId = id;
                     }
                 }
             }
@@ -640,25 +683,15 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                     componentSize = cache[sizeProperty];
                     itemDisplayMethod = cache?.method ?? ItemDisplayMethods.UPDATE;
                     const isItemNew = (cache satisfies Cache)?.[IS_NEW] ?? (this._isLazy && isStart && !this._isReseted);
-                    isNew = isNew || isItemNew;
-                    if ((!isItemNew && !this._isLazy) || !isStart) {
-                        isNew = false;
-                    }
+                    isNew = isItemNew;
                     const snapshotBounds = snapshot.get(id),
                         componentSnapshotSize = componentSize - (snapshotBounds ? snapshotBounds[sizeProperty] : typicalItemSize);
                     componentSizeDelta = componentSnapshotSize;
                     switch (itemDisplayMethod) {
-                        case ItemDisplayMethods.SNAPSHOT: {
-                            map.set(id, { ...cache, method: ItemDisplayMethods.NOT_CHANGED, isNew: false });
-                            if (isNew && y <= (scrollSize + deltaFromStartCreation + componentSize)) {
-                                deltaFromStartCreation += componentSize;
-                                componentSizeDelta = 0;
-                            }
-                            break;
-                        }
                         case ItemDisplayMethods.UPDATE: {
-                            map.set(id, { ...cache, method: ItemDisplayMethods.SNAPSHOT, isNew });
-                            if (isNew && y <= (scrollSize + deltaFromStartCreation + componentSize)) {
+                            map.set(id, { ...cache, method: isNew ? ItemDisplayMethods.UPDATE : ItemDisplayMethods.NOT_CHANGED, isNew });
+                            if (isNew && y <= (scrollSize + size + deltaFromStartCreation + componentSize)) {
+                                deltaFromStartCreation += componentSizeDelta;
                                 componentSizeDelta = 0;
                             }
                             break;
@@ -666,7 +699,8 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                         case ItemDisplayMethods.CREATE: {
                             componentSizeDelta = typicalItemSize;
                             map.set(id, { ...cache, method: ItemDisplayMethods.UPDATE, isNew });
-                            if (isNew && y <= (scrollSize + deltaFromStartCreation + componentSize)) {
+                            if (isNew && y <= (scrollSize + size + deltaFromStartCreation + componentSize)) {
+                                deltaFromStartCreation += componentSizeDelta;
                                 componentSizeDelta = 0;
                             }
                             break;
@@ -676,7 +710,7 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
 
                 if (deletedItemsMap.hasOwnProperty(i)) {
                     const cache = deletedItemsMap[i], size = cache?.[sizeProperty] ?? typicalItemSize;
-                    if (y < scrollSize - size) {
+                    if (y < scrollSize + this._scrollStartOffset - size) {
                         leftSizeOfDeletedItems += size;
                     }
                 }
@@ -685,7 +719,7 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
 
                 if (isFromId) {
                     if (itemById === undefined) {
-                        if (id !== fromItemId && id === styckyItemId && itemConfigMap?.[id]?.sticky === 1) {
+                        if (id !== fromItemId && id === stickyItemId && itemConfigMap?.[id]?.sticky === 1) {
                             stickyComponentSize = componentSize;
                             stickyCollectionItem = collectionItem;
                             y -= stickyComponentSize;
@@ -709,7 +743,7 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                             itemsFromStartToScrollEnd = ii;
                         }
                     }
-                } else if (y <= scrollSize - componentSize) {
+                } else if (y <= scrollSize + this._scrollStartOffset - componentSize) {
                     leftItemsWeights.push(componentSize);
                     leftHiddenItemsWeight += componentSize;
                     itemsFromStartToScrollEnd = ii;
@@ -721,19 +755,18 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                         totalItemsToDisplayEndWeight += componentSize;
                         itemsFromDisplayEndToOffsetEnd = itemsFromStartToDisplayEnd + rightItemsOffset;
                     }
-                } else if (y <= scrollSize + size + componentSize) {
+                } else if (y <= scrollSize + this._scrollStartOffset + size + componentSize) {
                     itemsFromStartToDisplayEnd = ii;
                     totalItemsToDisplayEndWeight += componentSize;
                     itemsFromDisplayEndToOffsetEnd = itemsFromStartToDisplayEnd + rightItemsOffset;
 
-                    if (y <= scrollSize - componentSize) {
+                    if (y <= scrollSize + this._scrollStartOffset - componentSize) {
                         switch (itemDisplayMethod) {
                             case ItemDisplayMethods.CREATE: {
                                 leftSizeOfAddedItems += componentSizeDelta;
                                 break;
                             }
                             case ItemDisplayMethods.NOT_CHANGED:
-                            case ItemDisplayMethods.SNAPSHOT:
                             case ItemDisplayMethods.UPDATE: {
                                 leftSizeOfUpdatedItems += componentSizeDelta;
                                 break;
@@ -817,7 +850,6 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                                 leftSizeOfUpdatedItems += componentSize;
                                 break;
                             }
-                            case ItemDisplayMethods.SNAPSHOT:
                             case ItemDisplayMethods.UPDATE: {
                                 leftSizeOfUpdatedItems += componentSize;
                                 break;
@@ -1080,7 +1112,7 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
             let i = startIndex;
 
             while (renderItems > 0) {
-                if (i >= totalLength) {
+                if (i >= totalLength || i < 0) {
                     break;
                 }
                 const collectionItem = items[i];

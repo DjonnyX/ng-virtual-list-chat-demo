@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, DestroyRef, effect, ElementRef, inject, input, OnDestroy, output, signal, Signal, viewChild } from '@angular/core';
 import { CdkMenuTrigger } from '@angular/cdk/menu';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { delay, distinctUntilChanged, filter, map, of, Subject, switchMap, take, tap } from 'rxjs';
+import {filter, map, Subject, switchMap, take, tap } from 'rxjs';
 import { MessageButtonSaveState, MessageButtonSaveStates, MessageMenuButtonComponent, MessageSaveButtonComponent } from '@entities/message';
 import { CalcFillPositionsDirective, LongPressDirective } from '@shared/directives';
 import { Id, IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/x-virtual-list';
@@ -22,10 +22,10 @@ import { IMessageParams } from '../message/interfaces';
 import { IDeleteEventData } from './interfaces';
 
 const DEFAULT_SIZE = 200,
-  CLASS_NEW = 'new', CLASS_IN = 'in', CLASS_OUT = 'out', CLASS_SIMPLE = 'simple', CLASS_END_OF_MESSAGES = 'end-of-messages',
+  CLASS_RESETED = 'reseted', CLASS_NEW = 'new', CLASS_IN = 'in', CLASS_OUT = 'out', CLASS_SIMPLE = 'simple', CLASS_END_OF_MESSAGES = 'end-of-messages',
   CLASS_REMOVAL = 'removal', CLASS_DELETED = 'deleted', CLASS_ANIMATE = 'animate', CLASS_EDITED = 'edited', CLASS_RTL = TextDirections.RTL,
-  CLASS_SELECTED = 'selected', CLASS_FOCUSED = 'focused', CLASS_FIRST_IN_GROUP = 'first-in-group', CLASS_FIREFOX = 'firefox', CLASS_FADEIN = 'fadein',
-  CLASS_FADEOUT = 'fadeout', CLASS_LAST_IN_GROUP = 'last-in-group', CLASS_HAS_MULTICONTENT = 'has-multicontent', DATA_PROP_IMAGE = 'image',
+  CLASS_SELECTED = 'selected', CLASS_FOCUSED = 'focused', CLASS_FIRST_IN_GROUP = 'first-in-group', CLASS_FIREFOX = 'firefox',
+  CLASS_LAST_IN_GROUP = 'last-in-group', CLASS_HAS_MULTICONTENT = 'has-multicontent', DATA_PROP_IMAGE = 'image',
   DATA_PROP_REMOVAL = 'removal', DATA_PROP_DELETED = 'deleted', DATA_PROP_ANIMATE = 'animate', CONFIG_PROP_SELECTED = 'selected',
   CONFIG_PROP_FOCUSED = 'focused';
 
@@ -137,8 +137,6 @@ export class MessageBoxComponent implements OnDestroy {
 
   contextMenuFillPositions = signal<GradientColorPositions>([0, 1]);
 
-  fadeOut = signal<boolean>(false);
-
   isMessageValid: Signal<boolean>;
 
   localization: Signal<ILocalization | undefined>;
@@ -190,20 +188,20 @@ export class MessageBoxComponent implements OnDestroy {
       }),
     ).subscribe();
 
-    $data.pipe(
-      takeUntilDestroyed(),
-      filter(v => !!v),
-      switchMap(data => of(data.id)),
-      distinctUntilChanged(),
-      tap(() => {
-        this.fadeOut.set(true);
-      }),
-      delay(1),
-      takeUntilDestroyed(this._destroyRef),
-      tap(() => {
-        this.fadeOut.set(false);
-      }),
-    ).subscribe();
+    // $data.pipe(
+    //   takeUntilDestroyed(),
+    //   filter(v => !!v),
+    //   switchMap(data => of(data.id)),
+    //   distinctUntilChanged(),
+    //   tap(() => {
+    //     this.fadeOut.set(true);
+    //   }),
+    //   delay(1),
+    //   takeUntilDestroyed(this._destroyRef),
+    //   tap(() => {
+    //     this.fadeOut.set(false);
+    //   }),
+    // ).subscribe();
 
     $menuOpen.pipe(
       takeUntilDestroyed(),
@@ -221,8 +219,9 @@ export class MessageBoxComponent implements OnDestroy {
     this.theme = toSignal(this._themeService.$theme);
 
     this.params = computed(() => {
-      const locale = this.locale(), data = this.data(), prevData = this.prevData(), nextData = this.nextData();
+      const locale = this.locale(), reseted = this.reseted(), data = this.data(), prevData = this.prevData(), nextData = this.nextData();
       return {
+        reseted,
         isRTL: this._localizationService.textDirection === TextDirections.RTL,
         isIncoming: data?.data?.incomType === 'in',
         isOutgoing: data?.data?.incomType === 'out',
@@ -267,12 +266,12 @@ export class MessageBoxComponent implements OnDestroy {
     });
 
     this.classes = computed(() => {
-      const reseted = this.reseted();
+      const params = this.params(), { reseted } = params;
       if (reseted) {
-        return {} as any;
+        return { [CLASS_RESETED]: reseted, } as any;
       }
 
-      const params = this.params(), data = this.data(), config = this.config() as any, fadeOut = this.fadeOut(),
+      const data = this.data(), config = this.config() as any,
         isIn = params.isIncoming, isOut = params.isOutgoing, isPrevIn = params.prevIsIncoming, isPrevOut = params.prevIsOutgoing,
         isNextIn = params.nextIsIncoming, isNextOut = params.nextIsOutgoing, firstInGroup = params.prevType !== params.type,
         lastInGroup = params.nextType !== params.type;
@@ -281,7 +280,7 @@ export class MessageBoxComponent implements OnDestroy {
         [CLASS_REMOVAL]: data?.[DATA_PROP_REMOVAL] == true, [CLASS_ANIMATE]: data?.[DATA_PROP_ANIMATE] == true, [CLASS_END_OF_MESSAGES]: (isIn && !isNextIn) || (isOut && !isNextOut),
         [CLASS_FIRST_IN_GROUP]: firstInGroup, [CLASS_LAST_IN_GROUP]: lastInGroup, [CLASS_EDITED]: data?.edited == true, [CLASS_FIREFOX]: IS_FIREFOX,
         [CLASS_RTL]: this._localizationService.textDirection === TextDirections.RTL, [CLASS_SELECTED]: config?.[CONFIG_PROP_SELECTED], [CLASS_FOCUSED]: config?.[CONFIG_PROP_FOCUSED],
-        [CLASS_HAS_MULTICONTENT]: data?.[DATA_PROP_IMAGE] !== undefined, [CLASS_FADEOUT]: fadeOut, [CLASS_FADEIN]: !fadeOut,
+        [CLASS_HAS_MULTICONTENT]: data?.[DATA_PROP_IMAGE] !== undefined,
       };
     });
 

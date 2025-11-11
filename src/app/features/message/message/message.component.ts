@@ -4,9 +4,9 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { delay, filter, map, tap } from 'rxjs';
+import { filter, map, tap } from 'rxjs';
 import {
-  MessageSubstrateComponent, MessageSubstarateMode, MessageSubstarateModes, MessageBottomBarComponent, EditableTextComponent,
+  MessageSubstrateComponent, MessageSubstarateMode, MessageSubstarateModes, EditableTextComponent,
   MessageSubstarateStyle, MessageSubstarateStyles,
 } from '@entities/message';
 import { IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/x-virtual-list';
@@ -16,13 +16,16 @@ import { ThemeService } from '@shared/theming';
 import { ITheme } from '@shared/theming';
 import { IProxyCollectionItem } from '@widgets/messages/messages/utils/proxy-collection';
 import { IMessageParams } from './interfaces/message-params';
+import { formatTime } from './utils';
 
 const DEFAULT_STROKE_ANIMATION_DURATION = 1000,
   DEFAULT_SIZE = 200,
+  DEFAULT_STROKE_WIDTH = 3,
   DEFAULT_STROKE_COLOR: GradientColor = ['rgba(255,255,255,0)', 'rgba(195, 0, 255, 0.17)'],
   DEFAULT_FILL_COLOR: GradientColor = ['rgb(255, 255, 255)', 'rgb(185, 210, 233)'],
-  CLASS_REMOVAL = 'removal', CLASS_DELETED = 'deleted', CLASS_ANIMATE = 'animate', CLASS_EDITED = 'edited',
-  CLASS_SELECTED = 'selected', CLASS_FOCUSED = 'focused';
+  CLASS_REMOVAL = 'removal',
+  CLASS_SELECTED = 'selected',
+  CLASS_FOCUSED = 'focused';
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -33,7 +36,7 @@ const DEFAULT_STROKE_ANIMATION_DURATION = 1000,
  */
 @Component({
   selector: 'x-message',
-  imports: [CommonModule, EditableTextComponent, MessageSubstrateComponent, MessageBottomBarComponent],
+  imports: [CommonModule, EditableTextComponent, MessageSubstrateComponent],
   templateUrl: './message.component.html',
   styleUrl: './message.component.scss',
   host: {
@@ -76,11 +79,15 @@ export class MessageComponent implements OnDestroy {
 
   strokeColor = signal<GradientColor | undefined>(undefined);
 
+  strokeWidth = signal<number>(DEFAULT_STROKE_WIDTH);
+
   fillColors = signal<GradientColor>(DEFAULT_FILL_COLOR);
 
   rippleColor = signal<Color | undefined>(undefined);
 
   theme: Signal<ITheme | undefined>;
+
+  time: Signal<string | undefined>;
 
   private _themeService = inject(ThemeService);
 
@@ -120,6 +127,11 @@ export class MessageComponent implements OnDestroy {
         this._onContainerResizeHandler();
       }),
     ).subscribe();
+
+    this.time = computed(() => {
+      const data = this.data();
+      return data ? formatTime(data.data.dateTime) : undefined;
+    });
 
     effect(() => {
       const data = this.data(), longPressActive = this.longPressActive(), currentTheme = this.theme();
@@ -164,21 +176,27 @@ export class MessageComponent implements OnDestroy {
         if (preset) {
           if (classes[CLASS_REMOVAL] && classes[CLASS_SELECTED]) {
             this.fillColors.set(preset.removalSelected.fill ?? DEFAULT_FILL_COLOR);
+            this.strokeWidth.set(preset.removalSelected.strokeWidth ?? DEFAULT_STROKE_WIDTH);
             containerElement.style.color = preset.removalSelected.color;
           } else if (classes[CLASS_REMOVAL]) {
             this.fillColors.set(preset.removal.fill ?? DEFAULT_FILL_COLOR);
+            this.strokeWidth.set(preset.removal.strokeWidth ?? DEFAULT_STROKE_WIDTH);
             containerElement.style.color = preset.removal.color;
           } else if (classes[CLASS_SELECTED] && classes[CLASS_FOCUSED]) {
             this.fillColors.set(preset.focusedSelected.fill ?? DEFAULT_FILL_COLOR);
+            this.strokeWidth.set(preset.focusedSelected.strokeWidth ?? DEFAULT_STROKE_WIDTH);
             containerElement.style.color = preset.focusedSelected.color;
           } else if (classes[CLASS_SELECTED]) {
             this.fillColors.set(preset.selected.fill ?? DEFAULT_FILL_COLOR);
+            this.strokeWidth.set(preset.selected.strokeWidth ?? DEFAULT_STROKE_WIDTH);
             containerElement.style.color = preset.selected.color;
           } else if (classes[CLASS_FOCUSED]) {
             this.fillColors.set(preset.focused.fill ?? DEFAULT_FILL_COLOR);
+            this.strokeWidth.set(preset.focused.strokeWidth ?? DEFAULT_STROKE_WIDTH);
             containerElement.style.color = preset.focused.color;
           } else {
             this.fillColors.set(preset.normal.fill ?? DEFAULT_FILL_COLOR);
+            this.strokeWidth.set(preset.normal.strokeWidth ?? DEFAULT_STROKE_WIDTH);
             containerElement.style.color = preset.normal.color;
           }
         }

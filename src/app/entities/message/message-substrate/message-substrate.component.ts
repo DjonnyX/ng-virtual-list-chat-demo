@@ -13,6 +13,7 @@ const DEFAULT_STROKE_ANIMATION_DURATION = 1000,
   RIGHT_WIDTH = 13,
   TOP_HEIGHT = 13,
   BOTTOM_HEIGHT = 13,
+  DEFAULT_STROKE_WIDTH = 3,
   RIPPLE_ANIMATE_CLASS = 'animate',
   DEFAULT_RIPPLE_COLOR = "rgba(0,0,0,0.1)",
   SHAPE_NAME = 'x-message-substrate-shape',
@@ -84,6 +85,8 @@ export class MessageSubstrateComponent {
 
   strokeColors = input<GradientColor>();
 
+  strokeWidth = input<number>(DEFAULT_STROKE_WIDTH);
+
   rippleColor = input<Color | undefined>(DEFAULT_RIPPLE_COLOR);
 
   fillColors = input<GradientColor | undefined>(undefined);
@@ -143,8 +146,8 @@ export class MessageSubstrateComponent {
       if (Array.isArray(fillColorPositions) && fillColorPositions.length === 2) {
         const fillGradient = this.fillGradient();
         if (fillGradient) {
-          fillGradient.nativeElement.setAttribute('x1', `${fillColorPositions[0] || 0}px`);
-          fillGradient.nativeElement.setAttribute('x2', `${fillColorPositions[1] || 0}px`);
+          fillGradient.nativeElement.setAttribute('x1', `${Number.isNaN(fillColorPositions[0]) ? 0 : fillColorPositions[0]}px`);
+          fillGradient.nativeElement.setAttribute('x2', `${Number.isNaN(fillColorPositions[1]) ? 0 : fillColorPositions[1]}px`);
         }
       }
     });
@@ -157,6 +160,27 @@ export class MessageSubstrateComponent {
           strokeGradientColor1.nativeElement.setAttribute(GRADIENT_COLOR_NAME, `${strokeColors[0]}`);
           strokeGradientColor2.nativeElement.setAttribute(GRADIENT_COLOR_NAME, `${strokeColors[1]}`);
         }
+      }
+    });
+
+    effect(() => {
+      const strokeWidth = this.strokeWidth(), shape = this.shape()?.nativeElement;
+      if (shape) {
+        shape.setAttribute('stroke-width', `${strokeWidth}`);
+      }
+    });
+
+    effect(() => {
+      const strokeWidth = this.strokeWidth(), path = this.path()?.nativeElement;
+      if (path) {
+        path.setAttribute('stroke-width', `${strokeWidth * 2}`);
+      }
+    });
+
+    effect(() => {
+      const strokeWidth = this.strokeWidth(), hilight = this.hilight()?.nativeElement;
+      if (hilight) {
+        hilight.setAttribute('stroke-width', `${strokeWidth * 2}`);
       }
     });
 
