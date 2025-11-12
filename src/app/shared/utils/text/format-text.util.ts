@@ -11,6 +11,8 @@ interface IFormatTextOptions {
     loading?: boolean;
 }
 
+const abortSignals = new Map<string, AbortController>();
+
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
@@ -42,18 +44,29 @@ export const formatText = async (str: string | undefined, time: string | undefin
  * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
  * All rights reserved.
  */
-const checkImage = (url: string): Promise<boolean> => {
+const checkImage = (url: string): Promise<string | undefined> => {
+    const prevController = abortSignals.get(url);
+    if (prevController) {
+        prevController.abort();
+    }
+    const controller = new AbortController();
+    abortSignals.set(url, controller);
     return new Promise((resolve) => {
-        const image = new Image();
-        image.onload = () => {
-            if (image.width > 0) {
-                resolve(true);
+        fetch(url, {
+            signal: controller.signal,
+        }).then(res => {
+            if (!res.ok) {
+                throw Error('Loading error');
             }
-        }
-        image.onerror = function () {
-            resolve(false);
-        }
-        image.src = url;
+            return res.blob();
+        }).then(imgBlob => {
+            const fileReader = new FileReader();
+            fileReader.onload = () => { resolve(fileReader.result?.toString()); };
+            fileReader.onerror = () => { resolve(undefined); };
+            fileReader.readAsDataURL(imgBlob);
+        }).catch(err => {
+            resolve(undefined);
+        });
     });
 };
 
@@ -72,14 +85,14 @@ const replaceURLs = async (src: string, time: string | undefined, selectable: bo
         const compiledURLs = new Array<[number, string, number, number]>();
         for (let i = 0, l = segments.length; i < l; i++) {
             const url = segments[i];
-            let isImage: boolean = false;
+            let image: string | undefined;
             if (!loading) {
-                isImage = await checkImage(url);
+                image = await checkImage(url);
             }
-            if (isImage) {
+            if (image) {
                 const index = withoutWhiteSpaceAndLineBreak.indexOf(url);
                 result = result.replace(url, `${SERVICE_COMPILED_URL}${i}`);
-                compiledURLs.push([i, (`<img${SERVICE_WHITESPACE}src="${url}"${SERVICE_WHITESPACE}class="message-editor-image"${SERVICE_WHITESPACE}width="100%"${SERVICE_WHITESPACE}style="display:block;max-height:250px;object-fit:cover;margin:2px${SERVICE_WHITESPACE}auto;border-radius:6px;"/>`), index, url.length]);
+                compiledURLs.push([i, (`<img${SERVICE_WHITESPACE}src="${image}"${SERVICE_WHITESPACE}class="message-editor-image"${SERVICE_WHITESPACE}width="100%"${SERVICE_WHITESPACE}style="display:block;max-height:250px;object-fit:cover;margin:2px${SERVICE_WHITESPACE}auto;border-radius:6px;"/>`), index, url.length]);
             } else {
                 const index = withoutWhiteSpaceAndLineBreak.indexOf(url);
                 result = result.replace(url, `${SERVICE_COMPILED_URL}${i}`);

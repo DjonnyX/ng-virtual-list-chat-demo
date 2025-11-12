@@ -989,7 +989,8 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                         selectable = itemConfigMap[id]?.selectable ?? true,
                         collapsable = itemConfigMap[id]?.collapsable ?? false,
                         size = dynamicSize ? cache?.[sizeProperty] || typicalItemSize : typicalItemSize,
-                        absoluteStartPosition = pos - (scrollSize - size) - size, ratio = boundsSize / size, absoluteStartPositionPercent = -(absoluteStartPosition / boundsSize) * ratio,
+                        absoluteStartPosition = pos - (scrollSize - size) - size,
+                        ratio = boundsSize / size, absoluteStartPositionPercent = -(absoluteStartPosition / boundsSize) * ratio,
                         absoluteEndPosition = boundsSize - (absoluteStartPositionPercent + size),
                         absoluteEndPositionPercent = (absoluteStartPositionPercent + ((absoluteEndPosition + size) / boundsSize) * ratio);
                     if (sticky === 1) {
@@ -1109,10 +1110,11 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                 }
             }
 
-            let i = startIndex;
+            let i = startIndex, iterations = 0;
 
             while (renderItems > 0) {
-                if (i >= totalLength || i < 0) {
+                iterations++;
+                if (iterations >= totalLength || i >= totalLength) {
                     break;
                 }
                 const collectionItem = items[i];
