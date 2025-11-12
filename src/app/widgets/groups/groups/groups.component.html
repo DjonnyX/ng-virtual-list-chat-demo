@@ -9,7 +9,7 @@
 
     <x-virtual-list #list class="list" [items]="items" [itemRenderer]="itemRenderer" [itemSize]="40" methodForSelecting="select"
     [selectByClick]="false" [dynamicSize]="true" [bufferSize]="5" [maxBufferSize]="5" [selectedIds]="initialSelectedId"
-    [scrollStartOffset]="scrollStartOffset()"></x-virtual-list>
+    [scrollStartOffset]="scrollStartOffset()" scrollbarPreset="x-scrollbar-primary"></x-virtual-list>
 
     <ng-template #itemRenderer let-data="data" let-config="config">
         @if (data) {

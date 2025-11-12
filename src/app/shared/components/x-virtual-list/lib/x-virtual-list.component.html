@@ -9,6 +9,7 @@
     </div>
   </div>
 }
-<x-scroller class="xvl__list-scroller" #scroller [classes]="classes()" [focusedElement]="focusedElement()">
+<x-scroller class="xvl__list-scroller" #scroller [classes]="classes()" [startOffset]="scrollStartOffset()"
+  [endOffset]="scrollEndOffset()" [scrollbarPreset]="scrollbarPreset()" [focusedElement]="focusedElement()" [loading]="isLazyLoading()">
   <ng-container #renderersContainer></ng-container>
 </x-scroller>

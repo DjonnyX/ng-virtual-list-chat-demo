@@ -1,7 +1,7 @@
 import { GradientColor, RoundedCorner } from "../../types";
 import { objectAsReadonly } from "../../utils/object";
 import { ITheme } from "./interfaces/theme";
-import { ButtonPresets, CheckboxPresets, ContextMenuPresets, DialogPresets } from "./presets";
+import { ButtonPresets, CheckboxPresets, ContextMenuPresets, DialogPresets, ScrollbarPresets } from "./presets";
 
 const BUTTON_ROUNDED_CORNER: RoundedCorner = [8, 8, 8, 8],
     BUTTON_ROUNDED_RECT_PADDING = "4px 6px",
@@ -622,6 +622,16 @@ const manifest: ITheme = {
             strokeAnimationDuration: 10000,
             strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
             buttonPreset: ButtonPresets.CONTEXT_MENU_SECONDARY,
+        },
+        [ScrollbarPresets.PRIMARY]: {
+            fill: ["rgba(203, 184, 240, 1)", "rgba(171, 219, 238, 1)"],
+            strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
+            strokeAnimationDuration: 1000,
+        },
+        [ScrollbarPresets.SECONDARY]: {
+            fill: ["rgba(203, 184, 240, 1)", "rgba(171, 219, 238, 1)"],
+            strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
+            strokeAnimationDuration: 1000,
         },
     }
 };

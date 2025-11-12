@@ -67,6 +67,8 @@ export class MessagesComponent implements OnDestroy {
 
   scrollEndOffset = input<number>(0);
 
+  isLazyLoading = signal<boolean>(false);
+
   searchedPattern = signal<Array<string>>([]);
 
   collection = signal<Array<IProxyCollectionItem<IMessageItemData>>>([]);
@@ -184,8 +186,7 @@ export class MessagesComponent implements OnDestroy {
       $virtualList = toObservable(this._list).pipe(
         takeUntilDestroyed(),
         filter(list => !!list),
-      ),
-      $isLoading = toObservable(this.isLoading);
+      );
 
     $proxyCollectionChange.pipe(
       takeUntilDestroyed(),
@@ -278,6 +279,7 @@ export class MessagesComponent implements OnDestroy {
           filter(() => !this.isLoading()),
           debounceTime(250),
           switchMap(() => {
+            this.isLazyLoading.set(true);
             return this._messagesService.getMessages(chatId, {
               number: this._chunkNumber + 1,
               size: CHUNK_SIZE,
@@ -292,6 +294,7 @@ export class MessagesComponent implements OnDestroy {
             });
           }),
           tap(res => {
+            this.isLazyLoading.set(false);
             const items = Array.isArray(res.items) ? res.items : [];
             this._chunkNumber++;
             validateCollection(items);
@@ -302,6 +305,7 @@ export class MessagesComponent implements OnDestroy {
             this.collectionConfigMap.set(configMap);
           }),
           catchError((err) => {
+            this.isLazyLoading.set(false);
             console.error(err);
             return of(undefined);
           }),

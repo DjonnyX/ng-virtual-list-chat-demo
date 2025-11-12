@@ -1,10 +1,17 @@
 @let c = content();
-@let orientation = direction;
-<div #scrollViewport cdkScrollable part="scroller" class="xvl__scroller">
-    <div #scrollContent [attr.aria-orientation]="orientation" [attr.aria-activedescendant]="focusedElement()"
-        tabindex="0" part="list" class="xvl__list" [ngClass]="classes()">
-        <ng-content>
-            {{c}}
-        </ng-content>
+@let class = actualClasses();
+@let cClass = containerClasses();
+@let vertical = isVertical();
+@let orientation = direction();
+<div localeSensitive class="xvl__container" [ngClass]="cClass">
+    <div #scrollViewport cdkScrollable part="scroller" class="xvl__scroller">
+        <div #scrollContent [attr.aria-orientation]="orientation" [attr.aria-activedescendant]="focusedElement()"
+            tabindex="0" part="list" class="xvl__list" [ngClass]="class">
+            <ng-content>
+                {{c}}
+            </ng-content>
+        </div>
     </div>
+    <x-scroll-bar [isVertical]="vertical" [size]="thumbSize()" [preset]="scrollbarPreset()" [position]="thumbPosition()"
+        [thumbGradientPositions]="thumbGradientPositions()" [loading]="loading()"></x-scroll-bar>
 </div>

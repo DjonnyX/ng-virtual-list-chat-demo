@@ -15,8 +15,8 @@
         [itemConfigMap]="itemsConfigMap" [dynamicSize]="true" [snap]="true" snappingMethod="chat" [defaultItemValue]="defaultItemValue()"
         [scrollStartOffset]="scrollStartOffset()" [scrollEndOffset]="scrollEndOffset()" [snapToEndTransitionInstantOffset]="50"
         methodForSelecting="multi-select" [selectedIds]="selectedItemIds" [snapToEndTransitionInstantOffset]="0"
-        [selectByClick]="false" (onSelect)="onSelectItemHandler($event)"
-        (onScrollReachStart)="onScrollReachStartHandler()">
+        [selectByClick]="false" (onSelect)="onSelectItemHandler($event)" scrollbarPreset="x-scrollbar-secondary"
+        (onScrollReachStart)="onScrollReachStartHandler()" [isLazyLoading]="isLazyLoading()">
     </x-virtual-list>
 
     <ng-template #itemRenderer let-index="index" let-data="data" let-prevData="prevData" let-nextData="nextData"

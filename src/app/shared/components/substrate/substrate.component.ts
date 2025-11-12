@@ -106,7 +106,7 @@ export class SubstrateComponent {
 
   type = input<SubstarateStyle>(SubstarateStyles.NONE);
 
-  strokeColors = input<GradientColor>();
+  strokeColors = input<string | GradientColor | undefined>();
 
   strokeWidth = input<number>(DEFAULT_STROKE_WIDTH);
 
@@ -114,7 +114,7 @@ export class SubstrateComponent {
 
   rippleColor = input<Color | undefined>(DEFAULT_RIPPLE_COLOR);
 
-  fillColors = input<GradientColor | undefined>(DEFAULT_FILL_COLORS);
+  fillColors = input<string | GradientColor | undefined>(DEFAULT_FILL_COLORS);
 
   fillColorPositions = input<GradientColorPositions | undefined>(undefined);
 

@@ -200,6 +200,10 @@ export class XVirtualListComponent implements OnDestroy {
    */
   onScrollReachEnd = output<void>();
 
+  scrollbarPreset = input<string | undefined>(undefined);
+
+  isLazyLoading = input<boolean>(false);
+
   private _itemsOptions = {
     transform: (v: IVirtualListCollection | undefined) => {
       let valid = validateArray(v, true);

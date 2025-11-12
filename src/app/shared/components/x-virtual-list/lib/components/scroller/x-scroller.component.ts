@@ -1,4 +1,4 @@
-import { Component, DestroyRef, ElementRef, inject, input, OnDestroy, signal, ViewChild, viewChild } from '@angular/core';
+import { Component, computed, DestroyRef, ElementRef, inject, input, OnDestroy, Signal, signal, ViewChild, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
@@ -9,6 +9,9 @@ import { ScrollerDirections } from './enums';
 import { Id, ISize } from '../../types';
 import { Easing } from './types';
 import { easeLinear, easeOutQuad } from './utils/ease';
+import { LocaleSensitiveDirective } from '@shared/localization';
+import { XScrollBarComponent } from "../x-scroll-bar/x-scroll-bar.component";
+import { GradientColorPositions } from '@shared/types';
 
 const TOP = 'top',
   LEFT = 'left',
@@ -63,7 +66,7 @@ const SCROLL_EVENT = new Event('scroll');
  */
 @Component({
   selector: 'x-scroller',
-  imports: [CommonModule, CdkScrollable],
+  imports: [CommonModule, CdkScrollable, LocaleSensitiveDirective, XScrollBarComponent],
   templateUrl: './x-scroller.component.html',
   styleUrl: './x-scroller.component.scss'
 })
@@ -81,7 +84,27 @@ export class XScrollerComponent implements OnDestroy {
 
   content = input<HTMLElement>();
 
+  loading = input<boolean>(false);
+
   classes = input<{ [cName: string]: boolean }>({});
+
+  startOffset = input<number>(0);
+
+  endOffset = input<number>(0);
+
+  scrollbarPreset = input<string | undefined>(undefined);
+
+  actualClasses: Signal<{ [cName: string]: boolean }>;
+
+  containerClasses: Signal<{ [cName: string]: boolean }>;
+
+  isVertical: Signal<boolean>;
+
+  thumbGradientPositions = signal<GradientColorPositions>([0, 0]);
+
+  thumbSize = signal<number>(0);
+
+  thumbPosition = signal<number>(0);
 
   private _$scroll = new Subject<void>();
   readonly $scroll = this._$scroll.asObservable();
@@ -402,6 +425,19 @@ export class XScrollerComponent implements OnDestroy {
         );
       }),
     ).subscribe();
+
+    this.isVertical = computed(() => {
+      return this.direction() === ScrollerDirection.VERTICAL;
+    });
+
+    this.actualClasses = computed(() => {
+      const classes = this.classes(), direction = this.direction();
+      return { ...classes, [direction]: true };
+    });
+
+    this.containerClasses = computed(() => {
+      return { [this.direction()]: true };
+    });
   }
 
   private calculateVelocity(offsets: Array<[number, number]>, delta: number, timestamp: number, indexOffset: number = 10) {
@@ -533,6 +569,27 @@ export class XScrollerComponent implements OnDestroy {
           }
           this._$scroll.next();
         }
+
+        const direction = this.direction(),
+          startOffset = this.startOffset(),
+          endOffset = this.endOffset(),
+          scrollViewport = this.scrollViewport()?.nativeElement as HTMLDivElement,
+          {
+            thumbSize,
+            thumbPosition,
+            thumbGradientPositions,
+          } = this._scrollBox.calculateScroll({
+            direction,
+            viewportWidth: scrollViewport.offsetWidth, viewportHeight: scrollViewport.offsetHeight,
+            contentWidth: scrollContent.offsetWidth, contentHeight: scrollContent.offsetHeight,
+            startOffset,
+            endOffset,
+            positionX: this._x, positionY: this._y,
+          });
+
+        this.thumbGradientPositions.set(thumbGradientPositions);
+        this.thumbSize.set(thumbSize);
+        this.thumbPosition.set(thumbPosition);
       }
 
       if (isFinished) {
@@ -562,6 +619,8 @@ export class XScrollerComponent implements OnDestroy {
       behavior = params.behavior ?? INSTANT,
       blending = params.blending ?? true,
       direction = this.direction(),
+      startOffset = this.startOffset(),
+      endOffset = this.endOffset(),
       scrollContent = this.scrollContent()?.nativeElement as HTMLDivElement,
       scrollViewport = this.scrollViewport()?.nativeElement as HTMLDivElement,
       isVertical = this.direction() === ScrollerDirection.VERTICAL;
@@ -569,10 +628,15 @@ export class XScrollerComponent implements OnDestroy {
     const {
       x,
       y,
+      thumbSize,
+      thumbPosition,
+      thumbGradientPositions,
     } = this._scrollBox.calculateScroll({
       direction,
       viewportWidth: scrollViewport.offsetWidth, viewportHeight: scrollViewport.offsetHeight,
       contentWidth: scrollContent.offsetWidth, contentHeight: scrollContent.offsetHeight,
+      startOffset,
+      endOffset,
       positionX: posX, positionY: posY,
     });
 
@@ -587,6 +651,10 @@ export class XScrollerComponent implements OnDestroy {
         }
       }
     }
+
+    this.thumbGradientPositions.set(thumbGradientPositions);
+    this.thumbSize.set(thumbSize);
+    this.thumbPosition.set(thumbPosition);
 
     const xx = x,
       yy = y,

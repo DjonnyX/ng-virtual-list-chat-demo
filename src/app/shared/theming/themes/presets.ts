@@ -106,6 +106,16 @@ const CONTEXT_MENU_PRESETS = [
     ContextMenuPresets.SECONDARY,
 ];
 
+enum ScrollbarPresets {
+    PRIMARY = 'x-scrollbar-primary',
+    SECONDARY = 'x-scrollbar-secondary',
+}
+
+const SCROLLBAR_PRESETS = [
+    ScrollbarPresets.PRIMARY,
+    ScrollbarPresets.SECONDARY,
+];
+
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
@@ -113,7 +123,7 @@ const CONTEXT_MENU_PRESETS = [
  * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
  * All rights reserved.
  */
-const PRESETS: Array<string> = [...BUTTON_PRESETS, ...CHECKBOX_PRESETS, ...DIALOG_PRESETS, ...CONTEXT_MENU_PRESETS];
+const PRESETS: Array<string> = [...BUTTON_PRESETS, ...CHECKBOX_PRESETS, ...DIALOG_PRESETS, ...CONTEXT_MENU_PRESETS, ...SCROLLBAR_PRESETS];
 
 export {
     ButtonPresets,
@@ -124,5 +134,7 @@ export {
     CONTEXT_MENU_PRESETS,
     DialogPresets,
     DIALOG_PRESETS,
+    ScrollbarPresets,
+    SCROLLBAR_PRESETS,
     PRESETS,
 }
