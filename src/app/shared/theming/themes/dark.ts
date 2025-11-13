@@ -564,7 +564,7 @@ const manifest: ITheme = {
             },
         },
         [DialogPresets.PRIMARY]: {
-            fill: ["rgba(59, 30, 112, 1)", "rgba(59, 30, 112, 1)"],
+            fill: ["rgba(45, 30, 112, 1)", "rgba(45, 30, 112, 1)"],
             roundedCorner: DIALOG_ROUNDED_CORNER,
             padding: DIALOG_PADDING,
             strokeAnimationDuration: 10000,
@@ -582,7 +582,7 @@ const manifest: ITheme = {
             },
         },
         [DialogPresets.SECONDARY]: {
-            fill: ["rgba(59, 30, 112, 1)", "rgba(59, 30, 112, 1)"],
+            fill: ["rgba(45, 30, 112, 1)", "rgba(45, 30, 112, 1)"],
             roundedCorner: DIALOG_ROUNDED_CORNER,
             padding: DIALOG_PADDING,
             strokeAnimationDuration: 10000,

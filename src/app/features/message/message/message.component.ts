@@ -211,8 +211,8 @@ export class MessageComponent implements OnDestroy {
     ).subscribe();
 
     this.substarateMode = computed(() => {
-      const params = this.params(), { isIncoming: isIn, prevIsIncoming: isPrevIn, isRTL } = params;
-      if (isIn === isPrevIn) {
+      const params = this.params(), { isIncoming: isIn, prevIsIncoming: isPrevIn, prevType, type, isRTL } = params;
+      if ((prevType === type) && (isIn === isPrevIn)) {
         return isRTL ? isIn ? MessageSubstarateModes.RIGHT : MessageSubstarateModes.LEFT :
           (isIn ? MessageSubstarateModes.LEFT : MessageSubstarateModes.RIGHT);
       }

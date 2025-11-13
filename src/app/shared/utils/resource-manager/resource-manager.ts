@@ -14,6 +14,8 @@ export enum ResourceManagerEvents {
     PROGRESS = 'progress',
 }
 
+const MAX_CONTENT_LIMIT = 1000000;
+
 type ResourceManagerProgressListener = (url: string) => void;
 
 type ResourceManagerListeners = ResourceManagerProgressListener;
@@ -64,6 +66,11 @@ class ResourceManager extends EventEmitter<ResourceManagerEvents, ResourceManage
                         }).then(imgBlob => {
                             try {
                                 const fileReader = new FileReader();
+                                fileReader.onprogress = (e: ProgressEvent<FileReader>) => {
+                                    if (e.loaded >= MAX_CONTENT_LIMIT) {
+                                        fileReader.abort();
+                                    }
+                                };
                                 fileReader.onload = () => { resolve(fileReader.result?.toString()); };
                                 fileReader.onerror = () => { resolve(undefined); };
                                 fileReader.readAsDataURL(imgBlob);
