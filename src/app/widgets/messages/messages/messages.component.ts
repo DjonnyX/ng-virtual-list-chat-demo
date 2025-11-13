@@ -31,6 +31,7 @@ import { IProxyCollectionItem, ProxyCollection, ProxyCollectionEvents } from './
 import { StaticClickDirective } from '@shared/directives';
 import { createGroups } from './utils/create-groups';
 import { ILocalization, LocalizationService } from '@shared/localization';
+import { resourceManager } from '@shared/utils/resource-manager';
 
 const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
   MIN_ITEM_HEIGHT = 28,
@@ -208,6 +209,7 @@ export class MessagesComponent implements OnDestroy {
       filter(({ list, chatId }) => !!list && chatId !== undefined),
       tap(({ list }) => {
         // reset
+        resourceManager.clear();
         this.isLoading.set(true);
         if (this._proxyCollection.collection.length > 0) {
           this._proxyCollection.from([]);

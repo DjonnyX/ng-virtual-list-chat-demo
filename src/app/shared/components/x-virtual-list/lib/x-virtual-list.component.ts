@@ -34,7 +34,7 @@ import { isDirection } from './utils/is-direction';
 import { XVirtualListService } from './x-virtual-list.service';
 import { isMethodForSelecting } from './utils/is-method-for-selecting';
 import { MethodsForSelectingTypes } from './enums/method-for-selecting-types';
-import { CMap } from './utils/cache-map';
+import { CMap } from '../../../utils/cmap';
 import { validateArray, validateBoolean, validateFloat, validateInt, validateObject, validateString } from './utils/validation';
 import { copyValueAsReadonly, objectAsReadonly } from './utils/object';
 import { isCollectionMode } from './utils/is-collection-mode';

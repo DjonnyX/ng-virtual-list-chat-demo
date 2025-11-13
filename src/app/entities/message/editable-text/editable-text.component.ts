@@ -2,13 +2,16 @@ import { Component, computed, DestroyRef, effect, ElementRef, inject, input, OnD
 import { CommonModule } from '@angular/common';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { combineLatest, filter, from, fromEvent, map, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, from, fromEvent, map, of, startWith, switchMap, tap } from 'rxjs';
 import { SearchHighlightDirective } from '@shared/directives';
 import { formatText } from '@shared/utils';
 import { ThemeService } from '@shared/theming';
 import { ITheme } from '@shared/theming';
 import { LocaleSensitiveDirective } from '@shared/localization';
 import { ISize } from '@shared/components/x-virtual-list';
+import { getTextUrls } from '@shared/utils/text/format-text.util';
+import { resourceManager } from '@shared/utils/resource-manager';
+import { ResourceManagerEvents } from '@shared/utils/resource-manager/resource-manager';
 
 const DEFAULT_SEARCH_SUBSTRING_CLASS = 'search-substring',
   INITIAL = 'initial',
@@ -100,6 +103,16 @@ export class EditableTextComponent implements OnDestroy {
       this.bounds.set({ width: el.offsetWidth || DEFAULT_TEXTAREA_SIZE, height: el.offsetHeight || DEFAULT_TEXTAREA_SIZE });
     }
   }
+
+  private _$resourceUrls = new BehaviorSubject<Array<string>>([]);
+  readonly $resourceUrls = this._$resourceUrls.asObservable();
+
+  private _$resourceLoaded = new BehaviorSubject<string>('');
+  readonly $resourceLoaded = this._$resourceLoaded.asObservable();
+
+  private _onResourceLoadedHandler = (url: string) => {
+    this._$resourceLoaded.next(url);
+  };
 
   constructor() {
     this._resizeObserver = new ResizeObserver(this._onContainerResizeHandler);
@@ -204,27 +217,38 @@ export class EditableTextComponent implements OnDestroy {
 
     const $text = toObservable(this.text),
       $time = toObservable(this.time),
-      $selectable = toObservable(this.selectable);
+      $selectable = toObservable(this.selectable),
+      $resources = combineLatest([this.$resourceUrls, this.$resourceLoaded]).pipe(
+        takeUntilDestroyed(),
+        switchMap(([resourceUrls, resourceLoaded]) => of(resourceUrls.includes(resourceLoaded))),
+      );
 
-    combineLatest([$selectable, $text, $time]).pipe(
+    $text.pipe(
       takeUntilDestroyed(),
+      distinctUntilChanged(),
+      filter(v => v !== undefined),
+      switchMap(text => {
+        return of(getTextUrls(text));
+      }),
+      tap(urls => {
+        if (urls.length > 0) {
+          this._$resourceUrls.next(urls);
+          resourceManager.addEventListener(ResourceManagerEvents.PROGRESS, this._onResourceLoadedHandler);
+        } else {
+          resourceManager.removeEventListener(ResourceManagerEvents.PROGRESS, this._onResourceLoadedHandler);
+        }
+      }),
+    ).subscribe();
+
+    combineLatest([$selectable, $text, $time, $resources]).pipe(
+      takeUntilDestroyed(),
+      distinctUntilChanged(),
       switchMap(([selectable, text, time]) => {
         return from(formatText(text, time, {
           selectable,
-          loading: true,
+          loading: false,
         })).pipe(
           takeUntilDestroyed(this._destroyRef),
-          tap(v => {
-            this.formattedText.set(v);
-          }),
-          switchMap(() => {
-            return from(formatText(text, time, {
-              selectable,
-              loading: false,
-            })).pipe(
-              takeUntilDestroyed(this._destroyRef),
-            );
-          }),
           tap(v => {
             this.formattedText.set(v);
           }),
@@ -255,6 +279,10 @@ export class EditableTextComponent implements OnDestroy {
   ngOnDestroy(): void {
     if (this._resizeObserver) {
       this._resizeObserver.disconnect();
+    }
+
+    if (resourceManager.hasEventListener(ResourceManagerEvents.PROGRESS, this._onResourceLoadedHandler)) {
+      resourceManager.removeEventListener(ResourceManagerEvents.PROGRESS, this._onResourceLoadedHandler);
     }
   }
 }

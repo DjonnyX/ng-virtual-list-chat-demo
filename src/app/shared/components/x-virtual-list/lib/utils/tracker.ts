@@ -3,7 +3,7 @@ import { ScrollDirection } from "../models";
 import { IRenderVirtualListCollection } from "../models/render-collection.model";
 import { BaseVirtualListItemComponent } from "../models/base-virtual-list-item-component";
 import { Id, ISize } from "../types";
-import { CMap } from "./cache-map";
+import { CMap } from "../../../../utils/cmap";
 
 type TrackingPropertyId = string | number;
 

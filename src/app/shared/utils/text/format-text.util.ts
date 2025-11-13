@@ -1,3 +1,6 @@
+import { resourceManager } from "../resource-manager";
+import { ResourceStatus } from "../resource-manager/resource-manager";
+
 const SERVICE_WHITESPACE = '&__whitespace__;',
     SERVICE_COMPILED_URL = '&__url__;',
     URL_PATTERN = /(https?:\/\/(?:www\.|(?!www))[\w\d\-_?=,;\[\]&.][\w\d\-_?=,;\[\]&.]+[\w\d\-_?=,;\[\]&.]\.[\w\d\-_?=,;\[\]&.\/]{2,}|www\.[\w\d\-_?=,;\[\]&.][\w\d\-_?=,;\[\]&.]+[\w\d\-_?=,;\[\]&.\/]\.[^\w]{2,}|https?:\/\/(?:www\.|(?!www))[\w\d\-_?=,;\[\]&.]+\.[^\w]{2,}|www\.[\w\d\-_?=,;\[\]&.\/]+\.[^\w]{2,})/gm,
@@ -11,7 +14,16 @@ interface IFormatTextOptions {
     loading?: boolean;
 }
 
-const abortSignals = new Map<string, AbortController>();
+export const getTextUrls = (text: string) => {
+    const result = new Array<string>(), segments = text.match(URL_PATTERN);
+    if (segments) {
+        for (let i = 0, l = segments.length; i < l; i++) {
+            const url = segments[i];
+            result.push(url);
+        }
+    }
+    return result;
+}
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -44,30 +56,15 @@ export const formatText = async (str: string | undefined, time: string | undefin
  * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
  * All rights reserved.
  */
-const checkImage = (url: string): Promise<string | undefined> => {
-    const prevController = abortSignals.get(url);
-    if (prevController) {
-        prevController.abort();
+const checkImage = (url: string) => {
+    const status = resourceManager.getStatus(url);
+    if (status === ResourceStatus.LOADED) {
+        return resourceManager.get(url);
     }
-    const controller = new AbortController();
-    abortSignals.set(url, controller);
-    return new Promise((resolve) => {
-        fetch(url, {
-            signal: controller.signal,
-        }).then(res => {
-            if (!res.ok) {
-                throw Error('Loading error');
-            }
-            return res.blob();
-        }).then(imgBlob => {
-            const fileReader = new FileReader();
-            fileReader.onload = () => { resolve(fileReader.result?.toString()); };
-            fileReader.onerror = () => { resolve(undefined); };
-            fileReader.readAsDataURL(imgBlob);
-        }).catch(err => {
-            resolve(undefined);
-        });
-    });
+    if (status === ResourceStatus.ERROR || status === ResourceStatus.NOT_ADDED) {
+        resourceManager.add(url);
+    }
+    return undefined;
 };
 
 /**
@@ -79,15 +76,15 @@ const checkImage = (url: string): Promise<string | undefined> => {
  */
 const replaceURLs = async (src: string, time: string | undefined, selectable: boolean, loading: boolean) => {
     let result = src;
-    const segments = result.match(URL_PATTERN);
-    if (segments) {
+    const urls = getTextUrls(src);
+    if (urls) {
         const withoutWhiteSpaceAndLineBreak = result.replaceAll(/\r\n|\n|\r|\s/gm, '');
         const compiledURLs = new Array<[number, string, number, number]>();
-        for (let i = 0, l = segments.length; i < l; i++) {
-            const url = segments[i];
+        for (let i = 0, l = urls.length; i < l; i++) {
+            const url = urls[i];
             let image: string | undefined;
             if (!loading) {
-                image = await checkImage(url);
+                image = checkImage(url);
             }
             if (image) {
                 const index = withoutWhiteSpaceAndLineBreak.indexOf(url);

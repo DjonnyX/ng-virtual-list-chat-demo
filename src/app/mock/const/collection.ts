@@ -42,9 +42,18 @@ export const COLLECTION_PARAMS = {
  */
 const testLinksText = () => {
   return `Test links:
+https://assets-v2.lottiefiles.com/a/e88e947e-117e-11ee-b32b-1f49352a17f5/s1A5Yx3U5y.gif
+http://eugene-grebennikov.pro/`;
+};
+
+/*
+// HANGS
+const testLinksText = () => {
+  return `Test links:
 https://media4.giphy.com/media/WoF3yfYupTt8mHc7va/200w.gif
 http://eugene-grebennikov.pro/`;
 };
+*/
 
 /**
  * @author Evgenii Alexandrovich Grebennikov

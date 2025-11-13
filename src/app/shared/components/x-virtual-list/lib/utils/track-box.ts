@@ -2,7 +2,8 @@ import { ComponentRef } from "@angular/core";
 import { IRenderVirtualListCollection, } from "../models/render-collection.model";
 import { IRenderVirtualListItem } from "../models/render-item.model";
 import { Id } from "../types/id";
-import { CacheMap, CMap } from "./cache-map";
+import { CMap } from '../../../../utils/cmap';
+import { CacheMap } from "./cache-map";
 import { Tracker } from "./tracker";
 import { IRect, ISize } from "../types";
 import {

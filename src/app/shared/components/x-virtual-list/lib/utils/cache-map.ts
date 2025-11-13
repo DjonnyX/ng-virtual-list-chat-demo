@@ -1,39 +1,7 @@
 import { ScrollDirection } from "../models";
 import { debounce } from "./debounce";
-import { EventEmitter } from "./event-emitter";
-
-export class CMap<K = string, V = any> {
-    protected _dict: { [k: string | number]: V } = {};
-
-    constructor(dict?: CMap<K, V>) {
-        if (dict) {
-            this._dict = { ...dict._dict };
-        }
-    }
-
-    get(key: K) {
-        const k = String(key);
-        return this._dict[k];
-    }
-    set(key: K, value: V) {
-        const k = String(key);
-        this._dict[k] = value;
-        return this;
-    }
-    has(key: K) {
-        return this._dict.hasOwnProperty(String(key));
-    }
-    delete(key: K) {
-        const k = String(key);
-        delete this._dict[k];
-    }
-    clear() {
-        this._dict = {};
-    }
-    toObject() {
-        return this._dict;
-    }
-}
+import { EventEmitter } from "../../../../utils/event-emitter";
+import { CMap } from "../../../../utils/cmap";
 
 export interface ICacheMap<I = any, B = any> {
     set: (id: I, bounds: B) => CMap<I, B>;
