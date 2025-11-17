@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, ElementRef, inject, input, output, Signal, signal, viewChild } from '@angular/core';
+import { Component, computed, DestroyRef, effect, ElementRef, inject, input, output, Signal, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { delay, Subject, tap } from 'rxjs';
 import { ButtonComponent } from '@shared/components/button';
@@ -62,13 +62,15 @@ export class MessageSendButtonComponent {
 
   private _themeService = inject(ThemeService);
 
+  private _destroyRef = inject(DestroyRef);
+
   constructor() {
     const $pressed = this.$pressed;
 
     $pressed.pipe(
       takeUntilDestroyed(),
       delay(300),
-      takeUntilDestroyed(),
+      takeUntilDestroyed(this._destroyRef),
       tap(v => {
         this.pressed.set(v);
       }),
@@ -79,7 +81,7 @@ export class MessageSendButtonComponent {
     $click.pipe(
       takeUntilDestroyed(),
       delay(300),
-      takeUntilDestroyed(),
+      takeUntilDestroyed(this._destroyRef),
       tap(v => {
         this.onClick.emit(v);
       }),

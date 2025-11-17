@@ -15,12 +15,28 @@ const DEFAULT_STROKE_ANIMATION_DURATION = 1000,
   BOTTOM_HEIGHT = 13,
   DEFAULT_STROKE_WIDTH = 3,
   RIPPLE_ANIMATE_CLASS = 'animate',
-  DEFAULT_RIPPLE_COLOR = "rgba(0,0,0,0.1)",
+  DEFAULT_RIPPLE_COLOR = 'rgba(0,0,0,0.1)',
   SHAPE_NAME = 'x-message-substrate-shape',
   CLIP_NAME = 'x-message-substrate-clip',
   GRADIENT_COLOR_NAME = 'stop-color',
   FILL_GRADIENT_NAME = 'x-message-substrate-fill-gradient',
-  STROKE_GRADIENT_NAME = 'x-message-substrate-stroke-gradient';
+  STROKE_GRADIENT_NAME = 'x-message-substrate-stroke-gradient',
+  FILL = 'fill',
+  INHERIT = 'inherit',
+  X1 = 'x1',
+  X2 = 'x2',
+  STROKE_WIDTH = 'stroke-width',
+  ID = 'id',
+  HREF = 'href',
+  CLIP_PATH = 'clip-path',
+  VIEW_BOX = 'viewBox',
+  D = 'd',
+  STROKE = 'stroke',
+  NONE = 'none',
+  CX = 'cx',
+  CY = 'cy',
+  R = 'r',
+  PX = 'px';
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -113,6 +129,7 @@ export class MessageSubstrateComponent {
     $prepared.pipe(
       takeUntilDestroyed(),
       debounceTime(50),
+      takeUntilDestroyed(this._destroyRef),
       tap((prepared) => {
         this.classes.set({ prepared });
       }),
@@ -129,13 +146,13 @@ export class MessageSubstrateComponent {
 
           const shape = this.shape()?.nativeElement;
           if (shape) {
-            shape.setAttribute('fill', `url(#${FILL_GRADIENT_NAME}${this._id})`);
+            shape.setAttribute(FILL, `url(#${FILL_GRADIENT_NAME}${this._id})`);
           }
         }
       } else {
         const shape = this.shape()?.nativeElement;
         if (shape) {
-          shape.setAttribute('fill', `inherit`);
+          shape.setAttribute(FILL, INHERIT);
         }
         this.prepared.set(false);
       }
@@ -146,8 +163,8 @@ export class MessageSubstrateComponent {
       if (Array.isArray(fillColorPositions) && fillColorPositions.length === 2) {
         const fillGradient = this.fillGradient();
         if (fillGradient) {
-          fillGradient.nativeElement.setAttribute('x1', `${Number.isNaN(fillColorPositions[0]) ? 0 : fillColorPositions[0]}px`);
-          fillGradient.nativeElement.setAttribute('x2', `${Number.isNaN(fillColorPositions[1]) ? 0 : fillColorPositions[1]}px`);
+          fillGradient.nativeElement.setAttribute(X1, `${Number.isNaN(fillColorPositions[0]) ? 0 : fillColorPositions[0]}px`);
+          fillGradient.nativeElement.setAttribute(X2, `${Number.isNaN(fillColorPositions[1]) ? 0 : fillColorPositions[1]}px`);
         }
       }
     });
@@ -166,79 +183,79 @@ export class MessageSubstrateComponent {
     effect(() => {
       const strokeWidth = this.strokeWidth(), shape = this.shape()?.nativeElement;
       if (shape) {
-        shape.setAttribute('stroke-width', `${strokeWidth}`);
+        shape.setAttribute(STROKE_WIDTH, `${strokeWidth}`);
       }
     });
 
     effect(() => {
       const strokeWidth = this.strokeWidth(), path = this.path()?.nativeElement;
       if (path) {
-        path.setAttribute('stroke-width', `${strokeWidth * 2}`);
+        path.setAttribute(STROKE_WIDTH, `${strokeWidth * 2}`);
       }
     });
 
     effect(() => {
       const strokeWidth = this.strokeWidth(), hilight = this.hilight()?.nativeElement;
       if (hilight) {
-        hilight.setAttribute('stroke-width', `${strokeWidth * 2}`);
+        hilight.setAttribute(STROKE_WIDTH, `${strokeWidth * 2}`);
       }
     });
 
     effect(() => {
       const fillGradient = this.fillGradient();
       if (fillGradient) {
-        fillGradient.nativeElement.setAttribute('id', `${FILL_GRADIENT_NAME}${this._id}`);
+        fillGradient.nativeElement.setAttribute(ID, `${FILL_GRADIENT_NAME}${this._id}`);
       }
     });
 
     effect(() => {
       const strokeGradient = this.strokeGradient();
       if (strokeGradient) {
-        strokeGradient.nativeElement.setAttribute('id', `${STROKE_GRADIENT_NAME}${this._id}`);
+        strokeGradient.nativeElement.setAttribute(ID, `${STROKE_GRADIENT_NAME}${this._id}`);
       }
     });
 
     effect(() => {
       const path = this.path();
       if (path) {
-        path.nativeElement.setAttribute('id', `${SHAPE_NAME}${this._id}`);
+        path.nativeElement.setAttribute(ID, `${SHAPE_NAME}${this._id}`);
       }
     });
 
     effect(() => {
       const clip = this.clip();
       if (clip) {
-        clip.nativeElement.setAttribute('id', `${CLIP_NAME}${this._id}`);
+        clip.nativeElement.setAttribute(ID, `${CLIP_NAME}${this._id}`);
       }
     });
 
     effect(() => {
       const clipUse = this.clipUse();
       if (clipUse) {
-        clipUse.nativeElement.setAttribute('href', `#${SHAPE_NAME}${this._id}`);
+        clipUse.nativeElement.setAttribute(HREF, `#${SHAPE_NAME}${this._id}`);
       }
     });
 
     effect(() => {
       const shape = this.shape();
       if (shape) {
-        shape.nativeElement.setAttribute('clip-path', `url(#${CLIP_NAME}${this._id})`);
-        shape.nativeElement.setAttribute('href', `#${SHAPE_NAME}${this._id}`);
+        shape.nativeElement.setAttribute(CLIP_PATH, `url(#${CLIP_NAME}${this._id})`);
+        shape.nativeElement.setAttribute(HREF, `#${SHAPE_NAME}${this._id}`);
       }
     });
 
     effect(() => {
       const hilight = this.hilight();
       if (hilight) {
-        hilight.nativeElement.setAttribute('clip-path', `url(#${CLIP_NAME}${this._id})`);
-        hilight.nativeElement.setAttribute('href', `#${SHAPE_NAME}${this._id}`);
+        hilight.nativeElement.setAttribute(CLIP_PATH, `url(#${CLIP_NAME}${this._id})`);
+        hilight.nativeElement.setAttribute(HREF, `#${SHAPE_NAME}${this._id}`);
       }
     });
 
     effect(() => {
       const rippleShape = this.rippleShape();
       if (rippleShape) {
-        rippleShape.nativeElement.setAttribute('clip-path', `url(#${CLIP_NAME}${this._id})`);
+        rippleShape.nativeElement.setAttribute(CLIP_PATH, `url(#${CLIP_NAME}${this._id})`);
       }
     });
 
@@ -254,25 +271,25 @@ export class MessageSubstrateComponent {
         ww = (this.width() ?? 0), w = ww > 0 ? ww - (LEFT_WIDTH + RIGHT_WIDTH + 10) : 0,
         hh = (this.height() ?? 0), h = hh > 0 ? hh - (TOP_HEIGHT + BOTTOM_HEIGHT + 10) : 0;
       if (svg && path) {
-        svg.style.width = `${ww}px`;
-        svg.style.height = `${hh}px`;
-        svg.setAttribute('viewBox', `0 0 ${ww} ${hh}`);
+        svg.style.width = `${ww}${PX}`;
+        svg.style.height = `${hh}${PX}`;
+        svg.setAttribute(VIEW_BOX, `0 0 ${ww} ${hh}`);
         switch (this.mode()) {
           case MessageSubstarateModes.IN_LEFT: {
             const shape = `M 26.485 0 c -7.15 0 -12.954 5.835 -12.954 13.022 l 0 ${h} c 0 6.304 -1.651 11.287 -6.382 15.423 c -1.498 1.309 -3.686 2.575 -5.992 3.7 c -0.908 0.535 -1.349 1.614 -1.077 2.637 c 0.272 1.022 1.19 1.735 2.243 1.742 c 7.244 0.079 16.514 0.131 24.162 0.131 l ${w} 0 c 7.15 0 12.954 -5.835 12.954 -10.022 l 0 ${-(h + 13.956)} c 0 -7.187 -5.804 -13.022 -12.954 -13.022 Z`;
-            path.setAttribute('d', shape);
+            path.setAttribute(D, shape);
             break;
           }
           case MessageSubstarateModes.IN_RIGHT: {
             const shape = `M${9 + w},0l4.516,0c7.15,0 12.954,5.835 12.954,13.022c-0,0 -0,-2.958 -0,${h}c-0,6.304 1.651,11.287 6.382,15.423c1.498,1.309 3.686,2.575 5.992,3.7c0.908,0.535 1.349,1.614 1.077,2.637c-0.272,1.022 -1.19,1.735 -2.243,1.742c-7.244,0.079 -16.514,0.131 ${-(w + 19.162)},0.131l-4.561,0c-7.15,0 -12.954,-5.835 -12.954,-13.022l0,${-(h + 10.8)}c0,-7.187 5.85,-13.022 12.999,-13.022Z`;
-            path.setAttribute('d', shape);
+            path.setAttribute(D, shape);
             break;
           }
           case MessageSubstarateModes.LEFT:
           case MessageSubstarateModes.RIGHT:
           default: {
             const shape = `M ${44.043 + w - 5} 13.2 c 0 -7.285 -5.913 -13.2 -13.196 -13.2 L 13.239 0 c -7.283 0 -13.196 5.915 -13.196 13.2 L 0.043 ${h + 23} c 0 7.285 5.913 13.2 13.196 13.2 l ${17.608 + w - 5} 0 c 7.283 0 13.196 -5.915 13.196 -13.2 Z`;
-            path.setAttribute('d', shape);
+            path.setAttribute(D, shape);
             break;
           }
         }
@@ -284,12 +301,12 @@ export class MessageSubstrateComponent {
       if (shape) {
         switch (type) {
           case MessageSubstarateStyles.STROKE: {
-            shape.setAttribute('stroke', `url(#${STROKE_GRADIENT_NAME}${this._id})`);
+            shape.setAttribute(STROKE, `url(#${STROKE_GRADIENT_NAME}${this._id})`);
             break;
           }
           case MessageSubstarateStyles.NONE:
           default:
-            shape.setAttribute('stroke', 'none');
+            shape.setAttribute(STROKE, NONE);
             break;
         }
       }
@@ -300,12 +317,12 @@ export class MessageSubstrateComponent {
       if (hilight) {
         switch (type) {
           case MessageSubstarateStyles.STROKE: {
-            hilight.setAttribute('stroke', `url(#${STROKE_GRADIENT_NAME}${this._id})`);
+            hilight.setAttribute(STROKE, `url(#${STROKE_GRADIENT_NAME}${this._id})`);
             break;
           }
           case MessageSubstarateStyles.NONE:
           default:
-            hilight.setAttribute('stroke', 'none');
+            hilight.setAttribute(STROKE, NONE);
             break;
         }
       }
@@ -328,6 +345,7 @@ export class MessageSubstrateComponent {
             }
           }),
           delay(800),
+          takeUntilDestroyed(this._destroyRef),
           tap(() => {
             rippleShape.classList.remove(RIPPLE_ANIMATE_CLASS);
             this.rippleEnabled.set(false);
@@ -342,10 +360,10 @@ export class MessageSubstrateComponent {
       localX = e.clientX - x, localY = e.clientY - y, rippleColor = this.rippleColor() ?? DEFAULT_RIPPLE_COLOR, endRadius = Math.max(width, height);
     const rippleShape = this.rippleShape()?.nativeElement;
     if (rippleShape) {
-      rippleShape.setAttribute('cx', String(localX));
-      rippleShape.setAttribute('cy', String(localY));
-      rippleShape.setAttribute('r', String(endRadius));
-      rippleShape.setAttribute('fill', rippleColor);
+      rippleShape.setAttribute(CX, String(localX));
+      rippleShape.setAttribute(CY, String(localY));
+      rippleShape.setAttribute(R, String(endRadius));
+      rippleShape.setAttribute(FILL, rippleColor);
     }
     this.rippleEnabled.set(true);
   }

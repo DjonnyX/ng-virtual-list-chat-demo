@@ -744,7 +744,7 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                             itemsFromStartToScrollEnd = ii;
                         }
                     }
-                } else if (y <= scrollSize + this._scrollStartOffset - componentSize) {
+                } else if (y <= scrollSize - componentSize) {
                     leftItemsWeights.push(componentSize);
                     leftHiddenItemsWeight += componentSize;
                     itemsFromStartToScrollEnd = ii;
@@ -756,19 +756,19 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                         totalItemsToDisplayEndWeight += componentSize;
                         itemsFromDisplayEndToOffsetEnd = itemsFromStartToDisplayEnd + rightItemsOffset;
                     }
-                } else if (y <= scrollSize + this._scrollStartOffset + size + componentSize) {
+                } else if (y <= scrollSize + size + componentSize) {
                     itemsFromStartToDisplayEnd = ii;
                     totalItemsToDisplayEndWeight += componentSize;
                     itemsFromDisplayEndToOffsetEnd = itemsFromStartToDisplayEnd + rightItemsOffset;
 
-                    if (y <= scrollSize + this._scrollStartOffset - componentSize) {
+                    if (y <= scrollSize + componentSize) {
                         switch (itemDisplayMethod) {
                             case ItemDisplayMethods.CREATE: {
                                 leftSizeOfAddedItems += componentSizeDelta;
                                 break;
                             }
-                            case ItemDisplayMethods.NOT_CHANGED:
-                            case ItemDisplayMethods.UPDATE: {
+                            case ItemDisplayMethods.UPDATE:
+                            case ItemDisplayMethods.NOT_CHANGED: {
                                 leftSizeOfUpdatedItems += componentSizeDelta;
                                 break;
                             }
@@ -1115,7 +1115,7 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
 
             while (renderItems > 0) {
                 iterations++;
-                if (iterations >= totalLength || i >= totalLength) {
+                if (iterations > totalLength || i >= totalLength) {
                     break;
                 }
                 const collectionItem = items[i];

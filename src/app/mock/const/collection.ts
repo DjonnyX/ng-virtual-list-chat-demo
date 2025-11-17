@@ -40,20 +40,16 @@ export const COLLECTION_PARAMS = {
  * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
  * All rights reserved.
  */
-const testLinksText = () => {
-  return `Test links:
-https://assets-v2.lottiefiles.com/a/e88e947e-117e-11ee-b32b-1f49352a17f5/s1A5Yx3U5y.gif
-http://eugene-grebennikov.pro/`;
-};
 
-/*
-// HANGS
+// hangs
+// https://media4.giphy.com/media/WoF3yfYupTt8mHc7va/200w.gif
+// 
+
 const testLinksText = () => {
   return `Test links:
-https://media4.giphy.com/media/WoF3yfYupTt8mHc7va/200w.gif
+https://i0.wp.com/www.dogwonder.co.uk/wp-content/uploads/2009/12/tumblr_ku2pvuJkJG1qz9qooo1_r1_400.gif?resize=320%2C320
 http://eugene-grebennikov.pro/`;
 };
-*/
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -63,7 +59,7 @@ http://eugene-grebennikov.pro/`;
  * All rights reserved.
  */
 const generateMessageCollection = (number: number, size: number) => {
-  const items: IVirtualListCollection<IMessage> = [], chunkSize = size; //  (number === 1 ? 1 + Math.round(Math.random() * size) : size);
+  const items: IVirtualListCollection<IMessage> = [], chunkSize = size;
 
   for (let i = 0, l = chunkSize; i < l; i++) {
     const id = COLLECTION_PARAMS.index + 1,

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, inject, signal, TemplateRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, Signal, signal, TemplateRef } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { map, tap, combineLatest, fromEvent } from 'rxjs';
 import { LocalizationService, TextDirections } from '@shared/localization';
@@ -17,12 +17,23 @@ import { validateBoolean } from '../../utils/validation';
 import { FocusAlignments } from '../../enums';
 import { IDisplayObjectConfig, IDisplayObjectMeasures } from '../../models';
 
-const ATTR_AREA_SELECTED = 'area-selected', TABINDEX = 'ng-vl-index', POSITION = 'position', POSITION_ZERO = '0', ID = 'item-id',
+interface ITemplateContext<D = any> {
+  data: D;
+  prevData: D;
+  nextData: D;
+  measures: IDisplayObjectMeasures | undefined;
+  config: IDisplayObjectConfig;
+  reseted: boolean;
+  index: number;
+}
+
+const ATTR_AREA_SELECTED = 'area-selected', XVL_INDEX = 'xvl-index', POSITION = 'position', POSITION_ZERO = '0', ID = 'item-id',
   KEY_SPACE = " ", KEY_ARR_LEFT = "ArrowLeft", KEY_ARR_UP = "ArrowUp", KEY_ARR_RIGHT = "ArrowRight", KEY_ARR_DOWN = "ArrowDown",
-  EVENT_FOCUS_IN = 'focusin', EVENT_FOCUS_OUT = 'focusout', EVENT_KEY_DOWN = 'keydown';
+  EVENT_FOCUS_IN = 'focusin', EVENT_FOCUS_OUT = 'focusout', EVENT_KEY_DOWN = 'keydown',
+  CLASS_NAME_SNAPPED = 'snapped', CLASS_NAME_SNAPPED_OUT = 'snapped-out', CLASS_NAME_FOCUS = 'focus';
 
 const getElementByIndex = (index: number) => {
-  return `[${TABINDEX}="${index}"]`;
+  return `[${XVL_INDEX}="${index}"]`;
 };
 
 /**
@@ -70,29 +81,33 @@ export class NgVirtualListItemComponent extends BaseVirtualListItemComponent {
 
   part = signal<string>(PART_DEFAULT_ITEM);
 
-  regular: boolean = false;
-
   data = signal<IRenderVirtualListItem | undefined>(undefined);
   private _data: IRenderVirtualListItem | undefined = undefined;
   set item(v: IRenderVirtualListItem | undefined) {
-    if (this._data === v || this._data?.id === -1 && !v) {
+    if (this._data === v || this._data?.id === -1 || !v) {
       return;
     }
 
-    if (v) {
-      this._data = v;
+    this._data = v;
 
-      this.updatePartStr(v, this._isSelected, this._isCollapsed);
+    this.updatePartStr(v, this._isSelected, this._isCollapsed);
 
-      this.updateConfig(v);
+    this.updateConfig(v);
 
-      this.updateMeasures(v);
+    this.updateMeasures(v);
 
-      this.update();
+    this.update();
 
-      this.data.set(v);
-    }
+    this.data.set(v);
   }
+
+  classes: Signal<{ [cName: string]: boolean; }>;
+
+  index: Signal<number>;
+
+  templateContext: Signal<ITemplateContext>;
+
+  regular: boolean = false;
 
   private _regularLength: string = SIZE_100_PERSENT;
   set regularLength(v: string) {
@@ -165,6 +180,23 @@ export class NgVirtualListItemComponent extends BaseVirtualListItemComponent {
     this._id = this._service.generateComponentId();
 
     this._elementRef.nativeElement.setAttribute('id', String(this._id));
+
+    this.classes = computed(() => {
+      const data = this.data(), focused = this.focused();
+      return { [CLASS_NAME_SNAPPED]: data?.config?.snapped ?? false, [CLASS_NAME_SNAPPED_OUT]: data?.config?.snappedOut ?? false, [CLASS_NAME_FOCUS]: focused };
+    });
+
+    this.index = computed(() => {
+      return this.config()?.tabIndex ?? -1;
+    });
+
+    this.templateContext = computed(() => {
+      const data = this.data(), measures = this.measures(), config = this.config();
+      return {
+        data: data?.data, prevData: data?.previouseData, nextData: data?.nextData, measures,
+        config, reseted: this.reseted(), index: data?.index ?? - 1
+      };
+    });
 
     const $data = toObservable(this.data),
       $focused = toObservable(this.focused);

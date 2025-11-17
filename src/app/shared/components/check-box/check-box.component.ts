@@ -17,7 +17,9 @@ const DEFAULT_ROUND_CORNER: RoundedCorner = [8, 8, 8, 8],
   CLASS_FOCUSED = 'focused',
   CLASS_DISABLED = 'disabled',
   INHERIT = 'inherit',
-  UNSET = 'unset';
+  UNSET = 'unset',
+  FOCUS = 'focus',
+  BLUR = 'blur';
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -171,14 +173,14 @@ export class CheckBoxComponent implements AfterViewInit, OnDestroy {
       filter(v => !!v),
       map(v => v.nativeElement),
       switchMap(checkbox => {
-        return fromEvent(checkbox, 'focus').pipe(
+        return fromEvent(checkbox, FOCUS).pipe(
           takeUntilDestroyed(this._destroyRef),
           tap(() => {
             this.focused.set(true);
             this.onFocus.emit(true);
           }),
           switchMap(() => {
-            return fromEvent(checkbox, 'blur').pipe(
+            return fromEvent(checkbox, BLUR).pipe(
               takeUntilDestroyed(this._destroyRef),
               tap(() => {
                 this.focused.set(false);

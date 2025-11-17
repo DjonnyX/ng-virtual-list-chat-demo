@@ -11,7 +11,7 @@
     }
 
     <x-virtual-list #list class="list" [ngClass]="listClass" [items]="items" [itemRenderer]="itemRenderer"
-        [snapScrollToBottom]="true" [itemSize]="38" [bufferSize]="5" [maxBufferSize]="5" collectionMode="lazy"
+        [snapScrollToBottom]="true" [itemSize]="38" [bufferSize]="2" [maxBufferSize]="2" collectionMode="lazy"
         [itemConfigMap]="itemsConfigMap" [dynamicSize]="true" [snap]="true" snappingMethod="chat" [defaultItemValue]="defaultItemValue()"
         [scrollStartOffset]="scrollStartOffset()" [scrollEndOffset]="scrollEndOffset()" [snapToEndTransitionInstantOffset]="50"
         methodForSelecting="multi-select" [selectedIds]="selectedItemIds" [snapToEndTransitionInstantOffset]="0"
@@ -23,7 +23,7 @@
         let-measures="measures" let-config="config" let-reseted="reseted">
         <div staticClick [maxStaticClickDistance]="maxStaticClickDistance" class="message-template"
             (onStaticClick)="config.select(data.edited ? true : undefined)">
-            @if (data.data) {
+            @if (data?.data) {
                 @switch (data.data.type) {
                     @case ("typing-indicator") {
                         @let class = {'animate': data.animate, 'deleted': data.deleted};

@@ -12,12 +12,30 @@ const DEFAULT_STROKE_ANIMATION_DURATION = 1000,
   DEFAULT_FILL_COLORS: GradientColor = ["rgba(0, 0, 0, .1)", "rgba(0, 0, 0, .1)"],
   DEFAULT_STROKE_WIDTH = 3,
   RIPPLE_ANIMATE_CLASS = 'animate',
-  DEFAULT_RIPPLE_COLOR = "rgba(0, 0, 0, .1)",
+  DEFAULT_RIPPLE_COLOR = 'rgba(0, 0, 0, .1)',
   SHAPE_NAME = 'x-substrate-shape',
   CLIP_NAME = 'x-substrate-clip',
   GRADIENT_COLOR_NAME = 'stop-color',
   FILL_GRADIENT_NAME = 'x-substrate-fill-gradient',
-  STROKE_GRADIENT_NAME = 'x-substrate-stroke-gradient';
+  STROKE_GRADIENT_NAME = 'x-substrate-stroke-gradient',
+  FILL = 'fill',
+  INHERIT = 'inherit',
+  STROKE_WIDTH = 'stroke-width',
+  DUR = 'dur',
+  X1 = 'x1',
+  X2 = 'x2',
+  ID = 'id',
+  HREF = 'href',
+  CLIP_PATH = 'clip-path',
+  PX = 'px',
+  MS = 'ms',
+  D = 'd',
+  VIEW_BOX = 'viewBox',
+  CX = 'cx',
+  CY = 'cy',
+  R = 'r',
+  STROKE = 'stroke',
+  NONE = 'none';
 
 const circlePath = (cx: number, cy: number, r: number) => {
   return 'M ' + cx + ' ' + cy + ' m -' + r + ', 0 a ' + r + ',' + r + ' 0 1,1 ' + (r * 2) + ',0 a ' + r + ',' + r + ' 0 1,1 -' + (r * 2) + ',0';
@@ -137,13 +155,13 @@ export class SubstrateComponent {
 
           const shape = this.shape()?.nativeElement;
           if (shape) {
-            shape.setAttribute('fill', `url(#${FILL_GRADIENT_NAME}${this._id})`);
+            shape.setAttribute(FILL, `url(#${FILL_GRADIENT_NAME}${this._id})`);
           }
         }
       } else {
         const shape = this.shape()?.nativeElement;
         if (shape) {
-          shape.setAttribute('fill', `inherit`);
+          shape.setAttribute(FILL, INHERIT);
         }
       }
     });
@@ -151,28 +169,28 @@ export class SubstrateComponent {
     effect(() => {
       const strokeWidth = this.strokeWidth(), shape = this.shape()?.nativeElement;
       if (shape) {
-        shape.setAttribute('stroke-width', `${strokeWidth}`);
+        shape.setAttribute(STROKE_WIDTH, `${strokeWidth}`);
       }
     });
 
     effect(() => {
       const strokeWidth = this.strokeWidth(), path = this.path()?.nativeElement;
       if (path) {
-        path.setAttribute('stroke-width', `${strokeWidth * 2}`);
+        path.setAttribute(STROKE_WIDTH, `${strokeWidth * 2}`);
       }
     });
 
     effect(() => {
       const strokeWidth = this.strokeWidth(), hilight = this.hilight()?.nativeElement;
       if (hilight) {
-        hilight.setAttribute('stroke-width', `${strokeWidth * 2}`);
+        hilight.setAttribute(STROKE_WIDTH, `${strokeWidth * 2}`);
       }
     });
 
     effect(() => {
       const strokeAnimationDuration = this.strokeAnimationDuration(), strokeAnimation = this.strokeAnimation()?.nativeElement;
       if (strokeAnimation) {
-        strokeAnimation.setAttribute('dur', `${strokeAnimationDuration ?? DEFAULT_STROKE_ANIMATION_DURATION}ms`);
+        strokeAnimation.setAttribute(DUR, `${strokeAnimationDuration ?? DEFAULT_STROKE_ANIMATION_DURATION}${MS}`);
       }
     });
 
@@ -181,8 +199,8 @@ export class SubstrateComponent {
       if (Array.isArray(fillColorPositions) && fillColorPositions.length === 2) {
         const fillGradient = this.fillGradient();
         if (fillGradient) {
-          fillGradient.nativeElement.setAttribute('x1', `${fillColorPositions[0]}px`);
-          fillGradient.nativeElement.setAttribute('x2', `${fillColorPositions[1]}px`);
+          fillGradient.nativeElement.setAttribute(X1, `${fillColorPositions[0]}${PX}`);
+          fillGradient.nativeElement.setAttribute(X2, `${fillColorPositions[1]}${PX}`);
         }
       }
     });
@@ -201,58 +219,58 @@ export class SubstrateComponent {
     effect(() => {
       const fillGradient = this.fillGradient();
       if (fillGradient) {
-        fillGradient.nativeElement.setAttribute('id', `${FILL_GRADIENT_NAME}${this._id}`);
+        fillGradient.nativeElement.setAttribute(ID, `${FILL_GRADIENT_NAME}${this._id}`);
       }
     });
 
     effect(() => {
       const strokeGradient = this.strokeGradient();
       if (strokeGradient) {
-        strokeGradient.nativeElement.setAttribute('id', `${STROKE_GRADIENT_NAME}${this._id}`);
+        strokeGradient.nativeElement.setAttribute(ID, `${STROKE_GRADIENT_NAME}${this._id}`);
       }
     });
 
     effect(() => {
       const path = this.path();
       if (path) {
-        path.nativeElement.setAttribute('id', `${SHAPE_NAME}${this._id}`);
+        path.nativeElement.setAttribute(ID, `${SHAPE_NAME}${this._id}`);
       }
     });
 
     effect(() => {
       const clip = this.clip();
       if (clip) {
-        clip.nativeElement.setAttribute('id', `${CLIP_NAME}${this._id}`);
+        clip.nativeElement.setAttribute(ID, `${CLIP_NAME}${this._id}`);
       }
     });
 
     effect(() => {
       const clipUse = this.clipUse();
       if (clipUse) {
-        clipUse.nativeElement.setAttribute('href', `#${SHAPE_NAME}${this._id}`);
+        clipUse.nativeElement.setAttribute(HREF, `#${SHAPE_NAME}${this._id}`);
       }
     });
 
     effect(() => {
       const shape = this.shape();
       if (shape) {
-        shape.nativeElement.setAttribute('clip-path', `url(#${CLIP_NAME}${this._id})`);
-        shape.nativeElement.setAttribute('href', `#${SHAPE_NAME}${this._id}`);
+        shape.nativeElement.setAttribute(CLIP_PATH, `url(#${CLIP_NAME}${this._id})`);
+        shape.nativeElement.setAttribute(HREF, `#${SHAPE_NAME}${this._id}`);
       }
     });
 
     effect(() => {
       const hilight = this.hilight();
       if (hilight) {
-        hilight.nativeElement.setAttribute('clip-path', `url(#${CLIP_NAME}${this._id})`);
-        hilight.nativeElement.setAttribute('href', `#${SHAPE_NAME}${this._id}`);
+        hilight.nativeElement.setAttribute(CLIP_PATH, `url(#${CLIP_NAME}${this._id})`);
+        hilight.nativeElement.setAttribute(HREF, `#${SHAPE_NAME}${this._id}`);
       }
     });
 
     effect(() => {
       const rippleShape = this.rippleShape();
       if (rippleShape) {
-        rippleShape.nativeElement.setAttribute('clip-path', `url(#${CLIP_NAME}${this._id})`);
+        rippleShape.nativeElement.setAttribute(CLIP_PATH, `url(#${CLIP_NAME}${this._id})`);
       }
     });
 
@@ -261,9 +279,9 @@ export class SubstrateComponent {
         ww = (this.width() || minSize), w = ww >= minSize ? ww : minSize,
         hh = (this.height() || minSize), h = hh >= minSize ? hh : minSize;
       if (svg && path) {
-        svg.style.width = `${w}px`;
-        svg.style.height = `${h}px`;
-        svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+        svg.style.width = `${w}${PX}`;
+        svg.style.height = `${h}${PX}`;
+        svg.setAttribute(VIEW_BOX, `0 0 ${w} ${h}`);
         switch (this.mode()) {
           case SubstarateModes.CIRCLE: {
             const r = Math.min(w, h) * .5, shape = circlePath(w * .5, h * .5, r);
@@ -273,13 +291,13 @@ export class SubstrateComponent {
           case SubstarateModes.ROUNDED_RECTANGLE: {
             const corner = Array.isArray(roundCorner) && roundCorner.length === 4 ? roundCorner : [0, 0, 0, 0];
             const shape = roundedRectPath(w, h, corner[0], corner[1], corner[2], corner[3]);
-            path.setAttribute('d', shape);
+            path.setAttribute(D, shape);
             break;
           }
           case SubstarateModes.RECTANGLE:
           default: {
             const shape = roundedRectPath(w, h, 0, 0, 0, 0);
-            path.setAttribute('d', shape);
+            path.setAttribute(D, shape);
             break;
           }
         }
@@ -291,12 +309,12 @@ export class SubstrateComponent {
       if (shape) {
         switch (type) {
           case SubstarateStyles.STROKE: {
-            shape.setAttribute('stroke', `url(#${STROKE_GRADIENT_NAME}${this._id})`);
+            shape.setAttribute(STROKE, `url(#${STROKE_GRADIENT_NAME}${this._id})`);
             break;
           }
           case SubstarateStyles.NONE:
           default:
-            shape.setAttribute('stroke', 'none');
+            shape.setAttribute(STROKE, NONE);
             break;
         }
       }
@@ -307,12 +325,12 @@ export class SubstrateComponent {
       if (hilight) {
         switch (type) {
           case SubstarateStyles.STROKE: {
-            hilight.setAttribute('stroke', `url(#${STROKE_GRADIENT_NAME}${this._id})`);
+            hilight.setAttribute(STROKE, `url(#${STROKE_GRADIENT_NAME}${this._id})`);
             break;
           }
           case SubstarateStyles.NONE:
           default:
-            hilight.setAttribute('stroke', 'none');
+            hilight.setAttribute(STROKE, NONE);
             break;
         }
       }
@@ -349,10 +367,10 @@ export class SubstrateComponent {
       localX = e.clientX - x, localY = e.clientY - y, rippleColor = this.rippleColor() ?? DEFAULT_RIPPLE_COLOR, endRadius = Math.max(width, height);
     const rippleShape = this.rippleShape()?.nativeElement;
     if (rippleShape) {
-      rippleShape.setAttribute('cx', String(localX));
-      rippleShape.setAttribute('cy', String(localY));
-      rippleShape.setAttribute('r', String(endRadius));
-      rippleShape.setAttribute('fill', rippleColor);
+      rippleShape.setAttribute(CX, String(localX));
+      rippleShape.setAttribute(CY, String(localY));
+      rippleShape.setAttribute(R, String(endRadius));
+      rippleShape.setAttribute(FILL, rippleColor);
     }
     this.rippleEnabled.set(true);
   }

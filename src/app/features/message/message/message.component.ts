@@ -19,13 +19,14 @@ import { IMessageParams } from './interfaces/message-params';
 import { formatTime } from './utils';
 
 const DEFAULT_STROKE_ANIMATION_DURATION = 1000,
-  DEFAULT_SIZE = 200,
   DEFAULT_STROKE_WIDTH = 3,
   DEFAULT_STROKE_COLOR: GradientColor = ['rgba(255,255,255,0)', 'rgba(195, 0, 255, 0.17)'],
   DEFAULT_FILL_COLOR: GradientColor = ['rgb(255, 255, 255)', 'rgb(185, 210, 233)'],
   CLASS_REMOVAL = 'removal',
   CLASS_SELECTED = 'selected',
-  CLASS_FOCUSED = 'focused';
+  CLASS_FOCUSED = 'focused',
+  IN = 'in',
+  OUT = 'out';
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -87,6 +88,8 @@ export class MessageComponent implements OnDestroy {
 
   theme: Signal<ITheme | undefined>;
 
+  themeType: Signal<'in' | 'out'>;
+
   time: Signal<string | undefined>;
 
   private _themeService = inject(ThemeService);
@@ -94,16 +97,22 @@ export class MessageComponent implements OnDestroy {
   private _resizeObserver: ResizeObserver;
 
   bounds = signal<ISize>({
-    width: this._container()?.nativeElement?.offsetWidth || DEFAULT_SIZE,
-    height: this._container()?.nativeElement?.offsetHeight || DEFAULT_SIZE,
+    width: this._container()?.nativeElement?.offsetWidth || 0,
+    height: this._container()?.nativeElement?.offsetHeight || 0,
   });
 
   private _onContainerResizeHandler = () => {
     const el = this._container()?.nativeElement as HTMLDivElement;
-    if (el && el.offsetWidth && el.offsetHeight) {
-      this.bounds.set({ width: el.offsetWidth || DEFAULT_SIZE, height: el.offsetHeight || DEFAULT_SIZE });
+    if (el) {
+      const width = el.offsetWidth, height = el.offsetHeight, bounds = this.bounds();
+      if (bounds.width === width && bounds.height === height) {
+        return;
+      }
+      this.bounds.set({ width, height });
     }
   }
+
+  actualBounds: Signal<ISize>;
 
   @HostBinding('class')
   get hostClasses(): { [key: string]: boolean } {
@@ -128,9 +137,25 @@ export class MessageComponent implements OnDestroy {
       }),
     ).subscribe();
 
+    this.theme = toSignal(this._themeService.$theme);
+
     this.time = computed(() => {
       const data = this.data();
       return data ? formatTime(data.data.dateTime) : undefined;
+    });
+
+    this.themeType = computed(() => {
+      return this.params()?.isIncoming === true ? IN : OUT;
+    });
+
+    this.actualBounds = computed(() => {
+      const bounds = this.bounds(), measures = this.measures();
+      if (bounds) {
+        return { width: bounds.width || measures?.width || 0, height: bounds.height || measures?.height || 0 };
+      } if (measures) {
+        return { width: measures?.width || 0, height: measures?.height || 0 };
+      }
+      return { width: 0, height: 0 };
     });
 
     effect(() => {
@@ -160,9 +185,9 @@ export class MessageComponent implements OnDestroy {
     });
 
     effect(() => {
-      const theme = this.theme();
+      const theme = this.theme(), type = this.themeType();
       if (theme) {
-        const preset = this._themeService.getPreset(theme?.chat.messages.message.content);
+        const preset = this._themeService.getPreset(theme?.chat.messages.message.content[type]);
         if (preset) {
           this.rippleColor.set(preset.rippleColor);
         }
@@ -170,9 +195,9 @@ export class MessageComponent implements OnDestroy {
     });
 
     effect(() => {
-      const classes = this.classes(), currentTheme = this.theme(), containerElement = this._container()?.nativeElement;
+      const classes = this.classes(), type = this.themeType(), currentTheme = this.theme(), containerElement = this._container()?.nativeElement;
       if (containerElement) {
-        const preset = this._themeService.getPreset(currentTheme?.chat.messages.message.content);
+        const preset = this._themeService.getPreset(currentTheme?.chat.messages.message.content[type]);
         if (preset) {
           if (classes[CLASS_REMOVAL] && classes[CLASS_SELECTED]) {
             this.fillColors.set(preset.removalSelected.fill ?? DEFAULT_FILL_COLOR);

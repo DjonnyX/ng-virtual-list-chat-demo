@@ -93,9 +93,9 @@
     }
 
     &.selected {
-        user-select: auto;
-        -moz-user-select: auto;
-        -webkit-user-select: auto;
+        user-select: text;
+        -moz-user-select: text;
+        -webkit-user-select: text;
 
         .message-container {
             &.in {

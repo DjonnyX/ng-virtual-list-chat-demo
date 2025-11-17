@@ -16,7 +16,7 @@
         word-break: break-word;
         box-sizing: border-box;
         overflow: hidden;
-        transition: opacity 100ms ease-out 50ms;
+        transition: opacity 100ms ease-out;
 
         &.reseted {
             opacity: 0;

@@ -1,7 +1,6 @@
 @let d = data();
 @let c = config();
-@let m = measures();
-@let b = bounds();
+@let b = actualBounds();
 @let mTime = time();
 @let isEditing = editing();
 @let substrMode = substarateMode();
@@ -10,21 +9,24 @@
 @let type = substrateType();
 @let stroke = strokeColor();
 @let gradientFillPositions = fillPositions();
-@if (d && c && m) {
-    <x-message-substrate #substrate class="message-substrate" [type]="type" [width]="b.width" [height]="b.height" [mode]="substrMode"
-        [strokeColors]="stroke" [strokeWidth]="strokeWidth()" [fillColors]="fillColors()" [fillPositions]="gradientFillPositions"
-        [rippleColor]="rippleColor()"></x-message-substrate>
+@let tType = themeType();
+@if (d && c) {
+    <x-message-substrate #substrate class="message-substrate" [type]="type" [width]="b.width" [height]="b.height"
+        [mode]="substrMode" [strokeColors]="stroke" [strokeWidth]="strokeWidth()" [fillColors]="fillColors()"
+        [fillPositions]="gradientFillPositions" [rippleColor]="rippleColor()"></x-message-substrate>
     <div #container class="message-container" [ngClass]="class" (pointerdown)="substrate.ripple($event)">
         @if (d?.['image']) {
             <div class="complex-message">
                 <img [src]="d?.['image']" />
-                <x-editable-text class="text" [text]="d.data.text" [time]="mTime" [searchPattern]="searchedWords" [editing]="isEditing"
-                    [selectable]="c.selected" substringClass="search-substring" (textAreaClick)="onTextAreaClickHandler($event)"
+                <x-editable-text class="text" [themeType]="tType" [text]="d.data.text" [time]="mTime"
+                    [searchPattern]="searchedWords" [editing]="isEditing" [selectable]="c.selected"
+                    substringClass="search-substring" (textAreaClick)="onTextAreaClickHandler($event)"
                     (changeText)="onEditedTextHandler($event, d)" />
             </div>
         } @else {
-            <x-editable-text class="text" [text]="d.data.text" [time]="mTime" [searchPattern]="searchedWords" [editing]="isEditing"
-                [selectable]="c.selected" substringClass="search-substring" (textAreaClick)="onTextAreaClickHandler($event)"
+            <x-editable-text class="text" [themeType]="tType" [text]="d.data.text" [time]="mTime"
+                [searchPattern]="searchedWords" [editing]="isEditing" [selectable]="c.selected"
+                substringClass="search-substring" (textAreaClick)="onTextAreaClickHandler($event)"
                 (changeText)="onEditedTextHandler($event, d)" />
         }
         <!-- <x-message-bottom-bar /> -->

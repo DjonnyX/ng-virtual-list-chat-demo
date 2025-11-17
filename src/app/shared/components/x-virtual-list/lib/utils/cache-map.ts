@@ -19,7 +19,7 @@ type OnChangeEventListener = (version: number) => void;
 
 type CacheMapListeners = OnChangeEventListener;
 
-const MAX_SCROLL_DIRECTION_POOL = 50, CLEAR_SCROLL_DIRECTION_TO = 10,
+const MAX_SCROLL_DIRECTION_POOL = 10, CLEAR_SCROLL_DIRECTION_TO = 10,
     DIR_BACK = '-1', DIR_NONE = '0', DIR_FORWARD = '1';
 
 /**

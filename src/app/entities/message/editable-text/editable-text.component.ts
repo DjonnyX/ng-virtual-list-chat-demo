@@ -2,7 +2,7 @@ import { Component, computed, DestroyRef, effect, ElementRef, inject, input, OnD
 import { CommonModule } from '@angular/common';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, from, fromEvent, map, of, startWith, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, fromEvent, map, of, switchMap, tap } from 'rxjs';
 import { SearchHighlightDirective } from '@shared/directives';
 import { formatText } from '@shared/utils';
 import { ThemeService } from '@shared/theming';
@@ -22,7 +22,9 @@ const DEFAULT_SEARCH_SUBSTRING_CLASS = 'search-substring',
   MAX_TEXTAREA_HEIGHT = 320,
   HIDDEN = 'hidden',
   AUTO = 'auto',
-  NONE = 'none';
+  NONE = 'none',
+  FOCUS = 'focus',
+  BLUR = 'blur';
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -49,6 +51,8 @@ export class EditableTextComponent implements OnDestroy {
   text = input<string>();
 
   time = input<string | undefined>();
+
+  themeType = input.required<'in' | 'out'>();
 
   searchSubstringClass = input<string>(DEFAULT_SEARCH_SUBSTRING_CLASS);
 
@@ -134,7 +138,7 @@ export class EditableTextComponent implements OnDestroy {
     $textarea.pipe(
       takeUntilDestroyed(),
       switchMap(textarea => {
-        return fromEvent(textarea, 'focus').pipe(
+        return fromEvent(textarea, FOCUS).pipe(
           takeUntilDestroyed(this._destroyRef),
           tap(() => {
             this.focused.set(true);
@@ -146,7 +150,7 @@ export class EditableTextComponent implements OnDestroy {
     $textarea.pipe(
       takeUntilDestroyed(),
       switchMap(textarea => {
-        return fromEvent(textarea, 'blur').pipe(
+        return fromEvent(textarea, BLUR).pipe(
           takeUntilDestroyed(this._destroyRef),
           tap(() => {
             this.focused.set(false);
@@ -172,9 +176,9 @@ export class EditableTextComponent implements OnDestroy {
     });
 
     effect(() => {
-      const theme = this.theme();
+      const theme = this.theme(), type = this.themeType();
       if (theme) {
-        const preset = this._themeService.getPreset(theme.chat.messages.message.content);
+        const preset = this._themeService.getPreset(theme.chat.messages.message.content[type]);
         if (preset) {
           this.searchSubstringBackground.set(preset.searchSubstringColor);
         }
@@ -182,9 +186,9 @@ export class EditableTextComponent implements OnDestroy {
     });
 
     effect(() => {
-      const theme = this.theme();
+      const theme = this.theme(), type = this.themeType();
       if (theme) {
-        const preset = this._themeService.getPreset(theme.chat.messages.message.content);
+        const preset = this._themeService.getPreset(theme.chat.messages.message.content[type]);
         if (preset) {
           this.messageStatusColor.set(preset.statusColor);
         }
@@ -192,9 +196,9 @@ export class EditableTextComponent implements OnDestroy {
     });
 
     effect(() => {
-      const theme = this.theme();
+      const theme = this.theme(), type = this.themeType();
       if (theme) {
-        const preset = this._themeService.getPreset(theme.chat.messages.message.content.textEditor.link);
+        const preset = this._themeService.getPreset(theme.chat.messages.message.content[type].textEditor.link);
         if (preset) {
           this.linkNormalColor.set(preset.normal.color);
           this.linkVisitedColor.set(preset.visited.color);
@@ -205,12 +209,12 @@ export class EditableTextComponent implements OnDestroy {
     });
 
     effect(() => {
-      const theme = this.theme(), editor = this.editor()?.nativeElement, focus = this.focused();
+      const theme = this.theme(), type = this.themeType(), editor = this.editor()?.nativeElement, focus = this.focused();
       if (theme && editor) {
-        const preset = this._themeService.getPreset(theme.chat.messages.message.content);
+        const preset = this._themeService.getPreset(theme.chat.messages.message.content[type]);
         if (preset) {
           editor.style.backgroundColor = preset.editingTextBackground;
-          editor.style.outline = focus ? preset.editingTextFocusedOutline : 'none';
+          editor.style.outline = focus ? preset.editingTextFocusedOutline : NONE;
         }
       }
     });
@@ -244,7 +248,7 @@ export class EditableTextComponent implements OnDestroy {
       takeUntilDestroyed(),
       distinctUntilChanged(),
       switchMap(([selectable, text, time]) => {
-        return from(formatText(text, time, {
+        return of(formatText(text, time, {
           selectable,
           loading: false,
         })).pipe(

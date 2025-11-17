@@ -73,6 +73,7 @@ export class Tracker<C extends BaseVirtualListItemComponent = any> {
         }
 
         const untrackedItems = [...components], newTrackItems: Array<any> = [],
+            untrackedComponentsByTypeMap: { [type: string]: Array<{ comp: ComponentRef<C>; index: number }>; } = {},
             isDown = direction === 0 || direction === 1;
         let isRegularSnapped = false;
 
@@ -125,9 +126,35 @@ export class Tracker<C extends BaseVirtualListItemComponent = any> {
             }
         }
 
+        if (untrackedItems.length > 0) {
+            for (let i = 0, l = untrackedItems.length; i < l; i++) {
+                const comp = untrackedItems[i], type = comp?.instance.item?.data?.data?.type;
+                if (!Array.isArray(untrackedComponentsByTypeMap[type])) {
+                    untrackedComponentsByTypeMap[type] = [];
+                }
+                untrackedComponentsByTypeMap[type].push({ comp, index: i });
+            }
+        }
+
         for (let i = 0, l = newTrackItems.length; i < l; i++) {
             if (untrackedItems.length > 0) {
-                const comp = untrackedItems.shift(), item = newTrackItems[i], itemTrackingProperty = item.id;
+                const item = newTrackItems[i], itemTrackingProperty = item.id,
+                    type = item.data?.data?.type;
+                let comp: ComponentRef<C> | undefined;
+                if (type) {
+                    const list = untrackedComponentsByTypeMap[type];
+                    if (Array.isArray(list) && list.length > 0) {
+                        const untrackedItem = list.shift();
+                        if (untrackedItem) {
+                            comp = untrackedItem.comp;
+                            untrackedItems.slice(untrackedItem.index, 1);
+                        }
+                    }
+                }
+
+                if (!comp) {
+                    comp = untrackedItems.shift();
+                }
 
                 if (comp) {
                     if (snapedComponent) {

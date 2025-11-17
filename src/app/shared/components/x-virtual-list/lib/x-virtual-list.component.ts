@@ -50,7 +50,7 @@ interface IScrollParams {
   cb?: () => void;
 }
 
-const MIN_SCROLL_TO_START_PIXELS = 5,
+const MIN_SCROLL_TO_START_PIXELS = 10,
   ROLE_LIST = 'list',
   ROLE_LIST_BOX = 'listbox',
   ITEM_ID = 'item-id',
@@ -815,7 +815,7 @@ export class XVirtualListComponent implements OnDestroy {
   }
 
   private itemToFocus = (element: HTMLElement, position: number, align: FocusAlignment = FocusAlignments.CENTER) => {
-    const scroller = this._scroller()?.nativeElement;
+    const scroller = this._scrollerComponent();
     if (scroller) {
       const { width, height } = this._bounds()!, { width: elementWidth, height: elementHeight } = element.getBoundingClientRect(),
         isVertical = this._isVertical;
@@ -840,7 +840,7 @@ export class XVirtualListComponent implements OnDestroy {
       }
       if (!Number.isNaN(pos)) {
         this._trackBox.cancelScrollSnappingToEnd(true);
-        const params: ScrollToOptions = { [this._isVertical ? TOP_PROP_NAME : LEFT_PROP_NAME]: pos, behavior: 'instant' };
+        const params: IScrollToParams = { [this._isVertical ? TOP_PROP_NAME : LEFT_PROP_NAME]: pos, behavior: 'instant' };
         scroller.scrollTo(params);
       }
     }
@@ -941,7 +941,7 @@ export class XVirtualListComponent implements OnDestroy {
       tap(prepared => {
         _prepared = prepared;
       }),
-      delay(100),
+      delay(1),
       takeUntilDestroyed(this._destroyRef),
       tap(prepared => {
         this.classes.set({ prepared });
@@ -1271,7 +1271,7 @@ export class XVirtualListComponent implements OnDestroy {
           const { width, height, x, y } = bounds, viewportSize = (isVertical ? height : width);
 
           let scrollLength = Math.round(this._totalSize()) ?? 0,
-            actualScrollLength = Math.round(scrollLength === 0 ? 0 : scrollLength - viewportSize),
+            actualScrollLength = Math.round(scrollLength === 0 ? 0 : scrollLength > viewportSize ? scrollLength - viewportSize : scrollLength),
             roundedMaxPosition = Math.round(actualScrollLength),
             scrollPosition = Math.round(actualScrollSize);
 
@@ -1280,18 +1280,18 @@ export class XVirtualListComponent implements OnDestroy {
             bufferSize, maxBufferSize, scrollSize: actualScrollSize, snap, enabledBufferOptimization,
           };
 
-          if (snapScrollToBottom && !_prepared) {
+          if (snapScrollToBottom && scrollLength > viewportSize && !_prepared) {
             const { totalSize: calculatedTotalSize } = this._trackBox.getMetrics(items, itemConfigMap, opts);
             totalSize = calculatedTotalSize;
 
-            actualScrollSize = (totalSize > totalSize ? totalSize - viewportSize : 0);
+            actualScrollSize = (totalSize > viewportSize ? totalSize - viewportSize : 0);
             const { displayItems: calculatedDisplayItems, totalSize: calculatedTotalSize1 } =
               this._trackBox.updateCollection(items, itemConfigMap, { ...opts, scrollSize: actualScrollSize });
 
             displayItems = calculatedDisplayItems;
             totalSize = calculatedTotalSize1;
             scrollLength = Math.round(totalSize) ?? 0;
-            actualScrollLength = Math.round(scrollLength === 0 ? 0 : scrollLength - viewportSize);
+            actualScrollLength = Math.round(scrollLength === 0 ? 0 : scrollLength > viewportSize ? scrollLength - viewportSize : scrollLength);
             roundedMaxPosition = Math.round(actualScrollLength);
             scrollPosition = Math.round(actualScrollSize);
           } else {
@@ -1866,7 +1866,6 @@ export class XVirtualListComponent implements OnDestroy {
         comp.instance.regular = true;
         this._snapedDisplayComponent = comp;
         this._trackBox.snapedDisplayComponent = this._snapedDisplayComponent;
-
         this._resizeSnappedObserver = new ResizeObserver(this._resizeSnappedComponentHandler);
         this._resizeSnappedObserver.observe(comp.instance.element);
       }
@@ -1878,15 +1877,13 @@ export class XVirtualListComponent implements OnDestroy {
 
     const maxLength = displayItems.length, components = this._displayComponents;
 
-    while (components.length < maxLength) {
-      if (_listContainerRef) {
+    if (_listContainerRef) {
+      while (components.length < maxLength) {
         const comp = _listContainerRef.createComponent(this._itemComponentClass);
         components.push(comp);
-
         this._componentsResizeObserver.observe(comp.instance.element);
       }
     }
-
     this.resetRenderers();
   }
 
@@ -2029,7 +2026,7 @@ export class XVirtualListComponent implements OnDestroy {
 
     if (this._displayComponents) {
       while (this._displayComponents.length > 0) {
-        const comp = this._displayComponents.pop();
+        const comp = this._displayComponents.shift();
         comp?.destroy();
       }
     }

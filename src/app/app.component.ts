@@ -1,6 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, ElementRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';
 import { ThemeNames, ThemeService } from '@shared/theming';
+import { fromEvent, take, tap } from 'rxjs';
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -20,6 +22,8 @@ import { ThemeNames, ThemeService } from '@shared/theming';
 export class AppComponent {
   private _themeService = inject(ThemeService);
 
+  private _elementRef = inject(ElementRef);
+
   constructor() {
     const appResizeHandler = () => document.body.style.height = `${window.innerHeight}px`;
     window.addEventListener('resize', appResizeHandler);
@@ -27,5 +31,16 @@ export class AppComponent {
     appResizeHandler();
 
     this._themeService.name = ThemeNames[0];
+
+    const el = this._elementRef.nativeElement;
+    fromEvent<KeyboardEvent>(el, 'keydown', { passive: false, capture: false }).pipe(
+      takeUntilDestroyed(),
+      tap(e => {
+        if (e.ctrlKey && e.code == 'KeyA') {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+        }
+      })
+    ).subscribe();
   }
 }

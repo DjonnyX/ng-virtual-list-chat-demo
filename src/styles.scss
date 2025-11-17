@@ -15,6 +15,11 @@
     --deleted-item-height: 0px;
 }
 
+html,
+body {
+    overflow: hidden;
+}
+
 body {
     font-family: Arial, Helvetica, sans-serif;
     letter-spacing: 0.5px;
@@ -24,7 +29,6 @@ body {
     width: calc(100%);
     height: calc(100%);
     position: relative;
-    overflow: hidden;
 }
 
 textarea:focus,

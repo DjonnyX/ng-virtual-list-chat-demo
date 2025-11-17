@@ -93,6 +93,8 @@ export const MARGIN_LEFT = 'marginLeft';
 
 export const PX = 'px';
 
+export const INTERACTIVE = 'interactive';
+
 export const WHEEL = 'wheel';
 
 export const TOUCH_MOVE = 'touchmove';

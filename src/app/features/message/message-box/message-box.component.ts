@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, DestroyRef, effect, ElementRef, inject, input, OnDestroy, output, signal, Signal, viewChild } from '@angular/core';
+import { AfterViewInit, Component, computed, DestroyRef, effect, ElementRef, inject, input, OnDestroy, output, signal, Signal, viewChild } from '@angular/core';
 import { CdkMenuTrigger } from '@angular/cdk/menu';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, Subject, switchMap, take, tap } from 'rxjs';
@@ -21,7 +21,7 @@ import { MessageComponent } from '../message/message.component';
 import { IMessageParams } from '../message/interfaces';
 import { IDeleteEventData } from './interfaces';
 
-const DEFAULT_SIZE = 200,
+const IN = 'in', OUT = 'out',
   CLASS_RESETED = 'reseted', CLASS_NEW = 'new', CLASS_IN = 'in', CLASS_OUT = 'out', CLASS_SIMPLE = 'simple', CLASS_END_OF_MESSAGES = 'end-of-messages',
   CLASS_REMOVAL = 'removal', CLASS_DELETED = 'deleted', CLASS_ANIMATE = 'animate', CLASS_EDITED = 'edited', CLASS_RTL = TextDirections.RTL,
   CLASS_SELECTED = 'selected', CLASS_FOCUSED = 'focused', CLASS_FIRST_IN_GROUP = 'first-in-group', CLASS_FIREFOX = 'firefox',
@@ -80,7 +80,7 @@ const getContextMenuNormal = (localization: ILocalization | undefined): IContext
   templateUrl: './message-box.component.html',
   styleUrl: './message-box.component.scss'
 })
-export class MessageBoxComponent implements OnDestroy {
+export class MessageBoxComponent implements AfterViewInit, OnDestroy {
   private _container = viewChild<ElementRef<HTMLDivElement>>('container');
 
   private _menuButton = viewChild<MessageMenuButtonComponent>('menuButton');
@@ -112,6 +112,8 @@ export class MessageBoxComponent implements OnDestroy {
   private tmpValue = signal<string | undefined>(undefined);
 
   contextMenuPreset = signal<ContextMenuPresets>(ContextMenuPresets.PRIMARY);
+
+  initialized = signal<boolean>(false);
 
   classes: Signal<{ [className: string]: boolean; }>;
 
@@ -159,14 +161,18 @@ export class MessageBoxComponent implements OnDestroy {
   private _resizeObserver: ResizeObserver;
 
   bounds = signal<ISize>({
-    width: this._container()?.nativeElement?.offsetWidth || DEFAULT_SIZE,
-    height: this._container()?.nativeElement?.offsetHeight || DEFAULT_SIZE,
+    width: this._container()?.nativeElement?.offsetWidth || 0,
+    height: this._container()?.nativeElement?.offsetHeight || 0,
   });
 
   private _onContainerResizeHandler = () => {
     const el = this._container()?.nativeElement as HTMLDivElement;
-    if (el && el.offsetWidth && el.offsetHeight) {
-      this.bounds.set({ width: el.offsetWidth || DEFAULT_SIZE, height: el.offsetHeight || DEFAULT_SIZE });
+    if (el) {
+      const width = el.offsetWidth, height = el.offsetHeight, bounds = this.bounds();
+      if (bounds.width === width && bounds.height === height) {
+        return;
+      }
+      this.bounds.set({ width, height });
     }
   }
 
@@ -188,21 +194,6 @@ export class MessageBoxComponent implements OnDestroy {
       }),
     ).subscribe();
 
-    // $data.pipe(
-    //   takeUntilDestroyed(),
-    //   filter(v => !!v),
-    //   switchMap(data => of(data.id)),
-    //   distinctUntilChanged(),
-    //   tap(() => {
-    //     this.fadeOut.set(true);
-    //   }),
-    //   delay(1),
-    //   takeUntilDestroyed(this._destroyRef),
-    //   tap(() => {
-    //     this.fadeOut.set(false);
-    //   }),
-    // ).subscribe();
-
     $menuOpen.pipe(
       takeUntilDestroyed(),
       switchMap(() => $menuButton.pipe(
@@ -219,16 +210,17 @@ export class MessageBoxComponent implements OnDestroy {
     this.theme = toSignal(this._themeService.$theme);
 
     this.params = computed(() => {
-      const locale = this.locale(), reseted = this.reseted(), data = this.data(), prevData = this.prevData(), nextData = this.nextData();
+      const locale = this.locale(), reseted = this.reseted(), initialized = this.initialized(), data = this.data(),
+        prevData = this.prevData(), nextData = this.nextData();
       return {
-        reseted,
+        reseted: !initialized || reseted,
         isRTL: this._localizationService.textDirection === TextDirections.RTL,
-        isIncoming: data?.data?.incomType === 'in',
-        isOutgoing: data?.data?.incomType === 'out',
-        prevIsIncoming: prevData?.data?.incomType === 'in',
-        prevIsOutgoing: prevData?.data?.incomType === 'out',
-        nextIsIncoming: nextData?.data?.incomType === 'in',
-        nextIsOutgoing: nextData?.data?.incomType === 'out',
+        isIncoming: data?.data?.incomType === IN,
+        isOutgoing: data?.data?.incomType === OUT,
+        prevIsIncoming: prevData?.data?.incomType === IN,
+        prevIsOutgoing: prevData?.data?.incomType === OUT,
+        nextIsIncoming: nextData?.data?.incomType === IN,
+        nextIsOutgoing: nextData?.data?.incomType === OUT,
         type: data?.data.type,
         prevType: prevData?.data.type,
         nextType: nextData?.data.type,
@@ -266,9 +258,9 @@ export class MessageBoxComponent implements OnDestroy {
     });
 
     this.classes = computed(() => {
-      const params = this.params(), { reseted } = params;
+      const params = this.params(), { reseted } = params, initialized = this.initialized;
       if (reseted) {
-        return { [CLASS_RESETED]: reseted, } as any;
+        return { [CLASS_RESETED]: !initialized || reseted, } as any;
       }
 
       const data = this.data(), config = this.config() as any,
@@ -297,6 +289,10 @@ export class MessageBoxComponent implements OnDestroy {
         }
       }
     });
+  }
+
+  ngAfterViewInit(): void {
+    this.initialized.set(true);
   }
 
   onEditItemHandler(event: Event, item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, selected: boolean) {

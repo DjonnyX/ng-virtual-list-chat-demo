@@ -17,7 +17,9 @@ const DEFAULT_ROUND_CORNER: RoundedCorner = [8, 8, 8, 8],
   CLASS_FOCUSED = 'focused',
   CLASS_DISABLED = 'disabled',
   INHERIT = 'inherit',
-  UNSET = 'unset';
+  UNSET = 'unset',
+  FOCUS = 'focus',
+  BLUR = 'blur';
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -125,14 +127,14 @@ export class ButtonComponent implements AfterViewInit, OnDestroy {
       filter(v => !!v),
       map(v => v.nativeElement),
       switchMap(button => {
-        return fromEvent(button, 'focus').pipe(
+        return fromEvent(button, FOCUS).pipe(
           takeUntilDestroyed(this._destroyRef),
           tap(() => {
             this.focused.set(true);
             this.onFocus.emit(true);
           }),
           switchMap(() => {
-            return fromEvent(button, 'blur').pipe(
+            return fromEvent(button, BLUR).pipe(
               takeUntilDestroyed(this._destroyRef),
               tap(() => {
                 this.focused.set(false);
