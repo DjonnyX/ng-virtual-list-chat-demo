@@ -7,7 +7,6 @@ import { MessageButtonSaveState, MessageButtonSaveStates, MessageMenuButtonCompo
 import { CalcFillPositionsDirective, LongPressDirective } from '@shared/directives';
 import { Id, IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/x-virtual-list';
 import { IMessageItemData } from "@shared/models/message";
-import { IS_FIREFOX } from '@shared/components/x-virtual-list/lib/utils/browser';
 import { ContextMenuComponent, IContextMenuCollection } from '@shared/components/context-menu';
 import { GradientColorPositions } from '@shared/types';
 import { DialogService } from '@shared/components/dialog/dialog.service';
@@ -24,10 +23,9 @@ import { IDeleteEventData } from './interfaces';
 const IN = 'in', OUT = 'out',
   CLASS_RESETED = 'reseted', CLASS_NEW = 'new', CLASS_IN = 'in', CLASS_OUT = 'out', CLASS_SIMPLE = 'simple', CLASS_END_OF_MESSAGES = 'end-of-messages',
   CLASS_REMOVAL = 'removal', CLASS_DELETED = 'deleted', CLASS_ANIMATE = 'animate', CLASS_EDITED = 'edited', CLASS_RTL = TextDirections.RTL,
-  CLASS_SELECTED = 'selected', CLASS_FOCUSED = 'focused', CLASS_FIRST_IN_GROUP = 'first-in-group', CLASS_FIREFOX = 'firefox',
-  CLASS_LAST_IN_GROUP = 'last-in-group', CLASS_HAS_MULTICONTENT = 'has-multicontent', DATA_PROP_IMAGE = 'image',
-  DATA_PROP_REMOVAL = 'removal', DATA_PROP_DELETED = 'deleted', DATA_PROP_ANIMATE = 'animate', CONFIG_PROP_SELECTED = 'selected',
-  CONFIG_PROP_FOCUSED = 'focused';
+  CLASS_SELECTED = 'selected', CLASS_FOCUSED = 'focused', CLASS_FIRST_IN_GROUP = 'first-in-group', CLASS_LAST_IN_GROUP = 'last-in-group',
+  CLASS_HAS_MULTICONTENT = 'has-multicontent', DATA_PROP_IMAGE = 'image', DATA_PROP_REMOVAL = 'removal', DATA_PROP_DELETED = 'deleted',
+  DATA_PROP_ANIMATE = 'animate', CONFIG_PROP_SELECTED = 'selected', CONFIG_PROP_FOCUSED = 'focused';
 
 enum ContextMenuItemIds {
   EDIT = 'edit',
@@ -270,7 +268,7 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
       return {
         [CLASS_NEW]: data?.new === true, [CLASS_IN]: isIn, [CLASS_OUT]: isOut, [CLASS_SIMPLE]: (isIn && isPrevIn) || (isOut && isPrevOut), [CLASS_DELETED]: data?.[DATA_PROP_DELETED] == true,
         [CLASS_REMOVAL]: data?.[DATA_PROP_REMOVAL] == true, [CLASS_ANIMATE]: data?.[DATA_PROP_ANIMATE] == true, [CLASS_END_OF_MESSAGES]: (isIn && !isNextIn) || (isOut && !isNextOut),
-        [CLASS_FIRST_IN_GROUP]: firstInGroup, [CLASS_LAST_IN_GROUP]: lastInGroup, [CLASS_EDITED]: data?.edited == true, [CLASS_FIREFOX]: IS_FIREFOX,
+        [CLASS_FIRST_IN_GROUP]: firstInGroup, [CLASS_LAST_IN_GROUP]: lastInGroup, [CLASS_EDITED]: data?.edited == true,
         [CLASS_RTL]: this._localizationService.textDirection === TextDirections.RTL, [CLASS_SELECTED]: config?.[CONFIG_PROP_SELECTED], [CLASS_FOCUSED]: config?.[CONFIG_PROP_FOCUSED],
         [CLASS_HAS_MULTICONTENT]: data?.[DATA_PROP_IMAGE] !== undefined,
       };

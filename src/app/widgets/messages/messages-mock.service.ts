@@ -119,7 +119,7 @@ export class MessagesMockService implements MessagesService {
             },
         };
         return of(result).pipe(
-            delay(200 + (Math.random() * 1000)),
+            delay(10 + (Math.random() * 1000)),
             switchMap(res => {
                 if (res.error) {
                     return throwError(() => {

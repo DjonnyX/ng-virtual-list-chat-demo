@@ -881,14 +881,15 @@ export class XVirtualListComponent implements OnDestroy {
   protected $scrollTo = this._$scrollTo.asObservable();
 
   private _onTrackBoxResetHandler = (v: boolean) => {
-    if (v) {
+    if (v && this._scrollerComponent()?.scrollable) {
       this._isResetedReachStart = true;
 
       const scroller = this._scroller()?.nativeElement;
       if (scroller) {
-        const params: ScrollToOptions = {
+        const params: IScrollToParams = {
           [this._isVertical ? TOP_PROP_NAME : LEFT_PROP_NAME]: 0,
           behavior: BEHAVIOR_INSTANT,
+          blending: false,
         };
 
         scroller.scrollTo(params);
@@ -923,28 +924,36 @@ export class XVirtualListComponent implements OnDestroy {
       return this._scrollerComponent()?.scrollContent();
     });
 
-    let _prepared = false;
+    let prepared = false;
 
     this.$prepared.pipe(
       takeUntilDestroyed(),
       distinctUntilChanged(),
-      tap(prepared => {
-        if (!prepared) {
-          _prepared = prepared;
+      tap(v => {
+        if (!v) {
+          prepared = v;
+          const scrollerComponent = this._scrollerComponent();
+          if (scrollerComponent) {
+            scrollerComponent.prepared = v;
+          }
+          this.classes.set({ prepared: v });
           this.cacheClean();
-          this.classes.set({ prepared });
         }
       }),
       filter(v => !!v),
       delay(0),
       takeUntilDestroyed(this._destroyRef),
-      tap(prepared => {
-        _prepared = prepared;
+      tap(v => {
+        prepared = v;
       }),
-      delay(1),
+      delay(0),
       takeUntilDestroyed(this._destroyRef),
-      tap(prepared => {
-        this.classes.set({ prepared });
+      tap(v => {
+        const scrollerComponent = this._scrollerComponent();
+        if (scrollerComponent) {
+          scrollerComponent.prepared = v;
+        }
+        this.classes.set({ prepared: v });
       }),
     ).subscribe();
 
@@ -1029,13 +1038,13 @@ export class XVirtualListComponent implements OnDestroy {
       takeUntilDestroyed(),
       distinctUntilChanged(),
       tap(v => {
-        if (v && !this._isResetedReachStart) {
+        if (v && !this._isResetedReachStart && this._scrollerComponent()?.scrollable) {
           this._trackBox.isScrollStart = true;
           this.onScrollReachStart.emit();
         }
         this._isResetedReachStart = false;
       }),
-    ).subscribe()
+    ).subscribe();
 
     $isScrollFinished.pipe(
       takeUntilDestroyed(),
@@ -1263,7 +1272,7 @@ export class XVirtualListComponent implements OnDestroy {
 
         const scroller = this._scrollerComponent();
         if (scroller) {
-          let actualScrollSize = snapScrollToBottom && !_prepared ?
+          let actualScrollSize = snapScrollToBottom && !prepared ?
             Number.MAX_SAFE_INTEGER * .5 :
             (isVertical ? scroller.actualScrollTop ?? 0 : scroller.actualScrollLeft ?? 0),
             totalSize = 0, displayItems: IRenderVirtualListCollection;
@@ -1280,7 +1289,7 @@ export class XVirtualListComponent implements OnDestroy {
             bufferSize, maxBufferSize, scrollSize: actualScrollSize, snap, enabledBufferOptimization,
           };
 
-          if (snapScrollToBottom && scrollLength > viewportSize && !_prepared) {
+          if (snapScrollToBottom && scrollLength > viewportSize && !prepared) {
             const { totalSize: calculatedTotalSize } = this._trackBox.getMetrics(items, itemConfigMap, opts);
             totalSize = calculatedTotalSize;
 
@@ -1332,7 +1341,7 @@ export class XVirtualListComponent implements OnDestroy {
 
           this._trackBox.clearDelta();
 
-          if (this._trackBox.isSnappedToEnd || (!!snapScrollToBottom && !_prepared) ||
+          if (this._trackBox.isSnappedToEnd || (!!snapScrollToBottom && !prepared) ||
             (snapScrollToBottom && actualScrollSize > 0 &&
               ((roundedScrollPositionAfterUpdate >= scrollPosition) &&
                 (scrollPosition >= roundedMaxPosition) &&
@@ -1344,7 +1353,7 @@ export class XVirtualListComponent implements OnDestroy {
             if (roundedMaxPositionAfterUpdate > 0) {
               const diff = roundedMaxPositionAfterUpdate - roundedScrollPositionAfterUpdate,
                 snapToEndTransitionInstantOffset = this.snapToEndTransitionInstantOffset() || viewportSize,
-                animated = _prepared && diff >= 0 && diff <= snapToEndTransitionInstantOffset,
+                animated = prepared && diff >= 0 && diff <= snapToEndTransitionInstantOffset,
                 params: IScrollToParams = {
                   [isVertical ? TOP_PROP_NAME : LEFT_PROP_NAME]: roundedMaxPositionAfterUpdate,
                   behavior: (animated ?

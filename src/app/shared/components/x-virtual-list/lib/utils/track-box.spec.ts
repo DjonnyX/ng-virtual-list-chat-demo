@@ -2,7 +2,7 @@ import { TrackBox, ItemDisplayMethods, TrackBoxEvents, IMetrics } from './track-
 import { IRenderVirtualListItem } from '../models/render-item.model';
 import { IRenderVirtualListCollection } from '../models/render-collection.model';
 import { Id, ISize } from '../types';
-import { CMap } from './cache-map';
+import { CMap } from '../../../../utils/cmap';
 
 interface IItem<I = any> {
     [prop: string]: I;

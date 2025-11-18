@@ -17,6 +17,9 @@ import { IMessageItemData } from "@shared/models/message";
 import { MessageTypes } from '@shared/enums';
 import { ThemeService } from '@shared/theming';
 import { ITheme } from '@shared/theming';
+import { ILocalization, LocalizationService } from '@shared/localization';
+import { resourceManager } from '@shared/utils/resource-manager';
+import { StaticClickDirective } from '@shared/directives';
 import { MessagesService } from '../messages.service';
 import { MessagesMockService } from '../messages-mock.service';
 import { MessagesHttpService } from '../messages-http.service';
@@ -28,14 +31,11 @@ import { MessagesNotificationMockService } from '../messages-notification-mock.s
 import { MessagesNotificationWSService } from '../messages-notification-ws.service';
 import { generateTypingIndicator, TYPING_INDICATOR_INDEX } from './utils/generate-typing-indicator';
 import { IProxyCollectionItem, ProxyCollection, ProxyCollectionEvents } from './utils/proxy-collection';
-import { StaticClickDirective } from '@shared/directives';
 import { createGroups } from './utils/create-groups';
-import { ILocalization, LocalizationService } from '@shared/localization';
-import { resourceManager } from '@shared/utils/resource-manager';
 
 const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
   MIN_ITEM_HEIGHT = 28,
-  CHUNK_SIZE = 100;
+  CHUNK_SIZE = 200;
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -209,13 +209,13 @@ export class MessagesComponent implements OnDestroy {
       filter(({ list, chatId }) => !!list && chatId !== undefined),
       tap(({ list }) => {
         // reset
-        resourceManager.clear();
+        this._chunkNumber = 1;
         this.isLoading.set(true);
         if (this._proxyCollection.collection.length > 0) {
+          resourceManager.clear();
           this._proxyCollection.from([]);
+          this.selectedIds.set([]);
         }
-        this.selectedIds.set([]);
-        this._chunkNumber = 1;
       }),
     ).subscribe();
 
@@ -223,8 +223,6 @@ export class MessagesComponent implements OnDestroy {
       takeUntilDestroyed(),
       filter(v => v !== undefined),
       switchMap(chatId => {
-        const timeStart = Date.now();
-        let delayTime = 100;
         return of(chatId).pipe(
           takeUntilDestroyed(this._destroyRef),
           tap(() => {
@@ -247,8 +245,6 @@ export class MessagesComponent implements OnDestroy {
           takeUntilDestroyed(this._destroyRef),
           switchMap(res => {
             const items = Array.isArray(res.items) ? res.items : [];
-            const time = 2000 - (Date.now() - timeStart);
-            delayTime = time < 0 ? 0 : time;
             validateCollection(items);
 
             this._proxyCollection.from(items, true);
@@ -258,7 +254,6 @@ export class MessagesComponent implements OnDestroy {
 
             return of(items);
           }),
-          delay(delayTime),
           takeUntilDestroyed(this._destroyRef),
           tap(() => {
             this.isLoading.set(false);

@@ -308,6 +308,10 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
 
     protected _prepared: boolean = false;
 
+    protected _preparedToStart: boolean = false;
+
+    protected _preparedToStartIterations: number = 2;
+
     get prepared() { return this._prepared; }
 
     protected override lifeCircle() {
@@ -329,15 +333,14 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
 
         const reseted = ((!this._previousCollection || this._previousCollection.length === 0) &&
             (!!currentCollection && currentCollection.length > 0));
-
-        this._isReseted = reseted;
-
-        if (reseted) {
+        if (this._preparedToStart && this._isReseted !== reseted && reseted && this._prepared) {
             this._prepared = false;
             this.dispatch(TrackBoxEvents.PREPARE, false);
         }
 
-        this.dispatch(TrackBoxEvents.RESET, reseted);
+        this._isReseted = reseted;
+
+        this.dispatch(TrackBoxEvents.RESET, this._preparedToStart && reseted);
 
         this.updateCache(this._previousCollection, currentCollection, itemSize);
 
@@ -516,9 +519,17 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
 
         this.updateAdaptiveBufferParams(metrics, items.length);
 
-        if (!this._prepared && !this._crudDetected) {
+        if (this._preparedToStart && !this._prepared && this._previousTotalSize === metrics.totalSize) {
             this._prepared = true;
             this.dispatch(TrackBoxEvents.PREPARE, true);
+        }
+
+        if (this._preparedToStartIterations > 0 && this._previousTotalSize !== metrics.totalSize) {
+            this._preparedToStartIterations--;
+        }
+
+        if (this._preparedToStartIterations === 0) {
+            this._preparedToStart = true;
         }
 
         this._previousTotalSize = metrics.totalSize;

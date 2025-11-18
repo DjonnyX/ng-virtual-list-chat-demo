@@ -34,7 +34,7 @@ export class MessagesNotificationMockService implements MessagesNotificationServ
             delay(2000),
             switchMap(() => from(interval(3000)).pipe(
                 tap(() => this.startWrite()),
-                delay(1000),
+                delay(1500),
                 concatMap(() => this.write()),
             )),
         ).subscribe();

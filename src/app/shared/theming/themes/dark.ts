@@ -585,7 +585,7 @@ const manifest: ITheme = {
         },
         [CheckboxPresets.SECONDARY]: {
             normal: {
-                fill: ["rgba(66, 5, 153, 1)", "rgba(82, 18, 173, 1)"],
+                fill: ["rgba(68, 62, 94, 1)", "rgba(79, 74, 104, 1)"],
                 iconFill: "rgb(255, 221, 239)",
                 color: "rgb(199, 186, 255)",
                 roundedCorner: BUTTON_ROUNDED_CORNER,
@@ -619,7 +619,7 @@ const manifest: ITheme = {
             },
         },
         [DialogPresets.PRIMARY]: {
-            fill: ["rgba(45, 30, 112, 1)", "rgba(45, 30, 112, 1)"],
+            fill: ["rgba(58, 54, 73, 1)", "rgba(67, 57, 85, 1)"],
             roundedCorner: DIALOG_ROUNDED_CORNER,
             padding: DIALOG_PADDING,
             strokeAnimationDuration: 10000,
@@ -653,7 +653,7 @@ const manifest: ITheme = {
             },
         },
         [ContextMenuPresets.PRIMARY]: {
-            fill: ["rgba(45, 30, 112, 1)", "rgba(59, 30, 112, 1)"],
+            fill: ["rgba(58, 54, 73, 1)", "rgba(67, 57, 85, 1)"],
             roundedCorner: CONTEXT_MENU_ROUNDED_CORNER,
             padding: CONTEXT_MENU_PADDING,
             strokeAnimationDuration: 10000,

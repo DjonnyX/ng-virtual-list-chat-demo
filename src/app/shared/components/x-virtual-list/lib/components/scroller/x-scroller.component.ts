@@ -109,6 +109,8 @@ export class XScrollerComponent implements OnDestroy {
 
   thumbPosition = signal<number>(0);
 
+  preparedSignal = signal<boolean>(false);
+
   private _$scroll = new Subject<void>();
   readonly $scroll = this._$scroll.asObservable();
 
@@ -117,8 +119,24 @@ export class XScrollerComponent implements OnDestroy {
 
   private _scrollBox = new ScrollBox();
 
+  get scrollable() {
+    const { width, height } = this.viewportBounds(),
+      isVertical = this.isVertical(),
+      viewportSize = isVertical ? height : width,
+      totalSize = this._totalSize;
+    return totalSize > viewportSize;
+  }
+
   get host() {
     return this.scrollViewport()?.nativeElement;
+  }
+
+  private _prepared = false;
+  set prepared(v: boolean) {
+    if (this._prepared !== v) {
+      this._prepared = v;
+      this.preparedSignal.set(v);
+    }
   }
 
   private _destroyRef = inject(DestroyRef);
@@ -272,7 +290,6 @@ export class XScrollerComponent implements OnDestroy {
     ),
       $mouseDragCancel = $mouseUp.pipe(
         takeUntilDestroyed(),
-        delay(0),
         tap(() => {
           this._isMoving = false;
         }),
@@ -320,6 +337,10 @@ export class XScrollerComponent implements OnDestroy {
                   takeUntilDestroyed(this._destroyRef),
                   tap(e => {
                     e.preventDefault();
+                  }),
+                  delay(0),
+                  takeUntilDestroyed(this._destroyRef),
+                  tap(e => {
                     const endTime = performance.now(),
                       timestamp = endTime - startTime,
                       { v0 } = this.calculateVelocity(offsets, scrollDelta, timestamp),
@@ -340,7 +361,6 @@ export class XScrollerComponent implements OnDestroy {
     ),
       $touchCanceler = $touchUp.pipe(
         takeUntilDestroyed(this._destroyRef),
-        delay(0),
         tap(() => {
           this._isMoving = false;
         }),
@@ -388,6 +408,10 @@ export class XScrollerComponent implements OnDestroy {
                   takeUntilDestroyed(this._destroyRef),
                   tap(e => {
                     e.preventDefault();
+                  }),
+                  delay(0),
+                  takeUntilDestroyed(this._destroyRef),
+                  tap(e => {
                     const endTime = performance.now(),
                       timestamp = endTime - startTime,
                       { v0 } = this.calculateVelocity(offsets, scrollDelta, timestamp),
@@ -547,7 +571,6 @@ export class XScrollerComponent implements OnDestroy {
           this._$scroll.next();
         }
       }
-
       if (isFinished) {
         this.stopScrolling();
         this._$scrollEnd.next();

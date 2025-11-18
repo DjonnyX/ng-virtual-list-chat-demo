@@ -9,7 +9,7 @@ import { MessageTypes } from "@shared/enums";
  * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
  * All rights reserved.
  */
-export type CollectionItem<D = any> = { id: Id, dateTime: number, version: number, __deleted__?: boolean } & D;
+export type CollectionItem<D = any> = { id: Id, dateTime: number, version: number, __deleted__?: boolean, type?: MessageTypes.ITEM | MessageTypes.GROUP | MessageTypes.TYPING_INDICATOR; } & D;
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -21,6 +21,7 @@ export type CollectionItem<D = any> = { id: Id, dateTime: number, version: numbe
 export interface IProxyCollectionItem<D = any> {
     id: Id;
     new: boolean;
+    type: MessageTypes | undefined;
     version: number;
     edited: boolean;
     selected: boolean;
@@ -42,6 +43,7 @@ const createProxyItem = <D = any>(data: CollectionItem<D>
     CollectionItem<IProxyCollectionItem<D>> => ({
         version: -1,
         new: true,
+        type: data.type,
         edited: false,
         selected: false,
         animate: false,
@@ -113,6 +115,7 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
         const dict = this._dict, collection = this._collection, item = dict[id];
         if (item) {
             item.data = { ...item.data, ...data };
+            item.type = (data as any)?.['data']?.type;
             const index = this._dictIndexes[id];
             if (index > -1) {
                 collection[index] = { ...collection[index], ...(params ?? {}) };
@@ -141,6 +144,10 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
                 if (index > -1) {
                     collection[index] = { ...collection[index], ...params };
                     dict[id] = collection[index];
+                }
+
+                if (params.hasOwnProperty('type')) {
+                    item.type = params.type;
                 }
             }
         }
@@ -185,6 +192,7 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
                         }
                     } else {
                         dict[id].data = { ...dict[id].data, ...item };
+                        dict[id].type = dict[id].data.type;
                         dict[id].version = item.version;
                         dict[id].dateTime = item.dateTime;
                     }

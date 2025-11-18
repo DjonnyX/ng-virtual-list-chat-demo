@@ -128,7 +128,7 @@ export class Tracker<C extends BaseVirtualListItemComponent = any> {
 
         if (untrackedItems.length > 0) {
             for (let i = 0, l = untrackedItems.length; i < l; i++) {
-                const comp = untrackedItems[i], type = comp?.instance.item?.data?.data?.type;
+                const comp = untrackedItems[i], type = comp?.instance.item?.data?.type;
                 if (!Array.isArray(untrackedComponentsByTypeMap[type])) {
                     untrackedComponentsByTypeMap[type] = [];
                 }
@@ -139,7 +139,7 @@ export class Tracker<C extends BaseVirtualListItemComponent = any> {
         for (let i = 0, l = newTrackItems.length; i < l; i++) {
             if (untrackedItems.length > 0) {
                 const item = newTrackItems[i], itemTrackingProperty = item.id,
-                    type = item.data?.data?.type;
+                    type = item.data?.type;
                 let comp: ComponentRef<C> | undefined;
                 if (type) {
                     const list = untrackedComponentsByTypeMap[type];

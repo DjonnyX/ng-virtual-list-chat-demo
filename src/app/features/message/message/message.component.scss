@@ -8,19 +8,23 @@
 
     .message-container {
         position: relative;
-        opacity: 1;
         z-index: 1;
         width: 100%;
         height: 100%;
-        padding: 10px 14px;
+        padding: 6px 8px 6px 6px;
+        display: flex;
+        align-items: center;
         word-break: break-word;
         box-sizing: border-box;
         overflow: hidden;
-        transition: opacity 100ms ease-out;
+        transition: opacity 100ms ease-out, height 100ms ease-out, min-height 100ms ease-out;
 
-        &.reseted {
-            opacity: 0;
-            transition: opacity 0ms linear;
+        &.selected {
+            min-height: 50px;
+        }
+
+        &.edited {
+            min-height: 86px;
         }
 
         &.has-multicontent {
@@ -28,18 +32,18 @@
         }
 
         &.in {
-            padding: 10px 14px 10px 26px;
+            padding: 4px 6px 4px 18px;
 
             &.rtl {
-                padding: 10px 26px 10px 14px;
+                padding: 4px 18px 4px 6px;
             }
         }
 
         &.out {
-            padding: 10px 26px 10px 14px;
+            padding: 4px 18px 4px 6px;
 
             &.rtl {
-                padding: 10px 14px 10px 26px;
+                padding: 4px 6px 4px 18px;
             }
         }
 
@@ -47,11 +51,11 @@
 
             &.in,
             &.out {
-                padding: 10px 14px;
+                padding: 6px 8px 6px 6px;
             }
         }
     }
-    
+
     @media (min-width: 600px) {
         max-width: calc(55%);
 
@@ -63,8 +67,6 @@
     }
 
     @media (min-width: 1200px) {
-        max-width: 800px;
-
         .message-container {
             &.reseted {
                 min-width: 100%;

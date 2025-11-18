@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, ElementRef, inject, input, Signal, signal, viewChild } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { Component, computed, DestroyRef, effect, ElementRef, inject, input, Signal, signal, viewChild } from '@angular/core';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { SubstarateStyle, SubstarateStyles, SubstrateComponent } from '@shared/components/substrate';
 import { ITheme, ThemeService } from '@shared/theming';
 import { IScrollBarTheme } from '@shared/theming/themes/interfaces/components/scrollbar';
 import { GradientColor, GradientColorPositions, RoundedCorner } from '@shared/types';
+import { debounceTime, tap } from 'rxjs';
 
 const DEFAULT_THICKNESS = 6,
   DEFAULT_SIZE = 6,
@@ -13,7 +14,13 @@ const DEFAULT_THICKNESS = 6,
   TRANSLATE_3D = 'translate3d',
   PX = 'px',
   WIDTH = 'width',
-  HEIGHT = 'height';
+  HEIGHT = 'height',
+  OPACITY = 'opacity',
+  OPACITY_0 = '0',
+  OPACITY_1 = '1',
+  TRANSITION = 'transition',
+  NONE = 'none',
+  TRANSITION_FADE_IN = `${OPACITY} 500ms ease-out`;
 
 @Component({
   selector: 'x-scroll-bar',
@@ -35,6 +42,10 @@ export class XScrollBarComponent {
   size = input<number>(DEFAULT_SIZE);
 
   preset = input<string | undefined>(undefined);
+
+  prepared = input<boolean>(false);
+
+  show = signal<boolean>(false);
 
   thickness = signal<number>(DEFAULT_THICKNESS);
 
@@ -58,7 +69,27 @@ export class XScrollBarComponent {
 
   private _themeService = inject(ThemeService);
 
+  private _destroyRef = inject(DestroyRef);
+
   constructor() {
+    const $prepared = toObservable(this.prepared);
+
+    $prepared.pipe(
+      takeUntilDestroyed(),
+      tap(v => {
+        if (!v) {
+          this.show.set(false);
+        }
+      }),
+      debounceTime(500),
+      takeUntilDestroyed(this._destroyRef),
+      tap(v => {
+        if (v) {
+          this.show.set(true);
+        }
+      }),
+    ).subscribe();
+
     this.theme = toSignal(this._themeService.$theme);
 
     this.thumbWidth = computed(() => {
@@ -74,7 +105,11 @@ export class XScrollBarComponent {
     });
 
     this.styles = computed(() => {
-      return { [this.isVertical() ? WIDTH : HEIGHT]: `${this.thickness()}${PX}` };
+      const show = this.show();
+      return {
+        [this.isVertical() ? WIDTH : HEIGHT]: `${this.thickness()}${PX}`,
+        [OPACITY]: show ? OPACITY_1 : OPACITY_0, [TRANSITION]: show ? TRANSITION_FADE_IN : NONE,
+      };
     });
 
     effect(() => {
