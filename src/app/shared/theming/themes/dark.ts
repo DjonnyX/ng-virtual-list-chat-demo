@@ -54,7 +54,7 @@ const manifest: ITheme = {
                 timeoutIndicatorColor: "rgba(255, 255, 255, 0.05)",
                 normal: {
                     background: "rgba(9, 5, 19, 0.15)",
-                    borderColor: "rgba(206, 191, 220, 0.2)",
+                    borderColor: "rgba(206, 191, 220, 0)",
                     color: "rgb(206, 191, 220)",
                     fontSize: "14px",
                     fill: "rgb(158, 173, 202)",
@@ -82,7 +82,45 @@ const manifest: ITheme = {
                 background: 'rgba(166, 117, 255, 0.14)',
                 color: 'rgb(234, 225, 243)',
                 outline: '1px solid rgba(166, 117, 255, 0.25)',
-            }
+            },
+            controls: {
+                cancel: {
+                    rippleColor: "rgba(255, 255, 255, 0.2)",
+                    normal: {
+                        fill: ["rgba(151, 142, 255, 0.1)", "rgba(151, 142, 255, 0.1)"],
+                        iconFill: "rgb(206, 191, 220)",
+                        strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
+                    },
+                    pressed: {
+                        fill: ["rgba(151, 142, 255, 0.2)", "rgba(151, 142, 255, 0.2)"],
+                        iconFill: "rgb(206, 191, 220)",
+                        strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
+                    },
+                    disabled: {
+                        fill: ["rgba(151, 142, 255, 0.05)", "rgba(151, 142, 255, 0.05)"],
+                        iconFill: "rgba(240, 217, 255, .5)",
+                        strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
+                    },
+                },
+                send: {
+                    rippleColor: "rgba(255, 255, 255, 0.2)",
+                    normal: {
+                        fill: ["rgba(69, 37, 187, 1)", "rgba(69, 37, 187, 1)"],
+                        iconFill: "rgb(191, 211, 220)",
+                        strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
+                    },
+                    pressed: {
+                        fill: ["rgba(103, 56, 214, 1)", "rgba(103, 56, 214, 1)"],
+                        iconFill: "rgb(191, 211, 220)",
+                        strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
+                    },
+                    disabled: {
+                        fill: ["rgba(43, 86, 179, .25)", "rgba(32, 88, 126, .25)"],
+                        iconFill: "rgba(191, 211, 220, .85)",
+                        strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
+                    },
+                },
+            },
         },
         messages: {
             background: "linear-gradient(180deg, rgb(8, 4, 15) 0%, rgb(4, 16, 20) 100%)",

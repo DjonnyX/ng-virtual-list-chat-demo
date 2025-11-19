@@ -111,11 +111,11 @@ export class MessageSendButtonComponent {
         let preset: any | undefined;
         switch (state) {
           case MessageButtonSendStates.SEND: {
-            preset = this._themeService.getPreset(currentTheme.chat.messages.message.controls.send);
+            preset = this._themeService.getPreset(currentTheme.chat.messageCreator.controls.send);
             break;
           }
           case MessageButtonSendStates.CANCEL: {
-            preset = this._themeService.getPreset(currentTheme.chat.messages.message.controls.cancel);
+            preset = this._themeService.getPreset(currentTheme.chat.messageCreator.controls.cancel);
             break;
           }
         }

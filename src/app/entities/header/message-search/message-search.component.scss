@@ -1,26 +1,27 @@
 .search-container {
     position: relative;
-    border-radius: 6px;
+    border-radius: 16px;
     overflow: hidden;
+    transition: border-radius 100ms ease-out;
 
     .timeout-indicator {
         position: absolute;
         width: 0%;
         height: 100%;
-        transition: width 100ms linear;
-        border-radius: 6px;
+        transition: width 100ms linear, border-radius 100ms ease-out;
+        border-radius: 16px;
     }
 
     .search {
         outline: none;
-        border-radius: 6px;
+        border-radius: 16px;
         padding: 6px 0 6px 6px;
         border-width: 2px;
         border-style: solid;
         width: calc(100%);
         max-width: 32px;
         padding-right: 24px;
-        transition: max-width 0.15s ease-in-out;
+        transition: max-width 150ms ease-in-out, border-radius 100ms ease-out;
         overflow: hidden;
         box-sizing: border-box;
 
@@ -51,8 +52,8 @@
         &+.icon {
             pointer-events: none;
             position: absolute;
-            right: 11px;
-            top: 6px;
+            right: 9px;
+            top: 8px;
             box-sizing: border-box;
         }
 
@@ -62,6 +63,19 @@
 
         &search:placeholder-shown+svg {
             visibility: visible;
+        }
+    }
+
+    &.focus {
+        border-radius: 6px;
+
+        .timeout-indicator {
+            border-radius: 6px;
+        }
+
+        .search {
+            outline: none;
+            border-radius: 6px;
         }
     }
 }

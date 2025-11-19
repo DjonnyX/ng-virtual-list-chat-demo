@@ -31,6 +31,8 @@ const TOP = 'top',
   MAX_VELOCITY_TIMESTAMP = 100,
   SPEED_SCALE = 5;
 
+const getStartTime = () => { return performance.now(); }
+
 const calculateDirection = (buffer: Array<[number, number]>) => {
   for (let i = buffer.length - 1, l = 0; i >= l; i--) {
     const v = buffer[i];
@@ -311,7 +313,7 @@ export class XScrollerComponent implements OnDestroy {
             let prevPos = startPos, prevClientPosition = 0, startPosDelta = 0;
             const startClientPos = isVertical ? e.clientY : e.clientX,
               offsets = new Array<[number, number]>(), velocities = new Array<[number, number]>();
-            let startTime = performance.now();
+            let startTime = Date.now();
             return fromEvent<MouseEvent>(window, MOUSE_MOVE, { passive: false }).pipe(
               takeUntilDestroyed(this._destroyRef),
               takeUntil($mouseDragCancel),
@@ -325,7 +327,7 @@ export class XScrollerComponent implements OnDestroy {
                 }
                 const currentPos = isVertical ? e.clientY : e.clientX,
                   scrollSize = isVertical ? this.scrollHeight : this.scrollWidth, delta = startClientPos - currentPos,
-                  dp = startPos + startPosDelta + delta, position = Math.round(dp < 0 ? 0 : dp > scrollSize ? scrollSize : dp), endTime = performance.now(),
+                  dp = startPos + startPosDelta + delta, position = Math.round(dp < 0 ? 0 : dp > scrollSize ? scrollSize : dp), endTime = Date.now(),
                   timestamp = endTime - startTime, scrollDelta = prevClientPosition === 0 ? 0 : prevClientPosition - currentPos,
                   { v0 } = this.calculateVelocity(offsets, scrollDelta, timestamp);
                 this.calculateAcceleration(velocities, v0, timestamp);
@@ -341,7 +343,7 @@ export class XScrollerComponent implements OnDestroy {
                   delay(0),
                   takeUntilDestroyed(this._destroyRef),
                   tap(e => {
-                    const endTime = performance.now(),
+                    const endTime = Date.now(),
                       timestamp = endTime - startTime,
                       { v0 } = this.calculateVelocity(offsets, scrollDelta, timestamp),
                       { a0 } = this.calculateAcceleration(velocities, v0, timestamp);
@@ -382,7 +384,7 @@ export class XScrollerComponent implements OnDestroy {
             let prevPos = startPos, prevClientPosition = 0, startPosDelta = 0;
             const startClientPos = isVertical ? e.touches[e.touches.length - 1].clientY : e.touches[e.touches.length - 1].clientX,
               offsets = new Array<[number, number]>(), velocities = new Array<[number, number]>();
-            let startTime = performance.now();
+            let startTime = Date.now();
             return fromEvent<TouchEvent>(window, TOUCH_MOVE, { passive: false }).pipe(
               takeUntilDestroyed(this._destroyRef),
               takeUntil($touchCanceler),
@@ -396,7 +398,7 @@ export class XScrollerComponent implements OnDestroy {
                 }
                 const currentPos = isVertical ? e.touches[e.touches.length - 1].clientY : e.touches[e.touches.length - 1].clientX,
                   scrollSize = isVertical ? this.scrollHeight : this.scrollWidth, delta = startClientPos - currentPos,
-                  dp = startPos + startPosDelta + delta, position = Math.round(dp < 0 ? 0 : dp > scrollSize ? scrollSize : dp), endTime = performance.now(),
+                  dp = startPos + startPosDelta + delta, position = Math.round(dp < 0 ? 0 : dp > scrollSize ? scrollSize : dp), endTime = Date.now(),
                   timestamp = endTime - startTime, scrollDelta = prevClientPosition === 0 ? 0 : prevClientPosition - currentPos,
                   { v0 } = this.calculateVelocity(offsets, scrollDelta, timestamp);
                 this.calculateAcceleration(velocities, v0, timestamp);
@@ -412,7 +414,7 @@ export class XScrollerComponent implements OnDestroy {
                   delay(0),
                   takeUntilDestroyed(this._destroyRef),
                   tap(e => {
-                    const endTime = performance.now(),
+                    const endTime = Date.now(),
                       timestamp = endTime - startTime,
                       { v0 } = this.calculateVelocity(offsets, scrollDelta, timestamp),
                       { a0 } = this.calculateAcceleration(velocities, v0, timestamp);
@@ -509,9 +511,8 @@ export class XScrollerComponent implements OnDestroy {
 
   animate(startValue: number, endValue: number, duration = 500, easingFunction: Easing = easeLinear) {
     this.stopScrolling();
-
-    const startTime = performance.now(), isVertical = this.direction() === ScrollerDirection.VERTICAL;
-    let isCanceled = false, prevPos = startValue, startPosDelta = 0, delta = 0, prevTime = performance.now();
+    const startTime = getStartTime(), isVertical = this.direction() === ScrollerDirection.VERTICAL;
+    let isCanceled = false, prevPos = startValue, startPosDelta = 0, delta = 0, prevTime = startTime;
 
     if (isVertical) {
       this.y = startValue;
@@ -540,7 +541,7 @@ export class XScrollerComponent implements OnDestroy {
         val = startPosDelta + startValue + (finishedValue - startValue) * easedProgress,
         scrollSize = isVertical ? this.scrollHeight : this.scrollWidth,
         currentValue = val < 0 ? 0 : val > scrollSize ? scrollSize : val,
-        t = performance.now(),
+        t = Date.now(),
         roundedCurrentValue = Math.round(currentValue);
 
       isFinished = (roundedCurrentValue === 0) || progress === 1;

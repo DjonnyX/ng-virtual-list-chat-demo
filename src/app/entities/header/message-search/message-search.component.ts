@@ -1,4 +1,5 @@
-import { Component, DestroyRef, effect, ElementRef, inject, output, signal, Signal, viewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, computed, DestroyRef, effect, ElementRef, inject, output, signal, Signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ILocalization, LocaleSensitiveDirective, LocalizationService } from '@shared/localization';
@@ -17,7 +18,7 @@ const INTERVAL_COUNT = 89, INTERVAL_TIMEOUT = 100, PERCENT = '%', ZERO_PERCENT =
  */
 @Component({
   selector: 'x-message-search',
-  imports: [FormsModule, LocaleSensitiveDirective],
+  imports: [CommonModule, FormsModule, LocaleSensitiveDirective],
   templateUrl: './message-search.component.html',
   styleUrl: './message-search.component.scss'
 })
@@ -31,6 +32,8 @@ export class MessageSearchComponent {
   search = output<string>();
 
   focused = signal<boolean>(false);
+
+  classes: Signal<{ [cName: string]: boolean }>;
 
   theme: Signal<ITheme | undefined>;
 
@@ -57,6 +60,10 @@ export class MessageSearchComponent {
     this.theme = toSignal(this._themeService.$theme);
 
     this.localization = toSignal(this._localizationService.$localization);
+
+    this.classes = computed(() => {
+      return { focus: this.focused() };
+    });
 
     effect(() => {
       const localization = this.localization();
