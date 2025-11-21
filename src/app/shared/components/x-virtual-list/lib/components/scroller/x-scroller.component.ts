@@ -472,7 +472,7 @@ export class XScrollerComponent implements OnDestroy {
         continue;
       }
       if (v00) {
-        const a0 = timestamp < MAX_VELOCITY_TIMESTAMP ? ((lastVSign * Math.abs(Math.abs(v01[0]) - Math.abs(v00[0]))) / Math.abs(v00[1])) : 0;
+        const a0 = timestamp < MAX_VELOCITY_TIMESTAMP ? (v00[1] !== 0 ? (lastVSign * Math.abs(Math.abs(v01[0]) - Math.abs(v00[0]))) / Math.abs(v00[1]) : 0) : 0;
         aSum += a0;
         prevV0 = v01;
       }
@@ -536,7 +536,7 @@ export class XScrollerComponent implements OnDestroy {
       }
 
       const elapsed = currentTime - startTime,
-        progress = Math.min(elapsed / duration, 1),
+        progress = Math.min(duration > 0 ? elapsed / duration : 0, 1),
         easedProgress = easingFunction(progress),
         val = startPosDelta + startValue + (finishedValue - startValue) * easedProgress,
         scrollSize = isVertical ? this.scrollHeight : this.scrollWidth,
@@ -549,7 +549,7 @@ export class XScrollerComponent implements OnDestroy {
       delta = currentValue - scrollDelta - prevPos;
 
       const ts = t - prevTime, timestamp = ts < MIN_TIMESTAMP ? MIN_TIMESTAMP : ts;
-      this._velocity = delta / timestamp;
+      this._velocity = timestamp > 0 ? delta / timestamp : 0;
 
       prevTime = t;
       prevPos = currentValue;

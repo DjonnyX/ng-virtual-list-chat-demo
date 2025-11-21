@@ -37,5 +37,5 @@ export const bufferInterpolation = (currentBufferValue: number, array: Array<num
         buffer += array[i];
     }
 
-    return Math.ceil(buffer / l);
+    return l !== 0 ? Math.ceil(buffer / l) : 0;
 };

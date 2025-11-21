@@ -46,10 +46,10 @@ export class CalcFillPositionsDirective {
     if (measures) {
       const { y: pos, height: size } = (this._elementRef?.nativeElement as HTMLDivElement).getBoundingClientRect(),
         { boundsSize, positionOffset } = measures,
-        absoluteStartPosition = pos - positionOffset, ratio = boundsSize / size,
-        absoluteStartPositionPercent = -(absoluteStartPosition / boundsSize) * ratio,
+        absoluteStartPosition = pos - positionOffset, ratio = size !== 0 ? boundsSize / size : 0,
+        absoluteStartPositionPercent = -(boundsSize !== 0 ? absoluteStartPosition / boundsSize : 0) * ratio,
         absoluteEndPosition = boundsSize - (absoluteStartPositionPercent + size),
-        absoluteEndPositionPercent = (absoluteStartPositionPercent + ((absoluteEndPosition + size) / boundsSize) * ratio);
+        absoluteEndPositionPercent = (absoluteStartPositionPercent + (boundsSize !== 0 ? (absoluteEndPosition + size) / boundsSize : 0) * ratio);
       this.onFillPositions.emit([absoluteStartPositionPercent, absoluteEndPositionPercent]);
     }
   }

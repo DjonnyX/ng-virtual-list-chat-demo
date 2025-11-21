@@ -560,7 +560,7 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
 
         const scrollSize = metrics.scrollSize + this._delta, delta = Math.abs(this._previousScrollSize - scrollSize);
         this._previousScrollSize = scrollSize;
-        const bufferRawSize = Math.min(Math.floor(delta / metrics.typicalItemSize) * 5, totalItemsLength),
+        const bufferRawSize = Math.min(Math.floor(metrics.typicalItemSize !== 0 ? delta / metrics.typicalItemSize : 0) * 5, totalItemsLength),
             minBufferSize = bufferRawSize < this._defaultBufferSize ? this._defaultBufferSize : bufferRawSize,
             bufferValue = minBufferSize > this._maxBufferSize ? this._maxBufferSize : minBufferSize;
 
@@ -622,7 +622,7 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
             { width, height } = bounds, sizeProperty = isVertical ? HEIGHT_PROP_NAME : WIDTH_PROP_NAME,
             size = isVertical ? height : width, totalLength = collection.length, typicalItemSize = itemSize,
             w = isVertical ? width : typicalItemSize, h = isVertical ? typicalItemSize : height,
-            map = this._map, snapshot = this._snapshot, checkOverscrollItemsLimit = Math.ceil(size / typicalItemSize),
+            map = this._map, snapshot = this._snapshot, checkOverscrollItemsLimit = Math.ceil(typicalItemSize !== 0 ? size / typicalItemSize : 0),
             snippedPos = Math.floor(scrollSize) + this._scrollStartOffset, leftItemsWeights: Array<number> = [],
             isFromId = fromItemId !== undefined && (typeof fromItemId === 'number' && fromItemId > -1)
                 || (typeof fromItemId === 'string' && fromItemId > '-1');
@@ -875,8 +875,8 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                     y += componentSize;
                 }
             }
-            itemsFromStartToScrollEnd = Math.floor(scrollSize / typicalItemSize);
-            itemsFromStartToDisplayEnd = Math.ceil((scrollSize + size) / typicalItemSize);
+            itemsFromStartToScrollEnd = Math.floor(typicalItemSize !== 0 ? scrollSize / typicalItemSize : 0);
+            itemsFromStartToDisplayEnd = Math.ceil(typicalItemSize !== 0 ? (scrollSize + size) / typicalItemSize : 0);
             leftItemLength = Math.min(itemsFromStartToScrollEnd, bufferSize);
             rightItemLength = itemsFromStartToDisplayEnd + bufferSize > totalLength
                 ? totalLength - itemsFromStartToDisplayEnd : bufferSize;
@@ -1002,9 +1002,9 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                         collapsable = itemConfigMap[id]?.collapsable ?? false,
                         size = dynamicSize ? cache?.[sizeProperty] || typicalItemSize : typicalItemSize,
                         absoluteStartPosition = pos - (scrollSize - size) - size,
-                        ratio = boundsSize / size, absoluteStartPositionPercent = -(absoluteStartPosition / boundsSize) * ratio,
+                        ratio = size !== 0 ? boundsSize / size : 0, absoluteStartPositionPercent = -(boundsSize !== 0 ? absoluteStartPosition / boundsSize : 0) * ratio,
                         absoluteEndPosition = boundsSize - (absoluteStartPositionPercent + size),
-                        absoluteEndPositionPercent = (absoluteStartPositionPercent + ((absoluteEndPosition + size) / boundsSize) * ratio);
+                        absoluteEndPositionPercent = (absoluteStartPositionPercent + (boundsSize !== 0 ? (absoluteEndPosition + size) / boundsSize : 0) * ratio);
                     if (sticky === 1) {
                         const isOdd = i % 2 != 0,
                             measures = {
@@ -1072,9 +1072,9 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                     if (sticky === 2) {
                         const isOdd = i % 2 != 0,
                             w = isVertical ? normalizedItemWidth : size, h = isVertical ? size : normalizedItemHeight,
-                            absoluteStartPosition = pos - (scrollSize - size) - size, ratio = boundsSize / size, absoluteStartPositionPercent = -(absoluteStartPosition / boundsSize) * ratio,
+                            absoluteStartPosition = pos - (scrollSize - size) - size, ratio = size !== 0 ? boundsSize / size : 0, absoluteStartPositionPercent = -(boundsSize !== 0 ? absoluteStartPosition / boundsSize : 0) * ratio,
                             absoluteEndPosition = boundsSize - (absoluteStartPositionPercent + size),
-                            absoluteEndPositionPercent = (absoluteStartPositionPercent + ((absoluteEndPosition + size) / boundsSize) * ratio),
+                            absoluteEndPositionPercent = (absoluteStartPositionPercent + (boundsSize !== 0 ? (absoluteEndPosition + size) / boundsSize : 0) * ratio),
                             measures = {
                                 x: isVertical ? 0 : actualEndSnippedPosition - w,
                                 y: isVertical ? actualEndSnippedPosition - h : 0,
@@ -1143,9 +1143,9 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                         selectable = itemConfigMap[id]?.selectable ?? true,
                         collapsable = itemConfigMap[id]?.collapsable ?? false,
                         snapped = snap && (sticky === 1 && (pos <= scrollSize + this._scrollStartOffset) || sticky === 2 && (pos >= scrollSize + boundsSize - size)),
-                        absoluteStartPosition = pos - (scrollSize - size) - size, ratio = boundsSize / size, absoluteStartPositionPercent = -(absoluteStartPosition / boundsSize) * ratio,
+                        absoluteStartPosition = pos - (scrollSize - size) - size, ratio = size !== 0 ? boundsSize / size : 0, absoluteStartPositionPercent = -(boundsSize !== 0 ? absoluteStartPosition / boundsSize : 0) * ratio,
                         absoluteEndPosition = boundsSize - (absoluteStartPositionPercent + size),
-                        absoluteEndPositionPercent = (absoluteStartPositionPercent + ((absoluteEndPosition + size) / boundsSize) * ratio),
+                        absoluteEndPositionPercent = (absoluteStartPositionPercent + (boundsSize !== 0 ? (absoluteEndPosition + size) / boundsSize : 0) * ratio),
                         measures = {
                             x: isVertical ? sticky === 1 ? 0 : boundsSize - size : pos,
                             y: isVertical ? pos : sticky === 2 ? boundsSize - size : 0,
