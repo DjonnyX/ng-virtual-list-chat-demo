@@ -10,14 +10,14 @@ import { MessageGroupComponent, MessagesTypingIndicatorComponent } from '@entiti
 import { IDeleteEventData, MessageBoxComponent } from '@features/message';
 import { XVirtualListComponent } from '@shared/components';
 import {
-  FocusAlignments, Id, IDisplayObjectConfig, ISize, IVirtualListItem, IVirtualListItemConfigMap,
+  FocusAlignments, Id, IDisplayObjectConfig, IScrollEvent, ISize, IVirtualListItem, IVirtualListItemConfigMap,
 } from '@shared/components/x-virtual-list';
 import { IRenderVirtualListItemConfig } from '@shared/components/x-virtual-list/lib/models/render-item-config.model';
 import { IMessageItemData } from "@shared/models/message";
 import { MessageTypes } from '@shared/enums';
 import { ThemeService } from '@shared/theming';
 import { ITheme } from '@shared/theming';
-import { ILocalization, LocalizationService } from '@shared/localization';
+import { ILocalization, LocaleSensitiveDirective, LocalizationService } from '@shared/localization';
 import { resourceManager } from '@shared/utils/resource-manager';
 import { StaticClickDirective } from '@shared/directives';
 import { MessagesService } from '../messages.service';
@@ -32,10 +32,12 @@ import { MessagesNotificationWSService } from '../messages-notification-ws.servi
 import { generateTypingIndicator, TYPING_INDICATOR_INDEX } from './utils/generate-typing-indicator';
 import { IProxyCollectionItem, ProxyCollection, ProxyCollectionEvents } from './utils/proxy-collection';
 import { createGroups } from './utils/create-groups';
+import { MessageScrollToEndButtonComponent } from '@entities/message/message-scroll-to-end-button/message-scroll-to-end-button.component';
 
 const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
   MIN_ITEM_HEIGHT = 28,
-  CHUNK_SIZE = 200;
+  CHUNK_SIZE = 200,
+  SCROLL_TO_FADE_PIXELS = 200;
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -48,7 +50,7 @@ const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
   selector: 'x-messages',
   imports: [
     CommonModule, MessageBoxComponent, MessageGroupComponent, XVirtualListComponent, MessagesTypingIndicatorComponent,
-    MessagesLoadingIndicatorComponent, StaticClickDirective,
+    MessagesLoadingIndicatorComponent, MessageScrollToEndButtonComponent, StaticClickDirective, LocaleSensitiveDirective,
   ],
   providers: [
     { provide: MessagesService, useClass: environment.useMock ? MessagesMockService : MessagesHttpService },
@@ -117,6 +119,8 @@ export class MessagesComponent implements OnDestroy {
   private _destroyRef = inject(DestroyRef);
 
   listClasses = signal<{ [className: string]: boolean }>({});
+
+  showScrollToBottom = signal<boolean>(false);
 
   private _chunkNumber = 1;
 
@@ -618,6 +622,17 @@ export class MessagesComponent implements OnDestroy {
 
   onEditingCancelHandler(item: IVirtualListItem<IMessageItemData>) {
     this._proxyCollection.setParams(item.id, { edited: false, });
+  }
+
+  onScrollHandler(e: IScrollEvent) {
+    this.showScrollToBottom.set(e.scrollSize + e.size + SCROLL_TO_FADE_PIXELS <= e.listSize);
+  }
+
+  onScrollToEndClickHandler() {
+    const list = this._list();
+    if (list) {
+      list.scrollToEnd();
+    }
   }
 
   ngOnDestroy(): void {

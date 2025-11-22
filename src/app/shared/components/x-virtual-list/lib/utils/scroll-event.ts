@@ -6,6 +6,7 @@ interface IScrollEventParams {
     list: HTMLElement;
     delta: number;
     scrollDelta: number;
+    scrollSize: number;
     isVertical: boolean;
 }
 
@@ -51,10 +52,10 @@ export class ScrollEvent implements IScrollEvent {
     get scrollDelta() { return this._scrollDelta; }
 
     constructor(params: IScrollEventParams) {
-        const { direction, isVertical, container, list, delta, scrollDelta } = params;
+        const { direction, container, list, scrollSize, delta, isVertical, scrollDelta } = params;
         this._direction = direction;
         this._isVertical = isVertical;
-        this._scrollSize = isVertical ? container.scrollTop : container.scrollLeft;
+        this._scrollSize = scrollSize;
         this._scrollWeight = isVertical ? container.scrollHeight : container.scrollWidth;
         this._listSize = isVertical ? list.offsetHeight : list.offsetWidth;
         this._size = isVertical ? container.offsetHeight : container.offsetWidth;

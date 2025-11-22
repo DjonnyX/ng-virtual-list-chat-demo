@@ -1,3 +1,5 @@
+import { ButtonPresets } from "../../presets";
+import { IButtonTheme } from "../components/button";
 import { IChatHeaderTheme } from "./chat-header-theme";
 import { IChatMessagesTheme } from "./chat-messages/messages-theme";
 import { IChatsTheme } from "./chats";
@@ -14,5 +16,6 @@ export interface IChatTheme {
     header: IChatHeaderTheme;
     messageCreator: IMessageCreatorTheme;
     messages: IChatMessagesTheme;
+    scrollToEndButton: ButtonPresets | IButtonTheme;
     chats: IChatsTheme;
 }

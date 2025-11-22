@@ -122,6 +122,24 @@ const manifest: ITheme = {
                 },
             },
         },
+        scrollToEndButton: {
+            rippleColor: "rgba(255, 255, 255, 0.2)",
+            normal: {
+                fill: ["rgba(20, 5, 32, 0.5)", "rgba(20, 5, 32, 0.5)"],
+                iconFill: "rgb(206, 191, 220)",
+                strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
+            },
+            pressed: {
+                fill: ["rgba(84, 33, 126, 0.5)", "rgba(84, 33, 126, 0.5)"],
+                iconFill: "rgb(206, 191, 220)",
+                strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
+            },
+            disabled: {
+                fill: ["rgba(84, 33, 126, .25)", "rgba(84, 33, 126, .25)"],
+                iconFill: "rgba(206, 191, 220, .85)",
+                strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
+            },
+        },
         messages: {
             background: "linear-gradient(180deg, rgb(8, 4, 15) 0%, rgb(4, 16, 20) 100%)",
             backgroundImage: "url(background_infinity-dark.png)",

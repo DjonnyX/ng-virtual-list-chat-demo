@@ -4,7 +4,7 @@ import { ILocalization } from './localizations/interfaces/localization';
 import { getTextDirectionByLocale, LocaleList, Localizations } from './localizations';
 import { TextDirections } from './localizations/enums';
 
-const DEFAULT_LOCALE: string = 'en-US';
+const DEFAULT_LOCALE: string = 'he-IL';
 
 /**
  * @author Evgenii Alexandrovich Grebennikov

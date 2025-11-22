@@ -10,13 +10,21 @@
         <x-messages-loading-indicator class="loading-indicator" />
     }
 
+    @if (!loading) {
+        <div class="overlay">
+            <x-message-scroll-to-end-button localeSensitive class="scroll-to-end" [ngClass]="{show: showScrollToBottom()}"
+                (onClick)="onScrollToEndClickHandler()">
+            </x-message-scroll-to-end-button>
+        </div>
+    }
+
     <x-virtual-list #list class="list" [ngClass]="listClass" [items]="items" [itemRenderer]="itemRenderer"
         [snapScrollToBottom]="true" [itemSize]="38" [bufferSize]="2" [maxBufferSize]="2" collectionMode="lazy"
         [itemConfigMap]="itemsConfigMap" [dynamicSize]="true" [snap]="true" snappingMethod="chat" [defaultItemValue]="defaultItemValue()"
         [scrollStartOffset]="scrollStartOffset()" [scrollEndOffset]="scrollEndOffset()" [snapToEndTransitionInstantOffset]="50"
         methodForSelecting="multi-select" [selectedIds]="selectedItemIds" [snapToEndTransitionInstantOffset]="0"
         [selectByClick]="false" (onSelect)="onSelectItemHandler($event)" scrollbarPreset="x-scrollbar-secondary"
-        (onScrollReachStart)="onScrollReachStartHandler()" [isLazyLoading]="isLazyLoading()">
+        (onScrollReachStart)="onScrollReachStartHandler()" [isLazyLoading]="isLazyLoading()" (onScroll)="onScrollHandler($event)">
     </x-virtual-list>
 
     <ng-template #itemRenderer let-index="index" let-data="data" let-prevData="prevData" let-nextData="nextData"

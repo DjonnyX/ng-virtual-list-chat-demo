@@ -1529,6 +1529,7 @@ export class XVirtualListComponent implements OnDestroy {
             direction: this._trackBox.scrollDirection, container: scrollerEl,
             list: this._list()!.nativeElement, delta: this._trackBox.delta,
             scrollDelta: this._trackBox.scrollDelta, isVertical: this._isVertical,
+            scrollSize: this._scrollSize(),
           });
 
           this.onScroll.emit(event);
@@ -1555,6 +1556,7 @@ export class XVirtualListComponent implements OnDestroy {
             direction: this._trackBox.scrollDirection, container: scrollerEl,
             list: this._list()!.nativeElement, delta: this._trackBox.delta,
             scrollDelta: this._trackBox.scrollDelta, isVertical: this._isVertical,
+            scrollSize: this._scrollSize(),
           });
 
           this.onScrollEnd.emit(event);
