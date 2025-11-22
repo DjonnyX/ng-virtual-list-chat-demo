@@ -31,9 +31,11 @@ export class MessaageInputComponent implements OnDestroy {
 
   text = input<string>();
 
+  loading = input<boolean>(false);
+
   changeText = output<string | undefined>();
 
-  edited = output<{ nativeEvent: Event, value: string | undefined }>();
+  onCreate = output<{ nativeEvent: Event, value: string | undefined }>();
 
   editingCancel = output<void>();
 
@@ -42,8 +44,6 @@ export class MessaageInputComponent implements OnDestroy {
   editingState: Signal<MessageButtonSaveState>;
 
   isMessageValid: Signal<boolean>;
-
-  isSaving: Signal<boolean>;
 
   tmpValue = signal<string>('');
 
@@ -135,10 +135,6 @@ export class MessaageInputComponent implements OnDestroy {
       return (tmpValue !== undefined && tmpValue.length > 0);
     });
 
-    this.isSaving = computed(() => {
-      return false;
-    });
-
     effect(() => {
       const theme = this.theme();
       if (theme) {
@@ -152,10 +148,18 @@ export class MessaageInputComponent implements OnDestroy {
             editor.style.backgroundColor = preset.input.background;
             editor.style.outline = focus ? preset.input.outline : NONE;
           }
-            this.containerBackground.set(preset.background);
+          this.containerBackground.set(preset.background);
         }
       }
     });
+  }
+
+  reset() {
+    const textarea = this.textarea()?.nativeElement;
+    if (textarea) {
+      textarea.value = '';
+    }
+    this.tmpValue.set('');
   }
 
   onInputHandler(e: Event) {
@@ -169,7 +173,7 @@ export class MessaageInputComponent implements OnDestroy {
     if (tmpValue) {
       switch (state) {
         case MessageButtonSaveStates.SEND: {
-          this.edited.emit({ nativeEvent: e, value: tmpValue });
+          this.onCreate.emit({ nativeEvent: e, value: tmpValue });
           break;
         }
         case MessageButtonSaveStates.CANCEL: {

@@ -122,6 +122,7 @@ export class EditableTextComponent implements OnDestroy {
 
   constructor() {
     this._resizeObserver = new ResizeObserver(this._onContainerResizeHandler);
+    resourceManager.addEventListener(ResourceManagerEvents.PROGRESS, this._onResourceLoadedHandler);
 
     const $textarea = toObservable(this.textarea).pipe(
       takeUntilDestroyed(),
@@ -227,7 +228,9 @@ export class EditableTextComponent implements OnDestroy {
       $selectable = toObservable(this.selectable),
       $resources = combineLatest([this.$resourceUrls, this.$resourceLoaded]).pipe(
         takeUntilDestroyed(),
-        switchMap(([resourceUrls, resourceLoaded]) => of(resourceUrls.includes(resourceLoaded))),
+        switchMap(([resourceUrls, resourceLoaded]) => {
+          return of(resourceUrls.includes(resourceLoaded));
+        }),
       );
 
     $text.pipe(
@@ -239,10 +242,10 @@ export class EditableTextComponent implements OnDestroy {
       }),
       tap(urls => {
         if (urls.length > 0) {
+          for (const url of urls) {
+            resourceManager.add(url);
+          }
           this._$resourceUrls.next(urls);
-          resourceManager.addEventListener(ResourceManagerEvents.PROGRESS, this._onResourceLoadedHandler);
-        } else {
-          resourceManager.removeEventListener(ResourceManagerEvents.PROGRESS, this._onResourceLoadedHandler);
         }
       }),
     ).subscribe();
@@ -289,8 +292,6 @@ export class EditableTextComponent implements OnDestroy {
       this._resizeObserver.disconnect();
     }
 
-    if (resourceManager.hasEventListener(ResourceManagerEvents.PROGRESS, this._onResourceLoadedHandler)) {
-      resourceManager.removeEventListener(ResourceManagerEvents.PROGRESS, this._onResourceLoadedHandler);
-    }
+    resourceManager.removeEventListener(ResourceManagerEvents.PROGRESS, this._onResourceLoadedHandler);
   }
 }

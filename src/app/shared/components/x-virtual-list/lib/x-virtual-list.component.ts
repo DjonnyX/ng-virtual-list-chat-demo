@@ -699,6 +699,10 @@ export class XVirtualListComponent implements OnDestroy {
 
   readonly screenReaderFormattedMessage = signal<string>(this.screenReaderMessage());
 
+  get displayItems() {
+    return this._service.displayItems;
+  }
+
   private _isNotSelecting = this.getIsNotSelecting();
   get isNotSelecting() { return this._isNotSelecting; }
 
@@ -2001,16 +2005,14 @@ export class XVirtualListComponent implements OnDestroy {
   /**
    * Scrolls the scroll area to the last item in the collection.
    */
-  scrollToEnd(cb?: () => void, options?: IScrollOptions) {
-    const behavior = options?.behavior ?? BEHAVIOR_INSTANT,
-      iteration = options?.iteration ?? 0;
-    validateScrollBehavior(behavior);
-    validateIteration(iteration);
-    const trackBy = this.trackBy(), items = this.items(), latItem = items[items.length > 0 ? items.length - 1 : 0], id = latItem?.[trackBy],
-      actualIteration = validateScrollIteration(iteration);
-    if (id !== undefined) {
-      this._$scrollTo.next({ id, behavior, iteration: actualIteration, isLastIteration: actualIteration === MAX_SCROLL_TO_ITERATIONS, cb });
-      this._trackBox.isScrollEnd = true;
+  scrollToEnd() {
+    this._isScrollFinished.set(true);
+    this._trackBox.isScrollEnd = true;
+    const scroller = this._scrollerComponent();
+    if (scroller) {
+      this._trackBox.cancelScrollSnappingToEnd(true);
+      const isVertical = this._isVertical, scrollSize = isVertical ? scroller.scrollTop : scroller.scrollLeft;
+      this._scrollSize.set(scrollSize);
     }
   }
 

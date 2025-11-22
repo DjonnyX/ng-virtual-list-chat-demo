@@ -49,6 +49,10 @@ class ResourceManager extends EventEmitter<ResourceManagerEvents, ResourceManage
     }
 
     add(url: string) {
+        const status = this._statusMap.get(url);
+        if (status === ResourceStatus.LOADING || status === ResourceStatus.LOADED) {
+            return;
+        }
         this._statusMap.set(url, ResourceStatus.WAITING);
         const thread = new Thread({
             onStart: async () => {
@@ -58,6 +62,7 @@ class ResourceManager extends EventEmitter<ResourceManagerEvents, ResourceManage
                         fetch(url, {
                             cache: 'no-cache',
                             priority: 'auto',
+                            mode: 'cors',
                         }).then(res => {
                             if (!res.ok) {
                                 throw Error('Loading error');
@@ -89,14 +94,16 @@ class ResourceManager extends EventEmitter<ResourceManagerEvents, ResourceManage
                     this._map.set(url, resource);
                     this._statusMap.set(url, ResourceStatus.LOADED);
                     this.dispatch(ResourceManagerEvents.PROGRESS, url);
+                    thread.complete();
                     return;
                 }
 
                 this._statusMap.set(url, ResourceStatus.ERROR);
-                this.dispatch(ResourceManagerEvents.PROGRESS, url);
+                thread.reject();
             },
         });
         this._threadManager.add(thread);
+        this._threadManager.play();
     }
 
     getStatus(url: string): ResourceStatus {
@@ -116,6 +123,7 @@ class ResourceManager extends EventEmitter<ResourceManagerEvents, ResourceManage
     }
 
     clear() {
+        this._statusMap.clear();
         return this._map.clear();
     }
 }

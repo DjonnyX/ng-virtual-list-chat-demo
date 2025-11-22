@@ -19,6 +19,10 @@
     background-size: 200% 200%;
     animation: gradientRotate 5s linear infinite alternate;
 
+    .button {
+        -webkit-tap-highlight-color: transparent;
+    }
+
     .editor {
         width: 100%;
         padding: 8px 12px;

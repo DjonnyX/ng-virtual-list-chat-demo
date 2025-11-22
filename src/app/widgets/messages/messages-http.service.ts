@@ -23,7 +23,7 @@ export class MessagesHttpService implements MessagesService {
     throw new Error('Method not implemented.');
   }
 
-  createMessage(chatId: Id, message: IVirtualListItem<IMessageItemData>): Observable<IVirtualListItem<IMessage>> {
+  createMessage(chatId: Id, message: Omit<IVirtualListItem<IMessageItemData>, 'id' | 'mailed' | 'edited' | 'incomType' | 'type' | 'dateTime'>): Observable<IVirtualListItem<IMessage>> {
     throw new Error('Method not implemented.');
   }
 

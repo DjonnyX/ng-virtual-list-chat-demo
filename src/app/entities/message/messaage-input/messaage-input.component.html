@@ -1,14 +1,14 @@
 @let value = tmpValue();
 @let sendButtonState = editingState();
 @let isValid = isMessageValid();
-@let saving = isSaving();
+@let saving = loading();
 @let focus = focused();
 @let scroll = scrolled();
 <div class="container" [style.--background]="containerBackground()">
     <div #editor class="editor" [ngClass]="{focus, scroll}">
-        <textarea #textarea localeSensitive cdkTextareaAutosize class="textarea" [value]="value"
+        <textarea #textarea localeSensitive cdkTextareaAutosize class="textarea" [disabled]="saving" [value]="value"
             (input)="onInputHandler($event)"></textarea>
     </div>
-    <x-message-send-button [state]="sendButtonState" [valid]="isValid" [loading]="saving"
+    <x-message-send-button class="button" [state]="sendButtonState" [valid]="isValid" [loading]="saving"
         (onClick)="onSaveHandler($event, sendButtonState)" calcFillPositions />
 </div>

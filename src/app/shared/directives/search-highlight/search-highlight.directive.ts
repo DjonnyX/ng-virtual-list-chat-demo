@@ -1,6 +1,6 @@
 import { Directive, Renderer2, ElementRef, input, inject, SecurityContext, effect } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { COMPILED_URL_PATTERN } from '@shared/utils/text/format-text.util';
+import { NON_SEARCHABLE_PATTERN } from '@shared/utils/text/format-text.util';
 
 const INNER_HTML = 'innerHTML';
 
@@ -66,6 +66,6 @@ export class SearchHighlightDirective {
             return t;
         }
         const regexp = new RegExp(`(${s.join('|')})`, 'g');
-        return t?.replaceAll(COMPILED_URL_PATTERN, '')?.replace(regexp, `<span class="${substringClass}">$1</span>`);
+        return t?.replaceAll(NON_SEARCHABLE_PATTERN, '')?.replace(regexp, `<span class="${substringClass}">$1</span>`);
     }
 }

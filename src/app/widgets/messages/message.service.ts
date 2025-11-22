@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, distinctUntilChanged } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, Subject } from 'rxjs';
 import { XVirtualListComponent } from '@shared/components';
+import { IMessageItemData } from '@shared/models/message';
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -20,12 +21,19 @@ export class MessageService {
     }
   }
 
+  private _$add = new Subject<IMessageItemData>();
+  readonly $add = this._$add.asObservable();
+
   private _$chatId = new BehaviorSubject<string | undefined>(undefined);
   readonly $chatId = this._$chatId.asObservable().pipe(
     distinctUntilChanged(),
   );
 
   constructor() { }
+
+  add(msg: IMessageItemData) {
+    this._$add.next(msg);
+  }
 
   changeChat(chatId: string) {
     this._$chatId.next(chatId);

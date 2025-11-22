@@ -20,7 +20,7 @@
                 <div class="viewer-container">
                     <x-messages [search]="searchText" [scrollStartOffset]="toolbarBounds().height" [scrollEndOffset]="messageCreatorBounds().height" />
                     <div #messageCreator class="message-creator">
-                        <x-messaage-creator></x-messaage-creator>
+                        <x-messaage-creator #creator [creating]="isCreating()" (onSend)="onSendMessageHandler($event)"></x-messaage-creator>
                     </div>
                 </div>
             </x-drawer>

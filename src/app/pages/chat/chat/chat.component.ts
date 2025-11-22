@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, effect, ElementRef, inject, OnDestroy, Signal, signal, viewChild, ViewEncapsulation } from '@angular/core';
+import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, OnDestroy, Signal, signal, viewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { BehaviorSubject, filter, map, tap, } from 'rxjs';
+import { BehaviorSubject, catchError, filter, map, of, Subject, switchMap, tap, } from 'rxjs';
 import { MenuButtonComponent, MessageSearchComponent } from '@entities/header';
 import { IRenderVirtualListItem, ISize, IVirtualListItem } from '@shared/components/x-virtual-list';
 import { DrawerComponent, DockMode } from "@shared/components";
@@ -16,6 +16,13 @@ import { generateChatCollection } from '@mock/const';
 import { IMessageItemData } from '@shared/models/message';
 import { LocaleSensitiveDirective } from '@shared/localization';
 import { MessaageCreatorComponent } from '@widgets/message/messaage-creator/messaage-creator.component';
+import { MessagesService } from '@widgets/messages/messages.service';
+import { MessagesMockService } from '@widgets/messages/messages-mock.service';
+import { MessagesNotificationService } from '@widgets/messages/messages-notification.service';
+import { MessagesNotificationMockService } from '@widgets/messages/messages-notification-mock.service';
+import { MessagesNotificationWSService } from '@widgets/messages/messages-notification-ws.service';
+import { MessagesHttpService } from '@widgets/messages/messages-http.service';
+import { environment } from '@environments/environment';
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -32,7 +39,10 @@ import { MessaageCreatorComponent } from '@widgets/message/messaage-creator/mess
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  providers: [ClickOutsideService, MessageService],
+  providers: [ClickOutsideService,
+    { provide: MessagesService, useClass: environment.useMock ? MessagesMockService : MessagesHttpService },
+    { provide: MessagesNotificationService, useClass: environment.useMock ? MessagesNotificationMockService : MessagesNotificationWSService },
+  ],
   encapsulation: ViewEncapsulation.Emulated,
 })
 export class ChatComponent implements OnDestroy {
@@ -42,8 +52,12 @@ export class ChatComponent implements OnDestroy {
 
   protected _header = viewChild<ElementRef<HTMLDivElement>>('header');
 
+  protected _creator = viewChild<MessaageCreatorComponent>('creator');
+
   private _$version = new BehaviorSubject<number>(0);
   readonly $version = this._$version.asObservable();
+
+  isCreating = signal<boolean>(false);
 
   menuOpened = signal<boolean>(false);
 
@@ -59,9 +73,14 @@ export class ChatComponent implements OnDestroy {
 
   title = signal<string | undefined>(undefined);
 
+  private _messagesService = inject(MessagesService);
+
   private _messageService = inject(MessageService);
 
   private _themeService = inject(ThemeService);
+
+  private _$send = new Subject<string>();
+  protected $send = this._$send.asObservable();
 
   private _messageCreatorResizeObserver: ResizeObserver;
 
@@ -91,10 +110,46 @@ export class ChatComponent implements OnDestroy {
     }
   }
 
+  private _destroyRef = inject(DestroyRef);
+
   constructor() {
     this._messageCreatorResizeObserver = new ResizeObserver(this._onMessageCreatorResizeHandler);
 
     this._toolbarResizeObserver = new ResizeObserver(this._onToolbarResizeHandler);
+
+    const $send = this.$send,
+      $chatId = this._messageService.$chatId;
+
+    $chatId.pipe(
+      takeUntilDestroyed(),
+      filter(v => v !== undefined),
+      switchMap(chatId => {
+        return $send.pipe(
+          takeUntilDestroyed(this._destroyRef),
+          switchMap(value => {
+            this.isCreating.set(true);
+            const msg: Omit<IVirtualListItem<IMessageItemData>, 'id' | 'mailed' | 'edited' | 'incomType' | 'type' | 'dateTime'> = {
+              text: value,
+            };
+            return this._messagesService.createMessage(chatId, msg);
+          }),
+          takeUntilDestroyed(this._destroyRef),
+          tap(msg => {
+            if (!msg) {
+              return;
+            }
+            this.isCreating.set(false);
+            this._messageService.add(msg);
+            this._creator()?.reset?.();
+          }),
+          catchError((err) => {
+            console.error(`Create message error: ${err}`);
+            this.isCreating.set(false);
+            return of(undefined);
+          }),
+        );
+      }),
+    ).subscribe();
 
     const $messageCreator = toObservable(this._messageCreator).pipe(
       takeUntilDestroyed(),
@@ -182,6 +237,10 @@ export class ChatComponent implements OnDestroy {
   onInfo(params: Array<any>) {
     const [param1, param2, param3] = params;
     this.title.set(`${param1}, ${param2}, ${param3}`)
+  }
+
+  onSendMessageHandler(value: string) {
+    this._$send.next(value);
   }
 
   ngOnDestroy(): void {

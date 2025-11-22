@@ -4,7 +4,6 @@ import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-i
 import {
   catchError, combineLatest, debounceTime, delay, filter, map, of, Subject, switchMap, tap, throwError,
 } from 'rxjs';
-import { environment } from '@environments/environment';
 import { MessagesLoadingIndicatorComponent } from '@entities/messages';
 import { MessageGroupComponent, MessagesTypingIndicatorComponent } from '@entities/message';
 import { IDeleteEventData, MessageBoxComponent } from '@features/message';
@@ -21,16 +20,12 @@ import { ILocalization, LocaleSensitiveDirective, LocalizationService } from '@s
 import { resourceManager } from '@shared/utils/resource-manager';
 import { StaticClickDirective } from '@shared/directives';
 import { MessagesService } from '../messages.service';
-import { MessagesMockService } from '../messages-mock.service';
-import { MessagesHttpService } from '../messages-http.service';
 import { fillConfigMap } from './utils/fill-config-map';
-import { validateCollection } from './utils/validate-collection';
+import { validateCollection, validateMessage } from './utils/validate-collection';
 import { MessageService } from '../message.service';
 import { MessagesNotificationService } from '../messages-notification.service';
-import { MessagesNotificationMockService } from '../messages-notification-mock.service';
-import { MessagesNotificationWSService } from '../messages-notification-ws.service';
 import { generateTypingIndicator, TYPING_INDICATOR_INDEX } from './utils/generate-typing-indicator';
-import { IProxyCollectionItem, ProxyCollection, ProxyCollectionEvents } from './utils/proxy-collection';
+import { CollectionItem, IProxyCollectionItem, ProxyCollection, ProxyCollectionEvents } from './utils/proxy-collection';
 import { createGroups } from './utils/create-groups';
 import { MessageScrollToEndButtonComponent } from '@entities/message/message-scroll-to-end-button/message-scroll-to-end-button.component';
 import { MessageUnmailedSeparatorComponent } from '@entities/message/message-unmailed-separator/message-unmailed-separator.component';
@@ -53,10 +48,6 @@ const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
     CommonModule, MessageBoxComponent, MessageGroupComponent, XVirtualListComponent, MessagesTypingIndicatorComponent,
     MessageUnmailedSeparatorComponent, MessagesLoadingIndicatorComponent, MessageScrollToEndButtonComponent,
     StaticClickDirective, LocaleSensitiveDirective,
-  ],
-  providers: [
-    { provide: MessagesService, useClass: environment.useMock ? MessagesMockService : MessagesHttpService },
-    { provide: MessagesNotificationService, useClass: environment.useMock ? MessagesNotificationMockService : MessagesNotificationWSService },
   ],
   templateUrl: './messages.component.html',
   styleUrl: './messages.component.scss',
@@ -188,6 +179,7 @@ export class MessagesComponent implements OnDestroy {
     this._proxyCollection.addEventListener(ProxyCollectionEvents.CHANGE, this._proxyCollectionChangeHandler);
     const $collection = toObservable(this.collection),
       $search = toObservable(this.search),
+      $add = this._messageService.$add,
       $edit = this.$edit,
       $delete = this.$delete,
       $change = this.$change,
@@ -220,10 +212,10 @@ export class MessagesComponent implements OnDestroy {
       filter(({ list, chatId }) => !!list && chatId !== undefined),
       tap(({ list }) => {
         // reset
+        resourceManager.clear();
         this._chunkNumber = 1;
         this.isLoading.set(true);
         if (this._proxyCollection.collection.length > 0) {
-          resourceManager.clear();
           this._proxyCollection.from([]);
           this.selectedIds.set([]);
         }
@@ -285,10 +277,11 @@ export class MessagesComponent implements OnDestroy {
         return $scroll.pipe(
           takeUntilDestroyed(this._destroyRef),
           filter(() => !this.isLoading()),
-          debounceTime(500),
+          debounceTime(2000),
           takeUntilDestroyed(this._destroyRef),
           switchMap(e => {
-            const messages: IVirtualListCollection<IVirtualListItem<IMessageItemData>> = [], range = e.itemsRange;
+            const messages: IVirtualListCollection<IVirtualListItem<IMessageItemData>> = [],
+              notFiltered: IVirtualListCollection<IVirtualListItem<IMessageItemData>> = [], range = e.itemsRange;
             if (range) {
               const collection = this._proxyCollection.collection;
               for (let i = range[0], l = range[1]; i < l; i++) {
@@ -297,6 +290,7 @@ export class MessagesComponent implements OnDestroy {
                   if (!msg.mailed) {
                     messages.push({ ...msg, mailed: true });
                   }
+                  notFiltered.push(msg);
                 }
               }
             }
@@ -306,7 +300,8 @@ export class MessagesComponent implements OnDestroy {
                 switchMap(v => of(createGroups(v, this._proxyCollection, locale!, localization!))),
               );
             }
-            return of(undefined);
+            createGroups({ version: 0, items: notFiltered as any, }, this._proxyCollection, locale!, localization!);
+            return of({ version: 0, items: [] });
           }),
           catchError((err) => {
             return throwError(() => {
@@ -372,6 +367,19 @@ export class MessagesComponent implements OnDestroy {
             return of(undefined);
           }),
         );
+      }),
+    ).subscribe();
+
+    $add.pipe(
+      takeUntilDestroyed(),
+      filter(v => v !== undefined),
+      tap(msg => {
+        validateMessage(msg);
+        this._proxyCollection.set(msg.id, msg as CollectionItem<IMessageItemData>);
+        const configMap = {};
+        fillConfigMap(configMap, this._proxyCollection.collection);
+        this.collectionConfigMap.set(configMap);
+        this._list()?.scrollToEnd();
       }),
     ).subscribe();
 

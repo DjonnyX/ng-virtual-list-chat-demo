@@ -3,8 +3,9 @@ import { ResourceStatus } from "../resource-manager/resource-manager";
 
 export const SERVICE_WHITESPACE = '&__whitespace__;',
     SERVICE_COMPILED_URL = '&__url__;',
-    URL_PATTERN = /(https?:\/\/(?:www\.|(?!www))[\w\d\-_?=%,;\[\]&.][\w\d\-_?=%,;\[\]&.]+[\w\d\-_?=%,;\[\]&.]\.[\w\d\-_?=%,;\[\]&.\/]{2,}|www\.[\w\d\-_?=%,;\[\]&.][\w\d\-_?=%,;\[\]&.]+[\w\d\-_?=%,;\[\]&.\/]\.[^\w]{2,}|https?:\/\/(?:www\.|(?!www))[\w\d\-_?=%,;\[\]&.]+\.[^\w]{2,}|www\.[\w\d\-_?=%,;\[\]&.\/]+\.[^\w]{2,})|((?:www\.|(?!www))[\w\d\-_?=%,;\[\]&.][\w\d\-_?=%,;\[\]&.]+[\w\d\-_?=%,;\[\]&.]\.[\w\d\-_?=%,;\[\]&.\/]{2,}|www\.[\w\d\-_?=%,;\[\]&.][\w\d\-_?=%,;\[\]&.]+[\w\d\-_?=%,;\[\]&.\/]\.[^\w]{2,})/gm,
+    URL_PATTERN = /(https?:\/\/(?:www\.|(?!www))[\w\d\-_?=%,;\[\]&.][\w\d\-_?=%:,;\[\]&.]+[\w\d\-_?=%:,;\[\]&.]\.[\w\d\-_?=%:,;\[\]&.\/]{2,}|www\.[\w\d\-_?=%:,;\[\]&.][\w\d\-_?=%:,;\[\]&.]+[\w\d\-_?=%:,;\[\]&.\/]\.[^\w]{2,}|https?:\/\/(?:www\.|(?!www))[\w\d\-_?=%:,;\[\]&.]+\.[^\w]{2,}|www\.[\w\d\-_?=%:,;\[\]&.\/]+\.[^\w]{2,})|((?:www\.|(?!www))[\w\d\-_?=%:,;\[\]&.][\w\d\-_?=%:,;\[\]&.]+[\w\d\-_?=%:,;\[\]&.]\.[\w\d\-_?=%:,;\[\]&.\/]{2,}|www\.[\w\d\-_?=%:,;\[\]&.][\w\d\-_?=%:,;\[\]&.]+[\w\d\-_?=%:,;\[\]&.\/]\.[^\w]{2,})/gm,
     COMPILED_URL_PATTERN = /(<a[^a].+<\/a>|<span[^span].+<\/span>|<img[^>].+>)/gm,
+    NON_SEARCHABLE_PATTERN = /(<a[^a].+<\/a>|<span[^span].+<\/span>|<img[^>].+>)/gm,
     LINEBREAK_PATTERN = /\r\n|\n|\r/gm;
 
 const messageStatus = (time: string, mailed: boolean) => `&nbsp;<span${SERVICE_WHITESPACE}class="message-status"style="display:inline-flex;float:right;word-break:keep-all;">${time}&nbsp;<span${SERVICE_WHITESPACE}>${mailed ?

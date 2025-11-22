@@ -6,6 +6,7 @@ import { IMessageItemData } from '@shared/models/message';
 import { IMessagesChunkParams, MessagesService } from './messages.service';
 import { IGetMessagesAnswer, IGetMessagesData } from './model/messages';
 import { IMessage } from './model/message';
+import { MessageTypes } from '@shared/enums';
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -136,8 +137,27 @@ export class MessagesMockService implements MessagesService {
         );
     }
 
-    createMessage(chatId: Id, message: IVirtualListItem<IMessageItemData>): Observable<IVirtualListItem<IMessage>> {
-        throw new Error('Method not implemented.');
+    createMessage(chatId: Id, message: Omit<IVirtualListItem<IMessageItemData>, 'id' | 'mailed' | 'edited' | 'incomType' | 'type' | 'dateTime'>): Observable<IVirtualListItem<IMessage>> {
+        const items = db.chats[chatId].messages ?? [];
+        return of(message as IMessageItemData).pipe(
+            delay(10 + (Math.random() * 1000)),
+            switchMap((message) => {
+                db.chats[chatId].version++;
+                const dt = Date.now();
+                const item: IVirtualListItem<IMessage> = {
+                    mailed: false,
+                    edited: false,
+                    incomType: 'out',
+                    type: MessageTypes.ITEM,
+                    version: 0,
+                    id: dt,
+                    ...message as any,
+                    dateTime: items.length > 0 ? items[items.length - 1].dateTime + 1 : dt,
+                };
+                items.push(item);
+                return of(item);
+            }),
+        );
     }
 
     updateMessage(chatId: Id, messageId: Id, message: Partial<Omit<IVirtualListItem<IMessageItemData>, 'id'>>): Observable<IVirtualListItem<IMessage>> {
