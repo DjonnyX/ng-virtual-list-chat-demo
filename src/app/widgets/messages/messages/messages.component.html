@@ -37,6 +37,10 @@
                         @let class = {'animate': data.animate, 'deleted': data.deleted};
                         <x-messages-typing-indicator [classes]="class" />
                     }
+                    @case ("unmailed-separator") {
+                        @let class = {'animate': data.animate, 'deleted': data.deleted};
+                        <x-message-unmailed-separator  [classes]="class" />
+                    }
                     @case ("group") {
                         @let class = {'snapped': config.snapped, 'snapped-out': config.snappedOut, 'focused': config.focused,
                         'collapsed': config.collapsed};

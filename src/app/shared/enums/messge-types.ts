@@ -5,6 +5,7 @@
  */
 export enum MessageTypes {
     TYPING_INDICATOR = 'typing-indicator',
+    UNREAD_SEPARATOR = 'unmailed-separator',
     GROUP = 'group',
     ITEM = 'item',
 }

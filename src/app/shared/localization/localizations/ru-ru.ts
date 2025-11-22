@@ -16,6 +16,7 @@ const localization: ILocalization = {
             }
         },
         messages: {
+            unmailedSeparator: 'Непрочитанные сообщения',
             message: {
                 dialog: {
                     delete: {

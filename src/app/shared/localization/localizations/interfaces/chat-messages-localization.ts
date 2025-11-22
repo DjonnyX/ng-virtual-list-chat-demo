@@ -8,5 +8,6 @@ import { IChatMessagesMessageLocalizataion } from "./chat-messages-message-local
  * All rights reserved.
  */
 export interface IMessagesLocalization {
+    unmailedSeparator: string;
     message: IChatMessagesMessageLocalizataion;
 }

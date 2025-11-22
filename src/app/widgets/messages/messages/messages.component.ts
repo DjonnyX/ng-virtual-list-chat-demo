@@ -10,7 +10,7 @@ import { MessageGroupComponent, MessagesTypingIndicatorComponent } from '@entiti
 import { IDeleteEventData, MessageBoxComponent } from '@features/message';
 import { XVirtualListComponent } from '@shared/components';
 import {
-  FocusAlignments, Id, IDisplayObjectConfig, IScrollEvent, ISize, IVirtualListItem, IVirtualListItemConfigMap,
+  FocusAlignments, Id, IDisplayObjectConfig, IScrollEvent, ISize, IVirtualListCollection, IVirtualListItem, IVirtualListItemConfigMap,
 } from '@shared/components/x-virtual-list';
 import { IRenderVirtualListItemConfig } from '@shared/components/x-virtual-list/lib/models/render-item-config.model';
 import { IMessageItemData } from "@shared/models/message";
@@ -33,6 +33,7 @@ import { generateTypingIndicator, TYPING_INDICATOR_INDEX } from './utils/generat
 import { IProxyCollectionItem, ProxyCollection, ProxyCollectionEvents } from './utils/proxy-collection';
 import { createGroups } from './utils/create-groups';
 import { MessageScrollToEndButtonComponent } from '@entities/message/message-scroll-to-end-button/message-scroll-to-end-button.component';
+import { MessageUnmailedSeparatorComponent } from '@entities/message/message-unmailed-separator/message-unmailed-separator.component';
 
 const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
   MIN_ITEM_HEIGHT = 28,
@@ -50,7 +51,8 @@ const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
   selector: 'x-messages',
   imports: [
     CommonModule, MessageBoxComponent, MessageGroupComponent, XVirtualListComponent, MessagesTypingIndicatorComponent,
-    MessagesLoadingIndicatorComponent, MessageScrollToEndButtonComponent, StaticClickDirective, LocaleSensitiveDirective,
+    MessageUnmailedSeparatorComponent, MessagesLoadingIndicatorComponent, MessageScrollToEndButtonComponent,
+    StaticClickDirective, LocaleSensitiveDirective,
   ],
   providers: [
     { provide: MessagesService, useClass: environment.useMock ? MessagesMockService : MessagesHttpService },
@@ -89,6 +91,7 @@ export class MessagesComponent implements OnDestroy {
 
   defaultItemValue = signal<IVirtualListItem<IMessageItemData>>({
     dateTime: 0,
+    mailed: false,
     text: '',
     edited: false,
     incomType: 'in',
@@ -106,6 +109,9 @@ export class MessagesComponent implements OnDestroy {
 
   private _$change = new Subject<{ item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, config: IDisplayObjectConfig, value: string | undefined }>();
   protected $change = this._$change.asObservable();
+
+  private _$scroll = new Subject<IScrollEvent>();
+  protected $scroll = this._$scroll.asObservable();
 
   private _$scrollReachStart = new Subject<void>();
   protected $scrollReachStart = this._$scrollReachStart.asObservable();
@@ -185,6 +191,7 @@ export class MessagesComponent implements OnDestroy {
       $edit = this.$edit,
       $delete = this.$delete,
       $change = this.$change,
+      $scroll = this.$scroll,
       $scrollReachStart = this.$scrollReachStart,
       $chatId = this._messageService.$chatId,
       $proxyCollectionChange = this.$proxyCollectionChange,
@@ -238,7 +245,7 @@ export class MessagesComponent implements OnDestroy {
               size: CHUNK_SIZE,
             }).pipe(
               takeUntilDestroyed(this._destroyRef),
-              switchMap(v => of(createGroups(v, locale!, localization!))),
+              switchMap(v => of(createGroups(v, this._proxyCollection, locale!, localization!))),
             );
           }),
           catchError((err) => {
@@ -275,6 +282,60 @@ export class MessagesComponent implements OnDestroy {
       takeUntilDestroyed(),
       filter(v => v !== undefined),
       switchMap(chatId => {
+        return $scroll.pipe(
+          takeUntilDestroyed(this._destroyRef),
+          filter(() => !this.isLoading()),
+          debounceTime(500),
+          takeUntilDestroyed(this._destroyRef),
+          switchMap(e => {
+            const messages: IVirtualListCollection<IVirtualListItem<IMessageItemData>> = [], range = e.itemsRange;
+            if (range) {
+              const collection = this._proxyCollection.collection;
+              for (let i = range[0], l = range[1]; i < l; i++) {
+                const proxyItem = collection[i], msg = proxyItem?.data;
+                if (msg) {
+                  if (!msg.mailed) {
+                    messages.push({ ...msg, mailed: true });
+                  }
+                }
+              }
+            }
+            if (messages.length > 0) {
+              return this._messagesService.patchMessages(chatId, messages).pipe(
+                takeUntilDestroyed(this._destroyRef),
+                switchMap(v => of(createGroups(v, this._proxyCollection, locale!, localization!))),
+              );
+            }
+            return of(undefined);
+          }),
+          catchError((err) => {
+            return throwError(() => {
+              return `Patch messages error: ${err}`;
+            });
+          }),
+          filter(res => !!res),
+          tap(res => {
+            const items = Array.isArray(res.items) ? res.items : [];
+            validateCollection(items);
+
+            this._proxyCollection.from(items, true);
+            const configMap = {};
+            fillConfigMap(configMap, this._proxyCollection.collection);
+            this.collectionConfigMap.set(configMap);
+          }),
+          catchError((err) => {
+            this.isLazyLoading.set(false);
+            console.error(err);
+            return of(undefined);
+          }),
+        );
+      }),
+    ).subscribe();
+
+    $chatId.pipe(
+      takeUntilDestroyed(),
+      filter(v => v !== undefined),
+      switchMap(chatId => {
         return $scrollReachStart.pipe(
           takeUntilDestroyed(this._destroyRef),
           filter(() => !this.isLoading()),
@@ -286,7 +347,7 @@ export class MessagesComponent implements OnDestroy {
               size: CHUNK_SIZE,
             }).pipe(
               takeUntilDestroyed(this._destroyRef),
-              switchMap(v => of(createGroups(v, locale!, localization!))),
+              switchMap(v => of(createGroups(v, this._proxyCollection, locale!, localization!))),
             );
           }),
           catchError((err) => {
@@ -323,7 +384,7 @@ export class MessagesComponent implements OnDestroy {
           switchMap(version => {
             return this._messagesService.getMessages(chatId).pipe(
               takeUntilDestroyed(this._destroyRef),
-              switchMap(v => of(createGroups(v, locale!, localization!))),
+              switchMap(v => of(createGroups(v, this._proxyCollection, locale!, localization!))),
             );
           }),
         );
@@ -366,8 +427,6 @@ export class MessagesComponent implements OnDestroy {
         );
       }),
     ).subscribe();
-
-
 
     $chatId.pipe(
       takeUntilDestroyed(),
@@ -626,6 +685,7 @@ export class MessagesComponent implements OnDestroy {
 
   onScrollHandler(e: IScrollEvent) {
     this.showScrollToBottom.set(e.scrollSize + e.size + SCROLL_TO_FADE_PIXELS <= e.listSize);
+    this._$scroll.next(e);
   }
 
   onScrollToEndClickHandler() {

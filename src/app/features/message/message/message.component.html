@@ -18,13 +18,13 @@
         @if (d?.['image']) {
             <div class="complex-message">
                 <img [src]="d?.['image']" />
-                <x-editable-text class="text" [themeType]="tType" [text]="d.data.text" [time]="mTime"
+                <x-editable-text class="text" [themeType]="tType" [text]="d.data.text" [time]="mTime" [mailed]="d.data.mailed"
                     [searchPattern]="searchedWords" [editing]="isEditing" [selectable]="c.selected"
                     substringClass="search-substring" (textAreaClick)="onTextAreaClickHandler($event)"
                     (changeText)="onEditedTextHandler($event, d)" />
             </div>
         } @else {
-            <x-editable-text class="text" [themeType]="tType" [text]="d.data.text" [time]="mTime"
+            <x-editable-text class="text" [themeType]="tType" [text]="d.data.text" [time]="mTime" [mailed]="d.data.mailed"
                 [searchPattern]="searchedWords" [editing]="isEditing" [selectable]="c.selected"
                 substringClass="search-substring" (textAreaClick)="onTextAreaClickHandler($event)"
                 (changeText)="onEditedTextHandler($event, d)" />

@@ -71,6 +71,7 @@ const generateMessageCollection = (number: number, size: number) => {
     items.push({
       id,
       version: 0,
+      mailed: true,
       dateTime: COLLECTION_PARAMS.maxDate - COLLECTION_PARAMS.index * 2000000, text: `${id}. ${[1].includes(id) ? testLinksText() : generateText()}`,
       image: hasImage ? 'https://ng-virtual-list-chat-demo.eugene-grebennikov.pro/media/logo.png' : undefined,
       incomType,

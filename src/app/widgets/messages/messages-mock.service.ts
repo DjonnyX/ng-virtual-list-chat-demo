@@ -168,6 +168,43 @@ export class MessagesMockService implements MessagesService {
         });
     }
 
+    patchMessages(chatId: Id, messages: IVirtualListCollection<Partial<IVirtualListItem<IMessageItemData>>>): Observable<IGetMessagesData> {
+        const items = db.chats[chatId].messages ?? [];
+        if (!!messages) {
+            return of(messages).pipe(
+                delay(10 + (Math.random() * 1000)),
+                switchMap(() => {
+                    db.chats[chatId].version++;
+                    if (messages) {
+                        const result: IVirtualListCollection<IMessage> = [];
+                        for (let i = 0, l = messages.length; i < l; i++) {
+                            const msg = messages[i];
+                            const index = items.findIndex(({ id }) => id == msg.id);
+                            if (index > -1) {
+                                const item = items[index] = {
+                                    ...items[index],
+                                    ...msg,
+                                    version: items[index].version + 1,
+                                };
+                                result.push(item);
+                            }
+                        }
+                        return of({
+                            items: result,
+                            version: db.chats[chatId].version,
+                        });
+                    }
+                    return throwError(() => {
+                        return `Messages not found.`;
+                    });
+                }),
+            );
+        }
+        return throwError(() => {
+            return `Message by id is not found.`;
+        });
+    }
+
     deleteMessage(chatId: Id, messageId: Id, params: { deleteAll: boolean; }): Observable<number | undefined> {
         console.info(params.deleteAll)
         const items = db.chats[chatId].messages ?? [];

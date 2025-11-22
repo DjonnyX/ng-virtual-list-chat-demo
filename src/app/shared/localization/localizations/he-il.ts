@@ -16,6 +16,7 @@ export const localization: ILocalization = {
             }
         },
         messages: {
+            unmailedSeparator: 'הודעות שלא נקראו',
             message: {
                 dialog: {
                     delete: {

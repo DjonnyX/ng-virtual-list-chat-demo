@@ -16,6 +16,7 @@ export const localization: ILocalization = {
             }
         },
         messages: {
+            unmailedSeparator: 'Unread messages',
             message: {
                 dialog: {
                     delete: {

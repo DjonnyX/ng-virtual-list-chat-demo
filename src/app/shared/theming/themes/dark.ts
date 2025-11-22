@@ -169,6 +169,28 @@ const manifest: ITheme = {
                     borderColor: "rgba(206, 191, 220, 0.14)",
                 },
             },
+            unmailedSeparator: {
+                normal: {
+                    background: ["rgba(79, 76, 100, 0.34)", "rgba(75, 62, 83, 0.34)"],
+                    color: "rgb(206, 191, 220)",
+                    borderColor: "transparent",
+                },
+                selected: {
+                    background: ["rgba(142, 138, 170, 0.34)", "rgba(139, 120, 151, 0.34)"],
+                    color: "rgb(206, 191, 220)",
+                    borderColor: "transparent",
+                },
+                focused: {
+                    background: ["rgba(142, 138, 170, 0.34)", "rgba(139, 120, 151, 0.34)"],
+                    color: "rgb(206, 191, 220)",
+                    borderColor: "rgba(206, 191, 220, 0.1)",
+                },
+                focusedSelected: {
+                    background: ["rgba(142, 138, 170, 0.34)", "rgba(139, 120, 151, 0.34)"],
+                    color: "rgb(206, 191, 220)",
+                    borderColor: "rgba(206, 191, 220, 0.14)",
+                },
+            },
             message: {
                 container: {
                     normal: {
@@ -205,7 +227,7 @@ const manifest: ITheme = {
                         editingTextBackground: "rgba(0, 0, 0, 0.1)",
                         editingTextFocusedOutline: "1px solid rgb(255, 255, 255, 0.15)",
                         normal: {
-                            fill: ["rgba(65, 62, 97, 1)", "rgba(86, 66, 99, 1)"],
+                            fill: ["rgba(45, 42, 77, 1)", "rgba(63, 45, 75, 1)"],
                             strokeWidth: 3,
                             color: "rgb(206, 191, 220)",
                         },
@@ -258,7 +280,7 @@ const manifest: ITheme = {
                         editingTextBackground: "rgba(0, 0, 0, 0.1)",
                         editingTextFocusedOutline: "1px solid rgb(255, 255, 255, 0.15)",
                         normal: {
-                            fill: ["rgb(56, 43, 179)", "rgba(101, 0, 168, 1)"],
+                            fill: ["rgba(54, 44, 146, 1)", "rgba(83, 8, 133, 1)"],
                             strokeWidth: 3,
                             color: "rgb(206, 191, 220)",
                         },

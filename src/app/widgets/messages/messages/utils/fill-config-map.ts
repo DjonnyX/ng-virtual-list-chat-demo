@@ -1,6 +1,7 @@
 import { IMessageItemData } from "@shared/models/message";
 import { IVirtualListItemConfigMap } from "@shared/components/x-virtual-list";
 import { IProxyCollectionItem } from "./proxy-collection";
+import { MessageTypes } from "@shared/enums";
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -15,7 +16,7 @@ export const fillConfigMap = (config: IVirtualListItemConfigMap, collection: Arr
     }
 
     for (let i = 0, l = collection.length; i < l; i++) {
-        const item = collection[i], { id, type } = item.data, isGroup = type === 'group';
+        const item = collection[i], { id, type } = item.data, isGroup = type === MessageTypes.GROUP;
         config[id] = {
             sticky: isGroup ? 1 : 0,
             selectable: !isGroup,

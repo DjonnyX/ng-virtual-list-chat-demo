@@ -12,5 +12,6 @@ export interface IChatMessagesTheme {
     background: string;
     backgroundImage: string;
     group: IGroupTheme;
+    unmailedSeparator: IGroupTheme;
     message: IMessageTheme;
 }

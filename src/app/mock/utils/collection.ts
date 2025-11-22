@@ -18,7 +18,7 @@ export const generateWriteIndicator = (): IVirtualListItem<IMessage> => {
 
     const dateTime = COLLECTION_PARAMS.maxDate + COLLECTION_PARAMS.index * 60000;
 
-    return { id, version, text: '', dateTime, type };
+    return { id, version, mailed: true, text: '', dateTime, type };
 }
 
 let timeOffset = 0;
@@ -39,7 +39,7 @@ export const generateMessage = (): IVirtualListItem<IMessage> => {
 
     const dateTime = COLLECTION_PARAMS.maxDate + timeOffset * 2000000;
     return {
-        id, version, dateTime, type, text: `${id}. ${generateText()}`,
+        id, version, dateTime, mailed: false, type, text: `${id}. ${generateText()}`,
         image: hasImage ? 'https://ng-virtual-list-chat-demo.eugene-grebennikov.pro/media/logo.png' : undefined, incomType,
     };
 }

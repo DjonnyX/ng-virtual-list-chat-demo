@@ -7,10 +7,14 @@ export const SERVICE_WHITESPACE = '&__whitespace__;',
     COMPILED_URL_PATTERN = /(<a[^a].+<\/a>|<span[^span].+<\/span>|<img[^>].+>)/gm,
     LINEBREAK_PATTERN = /\r\n|\n|\r/gm;
 
-const messageStatus = (time: string) => `&nbsp;<span${SERVICE_WHITESPACE}class="message-status"style="display:inline-flex;float:right;word-break:keep-all;">${time}&nbsp;<span${SERVICE_WHITESPACE}><svg${SERVICE_WHITESPACE}width="16"${SERVICE_WHITESPACE}height="16"${SERVICE_WHITESPACE}viewBox="0${SERVICE_WHITESPACE}0${SERVICE_WHITESPACE}16${SERVICE_WHITESPACE}16"style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><path${SERVICE_WHITESPACE}d="M0.306,9.037l3.184,3.184c0.293,0.292${SERVICE_WHITESPACE}0.768,0.292${SERVICE_WHITESPACE}1.061,-0l7.38,-7.381c0.293,-0.293${SERVICE_WHITESPACE}0.293,-0.768${SERVICE_WHITESPACE}0,-1.061c-0.293,-0.292${SERVICE_WHITESPACE}-0.768,-0.292${SERVICE_WHITESPACE}-1.061,0l-6.85,6.851c0,-0${SERVICE_WHITESPACE}-2.653,-2.654${SERVICE_WHITESPACE}-2.653,-2.654c-0.293,-0.293${SERVICE_WHITESPACE}-0.768,-0.293${SERVICE_WHITESPACE}-1.061,0c-0.292,0.293${SERVICE_WHITESPACE}-0.292,0.768${SERVICE_WHITESPACE}0,1.061Z"style="fill:inherit;"/><path${SERVICE_WHITESPACE}d="M8.313,12.221l7.381,-7.381c0.292,-0.293${SERVICE_WHITESPACE}0.292,-0.768${SERVICE_WHITESPACE}-0,-1.061c-0.293,-0.292${SERVICE_WHITESPACE}-0.768,-0.292${SERVICE_WHITESPACE}-1.061,0l-7.38,7.381c-0.293,0.293${SERVICE_WHITESPACE}-0.293,0.768${SERVICE_WHITESPACE}-0,1.061c0.292,0.292${SERVICE_WHITESPACE}0.768,0.292${SERVICE_WHITESPACE}1.06,-0Z"style="fill:inherit;"/></svg></span></span>`;
+const messageStatus = (time: string, mailed: boolean) => `&nbsp;<span${SERVICE_WHITESPACE}class="message-status"style="display:inline-flex;float:right;word-break:keep-all;">${time}&nbsp;<span${SERVICE_WHITESPACE}>${mailed ?
+    `<svg${SERVICE_WHITESPACE}width="16"${SERVICE_WHITESPACE}height="16"${SERVICE_WHITESPACE}viewBox="0${SERVICE_WHITESPACE}0${SERVICE_WHITESPACE}16${SERVICE_WHITESPACE}16"style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><path${SERVICE_WHITESPACE}d="M0.306,9.037l3.184,3.184c0.293,0.292${SERVICE_WHITESPACE}0.768,0.292${SERVICE_WHITESPACE}1.061,-0l7.38,-7.381c0.293,-0.293${SERVICE_WHITESPACE}0.293,-0.768${SERVICE_WHITESPACE}0,-1.061c-0.293,-0.292${SERVICE_WHITESPACE}-0.768,-0.292${SERVICE_WHITESPACE}-1.061,0l-6.85,6.851c0,-0${SERVICE_WHITESPACE}-2.653,-2.654${SERVICE_WHITESPACE}-2.653,-2.654c-0.293,-0.293${SERVICE_WHITESPACE}-0.768,-0.293${SERVICE_WHITESPACE}-1.061,0c-0.292,0.293${SERVICE_WHITESPACE}-0.292,0.768${SERVICE_WHITESPACE}0,1.061Z"style="fill:inherit;"/><path${SERVICE_WHITESPACE}d="M8.313,12.221l7.381,-7.381c0.292,-0.293${SERVICE_WHITESPACE}0.292,-0.768${SERVICE_WHITESPACE}-0,-1.061c-0.293,-0.292${SERVICE_WHITESPACE}-0.768,-0.292${SERVICE_WHITESPACE}-1.061,0l-7.38,7.381c-0.293,0.293${SERVICE_WHITESPACE}-0.293,0.768${SERVICE_WHITESPACE}-0,1.061c0.292,0.292${SERVICE_WHITESPACE}0.768,0.292${SERVICE_WHITESPACE}1.06,-0Z"style="fill:inherit;"/></svg>` :
+    `<svg${SERVICE_WHITESPACE}width="16"${SERVICE_WHITESPACE}height="16"${SERVICE_WHITESPACE}viewBox="0${SERVICE_WHITESPACE}0${SERVICE_WHITESPACE}16${SERVICE_WHITESPACE}16"${SERVICE_WHITESPACE}style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;"><path${SERVICE_WHITESPACE}d="M0.306,9.037l3.184,3.184c0.293,0.292${SERVICE_WHITESPACE}0.768,0.292${SERVICE_WHITESPACE}1.061,0l7.38,-7.381c0.293,-0.293${SERVICE_WHITESPACE}0.293,-0.768${SERVICE_WHITESPACE}0,-1.061c-0.293,-0.292${SERVICE_WHITESPACE}-0.768,-0.292${SERVICE_WHITESPACE}-1.061,0l-6.85,6.851l-2.653,-2.654c-0.293,-0.293${SERVICE_WHITESPACE}-0.768,-0.293${SERVICE_WHITESPACE}-1.061,0c-0.292,0.293${SERVICE_WHITESPACE}-0.292,0.768${SERVICE_WHITESPACE}0,1.061Z"${SERVICE_WHITESPACE}style="inherit"/></svg>
+`}</span></span>`;
 
 interface IFormatTextOptions {
     selectable?: boolean;
+    mailed?: boolean;
     loading?: boolean;
 }
 
@@ -35,11 +39,12 @@ export const formatText = (str: string | undefined, time: string | undefined, op
     }
 
     const loading = options?.loading ?? false,
-        selectable = options?.selectable ?? false;
+        selectable = options?.selectable ?? false,
+        mailed = options?.mailed ?? false;
 
     let result = str;
     // url
-    result = replaceURLs(result, time, selectable, loading);
+    result = replaceURLs(result, time, selectable, mailed, loading);
     // whitespace
     result = result.replaceAll(' ', '&nbsp;');
     // line break
@@ -74,7 +79,7 @@ const checkImage = (url: string) => {
  * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
  * All rights reserved.
  */
-const replaceURLs = (src: string, time: string | undefined, selectable: boolean, loading: boolean) => {
+const replaceURLs = (src: string, time: string | undefined, selectable: boolean, mailed: boolean, loading: boolean) => {
     let result = src;
     const urls = getTextUrls(src);
     if (urls) {
@@ -129,7 +134,7 @@ const replaceURLs = (src: string, time: string | undefined, selectable: boolean,
         }
     }
     if (time) {
-        result = result + messageStatus(time);
+        result = result + messageStatus(time, mailed);
     }
     return result.trim();
 };

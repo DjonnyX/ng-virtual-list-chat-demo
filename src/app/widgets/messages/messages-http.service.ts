@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Id, IVirtualListItem } from '@shared/components/x-virtual-list';
+import { Id, IVirtualListCollection, IVirtualListItem } from '@shared/components/x-virtual-list';
 import { IMessageItemData } from '@shared/models/message';
 import { IMessagesChunkParams, MessagesService } from './messages.service';
 import { IGetMessagesData } from './model/messages';
@@ -28,6 +28,10 @@ export class MessagesHttpService implements MessagesService {
   }
 
   updateMessage(chatId: Id, messageId: Id, message: Partial<Omit<IVirtualListItem<IMessageItemData>, 'id'>>): Observable<IVirtualListItem<IMessage>> {
+    throw new Error('Method not implemented.');
+  }
+
+  patchMessages(chatId: Id, messages: IVirtualListCollection<Partial<IVirtualListItem<IMessageItemData>>>): Observable<IGetMessagesData> {
     throw new Error('Method not implemented.');
   }
 

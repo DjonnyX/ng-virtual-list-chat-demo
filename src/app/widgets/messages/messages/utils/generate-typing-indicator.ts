@@ -1,4 +1,5 @@
 import { IVirtualListItem, IVirtualListItemConfig } from "@shared/components/x-virtual-list";
+import { MessageTypes } from "@shared/enums";
 
 export const TYPING_INDICATOR_INDEX = Number.MAX_SAFE_INTEGER - 1;
 
@@ -10,7 +11,7 @@ export const TYPING_INDICATOR_INDEX = Number.MAX_SAFE_INTEGER - 1;
  * All rights reserved.
  */
 export const generateTypingIndicator = (): { item: IVirtualListItem<any>, config: IVirtualListItemConfig } => {
-    const id = TYPING_INDICATOR_INDEX, type = 'typing-indicator';
+    const id = TYPING_INDICATOR_INDEX, type = MessageTypes.TYPING_INDICATOR;
 
     const dateTime = TYPING_INDICATOR_INDEX;
 

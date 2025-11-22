@@ -9,7 +9,7 @@ import { MessageTypes } from "@shared/enums";
  * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
  * All rights reserved.
  */
-export type CollectionItem<D = any> = { id: Id, dateTime: number, version: number, __deleted__?: boolean, type?: MessageTypes.ITEM | MessageTypes.GROUP | MessageTypes.TYPING_INDICATOR; } & D;
+export type CollectionItem<D = any> = { id: Id, dateTime: number, version: number, __deleted__?: boolean, type?: MessageTypes; } & D;
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -38,8 +38,8 @@ export interface IProxyCollectionItem<D = any> {
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
  */
-const createProxyItem = <D = any>(data: CollectionItem<D>
-    , params: Partial<Omit<IProxyCollectionItem<D>, 'id' | 'data'>> = {}):
+const createProxyItem = <D = any>(data: CollectionItem<D>,
+    params: Partial<Omit<IProxyCollectionItem<D>, 'id' | 'data'>> = {}):
     CollectionItem<IProxyCollectionItem<D>> => ({
         version: -1,
         new: true,
@@ -69,7 +69,8 @@ const sortByDateTime = (a: IProxyCollectionItem<any>, b: IProxyCollectionItem<an
     if (a.data.dateTime < b.data.dateTime) {
         return -1;
     }
-    return a.data.type === MessageTypes.GROUP && b.data.type !== MessageTypes.GROUP ? -1 : 0;
+    return (a.data.type === MessageTypes.GROUP && b.data.type !== MessageTypes.GROUP) ||
+        (a.data.type === MessageTypes.UNREAD_SEPARATOR && b.data.type !== MessageTypes.UNREAD_SEPARATOR) ? -1 : 0;
 }
 
 /**
@@ -93,14 +94,28 @@ type TProxyCollectionEventHandlers = TProxyCollectionChangeHandler;
 export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvents, TProxyCollectionEventHandlers> {
     protected _dict: { [id: Id]: CollectionItem<IProxyCollectionItem<D>> } = {};
 
+    protected _unmailedDict: { [id: Id]: CollectionItem<IProxyCollectionItem<D>> } = {};
+
     protected _dictIndexes: { [id: Id]: number } = {};
 
     protected _collection = new Array<CollectionItem<IProxyCollectionItem<D>>>();
     get collection() { return this._collection; }
 
+    get unmailedItem() {
+        const unmailed = Object.values(this._unmailedDict).sort(sortByDateTime);
+        return unmailed.length > 0 ? unmailed[0] : undefined;
+    }
+
+    private _unmailed: CollectionItem<IProxyCollectionItem<D>> | undefined;
+    get unmailed() { return this._unmailed; }
+
     constructor(from: Array<CollectionItem<D>>) {
         super();
         this.from(from);
+    }
+
+    isUnmailed(id: Id) {
+        return !!this._unmailedDict[id];
     }
 
     get(id: Id) {
@@ -116,6 +131,17 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
         if (item) {
             item.data = { ...item.data, ...data };
             item.type = (data as any)?.['data']?.type;
+            if ((item.data as any)?.type === MessageTypes.ITEM) {
+                if ((item.data as any)?.['data']?.mailed) {
+                    if (this._unmailedDict[id]) {
+                        delete this._unmailedDict[id];
+                    }
+                } else if ((item.data as any)?.['data']) {
+                    if (!this._unmailedDict[id]) {
+                        this._unmailedDict[id] = item;
+                    }
+                }
+            }
             const index = this._dictIndexes[id];
             if (index > -1) {
                 collection[index] = { ...collection[index], ...(params ?? {}) };
@@ -125,6 +151,18 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
             const proxyItem = createProxyItem(data, params);
             collection.push(proxyItem);
             dict[id] = proxyItem;
+
+            if ((dict[id] as any)?.type === MessageTypes.ITEM) {
+                if ((dict[id] as any)?.['data']?.mailed) {
+                    if (this._unmailedDict[id]) {
+                        delete this._unmailedDict[id];
+                    }
+                } else if ((dict[id] as any)?.['data']) {
+                    if (!this._unmailedDict[id]) {
+                        this._unmailedDict[id] = proxyItem;
+                    }
+                }
+            }
         }
 
         this._collection = collection.sort(sortByDateTime);
@@ -152,6 +190,8 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
             }
         }
 
+        this.resetIndexes();
+
         this.dispatch(ProxyCollectionEvents.CHANGE);
 
         return this._collection;
@@ -161,7 +201,14 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
         const index = this._dictIndexes[id];
         if (index > -1) {
             this._collection.splice(index, 1);
+            if (this._unmailed?.id === id) {
+                this._unmailed = undefined;
+            }
+            if (this._unmailedDict[id]) {
+                delete this._unmailedDict[id];
+            }
             delete this._dict[id];
+
             this.resetIndexes();
         }
 
@@ -174,9 +221,10 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
         if ((!src || src.length === 0) && !append) {
             this._dictIndexes = {};
             this._dict = {};
+            this._unmailedDict = {};
         }
 
-        const dict = append ? this._dict : {}, collection = append ? this._collection : [];
+        const dict = append ? this._dict : {}, unmailedDict = append ? this._unmailedDict : {}, collection = append ? this._collection : [];
 
         for (let i = 0, l = src.length; i < l; i++) {
             const item = src[i], id = item.id, dictItem = dict[id];
@@ -195,6 +243,18 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
                         dict[id].type = dict[id].data.type;
                         dict[id].version = item.version;
                         dict[id].dateTime = item.dateTime;
+
+                        if ((dict[id] as any)?.type === MessageTypes.ITEM) {
+                            if ((dict[id] as any)?.['data'].mailed) {
+                                if (unmailedDict[id]) {
+                                    delete unmailedDict[id];
+                                }
+                            } else if ((dict[id] as any)?.['data']) {
+                                if (!unmailedDict[id]) {
+                                    unmailedDict[id] = dict[id];
+                                }
+                            }
+                        }
                     }
                 }
             } else {
@@ -202,15 +262,38 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
                     const index = this._dictIndexes[id];
                     if (index > -1) {
                         this._collection.splice(index, 1);
+                        if (unmailedDict[id]) {
+                            delete unmailedDict[id];
+                        }
                         delete this._dict[id];
                     }
                 } else {
                     const proxyItem = createProxyItem(item);
                     collection.push(proxyItem);
                     dict[id] = proxyItem;
+
+                    if (item.type === MessageTypes.UNREAD_SEPARATOR) {
+                        this._unmailed = proxyItem as CollectionItem<any>;
+                    }
+
+                    if ((dict[id] as any)?.type === MessageTypes.ITEM) {
+                        if ((dict[id] as any)?.['data'].mailed) {
+                            if (unmailedDict[id]) {
+                                delete unmailedDict[id];
+                            }
+                        } else if ((dict[id] as any)?.['data']) {
+                            if (!unmailedDict[id]) {
+                                unmailedDict[id] = dict[id];
+                            }
+                        }
+                    }
                 }
             }
         }
+
+        this._dict = dict;
+
+        this._unmailedDict = unmailedDict;
 
         this._collection = collection.sort(sortByDateTime);
 
@@ -225,6 +308,9 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
         const collection = this._collection, indexes: { [id: Id]: number } = {};
         for (let i = 0, l = collection.length; i < l; i++) {
             const item = collection[i], id = item.id;
+            if (!this._unmailed && item.type === MessageTypes.UNREAD_SEPARATOR) {
+                this._unmailed = item as CollectionItem<any>;
+            }
             indexes[id] = i;
         }
         this._dictIndexes = indexes

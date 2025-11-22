@@ -50,6 +50,8 @@ export class EditableTextComponent implements OnDestroy {
 
   text = input<string>();
 
+  mailed = input<boolean>(false);
+
   time = input<string | undefined>();
 
   themeType = input.required<'in' | 'out'>();
@@ -221,6 +223,7 @@ export class EditableTextComponent implements OnDestroy {
 
     const $text = toObservable(this.text),
       $time = toObservable(this.time),
+      $mailed = toObservable(this.mailed),
       $selectable = toObservable(this.selectable),
       $resources = combineLatest([this.$resourceUrls, this.$resourceLoaded]).pipe(
         takeUntilDestroyed(),
@@ -244,12 +247,13 @@ export class EditableTextComponent implements OnDestroy {
       }),
     ).subscribe();
 
-    combineLatest([$selectable, $text, $time, $resources]).pipe(
+    combineLatest([$selectable, $mailed, $text, $time, $resources]).pipe(
       takeUntilDestroyed(),
       distinctUntilChanged(),
-      switchMap(([selectable, text, time]) => {
+      switchMap(([selectable, mailed, text, time]) => {
         return of(formatText(text, time, {
           selectable,
+          mailed,
           loading: false,
         })).pipe(
           takeUntilDestroyed(this._destroyRef),

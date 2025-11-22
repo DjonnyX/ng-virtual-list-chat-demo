@@ -52,4 +52,8 @@ export interface IScrollEvent {
      * Scroll delta
      */
     scrollDelta: number;
+    /**
+     * Display items range
+     */
+    itemsRange: [number, number] | undefined;
 }

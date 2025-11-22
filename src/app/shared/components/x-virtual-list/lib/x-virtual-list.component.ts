@@ -51,6 +51,7 @@ interface IScrollParams {
 }
 
 const MIN_SCROLL_TO_START_PIXELS = 10,
+  RANGE_DISPLAY_ITEMS_END_OFFSET = 20,
   ROLE_LIST = 'list',
   ROLE_LIST_BOX = 'listbox',
   ITEM_ID = 'item-id',
@@ -109,6 +110,26 @@ const formatScreenReaderMessage = (items: IRenderVirtualListCollection, messageP
   formatted = formatted.replace('$1', `${start}`);
   formatted = formatted.replace('$2', `${end}`);
   return formatted;
+};
+
+const formatActualDisplayItems = (items: IRenderVirtualListCollection, startOffset: number, endOffset: number, scrollSize: number,
+  isVertical: boolean, bounds: ISize): [number, number] | undefined => {
+  const list = items ?? [], size = isVertical ? bounds.height : bounds.width;
+  let start = Number.NaN, end = Number.NaN;
+  for (let i = 0, l = list.length; i < l; i++) {
+    const item = list[i], position = isVertical ? item.measures.y : item.measures.x,
+      itemSize = isVertical ? item.measures.height : item.measures.width;
+    if ((position + itemSize <= scrollSize + startOffset)) {
+      start = item.index;
+    }
+    if (((position) <= (scrollSize + size - endOffset + RANGE_DISPLAY_ITEMS_END_OFFSET))) {
+      end = item.index;
+    }
+  }
+  if (Number.isNaN(start) || Number.isNaN(end)) {
+    return undefined;
+  }
+  return [start, end];
 };
 
 /**
@@ -1521,16 +1542,19 @@ export class XVirtualListComponent implements OnDestroy {
       tap(e => {
         const scrollerEl = this._scroller()?.nativeElement, scrollerComponent = this._scrollerComponent();
         if (scrollerEl && scrollerComponent) {
-          const scrollSize = (this._isVertical ? scrollerComponent.scrollTop : scrollerComponent.scrollLeft),
+          const isVertical = this._isVertical, scrollSize = (isVertical ? scrollerComponent.scrollTop : scrollerComponent.scrollLeft),
+            bounds = this._bounds() || { x: 0, y: 0, width: DEFAULT_LIST_SIZE, height: DEFAULT_LIST_SIZE },
             currentScollSize = this._scrollSize();
           this._trackBox.deltaDirection = currentScollSize > scrollSize ? -1 : currentScollSize < scrollSize ? 1 : 0;
-
-          const event = new ScrollEvent({
-            direction: this._trackBox.scrollDirection, container: scrollerEl,
-            list: this._list()!.nativeElement, delta: this._trackBox.delta,
-            scrollDelta: this._trackBox.scrollDelta, isVertical: this._isVertical,
-            scrollSize: this._scrollSize(),
-          });
+          const itemsRange = formatActualDisplayItems(this._service.displayItems, this.scrollStartOffset(), this.scrollEndOffset(),
+            scrollSize, isVertical, bounds),
+            event = new ScrollEvent({
+              direction: this._trackBox.scrollDirection, container: scrollerEl,
+              list: this._list()!.nativeElement, delta: this._trackBox.delta,
+              scrollDelta: this._trackBox.scrollDelta, isVertical,
+              scrollSize,
+              itemsRange,
+            });
 
           this.onScroll.emit(event);
         }
@@ -1548,16 +1572,19 @@ export class XVirtualListComponent implements OnDestroy {
       tap(e => {
         const scrollerEl = this._scroller()?.nativeElement, scrollerComponent = this._scrollerComponent();
         if (scrollerEl && scrollerComponent) {
-          const scrollSize = (this._isVertical ? scrollerComponent.scrollTop : scrollerComponent.scrollLeft),
+          const isVertical = this._isVertical, scrollSize = (isVertical ? scrollerComponent.scrollTop : scrollerComponent.scrollLeft),
+            bounds = this._bounds() || { x: 0, y: 0, width: DEFAULT_LIST_SIZE, height: DEFAULT_LIST_SIZE },
             currentScollSize = this._scrollSize();
-          this._trackBox.deltaDirection = currentScollSize > scrollSize ? -1 : 0;
-
-          const event = new ScrollEvent({
-            direction: this._trackBox.scrollDirection, container: scrollerEl,
-            list: this._list()!.nativeElement, delta: this._trackBox.delta,
-            scrollDelta: this._trackBox.scrollDelta, isVertical: this._isVertical,
-            scrollSize: this._scrollSize(),
-          });
+          this._trackBox.deltaDirection = currentScollSize > scrollSize ? -1 : currentScollSize < scrollSize ? 1 : 0;
+          const itemsRange = formatActualDisplayItems(this._service.displayItems, this.scrollStartOffset(), this.scrollEndOffset(),
+            scrollSize, isVertical, bounds),
+            event = new ScrollEvent({
+              direction: this._trackBox.scrollDirection, container: scrollerEl,
+              list: this._list()!.nativeElement, delta: this._trackBox.delta,
+              scrollDelta: this._trackBox.scrollDelta, isVertical,
+              scrollSize,
+              itemsRange,
+            });
 
           this.onScrollEnd.emit(event);
         }

@@ -169,6 +169,28 @@ const manifest: ITheme = {
                     borderColor: "rgba(141, 108, 233, 0.47)",
                 },
             },
+            unmailedSeparator: {
+                normal: {
+                    background: ["rgba(124, 83, 206, 0.54)", "rgba(95, 194, 233, 0.54)"],
+                    color: "rgb(255, 255, 255)",
+                    borderColor: "transparent",
+                },
+                selected: {
+                    background: ["rgba(148, 112, 219, 0.54)", "rgba(122, 195, 224, 0.54)"],
+                    color: "rgb(255, 255, 255)",
+                    borderColor: "transparent",
+                },
+                focused: {
+                    background: ["rgba(148, 112, 219, 0.54)", "rgba(122, 195, 224, 0.54)"],
+                    color: "rgb(255, 255, 255)",
+                    borderColor: "rgba(141, 108, 233, 0.64)",
+                },
+                focusedSelected: {
+                    background: ["rgba(148, 112, 219, 0.54)", "rgba(122, 195, 224, 0.54)"],
+                    color: "rgb(255, 255, 255)",
+                    borderColor: "rgba(141, 108, 233, 0.47)",
+                },
+            },
             message: {
                 container: {
                     normal: {

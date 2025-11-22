@@ -58,6 +58,7 @@ export class XVirtualListService {
 
   private _$displayItems = new BehaviorSubject<IRenderVirtualListCollection>([]);
   readonly $displayItems = this._$displayItems.asObservable();
+  get displayItems() { return this._$displayItems.getValue(); }
 
   private _collection: IRenderVirtualListCollection = [];
   set collection(v: IRenderVirtualListCollection) {
