@@ -420,7 +420,7 @@ export class NgVirtualListItemComponent extends BaseVirtualListItemComponent {
   getBounds(): ISize {
     const el: HTMLElement = this._elementRef.nativeElement,
       { width, height } = el.getBoundingClientRect();
-    return { width, height };
+    return { width: width > 0 ? width : 1, height: height > 0 ? height : 1, };
   }
 
   show() {

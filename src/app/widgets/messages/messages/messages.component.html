@@ -39,7 +39,7 @@
                     }
                     @case ("unmailed-separator") {
                         @let class = {'animate': data.animate, 'deleted': data.deleted};
-                        <x-message-unmailed-separator  [classes]="class" />
+                        <x-message-unmailed-separator [classes]="class" [measures]="measures" />
                     }
                     @case ("group") {
                         @let class = {'snapped': config.snapped, 'snapped-out': config.snappedOut, 'focused': config.focused,

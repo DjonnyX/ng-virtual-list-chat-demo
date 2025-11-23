@@ -595,7 +595,7 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
             let itemSize = 0;
             if (map.has(id)) {
                 const cache = map.get(id);
-                itemSize = cache ? cache[sizeProperty] : typicalItemSize;
+                itemSize = cache && cache[sizeProperty] > 0 ? cache[sizeProperty] : typicalItemSize;
             } else {
                 itemSize = typicalItemSize;
             }
@@ -692,7 +692,7 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                 let componentSize = 0, componentSizeDelta = 0, itemDisplayMethod: ItemDisplayMethods = ItemDisplayMethods.NOT_CHANGED;
                 if (map.has(id)) {
                     const cache = map.get(id);
-                    componentSize = cache[sizeProperty];
+                    componentSize = cache[sizeProperty] > 0 ? cache[sizeProperty] : typicalItemSize;
                     itemDisplayMethod = cache?.method ?? ItemDisplayMethods.UPDATE;
                     const isItemNew = (cache satisfies Cache)?.[IS_NEW] ?? (this._isLazy && isStart && !this._isReseted);
                     isNew = isItemNew;
@@ -1000,7 +1000,7 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                     const id = collectionItem[trackBy], cache = this.get(id)!, sticky = itemConfigMap[id]?.sticky ?? 0,
                         selectable = itemConfigMap[id]?.selectable ?? true,
                         collapsable = itemConfigMap[id]?.collapsable ?? false,
-                        size = dynamicSize ? cache?.[sizeProperty] || typicalItemSize : typicalItemSize,
+                        size = dynamicSize ? cache?.[sizeProperty] > 0 ? cache?.[sizeProperty] : typicalItemSize : typicalItemSize,
                         absoluteStartPosition = pos - (scrollSize - size) - size,
                         ratio = size !== 0 ? boundsSize / size : 0, absoluteStartPositionPercent = -(boundsSize !== 0 ? absoluteStartPosition / boundsSize : 0) * ratio,
                         absoluteEndPosition = boundsSize - (absoluteStartPositionPercent + size),

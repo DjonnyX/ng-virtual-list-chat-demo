@@ -2011,8 +2011,9 @@ export class XVirtualListComponent implements OnDestroy {
     const scroller = this._scrollerComponent();
     if (scroller) {
       this._trackBox.cancelScrollSnappingToEnd(true);
-      const isVertical = this._isVertical, scrollSize = isVertical ? scroller.scrollTop : scroller.scrollLeft;
+      const isVertical = this._isVertical, scrollSize = isVertical ? scroller.scrollHeight : scroller.scrollWidth;
       this._scrollSize.set(scrollSize);
+      this._trackBox.changes();
     }
   }
 

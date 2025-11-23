@@ -273,6 +273,23 @@ export class MessagesComponent implements OnDestroy {
     $chatId.pipe(
       takeUntilDestroyed(),
       filter(v => v !== undefined),
+      switchMap(() => {
+        return $scroll.pipe(
+          takeUntilDestroyed(this._destroyRef),
+          filter(() => !this.isLoading()),
+          debounceTime(10),
+          takeUntilDestroyed(this._destroyRef),
+          filter(e => !!e),
+          tap(e => {
+            this.showScrollToBottom.set(e.scrollSize + e.size + SCROLL_TO_FADE_PIXELS <= e.listSize);
+          }),
+        );
+      }),
+    ).subscribe();
+
+    $chatId.pipe(
+      takeUntilDestroyed(),
+      filter(v => v !== undefined),
       switchMap(chatId => {
         return $scroll.pipe(
           takeUntilDestroyed(this._destroyRef),
@@ -692,7 +709,6 @@ export class MessagesComponent implements OnDestroy {
   }
 
   onScrollHandler(e: IScrollEvent) {
-    this.showScrollToBottom.set(e.scrollSize + e.size + SCROLL_TO_FADE_PIXELS <= e.listSize);
     this._$scroll.next(e);
   }
 

@@ -4,7 +4,7 @@
 @let saving = loading();
 @let focus = focused();
 @let scroll = scrolled();
-<div class="container" [style.--background]="containerBackground()">
+<div localeSensitive class="container" [style.--background]="containerBackground()">
     <div #editor class="editor" [ngClass]="{focus, scroll}">
         <textarea #textarea localeSensitive cdkTextareaAutosize class="textarea" [disabled]="saving" [value]="value"
             (input)="onInputHandler($event)"></textarea>
