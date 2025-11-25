@@ -81,7 +81,10 @@ const manifest: ITheme = {
             input: {
                 background: 'rgba(166, 117, 255, 0.14)',
                 color: 'rgb(234, 225, 243)',
-                outline: '1px solid rgba(166, 117, 255, 0.25)',
+                outline: '1px solid rgba(166, 117, 255, 0.05)',
+                focusedOutline: '1px solid rgba(166, 117, 255, 0.25)',
+                strokeGradientColor: X_LITE_BLUE_PLASMA_GRADIENT,
+                rippleColor: 'rgba(255, 255, 255, 0.2)',
             },
             controls: {
                 cancel: {

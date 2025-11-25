@@ -79,15 +79,18 @@ const manifest: ITheme = {
         messageCreator: {
             background: 'linear-gradient(245deg, rgba(70, 167, 207, 0.75) 0%, rgba(53, 146, 184, 0.75) 50%, rgba(70, 167, 207, 0.75) 100%)',
             input: {
-                background: 'rgba(255, 255, 255, 0.35)',
-                color: 'rgb(31, 45, 61)',
-                outline: '1px solid rgba(255, 255, 255, 0.5)',
+                background: 'rgba(0, 65, 90, 0.1)',
+                color: 'rgba(255, 255, 255, 1)',
+                focusedOutline: '1px solid rgba(255,255,255,0.35)',
+                outline: '1px solid rgba(255,255,255,0.2)',
+                strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
+                rippleColor: 'rgba(28, 133, 165, 0.2)',
             },
             controls: {
                 cancel: {
                     rippleColor: "rgba(28, 133, 165, 0.1)",
                     normal: {
-                        fill: ["rgba(255, 255, 255, .2)", "rgba(255, 255, 255, .2)"],
+                        fill: ["rgba(16, 44, 95, 0.15)", "rgba(16, 44, 95, .15)"],
                         iconFill: "rgba(255, 255, 255, 1)",
                         strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
                     },

@@ -21,10 +21,12 @@
 
 .shape {
     position: relative;
+    z-index: 2;
 }
 
 .hilight {
     filter: blur(10px);
+    z-index: 2;
 }
 
 .ripple {

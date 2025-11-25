@@ -5,22 +5,27 @@ import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-i
 import { filter, fromEvent, map, switchMap, tap } from 'rxjs';
 import { ISize } from '@shared/components/x-virtual-list';
 import { LocaleSensitiveDirective } from '@shared/localization';
-import { GradientColorPositions } from '@shared/types';
+import { Color, GradientColor, GradientColorPositions, RoundedCorner } from '@shared/types';
 import { MessageSendButtonComponent } from '../message-send-button/message-send-button.component';
 import { MessageButtonSendStates } from '../message-send-button/enums';
 import { MessageButtonSaveState } from '../message-save-button/types';
 import { MessageButtonSaveStates } from '../message-save-button/enums';
 import { ITheme, ThemeService } from '@shared/theming';
+import { SubstarateMode, SubstarateModes, SubstarateStyle, SubstarateStyles, SubstrateComponent } from '@shared/components/substrate';
 
 const DEFAULT_TEXTAREA_SIZE = 16,
   MAX_TEXTAREA_HEIGHT = 320,
+  STROKE_WIDTH = 3,
+  FILL_COLOR: GradientColor = ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0)'],
+  COLOR_POSITIONS: GradientColorPositions = [0, 1],
+  ROUND_CORNER: RoundedCorner = [8, 8, 8, 8],
   HIDDEN = 'hidden',
   AUTO = 'auto',
   NONE = 'none';
 
 @Component({
   selector: 'x-messaage-input',
-  imports: [CommonModule, LocaleSensitiveDirective, CdkTextareaAutosize, MessageSendButtonComponent],
+  imports: [CommonModule, LocaleSensitiveDirective, CdkTextareaAutosize, MessageSendButtonComponent, SubstrateComponent],
   templateUrl: './messaage-input.component.html',
   styleUrl: './messaage-input.component.scss'
 })
@@ -38,6 +43,22 @@ export class MessaageInputComponent implements OnDestroy {
   onCreate = output<{ nativeEvent: Event, value: string | undefined }>();
 
   editingCancel = output<void>();
+
+  mode = signal<SubstarateMode>(SubstarateModes.ROUNDED_RECTANGLE);
+
+  type = signal<SubstarateStyle>(SubstarateStyles.NONE);
+
+  fillGradientColors = signal<GradientColor | undefined>(FILL_COLOR);
+
+  fillPositions = signal<GradientColorPositions>(COLOR_POSITIONS);
+
+  shapeRoundCorner = signal<[number, number, number, number] | undefined>(ROUND_CORNER);
+
+  strokeWidth = signal<number>(STROKE_WIDTH);
+
+  strokeGradientColor = signal<GradientColor | undefined>(undefined);
+
+  rippleEffectColor = signal<Color | undefined>(undefined);
 
   sendButtonFillPositions = signal<GradientColorPositions>([0, 1]);
 
@@ -61,10 +82,24 @@ export class MessaageInputComponent implements OnDestroy {
 
   private _resizeObserver: ResizeObserver;
 
+  private _editorResizeObserver: ResizeObserver;
+
   bounds = signal<ISize>({
     width: this.textarea()?.nativeElement?.offsetWidth || DEFAULT_TEXTAREA_SIZE,
     height: this.textarea()?.nativeElement?.offsetHeight || DEFAULT_TEXTAREA_SIZE,
   });
+
+  editorBounds = signal<ISize>({
+    width: this.editor()?.nativeElement?.offsetWidth || DEFAULT_TEXTAREA_SIZE,
+    height: this.editor()?.nativeElement?.offsetHeight || DEFAULT_TEXTAREA_SIZE,
+  });
+
+  private _onEditorResizeHandler = () => {
+    const el = this.editor()?.nativeElement as HTMLDivElement;
+    if (el && el.offsetWidth && el.offsetHeight) {
+      this.editorBounds.set({ width: el.offsetWidth || DEFAULT_TEXTAREA_SIZE, height: el.offsetHeight || DEFAULT_TEXTAREA_SIZE });
+    }
+  }
 
   private _onContainerResizeHandler = () => {
     const el = this.textarea()?.nativeElement as HTMLTextAreaElement;
@@ -75,6 +110,7 @@ export class MessaageInputComponent implements OnDestroy {
 
   constructor() {
     this._resizeObserver = new ResizeObserver(this._onContainerResizeHandler);
+    this._editorResizeObserver = new ResizeObserver(this._onEditorResizeHandler);
 
     this.theme = toSignal(this._themeService.$theme);
 
@@ -82,7 +118,19 @@ export class MessaageInputComponent implements OnDestroy {
       takeUntilDestroyed(),
       filter(v => !!v),
       map(v => v.nativeElement),
+    ), $editor = toObservable(this.editor).pipe(
+      takeUntilDestroyed(),
+      filter(v => !!v),
+      map(v => v.nativeElement),
     );
+
+    $editor.pipe(
+      takeUntilDestroyed(),
+      tap(editor => {
+        this._editorResizeObserver.observe(editor, { box: "border-box" });
+        this._onEditorResizeHandler();
+      }),
+    ).subscribe();
 
     $textarea.pipe(
       takeUntilDestroyed(),
@@ -117,6 +165,11 @@ export class MessaageInputComponent implements OnDestroy {
     ).subscribe();
 
     effect(() => {
+      const loading = this.loading();
+      this.type.set(loading ? SubstarateStyles.STROKE : SubstarateStyles.NONE);
+    });
+
+    effect(() => {
       const bounds = this.bounds(), textarea = this.textarea()?.nativeElement as HTMLTextAreaElement;
       if (bounds && textarea) {
         textarea.style.overflow = bounds.height < MAX_TEXTAREA_HEIGHT ? HIDDEN : AUTO;
@@ -144,9 +197,11 @@ export class MessaageInputComponent implements OnDestroy {
           if (textarea) {
             textarea.style.color = preset.input.color;
           }
+          this.rippleEffectColor.set(preset.input.rippleColor);
+          this.strokeGradientColor.set(preset.input.strokeGradientColor);
           if (editor) {
             editor.style.backgroundColor = preset.input.background;
-            editor.style.outline = focus ? preset.input.outline : NONE;
+            editor.style.border = focus ? preset.input.focusedOutline : preset.input.outline;
           }
           this.containerBackground.set(preset.background);
         }
@@ -192,6 +247,9 @@ export class MessaageInputComponent implements OnDestroy {
   ngOnDestroy(): void {
     if (this._resizeObserver) {
       this._resizeObserver.disconnect();
+    }
+    if (this._editorResizeObserver) {
+      this._editorResizeObserver.disconnect();
     }
   }
 }
