@@ -1,6 +1,6 @@
 import { DestroyRef, Directive, ElementRef, inject, input, Input, output } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { fromEvent, of, race, timer } from 'rxjs';
+import { fromEvent, Observable, of, race, Subject, timer } from 'rxjs';
 import { delay, filter, switchMap, takeUntil, tap } from 'rxjs/operators';
 
 const DEFAULT_DURATION = 3000,
@@ -28,6 +28,8 @@ export class LongPressDirective {
 
     onLongPress = output<void>();
 
+    longPressPrevent = input<Observable<void>>(new Subject());
+
     onLongPressActive = output<boolean>();
 
     private _elementRef = inject(ElementRef<HTMLElement>);
@@ -36,21 +38,42 @@ export class LongPressDirective {
 
     constructor() {
         const $disabled = toObservable(this.longPressDisabled).pipe(
+            takeUntilDestroyed(),
             filter(v => !!v),
         ),
-            $mousePressed = fromEvent<MouseEvent>(this._elementRef.nativeElement, 'mousedown'),
+            longPressPrevent = this.longPressPrevent().pipe(
+                takeUntilDestroyed(),
+            ),
+            $mousePressed = fromEvent<MouseEvent>(this._elementRef.nativeElement, 'mousedown').pipe(
+                takeUntilDestroyed(),
+            ),
             $mouseCancel = race([
-                fromEvent(window, 'mouseup'),
-                fromEvent<MouseEvent>(window, 'mouseleave'),
+                longPressPrevent,
+                fromEvent(window, 'mouseup').pipe(
+                    takeUntilDestroyed(),
+                ),
+                fromEvent<MouseEvent>(window, 'mouseleave').pipe(
+                    takeUntilDestroyed(),
+                ),
             ]),
-            $mouseRelease = fromEvent<MouseEvent>(this._elementRef.nativeElement, 'mouseup'),
-
-            $touchPressed = fromEvent<TouchEvent>(this._elementRef.nativeElement, 'touchstart'),
+            $mouseRelease = fromEvent<MouseEvent>(this._elementRef.nativeElement, 'mouseup').pipe(
+                takeUntilDestroyed(),
+            ),
+            $touchPressed = fromEvent<TouchEvent>(this._elementRef.nativeElement, 'touchstart').pipe(
+                takeUntilDestroyed(),
+            ),
             $touchCancel = race([
-                fromEvent(window, 'touchend'),
-                fromEvent<TouchEvent>(window, 'touchleave'),
+                longPressPrevent,
+                fromEvent(window, 'touchend').pipe(
+                    takeUntilDestroyed(),
+                ),
+                fromEvent<TouchEvent>(window, 'touchleave').pipe(
+                    takeUntilDestroyed(),
+                ),
             ]),
-            $touchRelease = fromEvent<TouchEvent>(this._elementRef.nativeElement, 'touchend');
+            $touchRelease = fromEvent<TouchEvent>(this._elementRef.nativeElement, 'touchend').pipe(
+                takeUntilDestroyed(),
+            );
 
         $mousePressed.pipe(
             takeUntilDestroyed(),

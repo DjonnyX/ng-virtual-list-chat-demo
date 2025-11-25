@@ -2,6 +2,8 @@ import { CMap } from "../cmap";
 import { EventEmitter } from "../event-emitter";
 import { Thread, ThreadManager } from "../thread-manager";
 
+const IMAGE_PATTERN = /(data:image\/[\w]+;)/gm;
+
 export enum ResourceStatus {
     NOT_ADDED,
     WAITING,
@@ -90,7 +92,7 @@ class ResourceManager extends EventEmitter<ResourceManagerEvents, ResourceManage
                     }
                 }));
 
-                if (resource) {
+                if (resource && IMAGE_PATTERN.test(resource)) {
                     this._map.set(url, resource);
                     this._statusMap.set(url, ResourceStatus.LOADED);
                     this.dispatch(ResourceManagerEvents.PROGRESS, url);

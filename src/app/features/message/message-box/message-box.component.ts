@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, computed, DestroyRef, effect, ElementRef, inject, input, OnDestroy, output, signal, Signal, viewChild } from '@angular/core';
 import { CdkMenuTrigger } from '@angular/cdk/menu';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { filter, map, Subject, switchMap, take, tap } from 'rxjs';
+import { filter, map, Observable, Subject, switchMap, take, tap } from 'rxjs';
 import { MessageButtonSaveState, MessageButtonSaveStates, MessageMenuButtonComponent, MessageSaveButtonComponent } from '@entities/message';
 import { CalcFillPositionsDirective, LongPressDirective } from '@shared/directives';
 import { Id, IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/x-virtual-list';
@@ -19,6 +19,7 @@ import { DialogDeleteContentComponent } from '@entities/message/dialog-delete-co
 import { MessageComponent } from '../message/message.component';
 import { IMessageParams } from '../message/interfaces';
 import { IDeleteEventData } from './interfaces';
+import { MessageService } from '@widgets/messages';
 
 const IN = 'in', OUT = 'out',
   CLASS_RESETED = 'reseted', CLASS_NEW = 'new', CLASS_IN = 'in', CLASS_OUT = 'out', CLASS_SIMPLE = 'simple', CLASS_END_OF_MESSAGES = 'end-of-messages',
@@ -142,6 +143,11 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
   localization: Signal<ILocalization | undefined>;
 
   locale: Signal<string | undefined>;
+
+  private _messageService = inject(MessageService);
+
+  private _$longPressPrevent = this._messageService?.virtualList?.$scroll as unknown as Observable<void>;
+  readonly $longPressPrevent = this._$longPressPrevent;
 
   readonly longPressDuration = 1000;
 

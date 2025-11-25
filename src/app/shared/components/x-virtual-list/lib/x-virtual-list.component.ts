@@ -905,6 +905,9 @@ export class XVirtualListComponent implements OnDestroy {
   private _$scrollTo = new Subject<IScrollParams>();
   protected $scrollTo = this._$scrollTo.asObservable();
 
+  private _$scroll = new Subject<IScrollEvent>();
+  readonly $scroll = this._$scroll.asObservable();
+
   private _onTrackBoxResetHandler = (v: boolean) => {
     if (v && this._scrollerComponent()?.scrollable) {
       this._isResetedReachStart = true;
@@ -1561,6 +1564,7 @@ export class XVirtualListComponent implements OnDestroy {
             });
 
           this.onScroll.emit(event);
+          this._$scroll.next(event);
         }
       }),
     ).subscribe();
@@ -1591,6 +1595,7 @@ export class XVirtualListComponent implements OnDestroy {
             });
 
           this.onScrollEnd.emit(event);
+          this._$scroll.next(event);
         }
       }),
     ).subscribe();

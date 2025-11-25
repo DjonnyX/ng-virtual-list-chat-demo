@@ -113,12 +113,12 @@ const manifest: ITheme = {
                         strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
                     },
                     pressed: {
-                        fill: ["rgba(103, 56, 214, 1)", "rgba(103, 56, 214, 1)"],
+                        fill: ["rgba(52, 54, 206, 1)", "rgba(52, 54, 206, 1)"],
                         iconFill: "rgb(191, 211, 220)",
                         strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
                     },
                     disabled: {
-                        fill: ["rgba(43, 86, 179, .25)", "rgba(32, 88, 126, .25)"],
+                        fill: ["rgba(52, 54, 206, .25)", "rgba(52, 54, 206, .25)"],
                         iconFill: "rgba(191, 211, 220, .85)",
                         strokeGradientColor: X_LITE_CYAN_PLASMA_GRADIENT,
                     },

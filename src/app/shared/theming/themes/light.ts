@@ -118,7 +118,7 @@ const manifest: ITheme = {
                         strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
                     },
                     disabled: {
-                        fill: ["rgba(28, 25, 182, .25)", "rgba(48, 0, 141, .25)"],
+                        fill: ["rgba(209, 241, 255, .25)", "rgba(209, 241, 255, .25)"],
                         iconFill: "rgb(232, 217, 255, .5)",
                         strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
                     },
