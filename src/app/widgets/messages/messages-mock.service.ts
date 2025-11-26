@@ -148,7 +148,7 @@ export class MessagesMockService implements MessagesService {
                     mailed: false,
                     edited: false,
                     incomType: 'out',
-                    type: MessageTypes.ITEM,
+                    type: MessageTypes.MESSAGE,
                     version: 0,
                     id: dt,
                     ...message as any,

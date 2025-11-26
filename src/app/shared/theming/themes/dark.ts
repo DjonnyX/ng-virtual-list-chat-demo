@@ -224,40 +224,45 @@ const manifest: ITheme = {
                                 },
                             }
                         },
-                        statusColor: "rgba(148, 196, 218, 0.68)",
                         rippleColor: "rgba(255, 255, 255, 0.15)",
                         searchSubstringColor: "rgba(139, 0, 86, 0.84)",
                         editingTextBackground: "rgba(0, 0, 0, 0.1)",
                         editingTextFocusedOutline: "1px solid rgb(255, 255, 255, 0.15)",
                         normal: {
                             fill: ["rgba(45, 42, 77, 1)", "rgba(63, 45, 75, 1)"],
+                            statusColor: "rgba(148, 196, 218, 0.68)",
                             strokeWidth: 3,
                             color: "rgb(206, 191, 220)",
                         },
                         selected: {
                             fill: ["rgba(88, 85, 121, 1)", "rgba(103, 82, 117, 1)"],
+                            statusColor: "rgba(148, 196, 218, 0.68)",
                             strokeWidth: 3,
                             color: "rgb(206, 191, 220)",
                         },
                         focused: {
                             fill: ["rgba(88, 85, 121, 1)", "rgba(103, 82, 117, 1)"],
+                            statusColor: "rgba(148, 196, 218, 0.68)",
                             strokeWidth: 3,
                             color: "rgb(206, 191, 220)",
                         },
                         focusedSelected: {
                             fill: ["rgba(88, 85, 121, 1)", "rgba(103, 82, 117, 1)"],
+                            statusColor: "rgba(148, 196, 218, 0.68)",
                             strokeWidth: 3,
                             color: "rgb(206, 191, 220)",
                         },
                         removal: {
                             fill: ["rgb(255, 134, 118)", "rgb(255, 117, 158)"],
                             strokeWidth: 1.5,
-                            color: "rgb(255, 255, 255)",
+                            statusColor: "rgba(255, 210, 204, 1)",
+                            color: "rgba(255, 210, 204, 1)",
                         },
                         removalSelected: {
                             fill: ["rgb(255, 134, 118)", "rgb(255, 117, 158)"],
                             strokeWidth: 1.5,
-                            color: "rgb(255, 255, 255)",
+                            statusColor: "rgba(255, 210, 204, 1)",
+                            color: "rgba(255, 210, 204, 1)",
                         }
                     },
                     out: {
@@ -277,7 +282,6 @@ const manifest: ITheme = {
                                 },
                             }
                         },
-                        statusColor: "rgba(148, 196, 218, 0.68)",
                         rippleColor: "rgba(255, 255, 255, 0.15)",
                         searchSubstringColor: "rgba(139, 0, 86, 0.84)",
                         editingTextBackground: "rgba(0, 0, 0, 0.1)",
@@ -285,32 +289,38 @@ const manifest: ITheme = {
                         normal: {
                             fill: ["rgba(54, 44, 146, 1)", "rgba(83, 8, 133, 1)"],
                             strokeWidth: 3,
+                            statusColor: "rgba(148, 196, 218, 0.68)",
                             color: "rgb(206, 191, 220)",
                         },
                         selected: {
                             fill: ["rgb(74, 61, 196)", "rgba(113, 0, 189, 1)"],
                             strokeWidth: 3,
+                            statusColor: "rgba(148, 196, 218, 0.68)",
                             color: "rgb(206, 191, 220)",
                         },
                         focused: {
                             fill: ["rgb(87, 74, 204)", "rgba(113, 0, 189, 1)"],
                             strokeWidth: 3,
+                            statusColor: "rgba(148, 196, 218, 0.68)",
                             color: "rgb(206, 191, 220)",
                         },
                         focusedSelected: {
                             fill: ["rgb(87, 74, 204)", "rgba(113, 0, 189, 1)"],
                             strokeWidth: 3,
+                            statusColor: "rgba(148, 196, 218, 0.68)",
                             color: "rgb(206, 191, 220)",
                         },
                         removal: {
                             fill: ["rgb(255, 134, 118)", "rgb(255, 117, 158)"],
                             strokeWidth: 1.5,
-                            color: "rgb(255, 255, 255)",
+                            statusColor: "rgba(255, 210, 204, 1)",
+                            color: "rgba(255, 210, 204, 1)",
                         },
                         removalSelected: {
                             fill: ["rgb(255, 134, 118)", "rgb(255, 117, 158)"],
                             strokeWidth: 1.5,
-                            color: "rgb(255, 255, 255)",
+                            statusColor: "rgba(255, 210, 204, 1)",
+                            color: "rgba(255, 210, 204, 1)",
                         }
                     }
                 },
@@ -384,6 +394,76 @@ const manifest: ITheme = {
                         strokeAnimationDuration: 1000,
                     },
                 },
+            },
+            quote: {
+                content: {
+                    in: {
+                        rippleColor: "rgba(255, 255, 255, 0.15)",
+                        normal: {
+                            fill: ["rgba(39, 36, 70, 1)", "rgba(54, 37, 65, 1)"],
+                            borderColor: "rgb(206, 191, 220)",
+                            color: "rgb(206, 191, 220)",
+                        },
+                        selected: {
+                            fill: ["rgba(74, 72, 105, 1)", "rgba(92, 71, 105, 1)"],
+                            borderColor: "rgb(206, 191, 220)",
+                            color: "rgb(206, 191, 220)",
+                        },
+                        focused: {
+                            fill: ["rgba(74, 72, 105, 1)", "rgba(92, 71, 105, 1)"],
+                            borderColor: "rgb(206, 191, 220)",
+                            color: "rgb(206, 191, 220)",
+                        },
+                        focusedSelected: {
+                            fill: ["rgba(74, 72, 105, 1)", "rgba(92, 71, 105, 1)"],
+                            borderColor: "rgb(206, 191, 220)",
+                            color: "rgb(206, 191, 220)",
+                        },
+                        removal: {
+                            fill: ["rgba(238, 119, 103, 1)", "rgba(230, 99, 138, 1)"],
+                            borderColor: "rgba(255, 210, 204, 1)",
+                            color: "rgba(255, 210, 204, 1)",
+                        },
+                        removalSelected: {
+                            fill: ["rgba(238, 119, 103, 1)", "rgba(230, 99, 138, 1)"],
+                            borderColor: "rgba(255, 210, 204, 1)",
+                            color: "rgba(255, 210, 204, 1)",
+                        }
+                    },
+                    out: {
+                        rippleColor: "rgba(255, 255, 255, 0.15)",
+                        normal: {
+                            fill: ["rgba(48, 38, 136, 1)", "rgba(73, 5, 119, 1)"],
+                            borderColor: "rgb(206, 191, 220)",
+                            color: "rgb(206, 191, 220)",
+                        },
+                        selected: {
+                            fill: ["rgba(67, 54, 185, 1)", "rgba(103, 0, 172, 1)"],
+                            borderColor: "rgb(206, 191, 220)",
+                            color: "rgb(206, 191, 220)",
+                        },
+                        focused: {
+                            fill: ["rgba(67, 54, 185, 1)", "rgba(103, 0, 172, 1)"],
+                            borderColor: "rgb(206, 191, 220)",
+                            color: "rgb(206, 191, 220)",
+                        },
+                        focusedSelected: {
+                            fill: ["rgba(67, 54, 185, 1)", "rgba(103, 0, 172, 1)"],
+                            borderColor: "rgb(206, 191, 220)",
+                            color: "rgb(206, 191, 220)",
+                        },
+                        removal: {
+                            fill: ["rgba(238, 119, 103, 1)", "rgba(230, 99, 138, 1)"],
+                            borderColor: "rgba(255, 210, 204, 1)",
+                            color: "rgba(255, 210, 204, 1)",
+                        },
+                        removalSelected: {
+                            fill: ["rgba(238, 119, 103, 1)", "rgba(230, 99, 138, 1)"],
+                            borderColor: "rgba(255, 210, 204, 1)",
+                            color: "rgba(255, 210, 204, 1)",
+                        }
+                    }
+                }
             },
         },
         chats: {

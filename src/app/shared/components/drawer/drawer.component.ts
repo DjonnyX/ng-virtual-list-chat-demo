@@ -2,8 +2,10 @@ import { Component, computed, ElementRef, inject, input, output, Signal, signal,
 import { CommonModule } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { LocaleSensitiveDirective, LocalizationService, TextDirections } from '@shared/localization';
+import { StaticClickDirective } from '@shared/directives';
 
-const DEFAULT_DOCK_SIZE = 140;
+const DEFAULT_DOCK_SIZE = 140,
+  DEFAULT_MAX_DISTANCE = 40;
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -36,7 +38,7 @@ export type TDockMode = DockMode.LEFT | DockMode.RIGHT | DockMode.NONE | 'left' 
  */
 @Component({
   selector: 'x-drawer',
-  imports: [CommonModule, LocaleSensitiveDirective],
+  imports: [CommonModule, StaticClickDirective, LocaleSensitiveDirective],
   templateUrl: './drawer.component.html',
   styleUrl: './drawer.component.scss',
   encapsulation: ViewEncapsulation.ShadowDom,
@@ -59,6 +61,8 @@ export class DrawerComponent {
   locale: Signal<string | undefined>;
 
   protected _bounds = signal<DOMRect | null>(null);
+
+  readonly maxStaticClickDistance = DEFAULT_MAX_DISTANCE;
 
   private _resizeObserver: ResizeObserver | null = null;
 

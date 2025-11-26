@@ -10,8 +10,10 @@ import { GroupsService } from '../groups.service';
 import { GroupsMockService } from '../groups-mock.service';
 import { GroupsWebsocketService } from '../groups-websocket.service';
 import { validateCollection } from './utils/validate-collection';
-import { ClickOutsideDirective } from '@shared/directives';
+import { ClickOutsideDirective, StaticClickDirective } from '@shared/directives';
 import { LocaleSensitiveDirective } from '@shared/localization';
+
+const DEFAULT_MAX_DISTANCE = 40;
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -22,7 +24,10 @@ import { LocaleSensitiveDirective } from '@shared/localization';
  */
 @Component({
   selector: 'x-groups',
-  imports: [CommonModule, XVirtualListComponent, GroupsLoadingIndicatorComponent, ClickOutsideDirective, LocaleSensitiveDirective],
+  imports: [
+    CommonModule, XVirtualListComponent, GroupsLoadingIndicatorComponent, ClickOutsideDirective, StaticClickDirective,
+    LocaleSensitiveDirective,
+  ],
   providers: [
     { provide: GroupsService, useClass: environment.useMock ? GroupsMockService : GroupsWebsocketService },
   ],
@@ -45,6 +50,8 @@ export class GroupsComponent {
   isLoading = signal<boolean>(true);
 
   selectedId = signal<Id | undefined>(undefined);
+
+  readonly maxStaticClickDistance = DEFAULT_MAX_DISTANCE;
 
   private _service = inject(GroupsService);
 
@@ -126,5 +133,10 @@ export class GroupsComponent {
 
   onClickOutside() {
     this.close.emit();
+  }
+
+  onClickHandler(e: Event) {
+    e.stopImmediatePropagation();
+    e.preventDefault();
   }
 }

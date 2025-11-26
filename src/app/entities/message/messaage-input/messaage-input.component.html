@@ -15,7 +15,7 @@
 <div localeSensitive class="container" [style.--background]="containerBackground()">
     <div class="wrapper">
         <x-substrate #substrate class="substrate" [fillColors]="gradientFillColors" [rippleColor]="rippleColor"
-            [fillColorPositions]="gradientFillPositions" [width]="b.width" [height]="b.height" [roundCorner]="corner"
+            [fillPositions]="gradientFillPositions" [width]="b.width" [height]="b.height" [roundCorner]="corner"
             [mode]="m" [type]="t" [strokeColors]="stroke" [strokeWidth]="strokeWidth()" />
         <div #editor class="editor" [ngClass]="{focus, scroll}">
             <textarea #textarea localeSensitive cdkTextareaAutosize class="textarea" [disabled]="saving" [value]="value"

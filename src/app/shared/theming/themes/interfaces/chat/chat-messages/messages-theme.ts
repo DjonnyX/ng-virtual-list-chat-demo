@@ -1,5 +1,6 @@
 import { IGroupTheme } from "./group-theme";
 import { IMessageTheme } from "./message-theme";
+import { IMessageQuoteStatesTheme } from "./quote-theme";
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -14,4 +15,5 @@ export interface IChatMessagesTheme {
     group: IGroupTheme;
     unmailedSeparator: IGroupTheme;
     message: IMessageTheme;
+    quote: IMessageQuoteStatesTheme;
 }

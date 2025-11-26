@@ -159,12 +159,12 @@ export class MessageSubstrateComponent {
     });
 
     effect(() => {
-      const fillColorPositions = this.fillPositions();
-      if (Array.isArray(fillColorPositions) && fillColorPositions.length === 2) {
+      const fillPositions = this.fillPositions();
+      if (Array.isArray(fillPositions) && fillPositions.length === 2) {
         const fillGradient = this.fillGradient();
         if (fillGradient) {
-          fillGradient.nativeElement.setAttribute(X1, `${Number.isNaN(fillColorPositions[0]) ? 0 : fillColorPositions[0]}px`);
-          fillGradient.nativeElement.setAttribute(X2, `${Number.isNaN(fillColorPositions[1]) ? 0 : fillColorPositions[1]}px`);
+          fillGradient.nativeElement.setAttribute(X1, `${Number.isNaN(fillPositions[0]) ? 0 : fillPositions[0]}px`);
+          fillGradient.nativeElement.setAttribute(X2, `${Number.isNaN(fillPositions[1]) ? 0 : fillPositions[1]}px`);
         }
       }
     });

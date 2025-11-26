@@ -10,7 +10,7 @@
 <button #button press class="button" (pointerdown)="substrate.ripple($event)" (onPress)="onPressHandler($event)"
     (click)="onClickHandler($event)">
     <x-substrate #substrate class="substrate" [fillColors]="gradientFillColors" [rippleColor]="rippleColor"
-        [fillColorPositions]="gradientFillPositions" [width]="b.width" [height]="b.height" [roundCorner]="corner"
+        [fillPositions]="gradientFillPositions" [width]="b.width" [height]="b.height" [roundCorner]="corner"
         [mode]="m" [type]="t" [strokeColors]="stroke" [strokeWidth]="strokeWidth()" />
     <p localeSensitive class="content">
         <ng-content>

@@ -46,6 +46,12 @@
                         'collapsed': config.collapsed};
                         <x-message-group [classes]="class" [measures]="measures" [text]="data.data.text" [collapsed]="config.collapsed" />
                     }
+                    @case ("quote") {
+                        <x-message-box [messageType]="'quote'" [reseted]="reseted" [data]="data" [config]="config" [measures]="measures" [prevData]="prevData"
+                            [nextData]="nextData" [searchPattern]="searchedWords" (edited)="onChangeItemHandler($event)"
+                            (editingCancel)="onEditingCancelHandler(data)" (edit)="onEditItemHandler($event)" (quoteSelect)="onQuoteSelectHandler($event);"
+                            (delete)="onDeleteItemHandler($event, index)" (changeText)="onChangeMessageHandler($event)" />
+                    }
                     @default {
                         <x-message-box [reseted]="reseted" [data]="data" [config]="config" [measures]="measures" [prevData]="prevData"
                             [nextData]="nextData" [searchPattern]="searchedWords" (edited)="onChangeItemHandler($event)"

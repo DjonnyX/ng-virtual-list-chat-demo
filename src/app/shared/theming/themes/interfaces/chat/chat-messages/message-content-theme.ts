@@ -4,7 +4,6 @@ import { IMessageTextEditorTheme } from "./message-text-editor-theme";
 
 interface IMessageContentStateTheme {
     textEditor: IMessageTextEditorTheme;
-    statusColor: Color;
     rippleColor: Color;
     searchSubstringColor: string;
     editingTextBackground: string;

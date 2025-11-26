@@ -5,7 +5,7 @@
         <ng-content select="dock-left" />
     </div>
     <div class="content">
-        <div class="overlay" (click)="onOverlayClick($event)">
+        <div class="overlay" staticClick [maxStaticClickDistance]="maxStaticClickDistance" (onStaticClick)="onOverlayClick($event)">
             <div class="locker" [ngClass]="{'freeze': dockMode !== 'none'}">
                 <ng-content></ng-content>
             </div>

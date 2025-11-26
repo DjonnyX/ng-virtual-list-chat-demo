@@ -134,7 +134,7 @@ export class SubstrateComponent {
 
   fillColors = input<string | GradientColor | undefined>(DEFAULT_FILL_COLORS);
 
-  fillColorPositions = input<GradientColorPositions | undefined>(undefined);
+  fillPositions = input<GradientColorPositions | undefined>(undefined);
 
   rippleEnabled = signal<boolean>(false);
 
@@ -195,12 +195,12 @@ export class SubstrateComponent {
     });
 
     effect(() => {
-      const fillColorPositions = this.fillColorPositions();
-      if (Array.isArray(fillColorPositions) && fillColorPositions.length === 2) {
+      const fillPositions = this.fillPositions();
+      if (Array.isArray(fillPositions) && fillPositions.length === 2) {
         const fillGradient = this.fillGradient();
         if (fillGradient) {
-          fillGradient.nativeElement.setAttribute(X1, `${fillColorPositions[0]}${PX}`);
-          fillGradient.nativeElement.setAttribute(X2, `${fillColorPositions[1]}${PX}`);
+          fillGradient.nativeElement.setAttribute(X1, `${fillPositions[0]}${PX}`);
+          fillGradient.nativeElement.setAttribute(X2, `${fillPositions[1]}${PX}`);
         }
       }
     });

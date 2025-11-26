@@ -7,6 +7,7 @@ import { MessageTypes } from "@shared/enums";
  */
 export interface IMessageItemData {
   id: Id;
+  quoteId?: Id;
   dateTime: number;
   mailed: boolean;
   text: string;

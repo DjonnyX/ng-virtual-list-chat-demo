@@ -9,7 +9,7 @@ import { MessageTypes } from "@shared/enums";
  * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
  * All rights reserved.
  */
-export type CollectionItem<D = any> = { id: Id, dateTime: number, version: number, __deleted__?: boolean, type?: MessageTypes; } & D;
+export type CollectionItem<D = any> = { id: Id, quoteId?: Id, dateTime: number, version: number, __deleted__?: boolean, type?: MessageTypes; } & D;
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -20,6 +20,7 @@ export type CollectionItem<D = any> = { id: Id, dateTime: number, version: numbe
  */
 export interface IProxyCollectionItem<D = any> {
     id: Id;
+    quote?: IProxyCollectionItem<D>;
     new: boolean;
     type: MessageTypes | undefined;
     version: number;
@@ -131,7 +132,11 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
         if (item) {
             item.data = { ...item.data, ...data };
             item.type = (data as any)?.['data']?.type;
-            if ((item.data as any)?.type === MessageTypes.ITEM) {
+            const t = (item.data as any)?.type;
+            if (t === MessageTypes.QUOTE && item.data.quoteId !== undefined) {
+                item.quote = dict[item.data.quoteId];
+            }
+            if (t === MessageTypes.MESSAGE || t === MessageTypes.QUOTE) {
                 if ((item.data as any)?.['data']?.mailed) {
                     if (this._unmailedDict[id]) {
                         delete this._unmailedDict[id];
@@ -151,8 +156,11 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
             const proxyItem = createProxyItem(data, params);
             collection.push(proxyItem);
             dict[id] = proxyItem;
-
-            if ((dict[id] as any)?.type === MessageTypes.ITEM) {
+            const t = (dict[id] as any)?.type;
+            if (t === MessageTypes.QUOTE && proxyItem.data.quoteId !== undefined) {
+                proxyItem.quote = dict[proxyItem.data.quoteId];
+            }
+            if (t === MessageTypes.MESSAGE || t === MessageTypes.QUOTE) {
                 if ((dict[id] as any)?.['data']?.mailed) {
                     if (this._unmailedDict[id]) {
                         delete this._unmailedDict[id];
@@ -244,7 +252,11 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
                         dict[id].version = item.version;
                         dict[id].dateTime = item.dateTime;
 
-                        if ((dict[id] as any)?.type === MessageTypes.ITEM) {
+                        const t = (dict[id] as any)?.type;
+                        if (t === MessageTypes.QUOTE && (dict[id] as any)?.data !== undefined) {
+                            dict[id].quote = dict[(dict[id] as any)?.data?.quoteId];
+                        }
+                        if (t === MessageTypes.MESSAGE || t === MessageTypes.QUOTE) {
                             if ((dict[id] as any)?.['data'].mailed) {
                                 if (unmailedDict[id]) {
                                     delete unmailedDict[id];
@@ -276,7 +288,11 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
                         this._unmailed = proxyItem as CollectionItem<any>;
                     }
 
-                    if ((dict[id] as any)?.type === MessageTypes.ITEM) {
+                    const t = (dict[id] as any)?.type;
+                    if (t === MessageTypes.QUOTE && proxyItem.data.quoteId !== undefined) {
+                        proxyItem.quote = dict[proxyItem.data.quoteId];
+                    }
+                    if (t === MessageTypes.MESSAGE || t === MessageTypes.QUOTE) {
                         if ((dict[id] as any)?.['data'].mailed) {
                             if (unmailedDict[id]) {
                                 delete unmailedDict[id];

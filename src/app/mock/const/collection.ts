@@ -67,11 +67,14 @@ const generateMessageCollection = (number: number, size: number) => {
 
     COLLECTION_PARAMS.index++;
 
-    const hasImage = Boolean(Math.round(Math.random() * 0.75));
+    const hasImage = Boolean(Math.round(Math.random() * 0.75)),
+      type = Math.random() > .35 ? MessageTypes.MESSAGE : MessageTypes.QUOTE;
     items.push({
       id,
+      quoteId: type === MessageTypes.QUOTE ? i + 10 : undefined,
       version: 0,
       mailed: true,
+      type,
       dateTime: COLLECTION_PARAMS.maxDate - COLLECTION_PARAMS.index * 2000000, text: `${id}. ${[1].includes(id) ? testLinksText() : generateText()}`,
       image: hasImage ? 'https://ng-virtual-list-chat-demo.eugene-grebennikov.pro/media/logo.png' : undefined,
       incomType,

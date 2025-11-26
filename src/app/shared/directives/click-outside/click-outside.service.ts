@@ -1,6 +1,8 @@
-import { Injectable } from '@angular/core';
+import { DestroyRef, inject, Injectable, Input } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { fromEvent, Subject, tap } from 'rxjs';
+import { filter, fromEvent, of, race, Subject, switchMap, takeUntil, tap } from 'rxjs';
+
+const DEFAULT_MAX_DISTANCE = 40;
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -13,16 +15,67 @@ import { fromEvent, Subject, tap } from 'rxjs';
     providedIn: 'root'
 })
 export class ClickOutsideService {
+    private _maxDistance = DEFAULT_MAX_DISTANCE;
+
+    @Input('maxStaticClickDistance')
+    set maxDistance(v: number | string) {
+        this._maxDistance = v ? Number(v) : DEFAULT_MAX_DISTANCE;
+    }
+
     private _$onClick = new Subject<Event>();
     $onClick = this._$onClick.asObservable();
 
     public activeTarget: HTMLElement | null | undefined;
 
+    private _destroyRef = inject(DestroyRef);
+
     constructor() {
-        fromEvent(document.body, 'click').pipe(
+        const elementRef = document.body;
+        const $pointerPressed = fromEvent<PointerEvent>(elementRef, 'pointerdown'),
+            $pointerCancel = race([
+                fromEvent(window, 'pointerup').pipe(
+                    takeUntilDestroyed(),
+                ),
+                fromEvent<PointerEvent>(window, 'pointerleave').pipe(
+                    takeUntilDestroyed(),
+                ),
+            ]),
+            $pointerRelease = fromEvent<PointerEvent>(elementRef, 'pointerup', { passive: false });
+
+        $pointerPressed.pipe(
             takeUntilDestroyed(),
-            tap(e => {
-                this._$onClick.next(e);
+            switchMap(e => {
+                const x = Math.abs(e.clientX),
+                    y = Math.abs(e.clientY);
+                return $pointerRelease.pipe(
+                    takeUntilDestroyed(this._destroyRef),
+                    takeUntil(
+                        race([
+                            $pointerCancel,
+                            fromEvent<PointerEvent>(window, 'pointermove').pipe(
+                                takeUntilDestroyed(this._destroyRef),
+                                switchMap(e => {
+                                    const xx = x - Math.abs(e.clientX),
+                                        yy = y - Math.abs(e.clientY),
+                                        dist = Math.sqrt(Math.pow(xx, 2) + Math.pow(yy, 2));
+
+                                    if (dist > this._maxDistance) {
+                                        return of(true);
+                                    }
+
+                                    return of(false);
+                                }),
+                                filter(v => !!v),
+                            ),
+                        ]),
+                    ),
+                    takeUntilDestroyed(this._destroyRef),
+                    tap(e => {
+                        if (e) {
+                            this._$onClick.next(e);
+                        }
+                    }),
+                );
             }),
         ).subscribe();
     }

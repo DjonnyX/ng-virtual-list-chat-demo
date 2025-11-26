@@ -20,6 +20,9 @@ const DEFAULT_SEARCH_SUBSTRING_CLASS = 'search-substring',
   MOZ_USER_SELECT = '-moz-user-select',
   DEFAULT_TEXTAREA_SIZE = 16,
   MAX_TEXTAREA_HEIGHT = 320,
+  CLASS_REMOVAL = 'removal',
+  CLASS_SELECTED = 'selected',
+  CLASS_FOCUSED = 'focused',
   HIDDEN = 'hidden',
   AUTO = 'auto',
   NONE = 'none',
@@ -49,6 +52,12 @@ export class EditableTextComponent implements OnDestroy {
   editing = input<boolean>(false);
 
   text = input<string>();
+
+  classes = input<{ [className: string]: boolean; }>();
+
+  presetName = input<'message' | 'quote'>('message');
+
+  singleline = input<boolean>(false);
 
   mailed = input<boolean>(false);
 
@@ -194,6 +203,28 @@ export class EditableTextComponent implements OnDestroy {
         const preset = this._themeService.getPreset(theme.chat.messages.message.content[type]);
         if (preset) {
           this.messageStatusColor.set(preset.statusColor);
+        }
+      }
+    });
+
+    effect(() => {
+      const classes = this.classes(), type = this.themeType(), currentTheme = this.theme();
+      if (classes) {
+        const preset = (this._themeService.getPreset(currentTheme?.chat?.messages?.[this.presetName()] as any)?.content?.[type]);
+        if (preset) {
+          if (classes[CLASS_REMOVAL] && classes[CLASS_SELECTED]) {
+            this.messageStatusColor.set(preset.removalSelected.statusColor);
+          } else if (classes[CLASS_REMOVAL]) {
+            this.messageStatusColor.set(preset.removal.statusColor);
+          } else if (classes[CLASS_SELECTED] && classes[CLASS_FOCUSED]) {
+            this.messageStatusColor.set(preset.focusedSelected.statusColor);
+          } else if (classes[CLASS_SELECTED]) {
+            this.messageStatusColor.set(preset.selected.statusColor);
+          } else if (classes[CLASS_FOCUSED]) {
+            this.messageStatusColor.set(preset.focused.statusColor);
+          } else {
+            this.messageStatusColor.set(preset.normal.statusColor);
+          }
         }
       }
     });

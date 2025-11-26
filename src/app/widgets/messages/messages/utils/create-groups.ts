@@ -29,7 +29,6 @@ export const createGroups = (list: IGetMessagesData, proxy: ProxyCollection<IMes
     let unmailed: IVirtualListItem<IMessage> | undefined;
     for (let i = 0, l = items.length; i < l; i++) {
         const item = { ...items[i] }, dateTime = item.dateTime, d = new Date(dateTime), date = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-        item.type = MessageTypes.ITEM;
         if (!currentDate || currentDate != date) {
             currentDate = date;
             const dayFormat = Intl.DateTimeFormat(locale).format(date), isTooday = dayFormat === Intl.DateTimeFormat(locale).format(new Date());

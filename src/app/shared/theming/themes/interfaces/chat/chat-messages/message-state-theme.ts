@@ -1,4 +1,4 @@
-import { GradientColor } from "../../../../../types";
+import { Color, GradientColor } from "../../../../../types";
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -9,6 +9,7 @@ import { GradientColor } from "../../../../../types";
  */
 export interface IMessageStateTheme {
     fill: GradientColor;
+    statusColor: Color;
     strokeWidth: number;
-    color: string;
+    color: Color;
 }

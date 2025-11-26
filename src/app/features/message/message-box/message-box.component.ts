@@ -20,6 +20,7 @@ import { MessageComponent } from '../message/message.component';
 import { IMessageParams } from '../message/interfaces';
 import { IDeleteEventData } from './interfaces';
 import { MessageService } from '@widgets/messages';
+import { MessageTypes } from '@shared/enums';
 
 const IN = 'in', OUT = 'out',
   CLASS_RESETED = 'reseted', CLASS_NEW = 'new', CLASS_IN = 'in', CLASS_OUT = 'out', CLASS_SIMPLE = 'simple', CLASS_END_OF_MESSAGES = 'end-of-messages',
@@ -84,6 +85,8 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
 
   private _menuButton = viewChild<MessageMenuButtonComponent>('menuButton');
 
+  messageType = input<MessageTypes.MESSAGE | MessageTypes.QUOTE | 'message' | 'quote'>(MessageTypes.MESSAGE);
+
   data = input<IVirtualListItem<IProxyCollectionItem<IMessageItemData>> | null>(null);
 
   prevData = input<IVirtualListItem<IProxyCollectionItem<IMessageItemData>> | null>(null);
@@ -103,6 +106,8 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
   edited = output<{ nativeEvent: Event, item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, config: IDisplayObjectConfig, value: string | undefined }>();
 
   editingCancel = output<void>();
+
+  quoteSelect = output<Id | undefined>();
 
   changeText = output<string | undefined>();
 
@@ -269,8 +274,8 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
 
       const data = this.data(), config = this.config() as any,
         isIn = params.isIncoming, isOut = params.isOutgoing, isPrevIn = params.prevIsIncoming, isPrevOut = params.prevIsOutgoing,
-        isNextIn = params.nextIsIncoming, isNextOut = params.nextIsOutgoing, firstInGroup = params.prevType !== params.type,
-        lastInGroup = params.nextType !== params.type;
+        isNextIn = params.nextIsIncoming, isNextOut = params.nextIsOutgoing, firstInGroup = params.prevType === MessageTypes.GROUP && params.type !== MessageTypes.GROUP,
+        lastInGroup = params.nextType === MessageTypes.GROUP && params.type !== MessageTypes.GROUP;
       return {
         [CLASS_NEW]: data?.new === true, [CLASS_IN]: isIn, [CLASS_OUT]: isOut, [CLASS_SIMPLE]: (isIn && isPrevIn) || (isOut && isPrevOut), [CLASS_DELETED]: data?.[DATA_PROP_DELETED] == true,
         [CLASS_REMOVAL]: data?.[DATA_PROP_REMOVAL] == true, [CLASS_ANIMATE]: data?.[DATA_PROP_ANIMATE] == true, [CLASS_END_OF_MESSAGES]: (isIn && !isNextIn) || (isOut && !isNextOut),
@@ -402,6 +407,10 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
   openMenu() {
     this.longPressActive.set(false);
     this._$menuOpen.next();
+  }
+
+  onQuoteSelectHandler(id: Id | undefined) {
+    this.quoteSelect.emit(id);
   }
 
   ngOnDestroy(): void {

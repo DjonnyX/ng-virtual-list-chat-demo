@@ -33,13 +33,21 @@ let timeOffset = 0;
 export const generateMessage = (): IVirtualListItem<IMessage> => {
     timeOffset++;
     const version = 0, id = COLLECTION_PARAMS.index + 1,
-        type = MessageTypes.ITEM, incomType = Math.random() > .5 ? 'in' : 'out',
+        type = Math.random() > .35 ? MessageTypes.MESSAGE : MessageTypes.QUOTE,
+        incomType = Math.random() > .5 ? 'in' : 'out',
         hasImage = Boolean(Math.round(Math.random() * .75));
     COLLECTION_PARAMS.index++;
 
     const dateTime = COLLECTION_PARAMS.maxDate + timeOffset * 2000000;
     return {
-        id, version, dateTime, mailed: false, type, text: `${id}. ${generateText()}`,
-        image: hasImage ? 'https://ng-virtual-list-chat-demo.eugene-grebennikov.pro/media/logo.png' : undefined, incomType,
+        id,
+        quoteId: type === MessageTypes.QUOTE ? COLLECTION_PARAMS.index + 10 : undefined,
+        version,
+        dateTime,
+        mailed: false,
+        type,
+        text: `${id}. ${generateText()}`,
+        image: hasImage ? 'https://ng-virtual-list-chat-demo.eugene-grebennikov.pro/media/logo.png' : undefined,
+        incomType,
     };
 }

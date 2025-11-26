@@ -86,7 +86,7 @@ export class MessagesComponent implements OnDestroy {
     text: '',
     edited: false,
     incomType: 'in',
-    type: MessageTypes.ITEM,
+    type: MessageTypes.MESSAGE,
     id: '-1',
   });
 
@@ -716,6 +716,13 @@ export class MessagesComponent implements OnDestroy {
     const list = this._list();
     if (list) {
       list.scrollToEnd();
+    }
+  }
+
+  onQuoteSelectHandler(id: Id | undefined) {
+    const list = this._list();
+    if (list && id !== undefined) {
+      list.scrollTo(id);
     }
   }
 

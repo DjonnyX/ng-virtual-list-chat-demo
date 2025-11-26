@@ -29,6 +29,7 @@ const TOP = 'top',
   MAX_DIST = 15000,
   MIN_TIMESTAMP = 20,
   MAX_VELOCITY_TIMESTAMP = 100,
+  MIN_ANIMATED_VALUE = 10,
   SPEED_SCALE = 5;
 
 const getStartTime = () => { return performance.now(); }
@@ -497,8 +498,7 @@ export class XScrollerComponent implements OnDestroy {
 
   private moveWithAcceleration(isVertical: boolean, position: number, v0: number, v: number, a0: number) {
     if (a0 !== 0) {
-      const dvSign = Math.sign(v), v00 = Math.sign(v0) !== dvSign ? 0 : v0,
-        dv = (dvSign * Math.abs(Math.abs(v) - Math.abs(v00))),
+      const dvSign = Math.sign(v),
         duration = DURATION, maxDuration = MAX_DURATION,
         maxDistance = dvSign * MAX_DIST, s = (dvSign * Math.abs((a0 * Math.pow(duration, 2)) * .5) / 1000) / MASS,
         distance = Math.abs(s) < MAX_DIST ? s : maxDistance, positionWithVelocity = position + distance,
@@ -512,12 +512,21 @@ export class XScrollerComponent implements OnDestroy {
   animate(startValue: number, endValue: number, duration = 500, easingFunction: Easing = easeLinear) {
     this.stopScrolling();
     const startTime = getStartTime(), isVertical = this.direction() === ScrollerDirection.VERTICAL;
-    let isCanceled = false, prevPos = startValue, startPosDelta = 0, delta = 0, prevTime = startTime;
+    let isCanceled = false, prevPos = startValue, start = startValue, startPosDelta = 0, delta = 0, prevTime = startTime,
+      diff = Math.abs(Math.abs(endValue) - Math.abs(start));
 
-    if (isVertical) {
-      this.y = startValue;
+    if (diff < MIN_ANIMATED_VALUE) {
+      if (isVertical) {
+        this.y = prevPos = start = endValue;
+      } else {
+        this.x = prevPos = start = endValue;
+      }
     } else {
-      this.x = startValue;
+      if (isVertical) {
+        this.y = start;
+      } else {
+        this.x = start;
+      }
     }
 
     let finishedValue = endValue,
@@ -536,15 +545,14 @@ export class XScrollerComponent implements OnDestroy {
       }
 
       const elapsed = currentTime - startTime,
-        progress = Math.min(duration > 0 ? elapsed / duration : 0, 1),
+        progress = start === endValue ? 1 : Math.min(duration > 0 ? elapsed / duration : 0, 1),
         easedProgress = easingFunction(progress),
-        val = startPosDelta + startValue + (finishedValue - startValue) * easedProgress,
+        val = startPosDelta + start + (finishedValue - start) * easedProgress,
         scrollSize = isVertical ? this.scrollHeight : this.scrollWidth,
         currentValue = val < 0 ? 0 : val > scrollSize ? scrollSize : val,
-        t = Date.now(),
-        roundedCurrentValue = Math.round(currentValue);
+        t = Date.now();
 
-      isFinished = (roundedCurrentValue === 0) || progress === 1;
+      isFinished = currentValue === 0 || progress === 1;
 
       delta = currentValue - scrollDelta - prevPos;
 

@@ -9,7 +9,7 @@ import {
   MessageSubstrateComponent, MessageSubstarateMode, MessageSubstarateModes, EditableTextComponent,
   MessageSubstarateStyle, MessageSubstarateStyles,
 } from '@entities/message';
-import { IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/x-virtual-list';
+import { Id, IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/x-virtual-list';
 import { IMessageItemData } from "@shared/models/message";
 import { Color, GradientColor, GradientColorPositions } from '@shared/types';
 import { ThemeService } from '@shared/theming';
@@ -17,9 +17,13 @@ import { ITheme } from '@shared/theming';
 import { IProxyCollectionItem } from '@widgets/messages/messages/utils/proxy-collection';
 import { IMessageParams } from './interfaces/message-params';
 import { formatTime } from './utils';
+import { MessageTypes } from '@shared/enums';
+import { MessageQuoteComponent } from '../quote/message-quote.component';
+import { StaticClickDirective } from '@shared/directives';
 
 const DEFAULT_STROKE_ANIMATION_DURATION = 1000,
   DEFAULT_STROKE_WIDTH = 3,
+  DEFAULT_MAX_DISTANCE = 40,
   DEFAULT_STROKE_COLOR: GradientColor = ['rgba(255,255,255,0)', 'rgba(195, 0, 255, 0.17)'],
   DEFAULT_FILL_COLOR: GradientColor = ['rgb(255, 255, 255)', 'rgb(185, 210, 233)'],
   CLASS_REMOVAL = 'removal',
@@ -37,7 +41,7 @@ const DEFAULT_STROKE_ANIMATION_DURATION = 1000,
  */
 @Component({
   selector: 'x-message',
-  imports: [CommonModule, EditableTextComponent, MessageSubstrateComponent],
+  imports: [CommonModule, EditableTextComponent, MessageSubstrateComponent, MessageQuoteComponent, StaticClickDirective,],
   templateUrl: './message.component.html',
   styleUrl: './message.component.scss',
   host: {
@@ -56,6 +60,8 @@ export class MessageComponent implements OnDestroy {
 
   params = input.required<IMessageParams>();
 
+  messageType = input<MessageTypes.MESSAGE | MessageTypes.QUOTE | 'message' | 'quote'>(MessageTypes.MESSAGE);
+
   longPressActive = input<boolean>(false);
 
   searchPattern = input<Array<string>>([]);
@@ -65,6 +71,8 @@ export class MessageComponent implements OnDestroy {
   fillPositions = input<GradientColorPositions>();
 
   editedText = output<{ nativeEvent: Event, item: IVirtualListItem<IMessageItemData> }>();
+
+  quoteSelect = output<Id | undefined>();
 
   changeValue = output<string | undefined>();
 
@@ -93,6 +101,8 @@ export class MessageComponent implements OnDestroy {
   time: Signal<string | undefined>;
 
   private _themeService = inject(ThemeService);
+
+  readonly maxStaticClickDistance = DEFAULT_MAX_DISTANCE;
 
   private _resizeObserver: ResizeObserver;
 
@@ -237,7 +247,7 @@ export class MessageComponent implements OnDestroy {
 
     this.substarateMode = computed(() => {
       const params = this.params(), { isIncoming: isIn, prevIsIncoming: isPrevIn, prevType, type, isRTL } = params;
-      if ((prevType === type) && (isIn === isPrevIn)) {
+      if ((prevType !== MessageTypes.GROUP && type !== MessageTypes.GROUP) && (isIn === isPrevIn)) {
         return isRTL ? isIn ? MessageSubstarateModes.RIGHT : MessageSubstarateModes.LEFT :
           (isIn ? MessageSubstarateModes.LEFT : MessageSubstarateModes.RIGHT);
       }
@@ -253,6 +263,12 @@ export class MessageComponent implements OnDestroy {
   onEditedTextHandler(value: string | undefined, item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>) {
     item.tmpText = value;
     this.changeValue.emit(value);
+  }
+
+  onClickQuoteHandler(e: Event) {
+    e.stopImmediatePropagation();
+    e.preventDefault();
+    this.quoteSelect.emit(this.data()?.data?.quoteId);
   }
 
   ngOnDestroy(): void {

@@ -31,10 +31,14 @@ export class StaticClickDirective {
     constructor() {
         const $pointerPressed = fromEvent<PointerEvent>(this._elementRef.nativeElement, 'pointerdown'),
             $pointerCancel = race([
-                fromEvent(window, 'pointerup'),
-                fromEvent<PointerEvent>(window, 'pointerleave'),
+                fromEvent(window, 'pointerup').pipe(
+                    takeUntilDestroyed(),
+                ),
+                fromEvent<PointerEvent>(window, 'pointerleave').pipe(
+                    takeUntilDestroyed(),
+                ),
             ]),
-            $pointerRelease = fromEvent<PointerEvent>(this._elementRef.nativeElement, 'pointerup');
+            $pointerRelease = fromEvent<PointerEvent>(this._elementRef.nativeElement, 'pointerup', { passive: false });
 
         $pointerPressed.pipe(
             takeUntilDestroyed(),
@@ -63,8 +67,11 @@ export class StaticClickDirective {
                             ),
                         ]),
                     ),
+                    takeUntilDestroyed(this._destroyRef),
                     tap(e => {
-                        this.onStaticClick.emit(e);
+                        if (e) {
+                            this.onStaticClick.emit(e);
+                        }
                     }),
                 );
             }),

@@ -14,7 +14,7 @@
     <button #checkbox press class="checkbox" (pointerdown)="substrate.ripple($event)"
         (onPress)="onPressHandler($event)">
         <x-substrate #substrate class="substrate" [fillColors]="gradientFillColors" [rippleColor]="rippleColor"
-            [fillColorPositions]="gradientFillPositions" [width]="b.width" [height]="b.height" [roundCorner]="corner"
+            [fillPositions]="gradientFillPositions" [width]="b.width" [height]="b.height" [roundCorner]="corner"
             [mode]="m" [type]="t" [strokeColors]="stroke" [strokeAnimationDuration]="10000"
             [strokeWidth]="strokeWidth()" />
         <span #indicator class="indicator">
