@@ -5,7 +5,7 @@
     <div class="container">
         <div #toolbar localeSensitive class="toolbar">
             <div>
-                <x-menu-button (onClick)="onOpenMenuHandler($event)" [opened]="menuOpened()" />
+                <x-menu-button name="menu-button" (onClick)="onOpenMenuHandler($event)" [opened]="menuOpened()" />
             </div>
             <div #header class="title">{{groupTitle}}</div>
             <x-message-search (search)="onSearchHandler($event)" />

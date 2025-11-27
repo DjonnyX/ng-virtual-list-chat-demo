@@ -2,13 +2,13 @@
 @let initialSelectedId = selectedId();
 @let loading = isLoading();
 
-<div class="wrapper" clickOutside (onClickOutside)="onClickOutside()">
+<div class="wrapper" clickOutside (onClickOutside)="onClickOutside($event)">
     @if(loading) {
         <x-groups-loading-indicator />
     }
 
     <x-virtual-list #list class="list" [items]="items" [itemRenderer]="itemRenderer" [itemSize]="38" methodForSelecting="select"
-        [selectByClick]="false" [dynamicSize]="true" [bufferSize]="0" [maxBufferSize]="0" [selectedIds]="initialSelectedId"
+        [selectByClick]="false" [dynamicSize]="true" [bufferSize]="1" [maxBufferSize]="1" [selectedIds]="initialSelectedId"
         [scrollStartOffset]="scrollStartOffset()" scrollbarPreset="x-scrollbar-primary"></x-virtual-list>
 
     <ng-template #itemRenderer let-data="data" let-config="config">

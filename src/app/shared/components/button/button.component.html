@@ -7,7 +7,7 @@
 @let gradientFillColors = fillGradientColors();
 @let gradientFillPositions = fillPositions();
 @let rippleColor = rippleEffectColor();
-<button #button press class="button" (pointerdown)="substrate.ripple($event)" (onPress)="onPressHandler($event)"
+<button #button press class="button" [attr.name]="name()" (pointerdown)="substrate.ripple($event)" (onPress)="onPressHandler($event)"
     (click)="onClickHandler($event)">
     <x-substrate #substrate class="substrate" [fillColors]="gradientFillColors" [rippleColor]="rippleColor"
         [fillPositions]="gradientFillPositions" [width]="b.width" [height]="b.height" [roundCorner]="corner"

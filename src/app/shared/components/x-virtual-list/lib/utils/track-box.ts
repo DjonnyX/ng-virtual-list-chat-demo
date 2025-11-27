@@ -78,7 +78,7 @@ export interface IGetItemPositionOptions<I extends IItem, C extends Array<I>>
 export interface IUpdateCollectionOptions<I extends IItem, C extends Array<I>>
     extends Omit<IRecalculateMetricsOptions<I, C>, 'collection' | 'previousTotalSize' | 'crudDetected' | 'deletedItemsMap'> { }
 
-export type CacheMapEvents = TrackBoxEvents.CHANGE | TrackBoxEvents.RESET | TrackBoxEvents.PREPARE;
+export type CacheMapEvents = TrackBoxEvents;
 
 export type OnChangeEventListener = (version: number) => void;
 

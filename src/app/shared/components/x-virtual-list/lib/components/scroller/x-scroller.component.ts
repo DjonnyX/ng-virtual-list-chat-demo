@@ -549,10 +549,12 @@ export class XScrollerComponent implements OnDestroy {
         easedProgress = easingFunction(progress),
         val = startPosDelta + start + (finishedValue - start) * easedProgress,
         scrollSize = isVertical ? this.scrollHeight : this.scrollWidth,
+        actualScrollSize = isVertical ? this.actualScrollHeight : this.actualScrollWidth,
         currentValue = val < 0 ? 0 : val > scrollSize ? scrollSize : val,
         t = Date.now();
 
-      isFinished = currentValue === 0 || progress === 1;
+      isFinished = (currentValue === scrollSize && Math.round(scrollSize) >= Math.round(actualScrollSize)) ||
+        currentValue === 0 || progress === 1;
 
       delta = currentValue - scrollDelta - prevPos;
 

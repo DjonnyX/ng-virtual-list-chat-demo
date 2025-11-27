@@ -13,7 +13,8 @@ import { validateCollection } from './utils/validate-collection';
 import { ClickOutsideDirective, StaticClickDirective } from '@shared/directives';
 import { LocaleSensitiveDirective } from '@shared/localization';
 
-const DEFAULT_MAX_DISTANCE = 40;
+const DEFAULT_MAX_DISTANCE = 40,
+  MENU_BUTTON_NAME = 'menu-button';
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -131,7 +132,10 @@ export class GroupsComponent {
     this.close.emit();
   }
 
-  onClickOutside() {
+  onClickOutside(e: Event) {
+    if ((e.target as HTMLElement).getAttribute('name') === MENU_BUTTON_NAME) {
+      return;
+    }
     this.close.emit();
   }
 

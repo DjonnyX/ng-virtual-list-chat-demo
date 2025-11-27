@@ -24,6 +24,8 @@ const CLASS_ACTIVE = 'active';
 export class MenuButtonComponent {
   content = viewChild<ElementRef<HTMLDivElement>>('content');
 
+  name = input<string | undefined>(undefined);
+
   opened = input<boolean>(false);
 
   onClick = output<Event>();

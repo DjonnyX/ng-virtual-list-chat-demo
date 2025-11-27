@@ -1,4 +1,4 @@
-<x-button #button class="menu" aria-label="Open Menu" [fillColors]="fillColors()" [fillPositions]="fillPositions()" (onPress)="onPressHandler($event)"
+<x-button #button class="menu" [name]="name()" aria-label="Open Menu" [fillColors]="fillColors()" [fillPositions]="fillPositions()" (onPress)="onPressHandler($event)"
     (onFocus)="onFocusHandler($event)" (onClick)="onClickHandler($event)">
     <div #content class="content" [style.--icon-normal-fill]="iconNormalFill()" [style.--icon-pressed-fill]="iconPressedFill()"
             [style.--icon-focused-fill]="iconFocusedFill()">

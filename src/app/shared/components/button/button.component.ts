@@ -46,6 +46,8 @@ export class ButtonComponent implements AfterViewInit, OnDestroy {
 
   type = input<SubstarateStyle>(SubstarateStyles.NONE);
 
+  name = input<string | undefined>(undefined);
+
   content = input<string | undefined>();
 
   strokeColor = input<GradientColor | undefined>(undefined);

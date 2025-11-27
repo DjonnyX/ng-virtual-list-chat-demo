@@ -959,29 +959,33 @@ export class XVirtualListComponent implements OnDestroy {
       distinctUntilChanged(),
       tap(v => {
         if (!v) {
-          prepared = v;
+          prepared = false;
           const scrollerComponent = this._scrollerComponent();
           if (scrollerComponent) {
-            scrollerComponent.prepared = v;
+            scrollerComponent.prepared = false;
           }
-          this.classes.set({ prepared: v });
+          this.classes.set({ prepared: false });
           this.cacheClean();
+          this._trackBox.changes();
         }
       }),
       filter(v => !!v),
-      delay(0),
+      debounceTime(0),
       takeUntilDestroyed(this._destroyRef),
       tap(v => {
-        prepared = v;
+        prepared = true;
+        this._trackBox.changes();
       }),
-      delay(0),
+      debounceTime(0),
       takeUntilDestroyed(this._destroyRef),
       tap(v => {
+        prepared = true;
         const scrollerComponent = this._scrollerComponent();
         if (scrollerComponent) {
-          scrollerComponent.prepared = v;
+          scrollerComponent.prepared = true;
         }
-        this.classes.set({ prepared: v });
+        this.classes.set({ prepared: true });
+        this._trackBox.changes();
       }),
     ).subscribe();
 
@@ -1301,7 +1305,7 @@ export class XVirtualListComponent implements OnDestroy {
         const scroller = this._scrollerComponent();
         if (scroller) {
           let actualScrollSize = snapScrollToBottom && !prepared ?
-            Number.MAX_SAFE_INTEGER * .5 :
+            (isVertical ? scroller.actualScrollHeight ?? 0 : scroller.actualScrollWidth ?? 0) :
             (isVertical ? scroller.actualScrollTop ?? 0 : scroller.actualScrollLeft ?? 0),
             totalSize = 0, displayItems: IRenderVirtualListCollection;
 
@@ -1320,11 +1324,9 @@ export class XVirtualListComponent implements OnDestroy {
           if (snapScrollToBottom && scrollLength > viewportSize && !prepared) {
             const { totalSize: calculatedTotalSize } = this._trackBox.getMetrics(items, itemConfigMap, opts);
             totalSize = calculatedTotalSize;
-
             actualScrollSize = (totalSize > viewportSize ? totalSize - viewportSize : 0);
             const { displayItems: calculatedDisplayItems, totalSize: calculatedTotalSize1 } =
               this._trackBox.updateCollection(items, itemConfigMap, { ...opts, scrollSize: actualScrollSize });
-
             displayItems = calculatedDisplayItems;
             totalSize = calculatedTotalSize1;
             scrollLength = Math.round(totalSize) ?? 0;
@@ -1332,8 +1334,8 @@ export class XVirtualListComponent implements OnDestroy {
             roundedMaxPosition = Math.round(actualScrollLength);
             scrollPosition = Math.round(actualScrollSize);
           } else {
-            const { displayItems: calculatedDisplayItems, totalSize: calculatedTotalSize } = this._trackBox.updateCollection(items, itemConfigMap, opts);
-
+            const { displayItems: calculatedDisplayItems, totalSize: calculatedTotalSize } =
+              this._trackBox.updateCollection(items, itemConfigMap, opts);
             displayItems = calculatedDisplayItems;
             totalSize = calculatedTotalSize;
           }
@@ -1369,7 +1371,7 @@ export class XVirtualListComponent implements OnDestroy {
 
           this._trackBox.clearDelta();
 
-          if (this._trackBox.isSnappedToEnd || (!!snapScrollToBottom && !prepared) ||
+          if (this._trackBox.isSnappedToEnd || (!!snapScrollToBottom) ||
             (snapScrollToBottom && actualScrollSize > 0 &&
               ((roundedScrollPositionAfterUpdate >= scrollPosition) &&
                 (scrollPosition >= roundedMaxPosition) &&

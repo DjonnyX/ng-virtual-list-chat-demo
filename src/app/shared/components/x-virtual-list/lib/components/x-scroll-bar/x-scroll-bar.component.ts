@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, DestroyRef, effect, ElementRef, inject, input, Signal, signal, viewChild } from '@angular/core';
+import { Component, computed, effect, ElementRef, inject, input, Signal, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { SubstarateStyle, SubstarateStyles, SubstrateComponent } from '@shared/components/substrate';
 import { ITheme, ThemeService } from '@shared/theming';
 import { IScrollBarTheme } from '@shared/theming/themes/interfaces/components/scrollbar';
 import { GradientColor, GradientColorPositions, RoundedCorner } from '@shared/types';
-import { debounceTime, tap } from 'rxjs';
+import { combineLatest, filter, map, tap } from 'rxjs';
 
 const DEFAULT_THICKNESS = 6,
   DEFAULT_SIZE = 6,
@@ -30,6 +30,8 @@ const DEFAULT_THICKNESS = 6,
 })
 export class XScrollBarComponent {
   thumb = viewChild<ElementRef<HTMLDivElement>>('thumb');
+
+  track = viewChild<ElementRef<HTMLDivElement>>('track');
 
   loading = input<boolean>(false);
 
@@ -69,24 +71,21 @@ export class XScrollBarComponent {
 
   private _themeService = inject(ThemeService);
 
-  private _destroyRef = inject(DestroyRef);
-
   constructor() {
-    const $prepared = toObservable(this.prepared);
+    const $prepared = toObservable(this.prepared),
+      $track = toObservable(this.track).pipe(
+        takeUntilDestroyed(),
+        filter(v => !!v),
+        map(v => v.nativeElement),
+      ),
+      $isVertical = toObservable(this.isVertical),
+      $size = toObservable(this.size);
 
-    $prepared.pipe(
+    combineLatest([$prepared, $track, $isVertical, $size]).pipe(
       takeUntilDestroyed(),
-      tap(v => {
-        if (!v) {
-          this.show.set(false);
-        }
-      }),
-      debounceTime(500),
-      takeUntilDestroyed(this._destroyRef),
-      tap(v => {
-        if (v) {
-          this.show.set(true);
-        }
+      tap(([prepared, track, isVertical, size]) => {
+        const total = isVertical ? track.offsetHeight : track.offsetWidth;
+        this.show.set(prepared && size > 0 && size < total);
       }),
     ).subscribe();
 
