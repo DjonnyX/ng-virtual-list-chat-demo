@@ -2,7 +2,7 @@ import { Component, computed, DestroyRef, effect, ElementRef, inject, input, OnD
 import { CommonModule } from '@angular/common';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, fromEvent, map, of, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, combineLatest, debounceTime, distinctUntilChanged, filter, fromEvent, map, of, switchMap, tap } from 'rxjs';
 import { SearchHighlightDirective } from '@shared/directives';
 import { formatText } from '@shared/utils';
 import { ThemeService } from '@shared/theming';
@@ -259,6 +259,7 @@ export class EditableTextComponent implements OnDestroy {
       $selectable = toObservable(this.selectable),
       $resources = combineLatest([this.$resourceUrls, this.$resourceLoaded]).pipe(
         takeUntilDestroyed(),
+        debounceTime(100),
         switchMap(([resourceUrls, resourceLoaded]) => {
           return of(resourceUrls.includes(resourceLoaded));
         }),
@@ -284,7 +285,7 @@ export class EditableTextComponent implements OnDestroy {
     combineLatest([$selectable, $mailed, $text, $time, $resources]).pipe(
       takeUntilDestroyed(),
       distinctUntilChanged(),
-      switchMap(([selectable, mailed, text, time]) => {
+      switchMap(([selectable, mailed, text, time, resources]) => {
         return of(formatText(text, time, {
           selectable,
           mailed,

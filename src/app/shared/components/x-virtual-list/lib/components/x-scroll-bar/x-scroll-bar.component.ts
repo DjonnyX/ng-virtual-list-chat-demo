@@ -5,7 +5,7 @@ import { SubstarateStyle, SubstarateStyles, SubstrateComponent } from '@shared/c
 import { ITheme, ThemeService } from '@shared/theming';
 import { IScrollBarTheme } from '@shared/theming/themes/interfaces/components/scrollbar';
 import { GradientColor, GradientColorPositions, RoundedCorner } from '@shared/types';
-import { combineLatest, delay, filter, fromEvent, map, of, race, switchMap, takeUntil, tap } from 'rxjs';
+import { combineLatest, filter, fromEvent, map, race, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { MOUSE_DOWN, MOUSE_MOVE, MOUSE_UP, TOUCH_END, TOUCH_MOVE, TOUCH_START } from '../../const';
 import { ISize } from '../../types';
 
@@ -97,6 +97,9 @@ export class XScrollBarComponent implements OnDestroy {
     return isVertical ? size < bounds.height ? bounds.height - size : 0 : size < bounds.width ? bounds.width - size : 0;
   }
 
+  private _$scrollingCancel = new Subject<void>();
+  readonly $scrollingCancel = this._$scrollingCancel.asObservable();
+
   constructor() {
     this._resizeObserver = new ResizeObserver(this._onResizeHandler);
 
@@ -184,12 +187,14 @@ export class XScrollBarComponent implements OnDestroy {
     const $mouseUp = fromEvent<MouseEvent>(window, MOUSE_UP, { passive: false }).pipe(
       takeUntilDestroyed(),
     ),
-      $mouseDragCancel = $mouseUp.pipe(
-        takeUntilDestroyed(),
-        tap(() => {
-          this.grabbing.set(false);
-        }),
-      );
+      $mouseDragCancel = race([
+        $mouseUp.pipe(
+          takeUntilDestroyed(),
+          tap(() => {
+            this.grabbing.set(false);
+          }),
+        ), this.$scrollingCancel
+      ]);
 
     $thumb.pipe(
       takeUntilDestroyed(),
@@ -212,14 +217,13 @@ export class XScrollBarComponent implements OnDestroy {
                   scrollSize = this.scrollSize, delta = startClientPos - currentPos,
                   dp = startPos - delta, position = Math.round(dp < 0 ? 0 : dp > scrollSize ? scrollSize : dp);
                 this.scrollTo(position);
-                return race([fromEvent<MouseEvent>(window, MOUSE_UP, { passive: false }), fromEvent<MouseEvent>(thumb, MOUSE_UP, { passive: false })]).pipe(
+                return race([this.$scrollingCancel, fromEvent<MouseEvent>(window, MOUSE_UP, { passive: false }), fromEvent<MouseEvent>(thumb, MOUSE_UP, { passive: false })]).pipe(
                   takeUntilDestroyed(this._destroyRef),
+                  takeUntil($mouseDragCancel),
                   tap(e => {
-                    e.preventDefault();
-                  }),
-                  delay(0),
-                  takeUntilDestroyed(this._destroyRef),
-                  tap(e => {
+                    if (e) {
+                      e.preventDefault();
+                    }
                     this.scrollTo(position);
                     this.grabbing.set(false);
                   }),
@@ -234,12 +238,14 @@ export class XScrollBarComponent implements OnDestroy {
     const $touchUp = fromEvent<TouchEvent>(window, TOUCH_END, { passive: false }).pipe(
       takeUntilDestroyed(),
     ),
-      $touchCanceler = $touchUp.pipe(
-        takeUntilDestroyed(this._destroyRef),
-        tap(() => {
-          this.grabbing.set(false);
-        }),
-      );
+      $touchCanceler = race([
+        $touchUp.pipe(
+          takeUntilDestroyed(this._destroyRef),
+          tap(() => {
+            this.grabbing.set(false);
+          }),
+        ), this.$scrollingCancel,
+      ]);
 
     $thumb.pipe(
       takeUntilDestroyed(),
@@ -262,14 +268,13 @@ export class XScrollBarComponent implements OnDestroy {
                   scrollSize = this.scrollSize, delta = startClientPos - currentPos,
                   dp = startPos - delta, position = Math.round(dp < 0 ? 0 : dp > scrollSize ? scrollSize : dp);
                 this.scrollTo(position);
-                return race([fromEvent<TouchEvent>(window, TOUCH_END, { passive: false }), fromEvent<TouchEvent>(thumb, TOUCH_END, { passive: false })]).pipe(
+                return race([this.$scrollingCancel, fromEvent<TouchEvent>(window, TOUCH_END, { passive: false }), fromEvent<TouchEvent>(thumb, TOUCH_END, { passive: false })]).pipe(
                   takeUntilDestroyed(this._destroyRef),
+                  takeUntil(this.$scrollingCancel),
                   tap(e => {
-                    e.preventDefault();
-                  }),
-                  delay(0),
-                  takeUntilDestroyed(this._destroyRef),
-                  tap(e => {
+                    if (e) {
+                      e.preventDefault();
+                    }
                     this.scrollTo(position);
                     this.grabbing.set(false);
                   }),
@@ -285,6 +290,10 @@ export class XScrollBarComponent implements OnDestroy {
   scrollTo(position: number) {
     const scrollSize = this.scrollSize;
     this.onDrag.emit(scrollSize !== 0 ? position / scrollSize : 0);
+  }
+
+  stopScrolling() {
+    this._$scrollingCancel.next();
   }
 
   ngOnDestroy(): void {

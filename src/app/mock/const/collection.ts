@@ -47,8 +47,25 @@ export const COLLECTION_PARAMS = {
 
 const testLinksText = () => {
   return `Test links:
-https://i0.wp.com/www.dogwonder.co.uk/wp-content/uploads/2009/12/tumblr_ku2pvuJkJG1qz9qooo1_r1_400.gif?resize=320%2C320
+  <i>⚙️ Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</i> It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.
+
+  https://i0.wp.com/www.dogwonder.co.uk/wp-content/uploads/2009/12/tumblr_ku2pvuJkJG1qz9qooo1_r1_400.gif?resize=320%2C320
 http://eugene-grebennikov.pro/`;
+};
+
+const testFormattedText = () => {
+  return `Formated text: <h3>🚀 What is Lorem Ipsum?</h3><b>✨ Lorem Ipsum is simply dummy text of the printing and typesetting industry.</b> <br/><i>⚙️ Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</i> It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+
+- Fixed size (fastest)
+- Dynamic size (auto-measured)
+- Scrolling control
+`;
+};
+
+const testFormattedTable = () => {
+  return `What does Upside-Down Face emoji 🙃 mean?
+  https://media.tenor.com/UMs_iWeiCBMAAAAM/stitch-ruim-wave.gif
+`;
 };
 
 /**
@@ -75,7 +92,7 @@ const generateMessageCollection = (number: number, size: number) => {
       version: 0,
       mailed: true,
       type,
-      dateTime: COLLECTION_PARAMS.maxDate - COLLECTION_PARAMS.index * 2000000, text: `${id}. ${[1].includes(id) ? testLinksText() : generateText()}`,
+      dateTime: COLLECTION_PARAMS.maxDate - COLLECTION_PARAMS.index * 2000000, text: `${id}. ${[1].includes(id) ? testLinksText() : [2].includes(id) ? testFormattedText() : [3].includes(id) ? testFormattedTable() : generateText()}`,
       image: hasImage ? 'https://ng-virtual-list-chat-demo.eugene-grebennikov.pro/media/logo.png' : undefined,
       incomType,
     });

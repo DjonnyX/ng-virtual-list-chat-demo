@@ -1,5 +1,5 @@
 :host {
-    background: rgb(227, 247, 250);
+    background: rgb(255 255 255);
     display: block;
     overflow: hidden;
     width: 100%;
@@ -20,32 +20,6 @@
     height: 100%;
     max-height: unset;
     overflow: hidden;
-
-    &::part(scroller) {
-        scroll-behavior: auto;
-
-        &::-webkit-scrollbar {
-            width: 16px;
-            height: 16px;
-        }
-
-        &::-webkit-scrollbar-track {
-            background-color: transparent;
-        }
-
-        &::-webkit-scrollbar-thumb {
-            background-color: #b6b3d7;
-            border-radius: 20px;
-            border: 6px solid transparent;
-            background-clip: content-box;
-            min-width: 60px;
-            min-height: 60px;
-        }
-
-        &::-webkit-scrollbar-thumb:hover {
-            background-color: #908cbd;
-        }
-    }
 
     &::part(item) {
         background-color: unset;

@@ -92,11 +92,11 @@ class ResourceManager extends EventEmitter<ResourceManagerEvents, ResourceManage
                     }
                 }));
 
-                if (resource && IMAGE_PATTERN.test(resource)) {
+                if (resource !== undefined && IMAGE_PATTERN.test(resource)) {
                     this._map.set(url, resource);
                     this._statusMap.set(url, ResourceStatus.LOADED);
-                    this.dispatch(ResourceManagerEvents.PROGRESS, url);
                     thread.complete();
+                    this.dispatch(ResourceManagerEvents.PROGRESS, url);
                     return;
                 }
 

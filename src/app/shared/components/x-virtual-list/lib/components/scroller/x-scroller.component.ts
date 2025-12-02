@@ -84,6 +84,9 @@ export class XScrollerComponent implements OnDestroy {
   @ViewChild('scrollViewport', { read: CdkScrollable })
   cdkScrollable: CdkScrollable | undefined;
 
+  @ViewChild('scrollBar', { read: XScrollBarComponent })
+  scrollBar: XScrollBarComponent | undefined;
+
   scrollViewport = viewChild<ElementRef<HTMLDivElement>>('scrollViewport');
 
   direction = input<ScrollerDirections>(ScrollerDirection.VERTICAL);
@@ -323,6 +326,9 @@ export class XScrollerComponent implements OnDestroy {
         return fromEvent<MouseEvent>(content, MOUSE_DOWN, { passive: false }).pipe(
           takeUntilDestroyed(this._destroyRef),
           switchMap(e => {
+            if (this.scrollBar) {
+              this.scrollBar.stopScrolling();
+            }
             this.stopScrolling();
             const target = e.target as HTMLElement;
             if (target.classList.contains(INTERACTIVE)) {
@@ -358,18 +364,15 @@ export class XScrollerComponent implements OnDestroy {
                 startTime = endTime;
                 return race([fromEvent<MouseEvent>(window, MOUSE_UP, { passive: false }), fromEvent<MouseEvent>(content, MOUSE_UP, { passive: false })]).pipe(
                   takeUntilDestroyed(this._destroyRef),
+                  takeUntil($mouseDragCancel),
                   tap(e => {
                     e.preventDefault();
-                  }),
-                  delay(0),
-                  takeUntilDestroyed(this._destroyRef),
-                  tap(e => {
                     const endTime = Date.now(),
                       timestamp = endTime - startTime,
                       { v0 } = this.calculateVelocity(offsets, scrollDelta, timestamp),
                       { a0 } = this.calculateAcceleration(velocities, v0, timestamp);
-                    this.moveWithAcceleration(isVertical, position, 0, v0, a0);
                     this._isMoving = false;
+                    this.moveWithAcceleration(isVertical, position, 0, v0, a0);
                   }),
                 );
               }),
@@ -395,6 +398,9 @@ export class XScrollerComponent implements OnDestroy {
         return fromEvent<TouchEvent>(content, TOUCH_START, { passive: false }).pipe(
           takeUntilDestroyed(this._destroyRef),
           switchMap(e => {
+            if (this.scrollBar) {
+              this.scrollBar.stopScrolling();
+            }
             this.stopScrolling();
             const target = e.target as HTMLElement;
             if (target.classList.contains(INTERACTIVE)) {
@@ -430,18 +436,15 @@ export class XScrollerComponent implements OnDestroy {
                 startTime = endTime;
                 return race([fromEvent<TouchEvent>(window, TOUCH_END, { passive: false }), fromEvent<TouchEvent>(content, TOUCH_END, { passive: false })]).pipe(
                   takeUntilDestroyed(this._destroyRef),
+                  takeUntil($touchCanceler),
                   tap(e => {
                     e.preventDefault();
-                  }),
-                  delay(0),
-                  takeUntilDestroyed(this._destroyRef),
-                  tap(e => {
                     const endTime = Date.now(),
                       timestamp = endTime - startTime,
                       { v0 } = this.calculateVelocity(offsets, scrollDelta, timestamp),
                       { a0 } = this.calculateAcceleration(velocities, v0, timestamp);
-                    this.moveWithAcceleration(isVertical, position, this._velocity, v0, a0);
                     this._isMoving = false;
+                    this.moveWithAcceleration(isVertical, position, this._velocity, v0, a0);
                   }),
                 );
               }),
@@ -719,20 +722,9 @@ export class XScrollerComponent implements OnDestroy {
         scrollSize: isVertical ? this.actualScrollHeight : this.actualScrollWidth,
         position,
       });
-
     this.stopScrolling();
 
-    if (isVertical) {
-      if (position < 0 || position > this.scrollHeight) {
-        return;
-      }
-    } else {
-      if (position < 0 || position > this.scrollWidth) {
-        return;
-      }
-    }
-
-    this.move(this.isVertical(), absolutePosition, false);
+    this.move(this.isVertical(), absolutePosition);
     if (this.cdkScrollable) {
       this.cdkScrollable.getElementRef().nativeElement.dispatchEvent(SCROLLBAR_SCROLL_EVENT);
     }
