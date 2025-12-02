@@ -22,8 +22,8 @@ export class MessagesNotificationWSService implements MessagesNotificationServic
   /**
    * userId
    */
-  private _$writing = new Subject<number>;
-  readonly $writing = this._$writing.asObservable();
+  private _$typing = new Subject<number>;
+  readonly $typing = this._$typing.asObservable();
 
   constructor() { }
 }

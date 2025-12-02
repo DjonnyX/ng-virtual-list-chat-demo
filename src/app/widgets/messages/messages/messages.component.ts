@@ -98,7 +98,10 @@ export class MessagesComponent implements OnDestroy {
   }>();
   protected $edit = this._$edit.asObservable();
 
-  private _$change = new Subject<{ item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, config: IDisplayObjectConfig, value: string | undefined }>();
+  private _$change = new Subject<{
+    item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>,
+    config: IDisplayObjectConfig, value: string | undefined
+  }>();
   protected $change = this._$change.asObservable();
 
   private _$scroll = new Subject<IScrollEvent>();
@@ -437,10 +440,19 @@ export class MessagesComponent implements OnDestroy {
       takeUntilDestroyed(),
       filter(v => v !== undefined),
       switchMap(chatId => {
-        return this._messageNotificationService.$writing.pipe(
+        return this._messageNotificationService.$typing.pipe(
           takeUntilDestroyed(this._destroyRef),
           tap(() => {
             if (this._proxyCollection.has(TYPING_INDICATOR_INDEX)) {
+              const indicator = this._proxyCollection.get(TYPING_INDICATOR_INDEX);
+              this._proxyCollection.setParams(indicator.id, { deleted: false, animate: false });
+              const configMap = { ...this.collectionConfigMap() };
+              configMap[indicator.id] = {
+                sticky: 0,
+                collapsable: false,
+                selectable: false,
+              };
+              this.collectionConfigMap.set(configMap);
               return;
             }
             const indicator = generateTypingIndicator();
@@ -460,7 +472,7 @@ export class MessagesComponent implements OnDestroy {
         return this._messageNotificationService.$messages.pipe(
           takeUntilDestroyed(this._destroyRef),
           switchMap(() => {
-            return this.deleteWritingIndicator(chatId).pipe(
+            return this.deleteTypingIndicator(chatId).pipe(
               takeUntilDestroyed(this._destroyRef),
             );
           }),
@@ -602,7 +614,7 @@ export class MessagesComponent implements OnDestroy {
     ).subscribe();
   }
 
-  private deleteWritingIndicator(chatId: Id) {
+  private deleteTypingIndicator(chatId: Id) {
     return of(chatId).pipe(
       takeUntilDestroyed(this._destroyRef),
       tap(() => {

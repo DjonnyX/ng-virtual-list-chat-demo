@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, ElementRef, inject, input, OnDestroy, Signal, signal, ViewChild, viewChild } from '@angular/core';
+import { Component, computed, DestroyRef, effect, ElementRef, inject, input, OnDestroy, Signal, signal, ViewChild, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
@@ -13,7 +13,7 @@ import { LocaleSensitiveDirective } from '@shared/localization';
 import { XScrollBarComponent } from "../x-scroll-bar/x-scroll-bar.component";
 import { GradientColorPositions } from '@shared/types';
 import {
-  INTERACTIVE, MOUSE_DOWN, MOUSE_MOVE, MOUSE_UP, TOUCH_END, TOUCH_MOVE, TOUCH_START, WHEEL,
+  INTERACTIVE, MOUSE_DOWN, MOUSE_MOVE, MOUSE_UP, SCROLLER_SCROLL, SCROLLER_SCROLLBAR_SCROLL, SCROLLER_WHEEL, TOUCH_END, TOUCH_MOVE, TOUCH_START, WHEEL,
 } from '../../const';
 
 const TOP = 'top',
@@ -60,7 +60,9 @@ export interface IScrollToParams {
   behavior?: ScrollBehavior;
 }
 
-const SCROLL_EVENT = new Event('scroll');
+export const SCROLL_EVENT = new Event(SCROLLER_SCROLL),
+  WHEEL_EVENT = new Event(SCROLLER_WHEEL),
+  SCROLLBAR_SCROLL_EVENT = new Event(SCROLLER_SCROLLBAR_SCROLL);
 
 /**
  * The scroller for the XVirtualList item component
@@ -243,6 +245,10 @@ export class XScrollerComponent implements OnDestroy {
     this._viewportResizeObserver = new ResizeObserver(this._onResizeViewportHandler);
     this._contentResizeObserver = new ResizeObserver(this._onResizeContentHandler);
 
+    this.isVertical = computed(() => {
+      return this.direction() === ScrollerDirection.VERTICAL;
+    });
+
     const $viewport = toObservable(this.scrollViewport).pipe(
       takeUntilDestroyed(),
       filter(v => !!v),
@@ -270,25 +276,38 @@ export class XScrollerComponent implements OnDestroy {
       }),
     ).subscribe();
 
-    const isVertical = this.direction() === VERTICAL;
-
     $content.pipe(
       takeUntilDestroyed(),
       switchMap(content => {
-        return fromEvent<WheelEvent>(content, WHEEL, { passive: true }).pipe(
+        return fromEvent<WheelEvent>(content, WHEEL, { passive: false }).pipe(
           takeUntilDestroyed(this._destroyRef),
           tap(e => {
+            const isVertical = this.isVertical();
+            if (this.cdkScrollable) {
+              this.cdkScrollable.getElementRef().nativeElement.dispatchEvent(WHEEL_EVENT);
+            }
+            if (isVertical) {
+              if (this._y >= 0 && this._y <= this.scrollHeight) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+              }
+            } else {
+              if (this._x >= 0 && this._x <= this.scrollWidth) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+              }
+            }
             this.stopScrolling();
             const scrollSize = isVertical ? this.scrollHeight : this.scrollWidth,
               startPos = isVertical ? this.y : this.x,
               delta = isVertical ? e.deltaY : e.deltaX, dp = startPos + delta, position = dp < 0 ? 0 : dp > scrollSize ? scrollSize : dp;
-            this.scrollTo({ [TOP]: position, behavior: INSTANT });
+            this.scrollTo({ [isVertical ? TOP : LEFT]: position, behavior: INSTANT });
           }),
         );
       }),
     ).subscribe();
 
-    const $mouseUp = fromEvent<MouseEvent>(window, MOUSE_UP, { passive: true }).pipe(
+    const $mouseUp = fromEvent<MouseEvent>(window, MOUSE_UP, { passive: false }).pipe(
       takeUntilDestroyed(),
     ),
       $mouseDragCancel = $mouseUp.pipe(
@@ -301,7 +320,7 @@ export class XScrollerComponent implements OnDestroy {
     $content.pipe(
       takeUntilDestroyed(),
       switchMap(content => {
-        return fromEvent<MouseEvent>(content, MOUSE_DOWN, { passive: true }).pipe(
+        return fromEvent<MouseEvent>(content, MOUSE_DOWN, { passive: false }).pipe(
           takeUntilDestroyed(this._destroyRef),
           switchMap(e => {
             this.stopScrolling();
@@ -309,6 +328,7 @@ export class XScrollerComponent implements OnDestroy {
             if (target.classList.contains(INTERACTIVE)) {
               return of(undefined);
             }
+            const isVertical = this.isVertical();
             this._isMoving = true;
             const startPos = isVertical ? this.y : this.x;
             let prevPos = startPos, prevClientPosition = 0, startPosDelta = 0;
@@ -359,7 +379,7 @@ export class XScrollerComponent implements OnDestroy {
       }),
     ).subscribe();
 
-    const $touchUp = fromEvent<TouchEvent>(window, TOUCH_END, { passive: true }).pipe(
+    const $touchUp = fromEvent<TouchEvent>(window, TOUCH_END, { passive: false }).pipe(
       takeUntilDestroyed(),
     ),
       $touchCanceler = $touchUp.pipe(
@@ -372,7 +392,7 @@ export class XScrollerComponent implements OnDestroy {
     $content.pipe(
       takeUntilDestroyed(),
       switchMap(content => {
-        return fromEvent<TouchEvent>(content, TOUCH_START, { passive: true }).pipe(
+        return fromEvent<TouchEvent>(content, TOUCH_START, { passive: false }).pipe(
           takeUntilDestroyed(this._destroyRef),
           switchMap(e => {
             this.stopScrolling();
@@ -380,6 +400,7 @@ export class XScrollerComponent implements OnDestroy {
             if (target.classList.contains(INTERACTIVE)) {
               return of(undefined);
             }
+            const isVertical = this.isVertical();
             this._isMoving = true;
             const startPos = isVertical ? this.y : this.x;
             let prevPos = startPos, prevClientPosition = 0, startPosDelta = 0;
@@ -429,10 +450,6 @@ export class XScrollerComponent implements OnDestroy {
         );
       }),
     ).subscribe();
-
-    this.isVertical = computed(() => {
-      return this.direction() === ScrollerDirection.VERTICAL;
-    });
 
     this.actualClasses = computed(() => {
       const classes = this.classes(), direction = this.direction();
@@ -691,6 +708,35 @@ export class XScrollerComponent implements OnDestroy {
         }
       }
     }
+  }
+
+  onScrollBarDragHandler(position: number) {
+    this._isMoving = true;
+    const isVertical = this.isVertical(),
+      {
+        position: absolutePosition,
+      } = this._scrollBox.getScrollPositionByScrollBar({
+        scrollSize: isVertical ? this.actualScrollHeight : this.actualScrollWidth,
+        position,
+      });
+
+    this.stopScrolling();
+
+    if (isVertical) {
+      if (position < 0 || position > this.scrollHeight) {
+        return;
+      }
+    } else {
+      if (position < 0 || position > this.scrollWidth) {
+        return;
+      }
+    }
+
+    this.move(this.isVertical(), absolutePosition, false);
+    if (this.cdkScrollable) {
+      this.cdkScrollable.getElementRef().nativeElement.dispatchEvent(SCROLLBAR_SCROLL_EVENT);
+    }
+    this._isMoving = false;
   }
 
   ngOnDestroy(): void {

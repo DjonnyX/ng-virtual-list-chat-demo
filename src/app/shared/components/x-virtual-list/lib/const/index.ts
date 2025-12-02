@@ -97,6 +97,8 @@ export const INTERACTIVE = 'interactive';
 
 export const WHEEL = 'wheel';
 
+export const SCROLLER_WHEEL = 'wheel';
+
 export const TOUCH_MOVE = 'touchmove';
 
 export const TOUCH_START = 'touchstart';
@@ -118,6 +120,10 @@ export const MOUSE_LEAVE = 'mouseleave';
 export const MOUSE_OUT = 'mouseout';
 
 export const SCROLL = 'scroll';
+
+export const SCROLLER_SCROLL = 'scroll';
+
+export const SCROLLER_SCROLLBAR_SCROLL = 'scrollbar-scroll';
 
 export const SCROLL_END = 'scrollend';
 

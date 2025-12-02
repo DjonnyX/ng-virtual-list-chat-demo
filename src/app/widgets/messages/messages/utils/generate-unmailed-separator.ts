@@ -2,7 +2,7 @@ import { IVirtualListItem } from "@shared/components/x-virtual-list";
 import { IMessage } from "@widgets/messages/model/message";
 import { MessageTypes } from "@shared/enums";
 
-export const TYPING_INDICATOR_INDEX = Number.MAX_SAFE_INTEGER - 1;
+export const UNMAILED_SEPARATOR_INDEX = Number.MAX_SAFE_INTEGER - 2;
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -12,7 +12,7 @@ export const TYPING_INDICATOR_INDEX = Number.MAX_SAFE_INTEGER - 1;
  * All rights reserved.
  */
 export const generateUnmailedSeparator = (item: IVirtualListItem<IMessage>): IVirtualListItem<any> => {
-    const id = TYPING_INDICATOR_INDEX, type = MessageTypes.UNREAD_SEPARATOR;
+    const id = UNMAILED_SEPARATOR_INDEX, type = MessageTypes.UNREAD_SEPARATOR;
 
     const dt = item?.dateTime, dateTime = dt !== undefined ? dt - 1 : Date.now();
 

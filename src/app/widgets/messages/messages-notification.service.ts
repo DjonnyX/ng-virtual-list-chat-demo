@@ -16,5 +16,5 @@ export abstract class MessagesNotificationService {
     /**
      * userId
      */
-    abstract $writing: Observable<number>;
+    abstract $typing: Observable<number>;
 }

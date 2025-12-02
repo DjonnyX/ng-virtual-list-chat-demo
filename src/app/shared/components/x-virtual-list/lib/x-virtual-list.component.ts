@@ -16,7 +16,8 @@ import {
   HEIGHT_PROP_NAME, LEFT_PROP_NAME, MAX_SCROLL_TO_ITERATIONS, PX, SCROLL_END, TOP_PROP_NAME, TRACK_BY_PROPERTY_NAME, WIDTH_PROP_NAME,
   DEFAULT_MAX_BUFFER_SIZE, DEFAULT_SELECT_METHOD, DEFAULT_SELECT_BY_CLICK, DEFAULT_COLLAPSE_BY_CLICK, DEFAULT_COLLECTION_MODE,
   DEFAULT_SCREEN_READER_MESSAGE, BEHAVIOR_SMOOTH, DEFAULT_SNAP_TO_END_TRANSITION_INSTANT_OFFSET, DEFAULT_SNAP_SCROLLTO_BOTTOM,
-  WHEEL, MOUSE_DOWN, MOUSE_UP, MOUSE_LEAVE, MOUSE_OUT, TOUCH_END, TOUCH_LEAVE, TOUCH_OUT, TOUCH_START, MARGIN_TOP, MARGIN_LEFT,
+  MOUSE_DOWN, MOUSE_UP, MOUSE_LEAVE, MOUSE_OUT, TOUCH_END, TOUCH_LEAVE, TOUCH_OUT, TOUCH_START, MARGIN_TOP, MARGIN_LEFT,
+  SCROLLER_WHEEL, SCROLLER_SCROLLBAR_SCROLL,
 } from './const';
 import { IRenderVirtualListItem, IScrollEvent, IScrollOptions, IVirtualListCollection, IVirtualListItem, IVirtualListItemConfigMap, } from './models';
 import { FocusAlignment, Id, IRect, ISize } from './types';
@@ -900,7 +901,8 @@ export class XVirtualListComponent implements OnDestroy {
   private _$prepared = new BehaviorSubject<boolean>(false);
   readonly $prepared = this._$prepared.asObservable();
 
-  private _isResetedReachStart = true;
+  private _$isResetedReachStart = new BehaviorSubject<boolean>(true);
+  readonly $isResetedReachStart = this._$isResetedReachStart.asObservable();
 
   private _$scrollTo = new Subject<IScrollParams>();
   protected $scrollTo = this._$scrollTo.asObservable();
@@ -910,7 +912,7 @@ export class XVirtualListComponent implements OnDestroy {
 
   private _onTrackBoxResetHandler = (v: boolean) => {
     if (v && this._scrollerComponent()?.scrollable) {
-      this._isResetedReachStart = true;
+      this._$isResetedReachStart.next(true);
 
       const scroller = this._scroller()?.nativeElement;
       if (scroller) {
@@ -952,40 +954,37 @@ export class XVirtualListComponent implements OnDestroy {
       return this._scrollerComponent()?.scrollContent();
     });
 
-    let prepared = false;
+    let prepared = false, readyToStart = false;
 
     this.$prepared.pipe(
       takeUntilDestroyed(),
       distinctUntilChanged(),
       tap(v => {
         if (!v) {
-          prepared = false;
+          prepared = readyToStart = v;
           const scrollerComponent = this._scrollerComponent();
           if (scrollerComponent) {
-            scrollerComponent.prepared = false;
+            scrollerComponent.prepared = v;
           }
-          this.classes.set({ prepared: false });
+          this.classes.set({ prepared: v });
           this.cacheClean();
-          this._trackBox.changes();
         }
       }),
       filter(v => !!v),
-      debounceTime(0),
+      debounceTime(1),
       takeUntilDestroyed(this._destroyRef),
       tap(v => {
-        prepared = true;
-        this._trackBox.changes();
+        prepared = v;
       }),
-      debounceTime(0),
+      debounceTime(1),
       takeUntilDestroyed(this._destroyRef),
       tap(v => {
-        prepared = true;
+        readyToStart = v;
         const scrollerComponent = this._scrollerComponent();
         if (scrollerComponent) {
-          scrollerComponent.prepared = true;
+          scrollerComponent.prepared = v;
         }
-        this.classes.set({ prepared: true });
-        this._trackBox.changes();
+        this.classes.set({ prepared: v });
       }),
     ).subscribe();
 
@@ -1066,15 +1065,31 @@ export class XVirtualListComponent implements OnDestroy {
       }),
     ).subscribe();
 
+    let isResetedReachStart = this._$isResetedReachStart.getValue();
+
+    this.$isResetedReachStart.pipe(
+      takeUntilDestroyed(),
+      tap(v => {
+        if (v) {
+          isResetedReachStart = v;
+        }
+      }),
+      debounceTime(1000),
+      takeUntilDestroyed(this._destroyRef),
+      tap(v => {
+        isResetedReachStart = v;
+      }),
+    ).subscribe();
+
     $isScrollStart.pipe(
       takeUntilDestroyed(),
       distinctUntilChanged(),
       tap(v => {
-        if (v && !this._isResetedReachStart && this._scrollerComponent()?.scrollable) {
+        if (readyToStart && v && !isResetedReachStart && this._scrollerComponent()?.scrollable) {
           this._trackBox.isScrollStart = true;
           this.onScrollReachStart.emit();
         }
-        this._isResetedReachStart = false;
+        this._$isResetedReachStart.next(false);
       }),
     ).subscribe();
 
@@ -1269,22 +1284,11 @@ export class XVirtualListComponent implements OnDestroy {
 
     $scrollToEndDuringUpdateCanceller.pipe(
       takeUntilDestroyed(),
-      tap(v => {
-        if (v === 0) {
-          this._trackBox.cancelScrollSnappingToEnd(true);
-        }
-      }),
       filter(v => v > 0),
       tap((v) => {
         const scroller = this._scrollerComponent();
         if (scroller) {
           this._trackBox.cancelScrollSnappingToEnd(true);
-          const isVertical = this._isVertical, scrollSize = isVertical ? scroller.scrollTop : scroller.scrollLeft;
-          scroller.scrollTo({
-            [isVertical ? TOP_PROP_NAME : LEFT_PROP_NAME]: scrollSize,
-            behavior: BEHAVIOR_INSTANT as ScrollBehavior,
-            blending: false,
-          });
         }
       }),
       tap(() => {
@@ -1317,16 +1321,16 @@ export class XVirtualListComponent implements OnDestroy {
             scrollPosition = Math.round(actualScrollSize);
 
           const opts: IUpdateCollectionOptions<IVirtualListItem, IVirtualListCollection> = {
-            bounds: { width, height, x, y }, dynamicSize, isVertical, itemSize,
+            bounds: { width, height, x, y }, dynamicSize, isVertical, itemSize, reversed: false,
             bufferSize, maxBufferSize, scrollSize: actualScrollSize, snap, enabledBufferOptimization,
           };
 
           if (snapScrollToBottom && scrollLength > viewportSize && !prepared) {
-            const { totalSize: calculatedTotalSize } = this._trackBox.getMetrics(items, itemConfigMap, opts);
+            const { totalSize: calculatedTotalSize } = this._trackBox.getMetrics(items, itemConfigMap, { ...opts, reversed: true });
             totalSize = calculatedTotalSize;
             actualScrollSize = (totalSize > viewportSize ? totalSize - viewportSize : 0);
             const { displayItems: calculatedDisplayItems, totalSize: calculatedTotalSize1 } =
-              this._trackBox.updateCollection(items, itemConfigMap, { ...opts, scrollSize: actualScrollSize });
+              this._trackBox.updateCollection(items, itemConfigMap, { ...opts, reversed: true, scrollSize: actualScrollSize });
             displayItems = calculatedDisplayItems;
             totalSize = calculatedTotalSize1;
             scrollLength = Math.round(totalSize) ?? 0;
@@ -1334,8 +1338,7 @@ export class XVirtualListComponent implements OnDestroy {
             roundedMaxPosition = Math.round(actualScrollLength);
             scrollPosition = Math.round(actualScrollSize);
           } else {
-            const { displayItems: calculatedDisplayItems, totalSize: calculatedTotalSize } =
-              this._trackBox.updateCollection(items, itemConfigMap, opts);
+            const { displayItems: calculatedDisplayItems, totalSize: calculatedTotalSize } = this._trackBox.updateCollection(items, itemConfigMap, opts);
             displayItems = calculatedDisplayItems;
             totalSize = calculatedTotalSize;
           }
@@ -1360,7 +1363,8 @@ export class XVirtualListComponent implements OnDestroy {
           }
 
           actualScrollSize = (isVertical ? scroller.actualScrollTop ?? 0 : scroller.actualScrollLeft ?? 0);
-          const delta = this._trackBox.delta, roundedActualScrollSize = Math.round(actualScrollSize),
+          const delta = this._trackBox.delta,
+            roundedActualScrollSize = Math.round(actualScrollSize),
             scrollPositionAfterUpdate = actualScrollSize + delta,
             roundedScrollPositionAfterUpdate = Math.round(scrollPositionAfterUpdate),
             roundedMaxPositionAfterUpdate = Math.round(totalSize - viewportSize);
@@ -1371,7 +1375,7 @@ export class XVirtualListComponent implements OnDestroy {
 
           this._trackBox.clearDelta();
 
-          if (this._trackBox.isSnappedToEnd || (!!snapScrollToBottom) ||
+          if (this._trackBox.isSnappedToEnd || (!!snapScrollToBottom && !prepared) ||
             (snapScrollToBottom && actualScrollSize > 0 &&
               ((roundedScrollPositionAfterUpdate >= scrollPosition) &&
                 (scrollPosition >= roundedMaxPosition) &&
@@ -1432,18 +1436,26 @@ export class XVirtualListComponent implements OnDestroy {
       takeUntilDestroyed(),
       distinctUntilChanged(),
       switchMap(scroller => {
-        return fromEvent(scroller, WHEEL, { passive: true }).pipe(
+        return fromEvent(scroller, SCROLLER_WHEEL, { passive: true }).pipe(
           takeUntilDestroyed(this._destroyRef),
           filter(() => {
             return !!this._trackBox.isSnappedToEnd;
           }),
-          map(e => {
-            const scroller = this._scrollerComponent();
-            if (scroller) {
-              const isVertical = this._isVertical, scrollSize = isVertical ? scroller.scrollTop : scroller.scrollLeft;
-              return scrollSize;
-            }
-            return 0;
+          tap(() => {
+            _$scrollToEndDuringUpdateCanceller.next(1);
+          }),
+        );
+      }),
+    ).subscribe();
+
+    $scroller.pipe(
+      takeUntilDestroyed(),
+      distinctUntilChanged(),
+      switchMap(scroller => {
+        return fromEvent(scroller, SCROLLER_SCROLLBAR_SCROLL, { passive: true }).pipe(
+          takeUntilDestroyed(this._destroyRef),
+          filter(() => {
+            return !!this._trackBox.isSnappedToEnd;
           }),
           tap(() => {
             _$scrollToEndDuringUpdateCanceller.next(1);
@@ -1682,7 +1694,7 @@ export class XVirtualListComponent implements OnDestroy {
                 currentScollSize = (isVertical ? scrollerComponent.scrollTop : scrollerComponent.scrollLeft), delta = this._trackBox.delta,
                 opts: IGetItemPositionOptions<IVirtualListItem, IVirtualListCollection> = {
                   bounds: { width, height, x, y }, collection: items, dynamicSize, isVertical: this._isVertical, itemSize,
-                  bufferSize: this.bufferSize(), maxBufferSize: this.maxBufferSize(),
+                  bufferSize: this.bufferSize(), maxBufferSize: this.maxBufferSize(), reversed: false,
                   scrollSize: (isVertical ? scrollerComponent.scrollTop : scrollerComponent.scrollLeft) + delta,
                   snap: this.snap(), fromItemId: id, enabledBufferOptimization: this.enabledBufferOptimization(),
                 },

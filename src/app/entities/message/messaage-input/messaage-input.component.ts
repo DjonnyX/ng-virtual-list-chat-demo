@@ -21,7 +21,9 @@ const DEFAULT_TEXTAREA_SIZE = 16,
   ROUND_CORNER: RoundedCorner = [8, 8, 8, 8],
   HIDDEN = 'hidden',
   AUTO = 'auto',
-  NONE = 'none';
+  CLICK = 'click',
+  FOCUS = 'focus',
+  BLUR = 'blur';
 
 @Component({
   selector: 'x-messaage-input',
@@ -132,6 +134,21 @@ export class MessaageInputComponent implements OnDestroy {
       }),
     ).subscribe();
 
+    $editor.pipe(
+      takeUntilDestroyed(),
+      switchMap(editor => {
+        return fromEvent(editor, CLICK).pipe(
+          takeUntilDestroyed(this._destroyRef),
+          tap(e => {
+            const textarea = this.textarea()?.nativeElement;
+            if (textarea) {
+              textarea.focus();
+            }
+          })
+        )
+      }),
+    ).subscribe();
+
     $textarea.pipe(
       takeUntilDestroyed(),
       tap(textarea => {
@@ -143,7 +160,7 @@ export class MessaageInputComponent implements OnDestroy {
     $textarea.pipe(
       takeUntilDestroyed(),
       switchMap(textarea => {
-        return fromEvent(textarea, 'focus').pipe(
+        return fromEvent(textarea, FOCUS).pipe(
           takeUntilDestroyed(this._destroyRef),
           tap(() => {
             this.focused.set(true);
@@ -155,7 +172,7 @@ export class MessaageInputComponent implements OnDestroy {
     $textarea.pipe(
       takeUntilDestroyed(),
       switchMap(textarea => {
-        return fromEvent(textarea, 'blur').pipe(
+        return fromEvent(textarea, BLUR).pipe(
           takeUntilDestroyed(this._destroyRef),
           tap(() => {
             this.focused.set(false);

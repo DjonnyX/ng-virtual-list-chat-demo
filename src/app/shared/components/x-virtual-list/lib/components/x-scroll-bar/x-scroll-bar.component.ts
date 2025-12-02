@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, ElementRef, inject, input, Signal, signal, viewChild } from '@angular/core';
+import { Component, computed, DestroyRef, effect, ElementRef, inject, input, OnDestroy, output, Signal, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { SubstarateStyle, SubstarateStyles, SubstrateComponent } from '@shared/components/substrate';
 import { ITheme, ThemeService } from '@shared/theming';
 import { IScrollBarTheme } from '@shared/theming/themes/interfaces/components/scrollbar';
 import { GradientColor, GradientColorPositions, RoundedCorner } from '@shared/types';
-import { combineLatest, filter, map, tap } from 'rxjs';
+import { combineLatest, delay, filter, fromEvent, map, of, race, switchMap, takeUntil, tap } from 'rxjs';
+import { MOUSE_DOWN, MOUSE_MOVE, MOUSE_UP, TOUCH_END, TOUCH_MOVE, TOUCH_START } from '../../const';
+import { ISize } from '../../types';
 
 const DEFAULT_THICKNESS = 6,
   DEFAULT_SIZE = 6,
@@ -28,7 +30,7 @@ const DEFAULT_THICKNESS = 6,
   templateUrl: './x-scroll-bar.component.html',
   styleUrl: './x-scroll-bar.component.scss'
 })
-export class XScrollBarComponent {
+export class XScrollBarComponent implements OnDestroy {
   thumb = viewChild<ElementRef<HTMLDivElement>>('thumb');
 
   track = viewChild<ElementRef<HTMLDivElement>>('track');
@@ -38,6 +40,10 @@ export class XScrollBarComponent {
   isVertical = input<boolean>(true);
 
   position = input<number>(0);
+
+  actualPosition = signal<number>(0);
+
+  onDrag = output<number>();
 
   thumbGradientPositions = input<GradientColorPositions>([0, 0]);
 
@@ -71,7 +77,29 @@ export class XScrollBarComponent {
 
   private _themeService = inject(ThemeService);
 
+  private _destroyRef = inject(DestroyRef);
+
+  private _resizeObserver: ResizeObserver;
+
+  readonly bounds = signal<ISize>({ width: 0, height: 0 });
+
+  private _onResizeHandler = () => {
+    const content = this.track()?.nativeElement;
+    if (content) {
+      this.bounds.set({ width: content.offsetWidth, height: content.offsetHeight });
+    }
+  }
+
+  grabbing = signal<boolean>(false);
+
+  get scrollSize() {
+    const bounds = this.bounds(), size = this.size(), isVertical = this.isVertical();
+    return isVertical ? size < bounds.height ? bounds.height - size : 0 : size < bounds.width ? bounds.width - size : 0;
+  }
+
   constructor() {
+    this._resizeObserver = new ResizeObserver(this._onResizeHandler);
+
     const $prepared = toObservable(this.prepared),
       $track = toObservable(this.track).pipe(
         takeUntilDestroyed(),
@@ -80,6 +108,14 @@ export class XScrollBarComponent {
       ),
       $isVertical = toObservable(this.isVertical),
       $size = toObservable(this.size);
+
+    $track.pipe(
+      takeUntilDestroyed(),
+      tap(track => {
+        this._resizeObserver.observe(track);
+        this._onResizeHandler();
+      }),
+    ).subscribe();
 
     combineLatest([$prepared, $track, $isVertical, $size]).pipe(
       takeUntilDestroyed(),
@@ -112,7 +148,12 @@ export class XScrollBarComponent {
     });
 
     effect(() => {
-      const position = this.position(), isVertical = this.isVertical(), thumb = this.thumb()?.nativeElement;
+      const position = this.position();
+      this.actualPosition.set(position);
+    });
+
+    effect(() => {
+      const position = this.actualPosition(), isVertical = this.isVertical(), thumb = this.thumb()?.nativeElement;
       if (thumb) {
         if (isVertical) {
           thumb.style.transform = `${TRANSLATE_3D}(0, ${position}${PX}, 0)`;
@@ -133,5 +174,122 @@ export class XScrollBarComponent {
         }
       }
     });
+
+    const $thumb = toObservable(this.thumb).pipe(
+      takeUntilDestroyed(),
+      filter(v => !!v),
+      map(v => v.nativeElement),
+    );
+
+    const $mouseUp = fromEvent<MouseEvent>(window, MOUSE_UP, { passive: false }).pipe(
+      takeUntilDestroyed(),
+    ),
+      $mouseDragCancel = $mouseUp.pipe(
+        takeUntilDestroyed(),
+        tap(() => {
+          this.grabbing.set(false);
+        }),
+      );
+
+    $thumb.pipe(
+      takeUntilDestroyed(),
+      switchMap(thumb => {
+        return fromEvent<MouseEvent>(thumb, MOUSE_DOWN, { passive: false }).pipe(
+          takeUntilDestroyed(this._destroyRef),
+          switchMap(e => {
+            const isVertical = this.isVertical();
+            this.grabbing.set(true);
+            const startPos = this.position();
+            const startClientPos = isVertical ? e.clientY : e.clientX;
+            return fromEvent<MouseEvent>(window, MOUSE_MOVE, { passive: false }).pipe(
+              takeUntilDestroyed(this._destroyRef),
+              takeUntil($mouseDragCancel),
+              tap(e => {
+                e.preventDefault();
+              }),
+              switchMap(e => {
+                const currentPos = isVertical ? e.clientY : e.clientX,
+                  scrollSize = this.scrollSize, delta = startClientPos - currentPos,
+                  dp = startPos - delta, position = Math.round(dp < 0 ? 0 : dp > scrollSize ? scrollSize : dp);
+                this.scrollTo(position);
+                return race([fromEvent<MouseEvent>(window, MOUSE_UP, { passive: false }), fromEvent<MouseEvent>(thumb, MOUSE_UP, { passive: false })]).pipe(
+                  takeUntilDestroyed(this._destroyRef),
+                  tap(e => {
+                    e.preventDefault();
+                  }),
+                  delay(0),
+                  takeUntilDestroyed(this._destroyRef),
+                  tap(e => {
+                    this.scrollTo(position);
+                    this.grabbing.set(false);
+                  }),
+                );
+              }),
+            );
+          })
+        );
+      }),
+    ).subscribe();
+
+    const $touchUp = fromEvent<TouchEvent>(window, TOUCH_END, { passive: false }).pipe(
+      takeUntilDestroyed(),
+    ),
+      $touchCanceler = $touchUp.pipe(
+        takeUntilDestroyed(this._destroyRef),
+        tap(() => {
+          this.grabbing.set(false);
+        }),
+      );
+
+    $thumb.pipe(
+      takeUntilDestroyed(),
+      switchMap(thumb => {
+        return fromEvent<TouchEvent>(thumb, TOUCH_START, { passive: false }).pipe(
+          takeUntilDestroyed(this._destroyRef),
+          switchMap(e => {
+            const isVertical = this.isVertical();
+            this.grabbing.set(true);
+            const startPos = this.position();
+            const startClientPos = isVertical ? e.touches[e.touches.length - 1].clientY : e.touches[e.touches.length - 1].clientX;
+            return fromEvent<TouchEvent>(window, TOUCH_MOVE, { passive: false }).pipe(
+              takeUntilDestroyed(this._destroyRef),
+              takeUntil($touchCanceler),
+              tap(e => {
+                e.preventDefault();
+              }),
+              switchMap(e => {
+                const currentPos = isVertical ? e.touches[e.touches.length - 1].clientY : e.touches[e.touches.length - 1].clientX,
+                  scrollSize = this.scrollSize, delta = startClientPos - currentPos,
+                  dp = startPos - delta, position = Math.round(dp < 0 ? 0 : dp > scrollSize ? scrollSize : dp);
+                this.scrollTo(position);
+                return race([fromEvent<TouchEvent>(window, TOUCH_END, { passive: false }), fromEvent<TouchEvent>(thumb, TOUCH_END, { passive: false })]).pipe(
+                  takeUntilDestroyed(this._destroyRef),
+                  tap(e => {
+                    e.preventDefault();
+                  }),
+                  delay(0),
+                  takeUntilDestroyed(this._destroyRef),
+                  tap(e => {
+                    this.scrollTo(position);
+                    this.grabbing.set(false);
+                  }),
+                );
+              }),
+            );
+          })
+        );
+      }),
+    ).subscribe();
+  }
+
+  scrollTo(position: number) {
+    const scrollSize = this.scrollSize;
+    this.onDrag.emit(scrollSize !== 0 ? position / scrollSize : 0);
+  }
+
+  ngOnDestroy(): void {
+    if (this._resizeObserver) {
+      this._resizeObserver.disconnect();
+    }
   }
 }

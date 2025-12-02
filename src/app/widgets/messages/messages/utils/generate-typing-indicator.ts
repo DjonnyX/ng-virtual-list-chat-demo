@@ -17,7 +17,9 @@ export const generateTypingIndicator = (): { item: IVirtualListItem<any>, config
 
     return {
         item: {
-            id, dateTime, type,
+            id,
+            dateTime,
+            type,
         },
         config: {
             sticky: 0,

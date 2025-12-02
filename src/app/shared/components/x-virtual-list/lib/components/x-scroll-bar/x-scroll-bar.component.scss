@@ -11,9 +11,16 @@
 
     .thumb {
         position: absolute;
+        cursor: grab;
 
         .shape {
             box-sizing: border-box;
+        }
+    }
+
+    &.grabbing {
+        .thumb {
+            cursor: grabbing;
         }
     }
 }

@@ -53,6 +53,8 @@ export interface IMetrics {
     totalSize: number;
     typicalItemSize: number;
     isFromItemIdFound: boolean;
+    reversed: boolean;
+    isUpdating: boolean;
 }
 
 export interface IRecalculateMetricsOptions<I extends IItem, C extends Array<I>> {
@@ -70,6 +72,7 @@ export interface IRecalculateMetricsOptions<I extends IItem, C extends Array<I>>
     previousTotalSize: number;
     crudDetected: boolean;
     deletedItemsMap: { [index: number]: ISize; };
+    reversed: boolean;
 }
 
 export interface IGetItemPositionOptions<I extends IItem, C extends Array<I>>
@@ -333,14 +336,14 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
 
         const reseted = ((!this._previousCollection || this._previousCollection.length === 0) &&
             (!!currentCollection && currentCollection.length > 0));
-        if (this._preparedToStart && this._isReseted !== reseted && reseted && this._prepared) {
+        if (this._isReseted !== reseted && reseted && this._prepared) {
             this._prepared = false;
             this.dispatch(TrackBoxEvents.PREPARE, false);
         }
 
         this._isReseted = reseted;
 
-        this.dispatch(TrackBoxEvents.RESET, this._preparedToStart && reseted);
+        this.dispatch(TrackBoxEvents.RESET, reseted);
 
         this.updateCache(this._previousCollection, currentCollection, itemSize);
 
@@ -612,7 +615,7 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
      * Calculates list metrics
      */
     protected recalculateMetrics<I extends IItem, C extends Array<I>>(options: IRecalculateMetricsOptions<I, C>): IMetrics {
-        const { fromItemId, bounds, collection, dynamicSize, isVertical, itemSize,
+        const { fromItemId, bounds, collection, dynamicSize, isVertical, itemSize, reversed,
             bufferSize: minBufferSize, scrollSize, snap, itemConfigMap, enabledBufferOptimization,
             previousTotalSize, crudDetected, deletedItemsMap } = options as IRecalculateMetricsOptions<I, C> & {
                 itemConfigMap: IVirtualListItemConfigMap,
@@ -665,7 +668,8 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
             totalSize = this._scrollStartOffset + this._scrollEndOffset,
             startIndex: number,
             isFromItemIdFound = false,
-            deltaFromStartCreation = 0;
+            deltaFromStartCreation = 0,
+            isUpdating = false;
 
         const isStart = ((roundedScrollSize === 0) || this.isSnappedToStart);
         let stickyItemId: Id | undefined, isNew = false;
@@ -696,6 +700,9 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                     itemDisplayMethod = cache?.method ?? ItemDisplayMethods.UPDATE;
                     const isItemNew = (cache satisfies Cache)?.[IS_NEW] ?? (this._isLazy && isStart && !this._isReseted);
                     isNew = isItemNew;
+                    if (isNew) {
+                        isUpdating = true;
+                    }
                     const snapshotBounds = snapshot.get(id),
                         componentSnapshotSize = componentSize - (snapshotBounds ? snapshotBounds[sizeProperty] : typicalItemSize);
                     componentSizeDelta = componentSnapshotSize;
@@ -935,6 +942,8 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
             totalSize,
             typicalItemSize,
             isFromItemIdFound,
+            reversed: options.reversed,
+            isUpdating,
         };
 
         return metrics;
@@ -978,6 +987,7 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
             totalLength,
             startIndex,
             typicalItemSize,
+            reversed,
         } = metrics,
             displayItems: IRenderVirtualListCollection = [];
         if (items.length) {
@@ -1129,7 +1139,7 @@ export class TrackBox<C extends BaseVirtualListItemComponent = any>
                 if (iterations > totalLength || i >= totalLength) {
                     break;
                 }
-                const collectionItem = items[i];
+                const collectionItem = items[reversed ? (items.length - i + 1) : i];
                 if (!collectionItem) {
                     continue;
                 }

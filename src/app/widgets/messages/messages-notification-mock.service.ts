@@ -25,8 +25,8 @@ export class MessagesNotificationMockService implements MessagesNotificationServ
     /**
      * userId
      */
-    private _$writing = new Subject<number>;
-    readonly $writing = this._$writing.asObservable();
+    private _$typing = new Subject<number>;
+    readonly $typing = this._$typing.asObservable();
 
     constructor() {
         of(true).pipe(
@@ -41,7 +41,7 @@ export class MessagesNotificationMockService implements MessagesNotificationServ
     }
 
     private startWrite() {
-        this._$writing.next(1); // emits userId
+        this._$typing.next(1); // emits userId
     }
 
     private write() {

@@ -13,6 +13,11 @@ interface ICalculateScrollParams {
     positionY: number;
 }
 
+interface ICalculateScrollPositionParams {
+    scrollSize: number;
+    position: number;
+}
+
 const MIN_THUMB_SIZE = 80;
 
 export class ScrollBox {
@@ -60,6 +65,16 @@ export class ScrollBox {
             thumbSize,
             thumbPosition,
             thumbGradientPositions,
+        };
+    }
+
+    getScrollPositionByScrollBar({
+        scrollSize,
+        position,
+    }: ICalculateScrollPositionParams) {
+        const pos = (position * scrollSize);
+        return {
+            position: pos,
         };
     }
 }
