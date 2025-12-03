@@ -222,7 +222,11 @@ const manifest: ITheme = {
                                 active: {
                                     color: "rgb(236, 214, 144)",
                                 },
-                            }
+                            },
+                            comment: {
+                                color: 'rgb(151, 202, 231)',
+                                background: 'rgba(255, 255, 255, 0.15)'
+                            },
                         },
                         rippleColor: "rgba(255, 255, 255, 0.15)",
                         searchSubstringColor: "rgba(139, 0, 86, 0.84)",
@@ -280,7 +284,11 @@ const manifest: ITheme = {
                                 active: {
                                     color: "rgb(236, 214, 144)",
                                 },
-                            }
+                            },
+                            comment: {
+                                color: 'rgb(151, 202, 231)',
+                                background: "rgba(94, 80, 218, 0.5)"
+                            },
                         },
                         rippleColor: "rgba(255, 255, 255, 0.15)",
                         searchSubstringColor: "rgba(139, 0, 86, 0.84)",

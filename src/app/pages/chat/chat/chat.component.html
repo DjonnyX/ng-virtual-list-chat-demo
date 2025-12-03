@@ -4,11 +4,11 @@
 <div class="wrapper">
     <div class="container">
         <div #toolbar localeSensitive class="toolbar" [ngClass]="{'enabled-dock-left': enabledDockLeft}">
-            @if (enabledDockLeft) {
-                <div>
+            <div>
+                @if (enabledDockLeft) {
                     <x-menu-button name="menu-button" (onClick)="onOpenMenuHandler($event)" [opened]="menuOpened()" />
-                </div>
-            }
+                }
+            </div>
             <div #header class="title">{{groupTitle}}</div>
             <x-message-search (search)="onSearchHandler($event)" />
         </div>

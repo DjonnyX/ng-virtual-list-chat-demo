@@ -95,6 +95,10 @@ export class EditableTextComponent implements OnDestroy {
 
   linkActiveColor = signal<string>(INITIAL);
 
+  commentColor = signal<string>(INITIAL);
+
+  commentBackground = signal<string>(INITIAL);
+
   searchSubstringBackground = signal<string>(INITIAL);
 
   messageStatusColor = signal<string>(INITIAL);
@@ -225,6 +229,17 @@ export class EditableTextComponent implements OnDestroy {
           } else {
             this.messageStatusColor.set(preset.normal.statusColor);
           }
+        }
+      }
+    });
+
+    effect(() => {
+      const theme = this.theme(), type = this.themeType();
+      if (theme) {
+        const preset = this._themeService.getPreset(theme.chat.messages.message.content[type].textEditor.comment);
+        if (preset) {
+          this.commentColor.set(preset.color);
+          this.commentBackground.set(preset.background);
         }
       }
     });

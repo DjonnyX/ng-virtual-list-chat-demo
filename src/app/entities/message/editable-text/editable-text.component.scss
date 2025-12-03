@@ -92,6 +92,11 @@
         padding: 0 2px;
     }
 
+    ::ng-deep .comment {
+        color: var(--comment-color);
+        background-color: var(--comment-background);
+    }
+
     ::ng-deep .search-substring {
         background-color: var(--search-substring-background);
         border-radius: 3px;

@@ -14,6 +14,7 @@
 } @else {
     <p #readonlyText localeSensitive
         [ngClass]="{selectable: canselectable, interactive: canselectable, singleline: singleline()}"
+        [style.--comment-color]="commentColor()" [style.--comment-background]="commentBackground()"
         [style.--link-normal-color]="linkNormalColor()" [style.--link-visited-color]="linkVisitedColor()"
         [style.--message-status-color]="messageStatusColor()" [ngStyle]="readonlyStyles()"
         [style.--link-hover-color]="linkHoverColor()" [style.--link-active-color]="linkActiveColor()"

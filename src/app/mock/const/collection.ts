@@ -64,6 +64,16 @@ const testFormattedText = () => {
 
 const testFormattedTable = () => {
   return `What does Upside-Down Face emoji 🙃 mean?
+  <div class="wrapper">
+    <div class="container">
+        \`<div>
+            <div>
+              <span>HTML comment</span>
+            </div>
+        </div>\`
+      </div>
+</div>
+Text \`Comment\` lorem ipsum
   https://media.tenor.com/UMs_iWeiCBMAAAAM/stitch-ruim-wave.gif
 `;
 };
