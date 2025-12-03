@@ -1,19 +1,21 @@
 @let searchText = search();
 @let groupTitle = title();
-
+@let enabledDockLeft = dockLeftCollapsible();
 <div class="wrapper">
     <div class="container">
-        <div #toolbar localeSensitive class="toolbar">
-            <div>
-                <x-menu-button name="menu-button" (onClick)="onOpenMenuHandler($event)" [opened]="menuOpened()" />
-            </div>
+        <div #toolbar localeSensitive class="toolbar" [ngClass]="{'enabled-dock-left': enabledDockLeft}">
+            @if (enabledDockLeft) {
+                <div>
+                    <x-menu-button name="menu-button" (onClick)="onOpenMenuHandler($event)" [opened]="menuOpened()" />
+                </div>
+            }
             <div #header class="title">{{groupTitle}}</div>
             <x-message-search (search)="onSearchHandler($event)" />
         </div>
 
         <div class="list-container">
             @let doc = dockMode();
-            <x-drawer [dock]="doc" [dockLeftSize]="240">
+            <x-drawer [dock]="doc" [dockLeftSize]="menuSize()" [dockLeftCollapsible]="enabledDockLeft">
                 <dock-left>
                     <x-groups [scrollStartOffset]="toolbarBounds().height" (select)="onGroupSelectHandler($event)" (close)="onGroupsCloseHandler()" />
                 </dock-left>

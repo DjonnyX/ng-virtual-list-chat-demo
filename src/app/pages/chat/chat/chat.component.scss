@@ -26,10 +26,14 @@
     backdrop-filter: blur(20px);
     display: grid;
     align-items: center;
-    grid-template-columns: 32px 1fr auto;
+    grid-template-columns: 1fr auto;
     padding: 6px 12px 6px 12px;
     box-sizing: border-box;
     z-index: 1010;
+
+    &.enabled-dock-left {
+        grid-template-columns: 32px 1fr auto;
+    }
 
     .title {
         text-align: center;

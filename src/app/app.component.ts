@@ -1,6 +1,8 @@
 import { Component, ElementRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';
+import { ISize } from '@shared/components/x-virtual-list';
+import { MediaService } from '@shared/directives/media';
 import { ThemeNames, ThemeService } from '@shared/theming';
 import { fromEvent, take, tap } from 'rxjs';
 
@@ -15,20 +17,25 @@ import { fromEvent, take, tap } from 'rxjs';
   selector: 'app-root',
   standalone: true,
   imports: [RouterModule],
-  providers: [ThemeService],
+  providers: [ThemeService, MediaService],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
 export class AppComponent {
   private _themeService = inject(ThemeService);
 
+  private _mediaService = inject(MediaService);
+
   private _elementRef = inject(ElementRef);
 
   constructor() {
-    const appResizeHandler = () => document.body.style.height = `${window.innerHeight}px`;
-    window.addEventListener('resize', appResizeHandler);
-    window.addEventListener('scroll', appResizeHandler);
-    appResizeHandler();
+    const appResizeHandler = (bounds: ISize) => document.body.style.height = `${bounds.height}px`;
+    this._mediaService.$bounds.pipe(
+      takeUntilDestroyed(),
+      tap(bounds => {
+        appResizeHandler(bounds);
+      }),
+    ).subscribe();
 
     this._themeService.name = ThemeNames[0];
 

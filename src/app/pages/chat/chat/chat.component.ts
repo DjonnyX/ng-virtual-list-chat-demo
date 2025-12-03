@@ -23,6 +23,23 @@ import { MessagesNotificationMockService } from '@widgets/messages/messages-noti
 import { MessagesNotificationWSService } from '@widgets/messages/messages-notification-ws.service';
 import { MessagesHttpService } from '@widgets/messages/messages-http.service';
 import { environment } from '@environments/environment';
+import { IMediaParams, MediaService } from '@shared/directives/media';
+
+const DEFAULT_MENU_SIZE = 320,
+  COLLAPSIBLE_MENU_SIZES = ['xxs', 'xs', 's', 'sm', 'm', 'xm', 'xxm', 'l', 'xl'],
+  MENU_SIZES: IMediaParams = {
+    'xxs': 'col-12',
+    'xs': 'col-12',
+    's': 'col-12',
+    'sm': 'col-12',
+    'm': 'col-12',
+    'xm': 'col-12',
+    'xxm': DEFAULT_MENU_SIZE,
+    'l': DEFAULT_MENU_SIZE,
+    'xl': DEFAULT_MENU_SIZE,
+    'xxl': DEFAULT_MENU_SIZE,
+    undefined: DEFAULT_MENU_SIZE,
+  };
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -61,7 +78,11 @@ export class ChatComponent implements OnDestroy {
 
   menuOpened = signal<boolean>(false);
 
+  menuSize = signal<number>(DEFAULT_MENU_SIZE);
+
   dockMode: Signal<DockMode.LEFT | DockMode.NONE>;
+
+  dockLeftCollapsible = signal<boolean>(true);
 
   theme: Signal<ITheme | undefined>;
 
@@ -76,6 +97,8 @@ export class ChatComponent implements OnDestroy {
   private _messagesService = inject(MessagesService);
 
   private _messageService = inject(MessageService);
+
+  private _mediaService = inject(MediaService);
 
   private _themeService = inject(ThemeService);
 
@@ -116,6 +139,15 @@ export class ChatComponent implements OnDestroy {
     this._messageCreatorResizeObserver = new ResizeObserver(this._onMessageCreatorResizeHandler);
 
     this._toolbarResizeObserver = new ResizeObserver(this._onToolbarResizeHandler);
+
+    this._mediaService.$changes.pipe(
+      takeUntilDestroyed(),
+      tap(({ size }) => {
+        const val = this._mediaService.getMediaSize(MENU_SIZES) as number;
+        this.menuSize.set(val !== undefined ? val : DEFAULT_MENU_SIZE);
+        this.dockLeftCollapsible.set(size !== undefined && COLLAPSIBLE_MENU_SIZES.includes(size));
+      }),
+    ).subscribe();
 
     const $send = this.$send,
       $chatId = this._messageService.$chatId;
@@ -176,6 +208,13 @@ export class ChatComponent implements OnDestroy {
     ).subscribe();
 
     this.theme = toSignal(this._themeService.$theme);
+
+    effect(() => {
+      const dockLeftCollapsible = this.dockLeftCollapsible();
+      if (dockLeftCollapsible) {
+        this.menuOpened.set(false);
+      }
+    });
 
     effect(() => {
       const theme = this.theme(), toolbar = this._toolbar()?.nativeElement;

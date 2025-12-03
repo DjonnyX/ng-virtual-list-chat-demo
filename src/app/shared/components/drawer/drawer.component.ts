@@ -54,6 +54,8 @@ export class DrawerComponent {
 
   dockLeftSize = input<number>(DEFAULT_DOCK_SIZE);
 
+  dockLeftCollapsible = input<boolean>(true);
+
   dockRightSize = input<number>(DEFAULT_DOCK_SIZE);
 
   styles: Signal<any>;
@@ -76,16 +78,18 @@ export class DrawerComponent {
     this.locale = toSignal(this._localizationService.$locale);
 
     this.styles = computed(() => {
-      const loc = this.locale(), langTextDir = this._localizationService.textDirection, width = this._bounds()?.width ?? 0, dockMode = this.dock(), dockLeftSize = this.dockLeftSize(),
+      const loc = this.locale(), dockLeftCollapsible = this.dockLeftCollapsible(),
+        dockMode = this.dock(), dockLeftSize = this.dockLeftSize(),
+        langTextDir = this._localizationService.textDirection, width = (this._bounds()?.width ?? 0) - (dockLeftCollapsible ? 0 : dockLeftSize),
         dockRightSize = this.dockRightSize(),
         result = {
           'grid-template-columns': langTextDir === TextDirections.RTL ? `${dockLeftSize}px ${width}px ${dockRightSize}px` : `${dockLeftSize}px ${width}px ${dockRightSize}px`,
           'transform': langTextDir === TextDirections.RTL
             ?
-            (dockMode === 'left' ? `translate3d(0, 0, 0)` : dockMode === 'right'
+            (dockMode === 'left' || !dockLeftCollapsible ? `translate3d(0, 0, 0)` : dockMode === 'right'
               ? `translate3d(${-(dockLeftSize + dockRightSize)}px, 0, 0)` : `translate3d(${dockLeftSize}px, 0, 0)`)
             :
-            (dockMode === 'left' ? `translate3d(0, 0, 0)` : dockMode === 'right'
+            (dockMode === 'left' || !dockLeftCollapsible ? `translate3d(0, 0, 0)` : dockMode === 'right'
               ? `translate3d(${-(dockLeftSize + dockRightSize)}px, 0, 0)` : `translate3d(${-dockLeftSize}px, 0, 0)`),
         };
       return result;
