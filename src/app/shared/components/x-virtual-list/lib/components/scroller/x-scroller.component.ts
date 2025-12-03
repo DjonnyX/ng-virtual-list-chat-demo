@@ -119,6 +119,8 @@ export class XScrollerComponent implements OnDestroy {
 
   preparedSignal = signal<boolean>(false);
 
+  grabbing = signal<boolean>(false);
+
   private _$scroll = new Subject<void>();
   readonly $scroll = this._$scroll.asObservable();
 
@@ -317,6 +319,7 @@ export class XScrollerComponent implements OnDestroy {
         takeUntilDestroyed(),
         tap(() => {
           this._isMoving = false;
+          this.grabbing.set(false);
         }),
       );
 
@@ -336,6 +339,7 @@ export class XScrollerComponent implements OnDestroy {
             }
             const isVertical = this.isVertical();
             this._isMoving = true;
+            this.grabbing.set(true);
             const startPos = isVertical ? this.y : this.x;
             let prevPos = startPos, prevClientPosition = 0, startPosDelta = 0;
             const startClientPos = isVertical ? e.clientY : e.clientX,
@@ -372,6 +376,7 @@ export class XScrollerComponent implements OnDestroy {
                       { v0 } = this.calculateVelocity(offsets, scrollDelta, timestamp),
                       { a0 } = this.calculateAcceleration(velocities, v0, timestamp);
                     this._isMoving = false;
+                    this.grabbing.set(false);
                     this.moveWithAcceleration(isVertical, position, 0, v0, a0);
                   }),
                 );
@@ -389,6 +394,7 @@ export class XScrollerComponent implements OnDestroy {
         takeUntilDestroyed(this._destroyRef),
         tap(() => {
           this._isMoving = false;
+          this.grabbing.set(false);
         }),
       );
 
@@ -408,6 +414,7 @@ export class XScrollerComponent implements OnDestroy {
             }
             const isVertical = this.isVertical();
             this._isMoving = true;
+            this.grabbing.set(true);
             const startPos = isVertical ? this.y : this.x;
             let prevPos = startPos, prevClientPosition = 0, startPosDelta = 0;
             const startClientPos = isVertical ? e.touches[e.touches.length - 1].clientY : e.touches[e.touches.length - 1].clientX,
@@ -444,6 +451,7 @@ export class XScrollerComponent implements OnDestroy {
                       { v0 } = this.calculateVelocity(offsets, scrollDelta, timestamp),
                       { a0 } = this.calculateAcceleration(velocities, v0, timestamp);
                     this._isMoving = false;
+                    this.grabbing.set(false);
                     this.moveWithAcceleration(isVertical, position, this._velocity, v0, a0);
                   }),
                 );
@@ -456,11 +464,11 @@ export class XScrollerComponent implements OnDestroy {
 
     this.actualClasses = computed(() => {
       const classes = this.classes(), direction = this.direction();
-      return { ...classes, [direction]: true };
+      return { ...classes, [direction]: true, grabbing: this.grabbing() };
     });
 
     this.containerClasses = computed(() => {
-      return { [this.direction()]: true };
+      return { [this.direction()]: true, grabbing: this.grabbing() };
     });
   }
 
