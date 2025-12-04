@@ -1,4 +1,4 @@
-import { Component, computed, ElementRef, inject, input, output, Signal, signal, viewChild, ViewEncapsulation } from '@angular/core';
+import { Component, computed, ElementRef, inject, input, OnDestroy, output, Signal, signal, viewChild, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { LocaleSensitiveDirective, LocalizationService, TextDirections } from '@shared/localization';
@@ -43,7 +43,7 @@ export type TDockMode = DockMode.LEFT | DockMode.RIGHT | DockMode.NONE | 'left' 
   styleUrl: './drawer.component.scss',
   encapsulation: ViewEncapsulation.ShadowDom,
 })
-export class DrawerComponent {
+export class DrawerComponent implements OnDestroy {
   private _elementRef = inject(ElementRef<HTMLDivElement>);
 
   container = viewChild<ElementRef<HTMLDivElement>>('container');
@@ -66,7 +66,7 @@ export class DrawerComponent {
 
   readonly maxStaticClickDistance = DEFAULT_MAX_DISTANCE;
 
-  private _resizeObserver: ResizeObserver | null = null;
+  private _resizeObserver: ResizeObserver | undefined = undefined;
 
   private _localizationService = inject(LocalizationService);
 
@@ -113,5 +113,12 @@ export class DrawerComponent {
 
   onOverlayClick(e: Event) {
     this.close.emit();
+  }
+
+  ngOnDestroy(): void {
+    if (this._resizeObserver) {
+      this._resizeObserver.disconnect();
+      this._resizeObserver = undefined;
+    }
   }
 }

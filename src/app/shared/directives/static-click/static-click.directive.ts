@@ -63,6 +63,7 @@ export class StaticClickDirective {
 
                                     return of(false);
                                 }),
+                                takeUntilDestroyed(this._destroyRef),
                                 filter(v => !!v),
                             ),
                         ]),

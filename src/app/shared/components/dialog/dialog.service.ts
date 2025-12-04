@@ -1,5 +1,5 @@
 import { Dialog } from '@angular/cdk/dialog';
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, OnDestroy } from '@angular/core';
 import { DialogComponent } from './dialog.component';
 import { IDialogData } from './interfaces';
 
@@ -13,7 +13,7 @@ import { IDialogData } from './interfaces';
 @Injectable({
   providedIn: 'root'
 })
-export class DialogService {
+export class DialogService implements OnDestroy{
   private _dialog = inject(Dialog);
 
   open<A = any>(data: IDialogData) {
@@ -23,5 +23,9 @@ export class DialogService {
     });
 
     return dialogRef.closed;
+  }
+
+  ngOnDestroy(): void {
+    this._dialog.closeAll();
   }
 }

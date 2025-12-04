@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, DestroyRef, effect, ElementRef, inject, input, output, Signal, signal, viewChild } from '@angular/core';
+import { Component, computed, DestroyRef, effect, ElementRef, inject, input, OnDestroy, output, Signal, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { delay, Subject, tap } from 'rxjs';
 import { ButtonComponent } from '@shared/components/button';
@@ -25,7 +25,7 @@ const DEFAULT_STROKE_COLOR: GradientColor = ['rgba(186, 250, 255, 0)', 'rgb(183,
   templateUrl: './message-send-button.component.html',
   styleUrl: './message-send-button.component.scss'
 })
-export class MessageSendButtonComponent {
+export class MessageSendButtonComponent implements OnDestroy {
   content = viewChild<ElementRef<HTMLDivElement>>('content');
 
   onClick = output<Event>();
@@ -161,5 +161,10 @@ export class MessageSendButtonComponent {
 
   onFocusHandler(focused: boolean) {
     this.focused.set(focused);
+  }
+
+  ngOnDestroy(): void {
+    this._$pressed.complete();
+    this._$click.complete();
   }
 }

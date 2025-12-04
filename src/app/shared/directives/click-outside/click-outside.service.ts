@@ -1,4 +1,4 @@
-import { DestroyRef, inject, Injectable, Input } from '@angular/core';
+import { DestroyRef, inject, Injectable, Input, OnDestroy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter, fromEvent, of, race, Subject, switchMap, takeUntil, tap } from 'rxjs';
 
@@ -14,7 +14,7 @@ const DEFAULT_MAX_DISTANCE = 40;
 @Injectable({
     providedIn: 'root'
 })
-export class ClickOutsideService {
+export class ClickOutsideService implements OnDestroy {
     private _maxDistance = DEFAULT_MAX_DISTANCE;
 
     @Input('maxStaticClickDistance')
@@ -65,6 +65,7 @@ export class ClickOutsideService {
 
                                     return of(false);
                                 }),
+                                takeUntilDestroyed(this._destroyRef),
                                 filter(v => !!v),
                             ),
                         ]),
@@ -78,5 +79,10 @@ export class ClickOutsideService {
                 );
             }),
         ).subscribe();
+    }
+
+    ngOnDestroy(): void {
+        this._$onClick.complete();
+        this.activeTarget = undefined;
     }
 }

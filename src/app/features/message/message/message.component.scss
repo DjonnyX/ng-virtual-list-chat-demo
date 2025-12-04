@@ -6,11 +6,11 @@
     font-size: 14px;
     height: auto;
     opacity: 1;
-    transition: opacity 100ms ease-out 100ms;
+    transition: opacity 100ms ease-out 100ms, height 100ms ease-out;
 
     &.reseted {
         opacity: 0;
-        transition: opacity 0ms ease-out;
+        transition: opacity 0ms ease-out, height 100ms ease-out;
     }
 
     .message-container {

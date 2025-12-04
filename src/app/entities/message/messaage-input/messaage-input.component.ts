@@ -82,9 +82,9 @@ export class MessaageInputComponent implements OnDestroy {
 
   private _destroyRef = inject(DestroyRef);
 
-  private _resizeObserver: ResizeObserver;
+  private _resizeObserver: ResizeObserver | undefined;
 
-  private _editorResizeObserver: ResizeObserver;
+  private _editorResizeObserver: ResizeObserver | undefined;
 
   bounds = signal<ISize>({
     width: this.textarea()?.nativeElement?.offsetWidth || DEFAULT_TEXTAREA_SIZE,
@@ -129,7 +129,9 @@ export class MessaageInputComponent implements OnDestroy {
     $editor.pipe(
       takeUntilDestroyed(),
       tap(editor => {
-        this._editorResizeObserver.observe(editor, { box: "border-box" });
+        if (this._editorResizeObserver) {
+          this._editorResizeObserver.observe(editor, { box: "border-box" });
+        }
         this._onEditorResizeHandler();
       }),
     ).subscribe();
@@ -152,7 +154,9 @@ export class MessaageInputComponent implements OnDestroy {
     $textarea.pipe(
       takeUntilDestroyed(),
       tap(textarea => {
-        this._resizeObserver.observe(textarea, { box: "border-box" });
+        if (this._resizeObserver) {
+          this._resizeObserver.observe(textarea, { box: "border-box" });
+        }
         this._onContainerResizeHandler();
       }),
     ).subscribe();
@@ -264,9 +268,11 @@ export class MessaageInputComponent implements OnDestroy {
   ngOnDestroy(): void {
     if (this._resizeObserver) {
       this._resizeObserver.disconnect();
+      this._resizeObserver = undefined;
     }
     if (this._editorResizeObserver) {
       this._editorResizeObserver.disconnect();
+      this._editorResizeObserver = undefined;
     }
   }
 }

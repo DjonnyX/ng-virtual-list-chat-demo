@@ -105,7 +105,7 @@ export class CheckBoxComponent implements AfterViewInit, OnDestroy {
   private _$pressed = new Subject<boolean>();
   protected $pressed = this._$pressed.asObservable();
 
-  private _resizeObserer: ResizeObserver;
+  private _resizeObserer: ResizeObserver | undefined;
 
   private _elementRef = inject(ElementRef<HTMLDivElement>);
 
@@ -319,7 +319,9 @@ export class CheckBoxComponent implements AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     if (this._resizeObserer) {
       this._resizeObserer.disconnect();
+      this._resizeObserer = undefined;
     }
+    this._$pressed.complete();
   }
 }
 

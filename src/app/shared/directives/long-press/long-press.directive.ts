@@ -113,6 +113,7 @@ export class LongPressDirective {
 
                                             return of(false);
                                         }),
+                                        takeUntilDestroyed(this._destroyRef),
                                         filter(v => !!v),
                                         tap(() => {
                                             this.onLongPressActive.emit(false);
@@ -121,6 +122,7 @@ export class LongPressDirective {
                                 ])
                             ),
                             delay(1),
+                            takeUntilDestroyed(this._destroyRef),
                             tap(() => {
                                 this.onLongPress.emit();
                             }),
@@ -168,6 +170,7 @@ export class LongPressDirective {
 
                                             return of(false);
                                         }),
+                                        takeUntilDestroyed(this._destroyRef),
                                         filter(v => !!v),
                                         tap(() => {
                                             this.onLongPressActive.emit(false);
@@ -176,6 +179,7 @@ export class LongPressDirective {
                                 ])
                             ),
                             delay(1),
+                            takeUntilDestroyed(this._destroyRef),
                             tap(() => {
                                 this.onLongPress.emit();
                             }),

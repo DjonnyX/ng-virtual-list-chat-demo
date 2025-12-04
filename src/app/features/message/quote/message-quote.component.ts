@@ -79,7 +79,7 @@ export class MessageQuoteComponent implements OnDestroy {
 
   private _themeService = inject(ThemeService);
 
-  private _resizeObserver: ResizeObserver;
+  private _resizeObserver: ResizeObserver | undefined;
 
   bounds = signal<ISize>({
     width: this._container()?.nativeElement?.offsetWidth || 0,
@@ -115,7 +115,9 @@ export class MessageQuoteComponent implements OnDestroy {
       filter(v => !!v),
       map(v => v.nativeElement),
       tap(container => {
-        this._resizeObserver.observe(container, { box: "border-box" });
+        if (this._resizeObserver) {
+          this._resizeObserver.observe(container, { box: "border-box" });
+        }
         this._onContainerResizeHandler();
       }),
     ).subscribe();
@@ -174,6 +176,7 @@ export class MessageQuoteComponent implements OnDestroy {
   ngOnDestroy(): void {
     if (this._resizeObserver) {
       this._resizeObserver.disconnect();
+      this._resizeObserver = undefined;
     }
   }
 }

@@ -119,6 +119,18 @@ export const MOUSE_LEAVE = 'mouseleave';
 
 export const MOUSE_OUT = 'mouseout';
 
+export const POINTER_MOVE = 'pointermove';
+
+export const POINTER_UP = 'pointerup';
+
+export const POINTER_DOWN = 'pointerdown';
+
+export const POINTER_LEAVE = 'pointerleave';
+
+export const POINTER_OUT = 'pointerout';
+
+export const CLICK = 'click';
+
 export const SCROLL = 'scroll';
 
 export const SCROLLER_SCROLL = 'scroll';

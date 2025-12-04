@@ -353,6 +353,7 @@ export class SubstrateComponent {
             }
           }),
           delay(800),
+          takeUntilDestroyed(this._destroyRef),
           tap(() => {
             rippleShape.classList.remove(RIPPLE_ANIMATE_CLASS);
             this.rippleEnabled.set(false);

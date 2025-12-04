@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, OnDestroy, output } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { delay, Subject, tap } from 'rxjs';
 import { IButtonGroupItem } from './interfaces';
@@ -17,7 +17,7 @@ import { ButtonComponent } from '../button/button.component';
   templateUrl: './button-group.component.html',
   styleUrl: './button-group.component.scss'
 })
-export class ButtonGroupComponent {
+export class ButtonGroupComponent implements OnDestroy {
   items = input.required<Array<IButtonGroupItem>>();
 
   onClick = output<IButtonGroupItem>();
@@ -40,5 +40,9 @@ export class ButtonGroupComponent {
 
   onButtonClickHandler(item: IButtonGroupItem) {
     this._$click.next(item);
+  }
+
+  ngOnDestroy(): void {
+    this._$click.complete();
   }
 }

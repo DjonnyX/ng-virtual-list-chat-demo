@@ -109,7 +109,7 @@ export class EditableTextComponent implements OnDestroy {
 
   readonlyStyles: Signal<{ [sName: string]: string }>;
 
-  private _resizeObserver: ResizeObserver;
+  private _resizeObserver: ResizeObserver | undefined;
 
   bounds = signal<ISize>({
     width: this.textarea()?.nativeElement?.offsetWidth || DEFAULT_TEXTAREA_SIZE,
@@ -146,7 +146,9 @@ export class EditableTextComponent implements OnDestroy {
     $textarea.pipe(
       takeUntilDestroyed(),
       tap(textarea => {
-        this._resizeObserver.observe(textarea, { box: "border-box" });
+        if (this._resizeObserver) {
+          this._resizeObserver.observe(textarea, { box: "border-box" });
+        }
         this._onContainerResizeHandler();
       }),
     ).subscribe();
@@ -275,6 +277,7 @@ export class EditableTextComponent implements OnDestroy {
       $resources = combineLatest([this.$resourceUrls, this.$resourceLoaded]).pipe(
         takeUntilDestroyed(),
         debounceTime(100),
+        takeUntilDestroyed(this._destroyRef),
         switchMap(([resourceUrls, resourceLoaded]) => {
           return of(resourceUrls.includes(resourceLoaded));
         }),
@@ -337,6 +340,13 @@ export class EditableTextComponent implements OnDestroy {
   ngOnDestroy(): void {
     if (this._resizeObserver) {
       this._resizeObserver.disconnect();
+      this._resizeObserver = undefined;
+    }
+    if (this._$resourceUrls) {
+      this._$resourceUrls.complete();
+    }
+    if (this._$resourceLoaded) {
+      this._$resourceLoaded.complete();
     }
 
     resourceManager.removeEventListener(ResourceManagerEvents.PROGRESS, this._onResourceLoadedHandler);

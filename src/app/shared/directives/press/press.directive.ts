@@ -1,8 +1,12 @@
 import {
     Directive,
-    HostListener,
+    ElementRef,
+    inject,
     output,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { MOUSE_DOWN, MOUSE_LEAVE, MOUSE_UP, TOUCH_END, TOUCH_LEAVE, TOUCH_START } from '@shared/components/x-virtual-list/lib/const';
+import { fromEvent, tap } from 'rxjs';
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -14,17 +18,49 @@ import {
 export class PressDirective {
     onPress = output<boolean>();
 
-    @HostListener('mousedown', ['$event'])
-    @HostListener('touchstart', ['$event'])
-    onPressHandler() {
-        this.onPress.emit(true);
-    }
+    private _elementRef = inject(ElementRef<HTMLElement>);
 
-    @HostListener('mouseup', ['$event'])
-    @HostListener('mouseleave', ['$event'])
-    @HostListener('touchend', ['$event'])
-    @HostListener('touchleave', ['$event'])
-    onRelease() {
-        this.onPress.emit(false);
+    constructor() {
+        fromEvent<MouseEvent>(this._elementRef.nativeElement, MOUSE_DOWN).pipe(
+            takeUntilDestroyed(),
+            tap(e => {
+                this.onPress.emit(true);
+            }),
+        ).subscribe();
+
+        fromEvent<TouchEvent>(this._elementRef.nativeElement, TOUCH_START).pipe(
+            takeUntilDestroyed(),
+            tap(e => {
+                this.onPress.emit(true);
+            }),
+        ).subscribe();
+
+        fromEvent<MouseEvent>(this._elementRef.nativeElement, MOUSE_UP).pipe(
+            takeUntilDestroyed(),
+            tap(e => {
+                this.onPress.emit(false);
+            }),
+        ).subscribe();
+
+        fromEvent<MouseEvent>(this._elementRef.nativeElement, MOUSE_LEAVE).pipe(
+            takeUntilDestroyed(),
+            tap(e => {
+                this.onPress.emit(false);
+            }),
+        ).subscribe();
+
+        fromEvent<TouchEvent>(this._elementRef.nativeElement, TOUCH_END).pipe(
+            takeUntilDestroyed(),
+            tap(e => {
+                this.onPress.emit(false);
+            }),
+        ).subscribe();
+
+        fromEvent<TouchEvent>(this._elementRef.nativeElement, TOUCH_LEAVE).pipe(
+            takeUntilDestroyed(),
+            tap(e => {
+                this.onPress.emit(false);
+            }),
+        ).subscribe();
     }
 }

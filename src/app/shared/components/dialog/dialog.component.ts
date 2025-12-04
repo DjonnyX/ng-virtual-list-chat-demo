@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ComponentRef, computed, DestroyRef, effect, ElementRef, inject, signal, Signal, ViewChild, viewChild, ViewContainerRef } from '@angular/core';
+import { AfterViewInit, Component, ComponentRef, computed, DestroyRef, effect, ElementRef, inject, OnDestroy, signal, Signal, ViewChild, viewChild, ViewContainerRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
@@ -34,7 +34,7 @@ const DEFAULT_ROUND_CORNER: RoundedCorner = [8, 8, 8, 8],
   templateUrl: './dialog.component.html',
   styleUrl: './dialog.component.scss'
 })
-export class DialogComponent implements AfterViewInit {
+export class DialogComponent implements AfterViewInit, OnDestroy {
   @ViewChild('contentTemplate', { read: ViewContainerRef })
   contentTemplate!: ViewContainerRef;
 
@@ -72,7 +72,7 @@ export class DialogComponent implements AfterViewInit {
 
   private _componentData: any;
 
-  private _resizeObserer: ResizeObserver;
+  private _resizeObserer: ResizeObserver | undefined;
 
   private _elementRef = inject(ElementRef<HTMLDivElement>);
 
@@ -168,5 +168,12 @@ export class DialogComponent implements AfterViewInit {
 
   onButtonClickHandler(item: IButtonGroupItem & { data?: any }) {
     this.close({ data: item.data, componentData: this._componentData });
+  }
+
+  ngOnDestroy(): void {
+    if (this._resizeObserer) {
+      this._resizeObserer.disconnect();
+      this._resizeObserer = undefined;
+    }
   }
 }

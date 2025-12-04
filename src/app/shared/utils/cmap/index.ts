@@ -2,6 +2,10 @@ export class CMap<K = string, V = any> {
     protected _dict: { [k: string | number]: V } = {};
 
     constructor(dict?: CMap<K, V>) {
+        this.from(dict);
+    }
+
+    from(dict?: CMap<K, V>) {
         if (dict) {
             this._dict = { ...dict._dict };
         }

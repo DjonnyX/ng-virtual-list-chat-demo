@@ -1,4 +1,4 @@
-import { Component, effect, ElementRef, inject, input, output, signal, Signal, ViewChild, viewChild } from '@angular/core';
+import { Component, effect, ElementRef, inject, input, OnDestroy, output, signal, Signal, ViewChild, viewChild } from '@angular/core';
 import { CdkMenu } from '@angular/cdk/menu';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { delay, Subject, tap } from 'rxjs';
@@ -32,7 +32,7 @@ const DEFAULT_CONTEXT_MENU_WIDTH = 20,
   templateUrl: './context-menu.component.html',
   styleUrl: './context-menu.component.scss'
 })
-export class ContextMenuComponent {
+export class ContextMenuComponent implements OnDestroy {
   contextMenu = viewChild<ElementRef<HTMLDivElement>>('contextMenu');
 
   @ViewChild('contextMenu', { read: CdkMenu })
@@ -81,7 +81,7 @@ export class ContextMenuComponent {
 
   private _themeService = inject(ThemeService);
 
-  private _resizeObserer: ResizeObserver;
+  private _resizeObserer: ResizeObserver | undefined;
 
   private _elementRef = inject(ElementRef<HTMLDivElement>);
 
@@ -164,5 +164,13 @@ export class ContextMenuComponent {
 
   onItemClickHandler(event: Event, id: Id) {
     this._$click.next({ event, id });
+  }
+
+  ngOnDestroy(): void {
+    if (this._resizeObserer) {
+      this._resizeObserer.disconnect();
+      this._resizeObserer = undefined;
+    }
+    this._$click.complete();
   }
 }

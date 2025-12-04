@@ -1,4 +1,4 @@
-import { Directive, Renderer2, ElementRef, input, inject, SecurityContext, effect } from '@angular/core';
+import { Directive, Renderer2, ElementRef, input, inject, SecurityContext, effect, OnDestroy } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { NON_SEARCHABLE_PATTERN } from '@shared/utils/text/format-text.util';
 
@@ -14,7 +14,7 @@ const INNER_HTML = 'innerHTML';
 @Directive({
     selector: '[searchHighlight]'
 })
-export class SearchHighlightDirective {
+export class SearchHighlightDirective implements OnDestroy {
     searchedWords = input<Array<string>>();
 
     private _previousValue: string | undefined;
@@ -67,5 +67,9 @@ export class SearchHighlightDirective {
         }
         const regexp = new RegExp(`(${s.join('|')})`, 'g');
         return t?.replaceAll(NON_SEARCHABLE_PATTERN, '')?.replace(regexp, `<span class="${substringClass}">$1</span>`);
+    }
+
+    ngOnDestroy(): void {
+        this._previousValue = undefined;
     }
 }

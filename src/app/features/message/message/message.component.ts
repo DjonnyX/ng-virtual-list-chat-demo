@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import {
-  Component, computed, effect, ElementRef, HostBinding, inject, input, OnDestroy, output, signal, Signal, viewChild,
+  Component, computed, effect, ElementRef, inject, input, OnDestroy, output, signal, Signal, viewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
@@ -100,11 +100,13 @@ export class MessageComponent implements OnDestroy {
 
   time: Signal<string | undefined>;
 
+  private _elementRef = inject(ElementRef<HTMLDivElement>);
+
   private _themeService = inject(ThemeService);
 
   readonly maxStaticClickDistance = DEFAULT_MAX_DISTANCE;
 
-  private _resizeObserver: ResizeObserver;
+  private _resizeObserver: ResizeObserver | undefined;
 
   bounds = signal<ISize>({
     width: this._container()?.nativeElement?.offsetWidth || 0,
@@ -124,10 +126,6 @@ export class MessageComponent implements OnDestroy {
 
   actualBounds: Signal<ISize>;
 
-  @HostBinding('class')
-  get hostClasses(): { [key: string]: boolean } {
-    return this.classes();
-  }
   someCondition = true;
 
   constructor() {
@@ -142,12 +140,29 @@ export class MessageComponent implements OnDestroy {
       filter(v => !!v),
       map(v => v.nativeElement),
       tap(container => {
-        this._resizeObserver.observe(container, { box: "border-box" });
+        if (this._resizeObserver) {
+          this._resizeObserver.observe(container, { box: "border-box" });
+        }
         this._onContainerResizeHandler();
       }),
     ).subscribe();
 
     this.theme = toSignal(this._themeService.$theme);
+
+    effect(() => {
+      const classes = this.classes(), element = this._elementRef?.nativeElement as HTMLElement;
+      if (element) {
+        if (classes) {
+          for (const cName in classes) {
+            if (classes[cName]) {
+              element.classList.add(cName);
+            } else {
+              element.classList.remove(cName);
+            }
+          }
+        }
+      }
+    });
 
     this.time = computed(() => {
       const data = this.data();
@@ -274,6 +289,7 @@ export class MessageComponent implements OnDestroy {
   ngOnDestroy(): void {
     if (this._resizeObserver) {
       this._resizeObserver.disconnect();
+      this._resizeObserver = undefined;
     }
   }
 }
