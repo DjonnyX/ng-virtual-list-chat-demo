@@ -8,6 +8,6 @@
         </div>
     </div>
     <x-scroll-bar #scrollBar [isVertical]="isVertical()" [size]="thumbSize()" [preset]="scrollbarPreset()" [position]="thumbPosition()"
-        [thumbGradientPositions]="thumbGradientPositions()" [loading]="loading()" [prepared]="preparedSignal()"
+        [thumbGradientPositions]="thumbGradientPositions()" [loading]="loading()" [prepared]="preparedSignal()" [show]="thumbShow()"
         (onDrag)="onScrollBarDragHandler($event)"></x-scroll-bar>
 </div>

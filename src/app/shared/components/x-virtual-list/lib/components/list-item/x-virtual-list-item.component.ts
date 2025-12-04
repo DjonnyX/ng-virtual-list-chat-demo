@@ -27,7 +27,8 @@ interface ITemplateContext<D = any> {
   index: number;
 }
 
-const ATTR_AREA_SELECTED = 'area-selected', XVL_INDEX = 'xvl-index', POSITION = 'position', POSITION_ZERO = '0', ID = 'item-id',
+const ZEROS_POSITION = -1000,
+  ATTR_AREA_SELECTED = 'area-selected', XVL_INDEX = 'xvl-index', POSITION = 'position', POSITION_ZERO = '0', ID = 'item-id',
   KEY_SPACE = " ", KEY_ARR_LEFT = "ArrowLeft", KEY_ARR_UP = "ArrowUp", KEY_ARR_RIGHT = "ArrowRight", KEY_ARR_DOWN = "ArrowDown",
   EVENT_FOCUS_IN = 'focusin', EVENT_FOCUS_OUT = 'focusout', EVENT_KEY_DOWN = 'keydown',
   CLASS_NAME_SNAPPED = 'snapped', CLASS_NAME_SNAPPED_OUT = 'snapped-out', CLASS_NAME_FOCUS = 'focus';
@@ -428,6 +429,7 @@ export class NgVirtualListItemComponent extends BaseVirtualListItemComponent {
 
     const el = this._elementRef.nativeElement as HTMLElement,
       styles = el.style;
+    styles.zIndex = this._data?.config?.zIndex ?? DEFAULT_ZINDEX;
     if (this.regular) {
       if (styles.display === DISPLAY_BLOCK) {
         return;
@@ -441,7 +443,6 @@ export class NgVirtualListItemComponent extends BaseVirtualListItemComponent {
 
       styles.visibility = VISIBILITY_VISIBLE;
     }
-    styles.zIndex = this._data?.config?.zIndex ?? DEFAULT_ZINDEX;
   }
 
   hide() {
@@ -449,6 +450,9 @@ export class NgVirtualListItemComponent extends BaseVirtualListItemComponent {
 
     const el = this._elementRef.nativeElement as HTMLElement,
       styles = el.style;
+    styles.position = POSITION_ABSOLUTE;
+    styles.transform = `${TRANSLATE_3D}(${this._data?.config?.isVertical ? 0 : ZEROS_POSITION},${this._data?.config?.isVertical ? 0 : ZEROS_POSITION},0)`;
+    styles.zIndex = HIDDEN_ZINDEX;
     if (this.regular) {
       if (styles.display === DISPLAY_NONE) {
         return;
@@ -462,9 +466,6 @@ export class NgVirtualListItemComponent extends BaseVirtualListItemComponent {
 
       styles.visibility = VISIBILITY_HIDDEN;
     }
-    styles.position = POSITION_ABSOLUTE;
-    styles.transform = ZEROS_TRANSLATE_3D;
-    styles.zIndex = HIDDEN_ZINDEX;
   }
 
   onClickHandler() {

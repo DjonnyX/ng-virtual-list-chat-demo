@@ -1,6 +1,6 @@
 import { IVirtualListItem } from "@shared/components/x-virtual-list";
 import { MessageTypes } from "@shared/enums";
-import { COLLECTION_PARAMS } from "@mock/const/collection";
+import { COLLECTION_PARAMS, testFormattedTable, testFormattedText, testLinksText } from "@mock/const/collection";
 import { IMessage } from "@widgets/messages";
 import { generateText } from "./text";
 
@@ -46,7 +46,7 @@ export const generateMessage = (): IVirtualListItem<IMessage> => {
         dateTime,
         mailed: false,
         type,
-        text: `${id}. ${generateText()}`,
+        text: `${id}. ${id % 4 === 0 ? testLinksText() : id % 3 === 0 ? testFormattedText() : id % 5 === 0 ? testFormattedTable() : generateText()}`,
         image: hasImage ? 'https://ng-virtual-list-chat-demo.eugene-grebennikov.pro/media/logo.png' : undefined,
         incomType,
     };

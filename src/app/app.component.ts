@@ -29,13 +29,18 @@ export class AppComponent {
   private _elementRef = inject(ElementRef);
 
   constructor() {
-    const appResizeHandler = (bounds: ISize) => document.body.style.height = `${bounds.height}px`;
+    const appResizeHandler = (bounds: ISize) => document.body.style.height = `${bounds.height}px`,
+      winResizeHandler = () => appResizeHandler({ width: window.innerWidth, height: window.innerHeight });
+
     this._mediaService.$bounds.pipe(
       takeUntilDestroyed(),
       tap(bounds => {
         appResizeHandler(bounds);
       }),
     ).subscribe();
+
+    window.addEventListener('resize', winResizeHandler);
+    window.addEventListener('scroll', winResizeHandler);
 
     this._themeService.name = ThemeNames[0];
 

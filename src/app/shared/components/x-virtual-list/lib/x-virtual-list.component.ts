@@ -866,7 +866,7 @@ export class XVirtualListComponent implements OnDestroy {
       }
       if (!Number.isNaN(pos)) {
         this._trackBox.cancelScrollSnappingToEnd(true);
-        const params: IScrollToParams = { [this._isVertical ? TOP_PROP_NAME : LEFT_PROP_NAME]: pos, behavior: 'instant' };
+        const params: IScrollToParams = { [this._isVertical ? TOP_PROP_NAME : LEFT_PROP_NAME]: pos, behavior: BEHAVIOR_INSTANT as ScrollBehavior };
         scroller.scrollTo(params);
       }
     }
@@ -933,6 +933,8 @@ export class XVirtualListComponent implements OnDestroy {
 
   private _destroyRef = inject(DestroyRef);
 
+  private _updateId: number | undefined;
+
   constructor() {
     XVirtualListComponent.__nextId = XVirtualListComponent.__nextId + 1 === Number.MAX_SAFE_INTEGER
       ? 0 : XVirtualListComponent.__nextId + 1;
@@ -954,7 +956,7 @@ export class XVirtualListComponent implements OnDestroy {
       return this._scrollerComponent()?.scrollContent();
     });
 
-    let prepared = false, readyToStart = false;
+    let prepared = false, readyToStart = false, isUserScrolling = false;
 
     this.$prepared.pipe(
       takeUntilDestroyed(),
@@ -971,20 +973,25 @@ export class XVirtualListComponent implements OnDestroy {
         }
       }),
       filter(v => !!v),
-      debounceTime(1),
+      debounceTime(0),
       takeUntilDestroyed(this._destroyRef),
       tap(v => {
         prepared = v;
       }),
-      debounceTime(1),
+      delay(0),
       takeUntilDestroyed(this._destroyRef),
       tap(v => {
-        readyToStart = v;
         const scrollerComponent = this._scrollerComponent();
         if (scrollerComponent) {
           scrollerComponent.prepared = v;
         }
         this.classes.set({ prepared: v });
+      }),
+      delay(1000),
+      takeUntilDestroyed(this._destroyRef),
+      tap(v => {
+        readyToStart = v;
+        this.classes.set({ prepared: true, 'ready-to-start': true });
       }),
     ).subscribe();
 
@@ -1074,7 +1081,7 @@ export class XVirtualListComponent implements OnDestroy {
           isResetedReachStart = v;
         }
       }),
-      debounceTime(1000),
+      debounceTime(1),
       takeUntilDestroyed(this._destroyRef),
       tap(v => {
         isResetedReachStart = v;
@@ -1296,6 +1303,119 @@ export class XVirtualListComponent implements OnDestroy {
       }),
     ).subscribe();
 
+    const update = (params: {
+      snapScrollToBottom: boolean; bounds: IRect; listBounds: IRect; scrollEndOffset: number; items: IVirtualListCollection<Object>;
+      itemConfigMap: IVirtualListItemConfigMap; scrollSize: number; itemSize: number; bufferSize: number; maxBufferSize: number;
+      snap: boolean; isVertical: boolean; dynamicSize: boolean; enabledBufferOptimization: boolean; cacheVersion: number;
+    }) => {
+      const {
+        snapScrollToBottom, bounds, listBounds, scrollEndOffset, items, itemConfigMap, scrollSize, itemSize,
+        bufferSize, maxBufferSize, snap, isVertical, dynamicSize, enabledBufferOptimization, cacheVersion,
+      } = params;
+      const scroller = this._scrollerComponent();
+      if (scroller) {
+        let actualScrollSize = snapScrollToBottom && !prepared ?
+          (isVertical ? scroller.actualScrollHeight ?? 0 : scroller.actualScrollWidth ?? 0) :
+          (isVertical ? scroller.actualScrollTop ?? 0 : scroller.actualScrollLeft ?? 0),
+          totalSize = 0, displayItems: IRenderVirtualListCollection;
+
+        const { width, height, x, y } = bounds, viewportSize = (isVertical ? height : width);
+
+        let scrollLength = Math.round(this._totalSize()) ?? 0,
+          actualScrollLength = Math.round(scrollLength === 0 ? 0 : scrollLength > viewportSize ? scrollLength - viewportSize : scrollLength),
+          roundedMaxPosition = Math.round(actualScrollLength),
+          scrollPosition = Math.round(actualScrollSize);
+
+        const opts: IUpdateCollectionOptions<IVirtualListItem, IVirtualListCollection> = {
+          bounds: { width, height, x, y }, dynamicSize, isVertical, itemSize, reversed: false,
+          bufferSize, maxBufferSize, scrollSize: actualScrollSize, snap, enabledBufferOptimization,
+        };
+
+        if (snapScrollToBottom && scrollLength > viewportSize && !prepared) {
+          const { totalSize: calculatedTotalSize } = this._trackBox.getMetrics(items, itemConfigMap, { ...opts, reversed: true });
+          totalSize = calculatedTotalSize;
+          actualScrollSize = (totalSize > viewportSize ? totalSize - viewportSize : 0);
+          const { displayItems: calculatedDisplayItems, totalSize: calculatedTotalSize1 } =
+            this._trackBox.updateCollection(items, itemConfigMap, { ...opts, reversed: true, scrollSize: actualScrollSize });
+          displayItems = calculatedDisplayItems;
+          totalSize = calculatedTotalSize1;
+          scrollLength = Math.round(totalSize) ?? 0;
+          actualScrollLength = Math.round(scrollLength === 0 ? 0 : scrollLength > viewportSize ? scrollLength - viewportSize : scrollLength);
+          roundedMaxPosition = Math.round(actualScrollLength);
+          scrollPosition = Math.round(actualScrollSize);
+        } else {
+          const { displayItems: calculatedDisplayItems, totalSize: calculatedTotalSize } = this._trackBox.updateCollection(items, itemConfigMap, opts);
+          displayItems = calculatedDisplayItems;
+          totalSize = calculatedTotalSize;
+        }
+
+        scroller.totalSize = totalSize;
+
+        this._totalSize.set(totalSize);
+
+        this._service.collection = displayItems;
+
+        this.resetBoundsSize(isVertical, totalSize);
+
+        this.createDisplayComponentsIfNeed(displayItems);
+
+        this.tracking();
+
+        if (actualScrollLength > 0) {
+          const isScrollStart = isUserScrolling && scrollPosition < MIN_SCROLL_TO_START_PIXELS;
+          this._isScrollStart.set(isScrollStart);
+          if (snapScrollToBottom && isScrollStart) {
+            this._isScrollFinished.set(false);
+          }
+          if (snapScrollToBottom && !isScrollStart) {
+            this._isScrollFinished.set(scrollPosition >= roundedMaxPosition);
+          }
+        }
+
+        actualScrollSize = (isVertical ? scroller.actualScrollTop ?? 0 : scroller.actualScrollLeft ?? 0);
+        const delta = this._trackBox.delta,
+          roundedActualScrollSize = Math.round(actualScrollSize),
+          scrollPositionAfterUpdate = actualScrollSize + delta,
+          roundedScrollPositionAfterUpdate = Math.round(scrollPositionAfterUpdate),
+          roundedMaxPositionAfterUpdate = Math.round(totalSize - viewportSize);
+
+        if (this._isSnappingMethodAdvanced) {
+          this.updateRegularRenderer();
+        }
+
+        this._trackBox.clearDelta();
+
+        if (this._trackBox.isSnappedToEnd || (!!snapScrollToBottom && !prepared) ||
+          (snapScrollToBottom && actualScrollSize > 0 &&
+            ((roundedScrollPositionAfterUpdate >= scrollPosition) &&
+              (scrollPosition >= roundedMaxPosition) &&
+              (roundedMaxPositionAfterUpdate >= roundedMaxPosition)))) {
+          if (!this._trackBox.isSnappedToEnd) {
+            this._isScrollFinished.set(true);
+          }
+          this._trackBox.isScrollEnd = true;
+          if (roundedMaxPositionAfterUpdate > 0) {
+            const diff = roundedMaxPositionAfterUpdate - roundedScrollPositionAfterUpdate,
+              snapToEndTransitionInstantOffset = this.snapToEndTransitionInstantOffset() || viewportSize,
+              animated = prepared && readyToStart && diff >= 0 && diff <= snapToEndTransitionInstantOffset,
+              params: IScrollToParams = {
+                [isVertical ? TOP_PROP_NAME : LEFT_PROP_NAME]: roundedMaxPositionAfterUpdate,
+                behavior: (animated ?
+                  BEHAVIOR_SMOOTH : BEHAVIOR_INSTANT) as ScrollBehavior,
+                blending: false,
+              };
+            scroller?.scrollTo?.(params);
+          }
+        } else if (roundedActualScrollSize !== roundedScrollPositionAfterUpdate && scrollPositionAfterUpdate > 0) {
+          const params: IScrollToParams = {
+            [isVertical ? TOP_PROP_NAME : LEFT_PROP_NAME]: scrollPositionAfterUpdate,
+            behavior: BEHAVIOR_INSTANT as ScrollBehavior,
+          };
+          scroller.scrollTo(params);
+        }
+      }
+    };
+
     combineLatest([$snapScrollToBottom, $bounds, $listBounds, $scrollEndOffset, $actualItems, $itemConfigMap, $scrollSize, $itemSize,
       $bufferSize, $maxBufferSize, $snap, $isVertical, $dynamicSize, $enabledBufferOptimization, $cacheVersion,
     ]).pipe(
@@ -1305,104 +1425,23 @@ export class XVirtualListComponent implements OnDestroy {
         snapScrollToBottom, bounds, listBounds, scrollEndOffset, items, itemConfigMap, scrollSize, itemSize,
         bufferSize, maxBufferSize, snap, isVertical, dynamicSize, enabledBufferOptimization, cacheVersion,
       ]) => {
-
-        const scroller = this._scrollerComponent();
-        if (scroller) {
-          let actualScrollSize = snapScrollToBottom && !prepared ?
-            (isVertical ? scroller.actualScrollHeight ?? 0 : scroller.actualScrollWidth ?? 0) :
-            (isVertical ? scroller.actualScrollTop ?? 0 : scroller.actualScrollLeft ?? 0),
-            totalSize = 0, displayItems: IRenderVirtualListCollection;
-
-          const { width, height, x, y } = bounds, viewportSize = (isVertical ? height : width);
-
-          let scrollLength = Math.round(this._totalSize()) ?? 0,
-            actualScrollLength = Math.round(scrollLength === 0 ? 0 : scrollLength > viewportSize ? scrollLength - viewportSize : scrollLength),
-            roundedMaxPosition = Math.round(actualScrollLength),
-            scrollPosition = Math.round(actualScrollSize);
-
-          const opts: IUpdateCollectionOptions<IVirtualListItem, IVirtualListCollection> = {
-            bounds: { width, height, x, y }, dynamicSize, isVertical, itemSize, reversed: false,
-            bufferSize, maxBufferSize, scrollSize: actualScrollSize, snap, enabledBufferOptimization,
-          };
-
-          if (snapScrollToBottom && scrollLength > viewportSize && !prepared) {
-            const { totalSize: calculatedTotalSize } = this._trackBox.getMetrics(items, itemConfigMap, { ...opts, reversed: true });
-            totalSize = calculatedTotalSize;
-            actualScrollSize = (totalSize > viewportSize ? totalSize - viewportSize : 0);
-            const { displayItems: calculatedDisplayItems, totalSize: calculatedTotalSize1 } =
-              this._trackBox.updateCollection(items, itemConfigMap, { ...opts, reversed: true, scrollSize: actualScrollSize });
-            displayItems = calculatedDisplayItems;
-            totalSize = calculatedTotalSize1;
-            scrollLength = Math.round(totalSize) ?? 0;
-            actualScrollLength = Math.round(scrollLength === 0 ? 0 : scrollLength > viewportSize ? scrollLength - viewportSize : scrollLength);
-            roundedMaxPosition = Math.round(actualScrollLength);
-            scrollPosition = Math.round(actualScrollSize);
-          } else {
-            const { displayItems: calculatedDisplayItems, totalSize: calculatedTotalSize } = this._trackBox.updateCollection(items, itemConfigMap, opts);
-            displayItems = calculatedDisplayItems;
-            totalSize = calculatedTotalSize;
-          }
-
-          scroller.totalSize = totalSize;
-
-          this._totalSize.set(totalSize);
-
-          this._service.collection = displayItems;
-
-          this.resetBoundsSize(isVertical, totalSize);
-
-          this.createDisplayComponentsIfNeed(displayItems);
-
-          this.tracking();
-
-          if (actualScrollLength > 0) {
-            this._isScrollStart.set(scrollPosition < MIN_SCROLL_TO_START_PIXELS);
-            if (snapScrollToBottom) {
-              this._isScrollFinished.set(scrollPosition >= roundedMaxPosition);
-            }
-          }
-
-          actualScrollSize = (isVertical ? scroller.actualScrollTop ?? 0 : scroller.actualScrollLeft ?? 0);
-          const delta = this._trackBox.delta,
-            roundedActualScrollSize = Math.round(actualScrollSize),
-            scrollPositionAfterUpdate = actualScrollSize + delta,
-            roundedScrollPositionAfterUpdate = Math.round(scrollPositionAfterUpdate),
-            roundedMaxPositionAfterUpdate = Math.round(totalSize - viewportSize);
-
-          if (this._isSnappingMethodAdvanced) {
-            this.updateRegularRenderer();
-          }
-
-          this._trackBox.clearDelta();
-
-          if (this._trackBox.isSnappedToEnd || (!!snapScrollToBottom && !prepared) ||
-            (snapScrollToBottom && actualScrollSize > 0 &&
-              ((roundedScrollPositionAfterUpdate >= scrollPosition) &&
-                (scrollPosition >= roundedMaxPosition) &&
-                (roundedMaxPositionAfterUpdate >= roundedMaxPosition)))) {
-            if (!this._trackBox.isSnappedToEnd) {
-              this._isScrollFinished.set(true);
-            }
-            this._trackBox.isScrollEnd = true;
-            if (roundedMaxPositionAfterUpdate > 0) {
-              const diff = roundedMaxPositionAfterUpdate - roundedScrollPositionAfterUpdate,
-                snapToEndTransitionInstantOffset = this.snapToEndTransitionInstantOffset() || viewportSize,
-                animated = prepared && diff >= 0 && diff <= snapToEndTransitionInstantOffset,
-                params: IScrollToParams = {
-                  [isVertical ? TOP_PROP_NAME : LEFT_PROP_NAME]: roundedMaxPositionAfterUpdate,
-                  behavior: (animated ?
-                    BEHAVIOR_SMOOTH : BEHAVIOR_INSTANT) as ScrollBehavior,
-                  blending: false,
-                };
-              scroller?.scrollTo?.(params);
-            }
-          } else if (roundedActualScrollSize !== roundedScrollPositionAfterUpdate && scrollPositionAfterUpdate > 0) {
-            const params: IScrollToParams = {
-              [isVertical ? TOP_PROP_NAME : LEFT_PROP_NAME]: scrollPositionAfterUpdate,
-              behavior: BEHAVIOR_INSTANT as ScrollBehavior,
-            };
-            scroller.scrollTo(params);
-          }
+        const updateId = this._updateId;
+        if (updateId !== undefined) {
+          cancelAnimationFrame(updateId);
+          this._updateId = undefined;
+        }
+        if (!prepared || !isResetedReachStart) {
+          update({
+            snapScrollToBottom, bounds, listBounds, scrollEndOffset, items, itemConfigMap, scrollSize, itemSize,
+            bufferSize, maxBufferSize, snap, isVertical, dynamicSize, enabledBufferOptimization, cacheVersion,
+          });
+        } else {
+          this._updateId = requestAnimationFrame((time: DOMHighResTimeStamp) => {
+            update({
+              snapScrollToBottom, bounds, listBounds, scrollEndOffset, items, itemConfigMap, scrollSize, itemSize,
+              bufferSize, maxBufferSize, snap, isVertical, dynamicSize, enabledBufferOptimization, cacheVersion,
+            });
+          });
         }
       }),
     ).subscribe();
@@ -1560,7 +1599,8 @@ export class XVirtualListComponent implements OnDestroy {
           takeUntilDestroyed(this._destroyRef),
         );
       }),
-      tap(e => {
+      tap(userAction => {
+        isUserScrolling = userAction;
         const scrollerEl = this._scroller()?.nativeElement, scrollerComponent = this._scrollerComponent();
         if (scrollerEl && scrollerComponent) {
           const isVertical = this._isVertical, scrollSize = (isVertical ? scrollerComponent.scrollTop : scrollerComponent.scrollLeft),
@@ -1591,7 +1631,8 @@ export class XVirtualListComponent implements OnDestroy {
           takeUntilDestroyed(this._destroyRef),
         );
       }),
-      tap(e => {
+      tap(userAction => {
+        isUserScrolling = userAction;
         const scrollerEl = this._scroller()?.nativeElement, scrollerComponent = this._scrollerComponent();
         if (scrollerEl && scrollerComponent) {
           const isVertical = this._isVertical, scrollSize = (isVertical ? scrollerComponent.scrollTop : scrollerComponent.scrollLeft),
@@ -2024,11 +2065,29 @@ export class XVirtualListComponent implements OnDestroy {
   /**
    * Scrolls the scroll area to the last item in the collection.
    */
-  scrollToEnd() {
+  scrollToEnd(cb?: () => void, options?: IScrollOptions) {
+    const scroller = this._scrollerComponent();
+    if (scroller) {
+      scroller.stopScrolling();
+    }
+    const behavior = options?.behavior ?? BEHAVIOR_INSTANT,
+      iteration = options?.iteration ?? 0;
+    validateScrollBehavior(behavior);
+    validateIteration(iteration);
+    const trackBy = this.trackBy(), items = this.items(), latItem = items[items.length > 0 ? items.length - 1 : 0], id = latItem[trackBy],
+      actualIteration = validateScrollIteration(iteration);
+    this._$scrollTo.next({ id, behavior, iteration: actualIteration, isLastIteration: actualIteration === MAX_SCROLL_TO_ITERATIONS, cb });
+  }
+
+  /**
+   * Scrolls the scroll area to the last item in the collection.
+   */
+  scrollToEndRegular() {
     this._isScrollFinished.set(true);
     this._trackBox.isScrollEnd = true;
     const scroller = this._scrollerComponent();
     if (scroller) {
+      scroller.stopScrolling();
       this._trackBox.cancelScrollSnappingToEnd(true);
       const isVertical = this._isVertical, scrollSize = isVertical ? scroller.scrollHeight : scroller.scrollWidth;
       this._scrollSize.set(scrollSize);
@@ -2043,7 +2102,10 @@ export class XVirtualListComponent implements OnDestroy {
     this._isScrollFinished.set(false);
     this._totalSize.set(0);
     this._scrollSize.set(0);
-    this._listBounds.set({ width: 0, height: 0, x: 0, y: 0 });
+    const scrollerComponent = this._scrollerComponent();
+    if (scrollerComponent) {
+      scrollerComponent.reset();
+    }
   }
 
   stopSnappingScrollToEnd() {
@@ -2060,6 +2122,12 @@ export class XVirtualListComponent implements OnDestroy {
   }
 
   private dispose() {
+    const updateId = this._updateId;
+    if (updateId !== undefined) {
+      cancelAnimationFrame(updateId);
+      this._updateId = undefined;
+    }
+
     if (this._trackBox) {
       this._trackBox.dispose();
     }

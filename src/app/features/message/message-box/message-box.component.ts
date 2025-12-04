@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, computed, DestroyRef, effect, ElementRef, inject, input, OnDestroy, output, signal, Signal, viewChild } from '@angular/core';
 import { CdkMenuTrigger } from '@angular/cdk/menu';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { filter, map, Observable, Subject, switchMap, take, tap } from 'rxjs';
+import { filter, map, Observable, Subject, switchMap, take, tap, timer } from 'rxjs';
 import { MessageButtonSaveState, MessageButtonSaveStates, MessageMenuButtonComponent, MessageSaveButtonComponent } from '@entities/message';
 import { CalcFillPositionsDirective, LongPressDirective } from '@shared/directives';
 import { Id, IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/x-virtual-list';
@@ -267,7 +267,7 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
     });
 
     this.classes = computed(() => {
-      const params = this.params(), { reseted } = params, initialized = this.initialized;
+      const params = this.params(), { reseted } = params, initialized = this.initialized();
       if (reseted) {
         return { [CLASS_RESETED]: !initialized || reseted, } as any;
       }

@@ -5,6 +5,13 @@
     overflow: hidden;
     font-size: 14px;
     height: auto;
+    opacity: 1;
+    transition: opacity 100ms ease-out 100ms;
+
+    &.reseted {
+        opacity: 0;
+        transition: opacity 0ms ease-out;
+    }
 
     .message-container {
         position: relative;
@@ -60,6 +67,7 @@
 
         .message-container {
             &.reseted {
+                width: 100%;
                 min-width: 100%;
             }
         }
@@ -68,6 +76,7 @@
     @media (min-width: 1200px) {
         .message-container {
             &.reseted {
+                width: 100%;
                 min-width: 100%;
             }
         }

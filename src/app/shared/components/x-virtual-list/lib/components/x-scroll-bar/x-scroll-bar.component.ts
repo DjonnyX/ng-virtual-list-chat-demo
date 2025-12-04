@@ -53,7 +53,7 @@ export class XScrollBarComponent implements OnDestroy {
 
   prepared = input<boolean>(false);
 
-  show = signal<boolean>(false);
+  show = input<boolean>(false);
 
   thickness = signal<number>(DEFAULT_THICKNESS);
 
@@ -103,28 +103,17 @@ export class XScrollBarComponent implements OnDestroy {
   constructor() {
     this._resizeObserver = new ResizeObserver(this._onResizeHandler);
 
-    const $prepared = toObservable(this.prepared),
-      $track = toObservable(this.track).pipe(
-        takeUntilDestroyed(),
-        filter(v => !!v),
-        map(v => v.nativeElement),
-      ),
-      $isVertical = toObservable(this.isVertical),
-      $size = toObservable(this.size);
+    const $track = toObservable(this.track).pipe(
+      takeUntilDestroyed(),
+      filter(v => !!v),
+      map(v => v.nativeElement),
+    );
 
     $track.pipe(
       takeUntilDestroyed(),
       tap(track => {
         this._resizeObserver.observe(track);
         this._onResizeHandler();
-      }),
-    ).subscribe();
-
-    combineLatest([$prepared, $track, $isVertical, $size]).pipe(
-      takeUntilDestroyed(),
-      tap(([prepared, track, isVertical, size]) => {
-        const total = isVertical ? track.offsetHeight : track.offsetWidth;
-        this.show.set(prepared && size > 0 && size < total);
       }),
     ).subscribe();
 

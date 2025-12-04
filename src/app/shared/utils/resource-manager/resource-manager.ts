@@ -2,13 +2,15 @@ import { CMap } from "../cmap";
 import { EventEmitter } from "../event-emitter";
 import { Thread, ThreadManager } from "../thread-manager";
 
-const IMAGE_PATTERN = /(data:image\/[\w]+;)/gm;
+const IMAGE_PATTERN = 'data:image/',
+    NOT_RESOURCE = 'not:resource';
 
 export enum ResourceStatus {
     NOT_ADDED,
     WAITING,
     LOADING,
     LOADED,
+    REJECTED,
     ERROR,
 }
 
@@ -52,7 +54,7 @@ class ResourceManager extends EventEmitter<ResourceManagerEvents, ResourceManage
 
     add(url: string) {
         const status = this._statusMap.get(url);
-        if (status === ResourceStatus.LOADING || status === ResourceStatus.LOADED) {
+        if (status === ResourceStatus.LOADING || status === ResourceStatus.LOADED || status === ResourceStatus.REJECTED) {
             return;
         }
         this._statusMap.set(url, ResourceStatus.WAITING);
@@ -85,19 +87,27 @@ class ResourceManager extends EventEmitter<ResourceManagerEvents, ResourceManage
                                 resolve(undefined);
                             }
                         }).catch(err => {
-                            resolve(undefined);
+                            resolve(NOT_RESOURCE);
                         });
                     } catch (e) {
-                        resolve(undefined);
+                        resolve(NOT_RESOURCE);
                     }
                 }));
 
-                if (resource !== undefined && IMAGE_PATTERN.test(resource)) {
-                    this._map.set(url, resource);
-                    this._statusMap.set(url, ResourceStatus.LOADED);
-                    thread.complete();
-                    this.dispatch(ResourceManagerEvents.PROGRESS, url);
-                    return;
+                if (resource !== undefined) {
+                    if (resource.indexOf(IMAGE_PATTERN) === 0) {
+                        this._map.set(url, resource);
+                        this._statusMap.set(url, ResourceStatus.LOADED);
+                        thread.complete();
+                        this.dispatch(ResourceManagerEvents.PROGRESS, url);
+                        return;
+                    } else {
+                        this._map.set(url, url);
+                        this._statusMap.set(url, ResourceStatus.REJECTED);
+                        thread.complete();
+                        this.dispatch(ResourceManagerEvents.PROGRESS, url);
+                        return;
+                    }
                 }
 
                 this._statusMap.set(url, ResourceStatus.ERROR);

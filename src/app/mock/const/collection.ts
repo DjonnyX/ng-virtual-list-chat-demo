@@ -45,7 +45,7 @@ export const COLLECTION_PARAMS = {
 // https://media4.giphy.com/media/WoF3yfYupTt8mHc7va/200w.gif
 // 
 
-const testLinksText = () => {
+export const testLinksText = () => {
   return `Test links:
   <i>⚙️ Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</i> It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.
 
@@ -53,7 +53,7 @@ const testLinksText = () => {
 http://eugene-grebennikov.pro/`;
 };
 
-const testFormattedText = () => {
+export const testFormattedText = () => {
   return `Formated text: <h3>🚀 What is Lorem Ipsum?</h3><b>✨ Lorem Ipsum is simply dummy text of the printing and typesetting industry.</b> <br/><i>⚙️ Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</i> It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
 
 - Fixed size (fastest)
@@ -62,7 +62,7 @@ const testFormattedText = () => {
 `;
 };
 
-const testFormattedTable = () => {
+export const testFormattedTable = () => {
   return `What does Upside-Down Face emoji 🙃 mean?
   <div class="wrapper">
     <div class="container">
@@ -102,7 +102,7 @@ const generateMessageCollection = (number: number, size: number) => {
       version: 0,
       mailed: true,
       type,
-      dateTime: COLLECTION_PARAMS.maxDate - COLLECTION_PARAMS.index * 2000000, text: `${id}. ${[1].includes(id) ? testLinksText() : [2].includes(id) ? testFormattedText() : [3].includes(id) ? testFormattedTable() : generateText()}`,
+      dateTime: COLLECTION_PARAMS.maxDate - COLLECTION_PARAMS.index * 2000000, text: `${id}. ${id % 4 === 0 ? testLinksText() : id % 3 === 0 ? testFormattedText() : id % 5 === 0 ? testFormattedTable() : generateText()}`,
       image: hasImage ? 'https://ng-virtual-list-chat-demo.eugene-grebennikov.pro/media/logo.png' : undefined,
       incomType,
     });

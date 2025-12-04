@@ -399,7 +399,7 @@ export class MessagesComponent implements OnDestroy {
         const configMap = {};
         fillConfigMap(configMap, this._proxyCollection.collection);
         this.collectionConfigMap.set(configMap);
-        this._list()?.scrollToEnd();
+        this.onScrollToEndClickHandler();
       }),
     ).subscribe();
 
@@ -727,7 +727,9 @@ export class MessagesComponent implements OnDestroy {
   onScrollToEndClickHandler() {
     const list = this._list();
     if (list) {
-      list.scrollToEnd();
+      list.scrollToEnd(() => {
+        list.scrollToEndRegular();
+      });
     }
   }
 
