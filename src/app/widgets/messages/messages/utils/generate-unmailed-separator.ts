@@ -7,9 +7,7 @@ export const UNMAILED_SEPARATOR_INDEX = Number.MAX_SAFE_INTEGER - 2;
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
- * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
- * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
- * All rights reserved.
+ * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
  */
 export const generateUnmailedSeparator = (item: IVirtualListItem<IMessage>): IVirtualListItem<any> => {
     const id = UNMAILED_SEPARATOR_INDEX, type = MessageTypes.UNREAD_SEPARATOR;

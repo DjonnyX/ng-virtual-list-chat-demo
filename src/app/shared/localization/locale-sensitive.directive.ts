@@ -5,9 +5,7 @@ import { tap } from 'rxjs';
 import { TextDirections } from './localizations/enums';
 
 /**
- * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
- * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
- * All rights reserved.
+ * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
  */
 @Directive({
   selector: '[localeSensitive]'
