@@ -33,40 +33,4 @@
     &::part(item-focused) {
         outline: none;
     }
-
-    &__item-container {
-        height: 100%;
-        width: 100%;
-        box-sizing: border-box;
-        -webkit-tap-highlight-color: transparent;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        user-select: none;
-
-        .name {
-            padding: 0;
-            margin: 0;
-        }
-
-        &:hover {
-            background-color: #c7deeb;
-        }
-
-        &.selected {
-            background-color: #d2eaf7;
-
-            &:hover {
-                background-color: #bbd2df;
-            }
-        }
-
-        .group {
-            display: grid;
-            grid-template-columns: auto 1fr;
-            gap: 6px;
-            align-items: center;
-            font-size: 14px;
-            word-break: break-all;
-        }
-    }
 }

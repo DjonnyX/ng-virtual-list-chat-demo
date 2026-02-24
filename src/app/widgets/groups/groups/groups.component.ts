@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, inject, input, output, signal, viewChild } from '@angular/core';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { Component, effect, ElementRef, inject, input, output, Signal, signal, viewChild } from '@angular/core';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, combineLatest, filter, of, switchMap, tap, throwError } from 'rxjs';
 import { GroupsLoadingIndicatorComponent } from '@entities/groups';
 import { Id, IVirtualListCollection, IVirtualListItem } from '@shared/components/x-virtual-list';
@@ -11,7 +11,8 @@ import { GroupsMockService } from '../groups-mock.service';
 import { GroupsWebsocketService } from '../groups-websocket.service';
 import { validateCollection } from './utils/validate-collection';
 import { ClickOutsideDirective, StaticClickDirective } from '@shared/directives';
-import { LocaleSensitiveDirective } from '@shared/localization';
+import { ITheme, ThemeService } from '@shared/theming';
+import { GroupComponent } from './group/group.component';
 
 const DEFAULT_MAX_DISTANCE = 40,
   MENU_BUTTON_NAME = 'menu-button';
@@ -26,8 +27,7 @@ const DEFAULT_MAX_DISTANCE = 40,
 @Component({
   selector: 'x-groups',
   imports: [
-    CommonModule, XVirtualListComponent, GroupsLoadingIndicatorComponent, ClickOutsideDirective, StaticClickDirective,
-    LocaleSensitiveDirective,
+    CommonModule, XVirtualListComponent, GroupsLoadingIndicatorComponent, ClickOutsideDirective, StaticClickDirective, GroupComponent,
   ],
   providers: [
     { provide: GroupsService, useClass: environment.useMock ? GroupsMockService : GroupsWebsocketService },
@@ -54,9 +54,19 @@ export class GroupsComponent {
 
   readonly maxStaticClickDistance = DEFAULT_MAX_DISTANCE;
 
+  focused = signal<boolean>(false);
+
   private _service = inject(GroupsService);
 
+  theme: Signal<ITheme | undefined>;
+
+  private _themeService = inject(ThemeService);
+
+  private _elementRef = inject(ElementRef);
+
   constructor() {
+    this.theme = toSignal(this._themeService.$theme);
+
     effect(() => {
       const collection = this.collection();
       if (collection.length) {
@@ -69,7 +79,20 @@ export class GroupsComponent {
           break;
         }
       }
-    })
+    });
+
+    effect(() => {
+      const theme = this.theme();
+      if (theme) {
+        const preset = this._themeService.getPreset(theme.chat.chats.group);
+        if (preset) {
+          const host = this._elementRef?.nativeElement;
+          if (host) {
+            host.style.backgroundColor = preset.background;
+          }
+        }
+      }
+    });
 
     const $loading = toObservable(this.isLoading), $virtualList = toObservable(this._list).pipe(
       takeUntilDestroyed(),

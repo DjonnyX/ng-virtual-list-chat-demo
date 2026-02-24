@@ -475,7 +475,29 @@ const manifest: ITheme = {
             },
         },
         chats: {
-
+            group: {
+                background: "#10192b",
+                normal: {
+                    fill: "#10192b",
+                    color: "#bfaad1",
+                    iconColor: "#2c1e49",
+                },
+                focused: {
+                    fill: "#4d1b91",
+                    color: "#bfaad1",
+                    iconColor: "#8f6cad",
+                },
+                selected: {
+                    fill: "#48178b",
+                    color: "#bfaad1",
+                    iconColor: "#bfaad1",
+                },
+                selectedFocused: {
+                    fill: "#4d1b91",
+                    color: "#bfaad1",
+                    iconColor: "#bfaad1",
+                }
+            }
         },
     },
     presets: {

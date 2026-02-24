@@ -1,3 +1,11 @@
+import { Color } from "@shared/types";
+
+interface IChatGroupState {
+    fill: Color;
+    color: Color;
+    iconColor: Color;
+}
+
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
@@ -6,5 +14,11 @@
  * All rights reserved.
  */
 export interface IChatsTheme {
-    
+    group: {
+        background: Color;
+        normal: IChatGroupState;
+        focused: IChatGroupState;
+        selected: IChatGroupState;
+        selectedFocused: IChatGroupState;
+    };
 }

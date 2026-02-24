@@ -58,8 +58,6 @@ export class ButtonComponent implements AfterViewInit, OnDestroy {
 
   disabled = input<boolean>(false);
 
-  pressed = signal<boolean>(false);
-
   fillColors = input<GradientColor | undefined>(undefined);
 
   fillPositions = input<GradientColorPositions | undefined>(undefined);
@@ -75,6 +73,8 @@ export class ButtonComponent implements AfterViewInit, OnDestroy {
   onPress = output<boolean>();
 
   readonly bounds = signal<ISize>({ width: 0, height: 0 });
+
+  pressed = signal<boolean>(false);
 
   focused = signal<boolean>(false);
 

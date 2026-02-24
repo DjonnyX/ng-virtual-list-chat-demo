@@ -38,7 +38,8 @@ const DEFAULT_STROKE_ANIMATION_DURATION = 1000,
   NONE = 'none';
 
 const circlePath = (cx: number, cy: number, r: number) => {
-  return 'M ' + cx + ' ' + cy + ' m -' + r + ', 0 a ' + r + ',' + r + ' 0 1,1 ' + (r * 2) + ',0 a ' + r + ',' + r + ' 0 1,1 -' + (r * 2) + ',0';
+  // return 'M ' + cx + ' ' + cy + ' m -' + r + ', 0 a ' + r + ',' + r + ' 0 1,1 ' + (r * 2) + ',0 a ' + r + ',' + r + ' 0 1,1 -' + (r * 2) + ',0';
+  return `M ${cx} ${cy} m -${r}, 0 a ${r},${r} 0 1,1 ${(r * 2)},0 a ${r},${r} 0 1,1 -${(r * 2)},0`;
 };
 
 const roundedRectPath = (width: number, height: number, tl: number, tr: number, br: number, bl: number) => {
