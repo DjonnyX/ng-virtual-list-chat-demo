@@ -4,13 +4,13 @@
 
 The main task was to implement a virtual list with dynamically height elements using virtual scrolling.
 
+The project uses dependencies only from the Angular ecosystem without implementing third-party solutions.
+
 <img width="1033" height="171" alt="logo-center" src="https://github.com/user-attachments/assets/051bf2b3-0ead-4074-80f5-1ba6f994f419" />
 
 <b>Angular version 20.X.X</b>.
 
 [Live Demo](https://chat-demo.eugene-grebennikov.pro/)
-
-![preview](https://github.com/user-attachments/assets/94c77231-07a6-443d-8c67-a1c831cd0e35)
 
 <br/>
 
@@ -27,9 +27,43 @@ The main task was to implement a virtual list with dynamically height elements u
 
 <br/>
 
+## 🧩 Purpose and Problems Solved
+This project addresses performance issues when working with long lists of chat messages:
+
+- DOM overload: without virtualization, the browser attempts to display all messages at once, even those not visible to the user;
+- Scrolling slowdown: with thousands of messages, scrolling becomes laggy;
+- High memory consumption: storing all elements in memory reduces overall application performance.
+- Virtual scrolling solves these issues by displaying only the messages visible to the user and a small buffer around them.
+
+<br/>
+
+## ⚡Advantages of this approach
+- High performance: smooth scrolling even with 100,000+ elements;
+- Low memory consumption: only visible elements are stored in memory;
+- Flexibility: support for dynamic sizes, grouping, and animation;
+- Integration with Angular: native template syntax, reactive forms;
+- Ease of setup: minimal code changes required for implementation.
+
+<br/>
+
+## 🔍 Brief description of components
+
+- [src\app\shared\components\substrate](https://github.com/DjonnyX/ng-virtual-list-chat-demo/tree/main/src/app/shared/components/substrate) is a basic component for rendering shapes with highlight animation.<br/>
+- [src\app\shared\components\x-virtual-list](https://github.com/DjonnyX/ng-virtual-list-chat-demo/tree/main/src/app/shared/components/x-virtual-list) is a fork of the [ng-virtual-list](https://github.com/DjonnyX/ng-virtual-list) library.
+- Added [src\app\shared\components\x-virtual-list\lib\components\scroller](https://github.com/DjonnyX/ng-virtual-list-chat-demo/tree/main/src/app/shared/components/x-virtual-list/lib/components/scroller) and [src\app\shared\components\x-virtual-list\lib\components\x-scroll-bar](https://github.com/DjonnyX/ng-virtual-list-chat-demo/tree/main/src/app/shared/components/x-virtual-list/lib/components/x-scroll-bar) developed based on [src\app\shared\components\substrate](https://github.com/DjonnyX/ng-virtual-list-chat-demo/blob/main/src/app/shared/components/substrate/substrate.component.ts).
+- The [src\app\shared\components\x-virtual-list](https://github.com/DjonnyX/ng-virtual-list-chat-demo/tree/main/src/app/shared/components/x-virtual-list) core is adapted for virtual scrolling and rendering of SVG shapes.
+- An example of virtual scrolling implementation [src\app\shared\components\x-virtual-list\lib\components\scroller\x-scroller.component.ts](https://github.com/DjonnyX/ng-virtual-list-chat-demo/blob/main/src/app/shared/components/x-virtual-list/lib/components/scroller/x-scroller.component.ts)
+
+<br/>
+
 ## 🚀 Getting Started:
 
 📄 Clone the repository.
+
+```bash
+git clone https://github.com/DjonnyX/ng-virtual-list-chat-demo.git
+cd ng-virtual-list-chat-demo
+```
 
 📦 Install dependencies
 
@@ -52,13 +86,7 @@ npm ng start
 
 <br/>
 
-## Description
-
-[src\app\shared\components\substrate](https://github.com/DjonnyX/ng-virtual-list-chat-demo/tree/main/src/app/shared/components/substrate) is a basic component for rendering shapes with highlight animation.<br/>
-[src\app\shared\components\x-virtual-list](https://github.com/DjonnyX/ng-virtual-list-chat-demo/tree/main/src/app/shared/components/x-virtual-list) is a fork of the [ng-virtual-list](https://github.com/DjonnyX/ng-virtual-list) library.<br/> Added [src\app\shared\components\x-virtual-list\lib\components\scroller](https://github.com/DjonnyX/ng-virtual-list-chat-demo/tree/main/src/app/shared/components/x-virtual-list/lib/components/scroller) and [src\app\shared\components\x-virtual-list\lib\components\x-scroll-bar](https://github.com/DjonnyX/ng-virtual-list-chat-demo/tree/main/src/app/shared/components/x-virtual-list/lib/components/x-scroll-bar) developed based on [src\app\shared\components\substrate](https://github.com/DjonnyX/ng-virtual-list-chat-demo/blob/main/src/app/shared/components/substrate/substrate.component.ts).<br/>
-The [src\app\shared\components\x-virtual-list](https://github.com/DjonnyX/ng-virtual-list-chat-demo/tree/main/src/app/shared/components/x-virtual-list) core is adapted for virtual scrolling and rendering of SVG shapes.<br/>
-
-An example of virtual scrolling implementation [src\app\shared\components\x-virtual-list\lib\components\scroller\x-scroller.component.ts](https://github.com/DjonnyX/ng-virtual-list-chat-demo/blob/main/src/app/shared/components/x-virtual-list/lib/components/scroller/x-scroller.component.ts)
+![preview](https://github.com/user-attachments/assets/94c77231-07a6-443d-8c67-a1c831cd0e35)
 
 <br/>
 
