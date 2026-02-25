@@ -58,20 +58,20 @@ This project addresses performance issues when working with long lists of chat m
 
 ## 🚀 Getting Started:
 
-📄 Clone the repository.
+1. 📄 Clone the repository.
 
 ```bash
 git clone https://github.com/DjonnyX/ng-virtual-list-chat-demo.git
 cd ng-virtual-list-chat-demo
 ```
 
-📦 Install dependencies
+2. 📦 Install dependencies
 
 ```bash
 npm install
 ```
 
-🔀 Launch the development server
+3. 🔀 Launch the development server
 
 ```bash
 npm ng serve
@@ -82,7 +82,7 @@ or
 npm ng start
 ```
 
-📱Open http://localhost:4200/ in your browser
+4. 📱Open http://localhost:4200/ in your browser
 
 <br/>
 
