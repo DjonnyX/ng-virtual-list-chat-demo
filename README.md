@@ -2,9 +2,13 @@
 
 ✨ NgVirtualList Chat Demo (ng-virtual-list-chat-demo) is an Angular-based showcase application designed to demonstrate high-performance rendering of long message history using virtual scrolling techniques.
 
+<img width="1033" height="171" alt="logo-center" src="https://github.com/user-attachments/assets/369888ef-2918-4d99-aafb-777731fe8f80" />
+
 <b>Angular version 20.X.X</b>.
 
 [Live Demo](https://chat-demo.eugene-grebennikov.pro/)
+
+![preview](https://github.com/user-attachments/assets/94c77231-07a6-443d-8c67-a1c831cd0e35)
 
 <br/>
 
