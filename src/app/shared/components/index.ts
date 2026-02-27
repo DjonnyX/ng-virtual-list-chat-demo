@@ -1,9 +1,9 @@
 import { DockMode, DrawerComponent, TDockMode } from './drawer/drawer.component';
-import { XVirtualListComponent } from './x-virtual-list';
+import { NgVirtualListComponent } from './ng-virtual-list';
 
 export {
     DockMode, DrawerComponent,
-    XVirtualListComponent,
+    NgVirtualListComponent,
 };
 
 export type {

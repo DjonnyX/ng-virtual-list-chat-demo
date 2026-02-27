@@ -7,9 +7,9 @@
         <x-groups-loading-indicator />
     }
 
-    <x-virtual-list #list class="list" [items]="items" [itemRenderer]="itemRenderer" [itemSize]="38" methodForSelecting="select"
+    <ng-virtual-list #list class="list" [items]="items" [itemRenderer]="itemRenderer" [itemSize]="38" methodForSelecting="select"
         [selectByClick]="false" [dynamicSize]="true" [bufferSize]="1" [maxBufferSize]="1" [selectedIds]="initialSelectedId"
-        [scrollStartOffset]="scrollStartOffset()" scrollbarPreset="x-scrollbar-primary"></x-virtual-list>
+        [scrollStartOffset]="scrollStartOffset()" [scrollbarTheme]="scrollbarTheme()"></ng-virtual-list>
 
     <ng-template #itemRenderer let-data="data" let-config="config">
         <x-group [data]="data" [config]="config" (staticClick)="onGroupClickHandler(data)"></x-group>

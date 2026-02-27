@@ -2,7 +2,7 @@ import { Directive, effect, ElementRef, inject, input, Signal } from '@angular/c
 import { IMediaParams } from './interfaces';
 import { MediaService } from './media.service';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ISize } from '@shared/components/x-virtual-list';
+import { ISize } from '@shared/components/ng-virtual-list';
 import { MediaScreenSize } from './types';
 import { getMediaSize } from './utils';
 

@@ -18,14 +18,14 @@
         </div>
     }
 
-    <x-virtual-list #list class="list" [ngClass]="listClass" [items]="items" [itemRenderer]="itemRenderer"
+    <ng-virtual-list #list class="list" [ngClass]="listClass" [items]="items" [itemRenderer]="itemRenderer"
         [snapScrollToBottom]="true" [itemSize]="38" [bufferSize]="2" [maxBufferSize]="2" collectionMode="lazy"
         [itemConfigMap]="itemsConfigMap" [dynamicSize]="true" [snap]="true" snappingMethod="chat" [defaultItemValue]="defaultItemValue()"
         [scrollStartOffset]="scrollStartOffset()" [scrollEndOffset]="scrollEndOffset()" [snapToEndTransitionInstantOffset]="0"
-        methodForSelecting="multi-select" [selectedIds]="selectedItemIds"
-        [selectByClick]="false" (onSelect)="onSelectItemHandler($event)" scrollbarPreset="x-scrollbar-secondary"
-        (onScrollReachStart)="onScrollReachStartHandler()" [isLazyLoading]="isLazyLoading()" (onScroll)="onScrollHandler($event)">
-    </x-virtual-list>
+        methodForSelecting="multi-select" [selectedIds]="selectedItemIds" [scrollbarTheme]="scrollbarTheme()"
+        [selectByClick]="false" (onSelect)="onSelectItemHandler($event)" (onScrollReachStart)="onScrollReachStartHandler()"
+        [loading]="isLazyLoading()" (onScroll)="onScrollHandler($event)">
+    </ng-virtual-list>
 
     <ng-template #itemRenderer let-index="index" let-data="data" let-prevData="prevData" let-nextData="nextData"
         let-measures="measures" let-config="config" let-reseted="reseted">

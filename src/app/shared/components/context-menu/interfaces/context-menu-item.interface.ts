@@ -1,4 +1,4 @@
-import { Id } from "@shared/components/x-virtual-list";
+import { Id } from "@shared/components/ng-virtual-list";
 
 /**
  * @author Evgenii Alexandrovich Grebennikov

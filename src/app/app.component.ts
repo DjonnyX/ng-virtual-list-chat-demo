@@ -1,7 +1,7 @@
 import { Component, ElementRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterModule } from '@angular/router';
-import { ISize } from '@shared/components/x-virtual-list';
+import { ISize } from '@shared/components/ng-virtual-list';
 import { MediaService } from '@shared/directives/media';
 import { ThemeNames, ThemeService } from '@shared/theming';
 import { fromEvent, take, tap } from 'rxjs';

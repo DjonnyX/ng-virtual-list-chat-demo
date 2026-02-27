@@ -1,9 +1,0 @@
-@let grab = grabbing();
-<div #track class="track" [ngStyle]="styles()" [ngClass]="{grabbing: grab}">
-    <div #thumb class="thumb">
-        <x-substrate mode="rounded-rectangle" class="shape" [type]="type()" [width]="thumbWidth()"
-            [height]="thumbHeight()" [roundCorner]="roundCorner()" [strokeWidth]="8"
-            [fillPositions]="thumbGradientPositions()" [fillColors]="thumbGradientFill()"
-            [strokeColors]="strokeGradientColor()" [strokeAnimationDuration]="strokeAnimationDuration()"></x-substrate>
-    </div>
-</div>

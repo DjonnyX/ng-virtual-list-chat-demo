@@ -1,4 +1,4 @@
-import { IVirtualListItem, IVirtualListItemConfig } from "@shared/components/x-virtual-list";
+import { IVirtualListItem, IVirtualListItemConfig } from "@shared/components/ng-virtual-list";
 import { MessageTypes } from "@shared/enums";
 
 export const TYPING_INDICATOR_INDEX = Number.MAX_SAFE_INTEGER - 1;

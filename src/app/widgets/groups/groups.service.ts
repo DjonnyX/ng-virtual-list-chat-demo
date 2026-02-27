@@ -1,5 +1,5 @@
 import { Observable } from "rxjs";
-import { Id, IVirtualListCollection } from "@shared/components/x-virtual-list";
+import { Id, IVirtualListCollection } from "@shared/components/ng-virtual-list";
 
 /**
  * @author Evgenii Alexandrovich Grebennikov

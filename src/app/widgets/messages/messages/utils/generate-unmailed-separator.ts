@@ -1,4 +1,4 @@
-import { IVirtualListItem } from "@shared/components/x-virtual-list";
+import { IVirtualListItem } from "@shared/components/ng-virtual-list";
 import { IMessage } from "@widgets/messages/model/message";
 import { MessageTypes } from "@shared/enums";
 

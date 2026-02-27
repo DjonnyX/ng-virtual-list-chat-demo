@@ -1,5 +1,5 @@
 import { Observable } from "rxjs";
-import { Id, IVirtualListCollection, IVirtualListItem } from "@shared/components/x-virtual-list";
+import { Id, IVirtualListCollection, IVirtualListItem } from "@shared/components/ng-virtual-list";
 import { IMessageItemData } from "@shared/models/message";
 import { IGetMessagesData } from "./model/messages";
 import { IMessage } from "./model/message";

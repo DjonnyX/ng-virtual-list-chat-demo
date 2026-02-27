@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { delay, Observable, of, throwError } from 'rxjs';
-import { Id, IVirtualListCollection } from '@shared/components/x-virtual-list';
+import { Id, IVirtualListCollection } from '@shared/components/ng-virtual-list';
 import { generateChatCollection } from '@mock/const';
 import { GroupsService } from './groups.service';
 

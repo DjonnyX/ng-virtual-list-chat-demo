@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { CdkTextareaAutosize } from '@angular/cdk/text-field';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { filter, fromEvent, map, switchMap, tap } from 'rxjs';
-import { ISize } from '@shared/components/x-virtual-list';
+import { ISize } from '@shared/components/ng-virtual-list';
 import { LocaleSensitiveDirective } from '@shared/localization';
 import { Color, GradientColor, GradientColorPositions, RoundedCorner } from '@shared/types';
 import { MessageSendButtonComponent } from '../message-send-button/message-send-button.component';

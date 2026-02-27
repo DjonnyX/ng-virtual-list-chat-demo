@@ -1,5 +1,0 @@
-@let renderer = itemRenderer();
-<div [part]="part()" [attr.xvl-index]="index()" tabindex="0" class="xvl-item__container" [ngClass]="classes()"
-    (click)="onClickHandler()">
-    <ng-container [ngTemplateOutlet]="renderer" [ngTemplateOutletContext]="templateContext()" />
-</div>

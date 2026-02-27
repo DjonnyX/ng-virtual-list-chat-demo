@@ -1,4 +1,4 @@
-import { IVirtualListCollection } from "@shared/components/x-virtual-list";
+import { IVirtualListCollection } from "@shared/components/ng-virtual-list";
 import { IAnswer } from "./answer";
 import { IMessage } from "./message";
 

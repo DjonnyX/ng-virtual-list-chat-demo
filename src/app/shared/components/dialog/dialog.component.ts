@@ -12,7 +12,7 @@ import { ButtonGroupComponent } from '../button-group';
 import { IButtonGroupItem } from '../button-group/interfaces';
 import { formatCSSNumber } from '../utils';
 import { SubstarateMode, SubstarateModes, SubstarateStyle, SubstarateStyles, SubstrateComponent } from '../substrate';
-import { ISize } from '../x-virtual-list';
+import { ISize } from '../ng-virtual-list';
 import { LocaleSensitiveDirective } from '@shared/localization';
 
 const DEFAULT_ROUND_CORNER: RoundedCorner = [8, 8, 8, 8],

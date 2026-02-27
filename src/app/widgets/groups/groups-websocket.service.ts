@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { GroupsService } from './groups.service';
-import { Id, IVirtualListCollection } from '@shared/components/x-virtual-list';
+import { Id, IVirtualListCollection } from '@shared/components/ng-virtual-list';
 import { Observable } from 'rxjs';
 
 /**

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, distinctUntilChanged, Subject } from 'rxjs';
-import { XVirtualListComponent } from '@shared/components';
+import { NgVirtualListComponent } from '@shared/components';
 import { IMessageItemData } from '@shared/models/message';
 
 /**
@@ -12,8 +12,8 @@ import { IMessageItemData } from '@shared/models/message';
   providedIn: 'root'
 })
 export class MessageService {
-  private _virtualList: XVirtualListComponent | undefined;
-  set virtualList(v: XVirtualListComponent | undefined) {
+  private _virtualList: NgVirtualListComponent | undefined;
+  set virtualList(v: NgVirtualListComponent | undefined) {
     if (this._virtualList !== v) {
       this._virtualList = v;
     }

@@ -1,4 +1,4 @@
-import { ISize } from "@shared/components/x-virtual-list";
+import { ISize } from "@shared/components/ng-virtual-list";
 import { IMediaParams } from "../interfaces";
 import { MediaScreenSize } from "../types";
 

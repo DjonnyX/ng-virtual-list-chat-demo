@@ -871,11 +871,17 @@ const manifest: ITheme = {
             fill: ["rgba(203, 184, 240, 1)", "rgba(171, 219, 238, 1)"],
             strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
             strokeAnimationDuration: 1000,
+            thickness: 6,
+            roundCorner: [3,3,3,3],
+            rippleColor: 'rgb(119, 50, 255)',
         },
         [ScrollbarPresets.SECONDARY]: {
             fill: ["rgba(203, 184, 240, 1)", "rgba(171, 219, 238, 1)"],
             strokeGradientColor: X_BLUE_PLASMA_GRADIENT,
             strokeAnimationDuration: 1000,
+            thickness: 6,
+            roundCorner: [3,3,3,3],
+            rippleColor: 'rgb(98, 18, 255)',
         },
     }
 };

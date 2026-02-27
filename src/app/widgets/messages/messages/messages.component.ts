@@ -1,4 +1,4 @@
-import { Component, DestroyRef, effect, ElementRef, inject, input, OnDestroy, Signal, signal, viewChild } from '@angular/core';
+import { Component, computed, DestroyRef, effect, ElementRef, inject, input, OnDestroy, Signal, signal, viewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import {
@@ -7,11 +7,12 @@ import {
 import { MessagesLoadingIndicatorComponent } from '@entities/messages';
 import { MessageGroupComponent, MessagesTypingIndicatorComponent } from '@entities/message';
 import { IDeleteEventData, MessageBoxComponent } from '@features/message';
-import { XVirtualListComponent } from '@shared/components';
+import { NgVirtualListComponent } from '@shared/components';
 import {
   FocusAlignments, Id, IDisplayObjectConfig, IScrollEvent, ISize, IVirtualListCollection, IVirtualListItem, IVirtualListItemConfigMap,
-} from '@shared/components/x-virtual-list';
-import { IRenderVirtualListItemConfig } from '@shared/components/x-virtual-list/lib/models/render-item-config.model';
+  ScrollBarTheme,
+} from '@shared/components/ng-virtual-list';
+import { IRenderVirtualListItemConfig } from '@shared/components/ng-virtual-list/models/render-item-config.model';
 import { IMessageItemData } from "@shared/models/message";
 import { MessageTypes } from '@shared/enums';
 import { ThemeService } from '@shared/theming';
@@ -31,6 +32,7 @@ import { MessageScrollToEndButtonComponent } from '@entities/message/message-scr
 import { MessageUnmailedSeparatorComponent } from '@entities/message/message-unmailed-separator/message-unmailed-separator.component';
 
 const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
+  SCROLLBAR_PRESET = 'x-scrollbar-secondary',
   MIN_ITEM_HEIGHT = 28,
   CHUNK_SIZE = 200,
   SCROLL_TO_FADE_PIXELS = 200;
@@ -43,7 +45,7 @@ const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
 @Component({
   selector: 'x-messages',
   imports: [
-    CommonModule, MessageBoxComponent, MessageGroupComponent, XVirtualListComponent, MessagesTypingIndicatorComponent,
+    CommonModule, MessageBoxComponent, MessageGroupComponent, NgVirtualListComponent, MessagesTypingIndicatorComponent,
     MessageUnmailedSeparatorComponent, MessagesLoadingIndicatorComponent, MessageScrollToEndButtonComponent,
     StaticClickDirective, LocaleSensitiveDirective,
   ],
@@ -53,7 +55,7 @@ const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
 export class MessagesComponent implements OnDestroy {
   protected _wrapper = viewChild<ElementRef<HTMLDivElement>>('wrapper');
 
-  protected _list = viewChild('list', { read: XVirtualListComponent });
+  protected _list = viewChild('list', { read: NgVirtualListComponent });
 
   search = input<string>();
 
@@ -87,6 +89,8 @@ export class MessagesComponent implements OnDestroy {
     type: MessageTypes.MESSAGE,
     id: '-1',
   });
+
+  scrollbarTheme: Signal<ScrollBarTheme>;
 
   private _$delete = new Subject<[IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, IRenderVirtualListItemConfig, ISize, boolean]>();
   protected $delete = this._$delete.asObservable();
@@ -139,6 +143,17 @@ export class MessagesComponent implements OnDestroy {
 
   constructor() {
     this.theme = toSignal(this._themeService.$theme);
+
+    this.scrollbarTheme = computed(() => {
+      const theme = this.theme();
+      if (theme) {
+        const preset = this._themeService.getPreset(SCROLLBAR_PRESET);
+        if (preset) {
+          return preset;
+        }
+      }
+      return undefined;
+    });
 
     let locale: string | undefined,
       localization: ILocalization | undefined;

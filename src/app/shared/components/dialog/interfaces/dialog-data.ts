@@ -1,6 +1,6 @@
 import { DialogPresets } from "@shared/theming/themes/presets";
 import { IDialogAction } from "./dialog-action";
-import { Component$1 } from "@shared/components/x-virtual-list/lib/models/component.model";
+import { Component$1 } from "@shared/components/ng-virtual-list//models/component.model";
 
 /**
  * @author Evgenii Alexandrovich Grebennikov

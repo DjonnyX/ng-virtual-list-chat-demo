@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, effect, ElementRef, inject, input, output, Signal, signal } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { fromEvent, tap } from 'rxjs';
-import { IDisplayObjectConfig, IVirtualListItem } from '@shared/components/x-virtual-list';
+import { IDisplayObjectConfig, IVirtualListItem } from '@shared/components/ng-virtual-list';
 import { StaticClickDirective } from '@shared/directives';
 import { LocaleSensitiveDirective } from '@shared/localization';
 import { ITheme, ThemeService } from '@shared/theming';

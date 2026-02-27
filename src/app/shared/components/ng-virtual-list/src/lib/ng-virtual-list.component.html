@@ -1,0 +1,16 @@
+<div aria-live="polite" aria-atomic="true" class="ngvl__screen-reader">
+  {{ screenReaderFormattedMessage() }}
+</div>
+
+@if (snap()) {
+  <div #snappedContainer class="ngvl__snapped-container">
+    <div #snapped part="snapped-item" class="ngvl__list-snapper">
+      <ng-container #snapRendererContainer></ng-container>
+    </div>
+  </div>
+}
+<ng-scroller class="ngvl__list-scroller" #scroller [classes]="classes()" [startOffset]="scrollStartOffset()" [direction]="direction()"
+  [endOffset]="scrollEndOffset()" [scrollbarTheme]="scrollbarTheme()" [focusedElement]="focusedElement()" [loading]="loading()"
+  [scrollbarMinSize]="scrollbarMinSize()">
+  <ng-container #renderersContainer></ng-container>
+</ng-scroller>

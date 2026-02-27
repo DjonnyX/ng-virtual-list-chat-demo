@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, ElementRef, inject, input, output, Signal, signal, viewChild } from '@angular/core';
+import { Component, computed, effect, ElementRef, inject, input, output, Signal, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, combineLatest, filter, of, switchMap, tap, throwError } from 'rxjs';
 import { GroupsLoadingIndicatorComponent } from '@entities/groups';
-import { Id, IVirtualListCollection, IVirtualListItem } from '@shared/components/x-virtual-list';
-import { XVirtualListComponent } from '@shared/components';
+import { Id, IVirtualListCollection, IVirtualListItem, ScrollBarTheme } from '@shared/components/ng-virtual-list';
+import { NgVirtualListComponent } from '@shared/components';
 import { environment } from '@environments/environment';
 import { GroupsService } from '../groups.service';
 import { GroupsMockService } from '../groups-mock.service';
@@ -15,7 +15,8 @@ import { ITheme, ThemeService } from '@shared/theming';
 import { GroupComponent } from './group/group.component';
 
 const DEFAULT_MAX_DISTANCE = 40,
-  MENU_BUTTON_NAME = 'menu-button';
+  MENU_BUTTON_NAME = 'menu-button',
+  SCROLLBAR_PRESET = 'x-scrollbar-secondary';
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -25,7 +26,7 @@ const DEFAULT_MAX_DISTANCE = 40,
 @Component({
   selector: 'x-groups',
   imports: [
-    CommonModule, XVirtualListComponent, GroupsLoadingIndicatorComponent, ClickOutsideDirective, StaticClickDirective, GroupComponent,
+    CommonModule, NgVirtualListComponent, GroupsLoadingIndicatorComponent, ClickOutsideDirective, StaticClickDirective, GroupComponent,
   ],
   providers: [
     { provide: GroupsService, useClass: environment.useMock ? GroupsMockService : GroupsWebsocketService },
@@ -34,7 +35,7 @@ const DEFAULT_MAX_DISTANCE = 40,
   styleUrl: './groups.component.scss'
 })
 export class GroupsComponent {
-  protected _list = viewChild('list', { read: XVirtualListComponent });
+  protected _list = viewChild('list', { read: NgVirtualListComponent });
 
   projectId = input<string>('');
 
@@ -54,6 +55,8 @@ export class GroupsComponent {
 
   focused = signal<boolean>(false);
 
+  scrollbarTheme: Signal<ScrollBarTheme>;
+
   private _service = inject(GroupsService);
 
   theme: Signal<ITheme | undefined>;
@@ -64,6 +67,17 @@ export class GroupsComponent {
 
   constructor() {
     this.theme = toSignal(this._themeService.$theme);
+
+    this.scrollbarTheme = computed(() => {
+      const theme = this.theme();
+      if (theme) {
+        const preset = this._themeService.getPreset(SCROLLBAR_PRESET);
+        if (preset) {
+          return preset;
+        }
+      }
+      return undefined;
+    });
 
     effect(() => {
       const collection = this.collection();

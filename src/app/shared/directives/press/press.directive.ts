@@ -5,7 +5,7 @@ import {
     output,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { MOUSE_DOWN, MOUSE_LEAVE, MOUSE_UP, TOUCH_END, TOUCH_LEAVE, TOUCH_START } from '@shared/components/x-virtual-list/lib/const';
+import { MOUSE_DOWN, MOUSE_LEAVE, MOUSE_UP, TOUCH_END, TOUCH_LEAVE, TOUCH_START } from '@shared/components/ng-virtual-list//const';
 import { fromEvent, tap } from 'rxjs';
 
 /**
