@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Id, IVirtualListCollection, IVirtualListItem } from '@shared/components/ng-virtual-list';
+import { Id, IVirtualListCollection, IVirtualListItem } from 'ng-virtual-list';
 import { IMessageItemData } from '@shared/models/message';
 import { IMessagesChunkParams, MessagesService } from './messages.service';
 import { IGetMessagesData } from './model/messages';

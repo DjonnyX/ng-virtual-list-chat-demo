@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { ISize } from '@shared/components/ng-virtual-list';
+import { ISize } from 'ng-virtual-list';
 import { BehaviorSubject, combineLatest, Subject, tap } from 'rxjs';
 import { MEDIA_CONFIG } from './const';
 import { MediaScreenSize } from './types';

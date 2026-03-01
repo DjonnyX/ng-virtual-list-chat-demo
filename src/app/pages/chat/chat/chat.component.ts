@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { BehaviorSubject, catchError, filter, map, of, Subject, switchMap, tap, } from 'rxjs';
 import { MenuButtonComponent, MessageSearchComponent } from '@entities/header';
-import { IRenderVirtualListItem, ISize, IVirtualListItem } from '@shared/components/ng-virtual-list';
+import { IRenderVirtualListItem, ISize, IVirtualListItem } from 'ng-virtual-list';
 import { DrawerComponent, DockMode } from "@shared/components";
 import { ClickOutsideService } from '@shared/directives';
 import { MessagesComponent } from "@widgets/messages/messages/messages.component";

@@ -1,4 +1,4 @@
-import { IDisplayObjectConfig, ISize, IVirtualListItem } from "@shared/components/ng-virtual-list";
+import { IDisplayObjectConfig, ISize, IVirtualListItem } from "ng-virtual-list";
 import { IMessageItemData } from "@shared/models/message";
 import { IProxyCollectionItem } from "@widgets/messages/messages/utils/proxy-collection";
 

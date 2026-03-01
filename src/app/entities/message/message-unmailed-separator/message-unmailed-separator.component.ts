@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, effect, ElementRef, inject, input, OnDestroy, signal, Signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { SubstrateComponent } from '@shared/components/substrate';
-import { IDisplayObjectMeasures, ISize } from '@shared/components/ng-virtual-list';
+import { IDisplayObjectMeasures, ISize } from 'ng-virtual-list';
 import { PressDirective } from '@shared/directives';
 import { ILocalization, LocaleSensitiveDirective, LocalizationService } from '@shared/localization';
 import { ThemeService } from '@shared/theming';

@@ -1,4 +1,4 @@
-import { IVirtualListCollection } from "@shared/components/ng-virtual-list";
+import { IVirtualListCollection } from "ng-virtual-list";
 
 /**
  * @author Evgenii Alexandrovich Grebennikov

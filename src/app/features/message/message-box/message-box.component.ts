@@ -5,7 +5,7 @@ import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-i
 import { filter, map, Observable, Subject, switchMap, take, tap, timer } from 'rxjs';
 import { MessageButtonSaveState, MessageButtonSaveStates, MessageMenuButtonComponent, MessageSaveButtonComponent } from '@entities/message';
 import { CalcFillPositionsDirective, LongPressDirective } from '@shared/directives';
-import { Id, IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/ng-virtual-list';
+import { Id, IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from 'ng-virtual-list';
 import { IMessageItemData } from "@shared/models/message";
 import { ContextMenuComponent, IContextMenuCollection } from '@shared/components/context-menu';
 import { GradientColorPositions } from '@shared/types';

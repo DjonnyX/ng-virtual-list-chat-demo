@@ -7,12 +7,11 @@ import {
 import { MessagesLoadingIndicatorComponent } from '@entities/messages';
 import { MessageGroupComponent, MessagesTypingIndicatorComponent } from '@entities/message';
 import { IDeleteEventData, MessageBoxComponent } from '@features/message';
-import { NgVirtualListComponent } from '@shared/components';
+import { NgVirtualListComponent } from 'ng-virtual-list';
 import {
   FocusAlignments, Id, IDisplayObjectConfig, IScrollEvent, ISize, IVirtualListCollection, IVirtualListItem, IVirtualListItemConfigMap,
   ScrollBarTheme,
-} from '@shared/components/ng-virtual-list';
-import { IRenderVirtualListItemConfig } from '@shared/components/ng-virtual-list/models/render-item-config.model';
+} from 'ng-virtual-list';
 import { IMessageItemData } from "@shared/models/message";
 import { MessageTypes } from '@shared/enums';
 import { ThemeService } from '@shared/theming';
@@ -92,7 +91,7 @@ export class MessagesComponent implements OnDestroy {
 
   scrollbarTheme: Signal<ScrollBarTheme>;
 
-  private _$delete = new Subject<[IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, IRenderVirtualListItemConfig, ISize, boolean]>();
+  private _$delete = new Subject<[IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, any, ISize, boolean]>(); // IRenderVirtualListItemConfig
   protected $delete = this._$delete.asObservable();
 
   private _$edit = new Subject<{

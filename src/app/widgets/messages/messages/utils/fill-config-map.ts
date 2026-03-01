@@ -1,5 +1,5 @@
 import { IMessageItemData } from "@shared/models/message";
-import { IVirtualListItemConfigMap } from "@shared/components/ng-virtual-list";
+import { IVirtualListItemConfigMap } from "ng-virtual-list";
 import { IProxyCollectionItem } from "./proxy-collection";
 import { MessageTypes } from "@shared/enums";
 

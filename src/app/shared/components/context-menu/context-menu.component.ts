@@ -7,7 +7,7 @@ import { ITheme } from '@shared/theming';
 import { ButtonPresets, ContextMenuPresets } from '@shared/theming/themes/presets';
 import { GradientColor, GradientColorPositions, RoundedCorner } from '@shared/types';
 import { IContextMenuCollection } from './interfaces/context-menu-collection.interface';
-import { Id, ISize } from '../ng-virtual-list';
+import { Id, ISize } from 'ng-virtual-list';
 import { ButtonComponent } from '../button';
 import { SubstarateMode, SubstarateModes, SubstarateStyle, SubstarateStyles, SubstrateComponent } from '../substrate';
 import { formatCSSNumber } from '../utils';

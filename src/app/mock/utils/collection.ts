@@ -1,4 +1,4 @@
-import { IVirtualListItem } from "@shared/components/ng-virtual-list";
+import { IVirtualListItem } from "ng-virtual-list";
 import { MessageTypes } from "@shared/enums";
 import { COLLECTION_PARAMS, testFormattedTable, testFormattedText, testLinksText } from "@mock/const/collection";
 import { IMessage } from "@widgets/messages";

@@ -6,7 +6,7 @@ import {
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, tap } from 'rxjs';
 import { EditableTextComponent } from '@entities/message';
-import { ISize } from '@shared/components/ng-virtual-list';
+import { ISize } from 'ng-virtual-list';
 import { IMessageItemData } from "@shared/models/message";
 import { Color, GradientColor, GradientColorPositions, RoundedCorner } from '@shared/types';
 import { ThemeService } from '@shared/theming';

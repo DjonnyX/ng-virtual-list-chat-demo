@@ -3,8 +3,8 @@ import { Component, computed, effect, ElementRef, inject, input, output, Signal,
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { catchError, combineLatest, filter, of, switchMap, tap, throwError } from 'rxjs';
 import { GroupsLoadingIndicatorComponent } from '@entities/groups';
-import { Id, IVirtualListCollection, IVirtualListItem, ScrollBarTheme } from '@shared/components/ng-virtual-list';
-import { NgVirtualListComponent } from '@shared/components';
+import { Id, IVirtualListCollection, IVirtualListItem, ScrollBarTheme } from 'ng-virtual-list';
+import { NgVirtualListComponent } from 'ng-virtual-list';
 import { environment } from '@environments/environment';
 import { GroupsService } from '../groups.service';
 import { GroupsMockService } from '../groups-mock.service';

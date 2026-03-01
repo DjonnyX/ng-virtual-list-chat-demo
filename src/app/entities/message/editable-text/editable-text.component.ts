@@ -8,7 +8,7 @@ import { formatText } from '@shared/utils';
 import { ThemeService } from '@shared/theming';
 import { ITheme } from '@shared/theming';
 import { LocaleSensitiveDirective } from '@shared/localization';
-import { ISize } from '@shared/components/ng-virtual-list';
+import { ISize } from 'ng-virtual-list';
 import { getTextUrls } from '@shared/utils/text/format-text.util';
 import { resourceManager } from '@shared/utils/resource-manager';
 import { ResourceManagerEvents } from '@shared/utils/resource-manager/resource-manager';

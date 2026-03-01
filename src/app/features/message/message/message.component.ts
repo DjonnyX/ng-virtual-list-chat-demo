@@ -9,7 +9,7 @@ import {
   MessageSubstrateComponent, MessageSubstarateMode, MessageSubstarateModes, EditableTextComponent,
   MessageSubstarateStyle, MessageSubstarateStyles,
 } from '@entities/message';
-import { Id, IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from '@shared/components/ng-virtual-list';
+import { Id, IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from 'ng-virtual-list';
 import { IMessageItemData } from "@shared/models/message";
 import { Color, GradientColor, GradientColorPositions } from '@shared/types';
 import { ThemeService } from '@shared/theming';
