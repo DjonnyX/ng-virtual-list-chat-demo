@@ -1,4 +1,4 @@
-import { ApplicationConfig, EnvironmentProviders, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, EnvironmentProviders, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter, withHashLocation } from '@angular/router';
 import { environment } from '@environments/environment';
 import { MEDIA_CONFIG } from '@shared/directives/media';
@@ -14,7 +14,7 @@ if (environment.useMock) {
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideZoneChangeDetection(),
+    provideZonelessChangeDetection(),
     routerProvider,
     {
       provide: MEDIA_CONFIG, useValue: mediaConfig,
