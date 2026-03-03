@@ -6,6 +6,10 @@
     font-size: 14px;
     height: auto;
 
+    .substrate-container {
+        opacity: 0;
+    }
+
     .message-quote-wrapper {
         position: relative;
         width: 100%;

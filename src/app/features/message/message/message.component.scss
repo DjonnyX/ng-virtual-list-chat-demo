@@ -5,12 +5,14 @@
     overflow: hidden;
     font-size: 14px;
     height: auto;
-    opacity: 1;
-    transition: opacity 100ms ease-out 100ms, height 100ms ease-out;
+    transition: height 100ms ease-out;
 
     &.reseted {
+        transition: height 100ms ease-out;
+    }
+
+    .substrate-container {
         opacity: 0;
-        transition: opacity 0ms ease-out, height 100ms ease-out;
     }
 
     .message-container {

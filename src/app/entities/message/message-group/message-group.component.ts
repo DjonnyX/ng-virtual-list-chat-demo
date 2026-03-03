@@ -29,6 +29,8 @@ const FOCUSED = 'focused',
   styleUrl: './message-group.component.scss',
 })
 export class MessageGroupComponent implements OnDestroy {
+  private _substrateContainer = viewChild<ElementRef<HTMLDivElement>>('substrateContainer');
+
   private _container = viewChild<ElementRef<HTMLSpanElement>>('container');
 
   private _indicator = viewChild<ElementRef<HTMLSpanElement>>('indicator');
@@ -69,9 +71,15 @@ export class MessageGroupComponent implements OnDestroy {
 
   private _onContainerResizeHandler = () => {
     const el = this._container()?.nativeElement as HTMLDivElement;
-    if (el && el.offsetWidth && el.offsetHeight) {
-      this.bounds.set({ width: el.offsetWidth || DEFAULT_SIZE, height: el.offsetHeight || DEFAULT_SIZE });
+    const width = el.offsetWidth || DEFAULT_SIZE, height = el.offsetHeight || DEFAULT_SIZE, bounds = this.bounds(),
+      substrate = this._substrateContainer()?.nativeElement;
+    if (!!substrate) {
+      substrate.style.opacity = (width < 100) ? '0' : '1';
     }
+    if (bounds.width === width && bounds.height === height) {
+      return;
+    }
+    this.bounds.set({ width, height });
   }
 
   constructor() {

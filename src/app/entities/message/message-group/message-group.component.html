@@ -10,9 +10,11 @@
 <div press class="group-container" [ngClass]="class" (pointerdown)="substrate.ripple($event)"
     (onPress)="onPressHandler($event)">
     <div class="wrapper">
-        <x-substrate #substrate class="substrate" [fillColors]="gradientFillColors" [rippleColor]="rippleColor"
-            [fillPositions]="gradientFillPositions" [width]="b.width" [height]="b.height" [roundCorner]="corner"
-            mode="rounded-rectangle" type="none" />
+        <div #substrateContainer class="substrate-container">
+            <x-substrate #substrate class="substrate" [fillColors]="gradientFillColors" [rippleColor]="rippleColor"
+                [fillPositions]="gradientFillPositions" [width]="b.width" [height]="b.height" [roundCorner]="corner"
+                mode="rounded-rectangle" type="none" />
+        </div>
         <span #container localeSensitive class="content">
             <span>
                 <p localeSensitive class="text">{{value}}</p>

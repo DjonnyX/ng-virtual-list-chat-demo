@@ -7,10 +7,9 @@ import {
 import { MessagesLoadingIndicatorComponent } from '@entities/messages';
 import { MessageGroupComponent, MessagesTypingIndicatorComponent } from '@entities/message';
 import { IDeleteEventData, MessageBoxComponent } from '@features/message';
-import { NgVirtualListComponent } from 'ng-virtual-list';
 import {
-  FocusAlignments, Id, IDisplayObjectConfig, IScrollEvent, ISize, IVirtualListCollection, IVirtualListItem, IVirtualListItemConfigMap,
-  ScrollBarTheme,
+  NgVirtualListComponent, FocusAlignments, Id, IDisplayObjectConfig, IScrollEvent, ISize, IVirtualListCollection, IVirtualListItem, IVirtualListItemConfigMap,
+  ScrollBarTheme, IRenderVirtualListItemConfig
 } from 'ng-virtual-list';
 import { IMessageItemData } from "@shared/models/message";
 import { MessageTypes } from '@shared/enums';
@@ -91,7 +90,7 @@ export class MessagesComponent implements OnDestroy {
 
   scrollbarTheme: Signal<ScrollBarTheme>;
 
-  private _$delete = new Subject<[IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, any, ISize, boolean]>(); // IRenderVirtualListItemConfig
+  private _$delete = new Subject<[IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, IRenderVirtualListItemConfig, ISize, boolean]>();
   protected $delete = this._$delete.asObservable();
 
   private _$edit = new Subject<{
@@ -309,7 +308,7 @@ export class MessagesComponent implements OnDestroy {
         return $scroll.pipe(
           takeUntilDestroyed(this._destroyRef),
           filter(() => !this.isLoading()),
-          debounceTime(2000),
+          debounceTime(500),
           takeUntilDestroyed(this._destroyRef),
           switchMap(e => {
             const messages: IVirtualListCollection<IVirtualListItem<IMessageItemData>> = [],

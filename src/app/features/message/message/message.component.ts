@@ -48,6 +48,8 @@ const DEFAULT_STROKE_ANIMATION_DURATION = 1000,
   encapsulation: ViewEncapsulation.Emulated,
 })
 export class MessageComponent implements OnDestroy {
+  private _substrateContainer = viewChild<ElementRef<HTMLDivElement>>('substrateContainer');
+
   private _container = viewChild<ElementRef<HTMLDivElement>>('container');
 
   data = input<IVirtualListItem<IProxyCollectionItem<IMessageItemData>> | null>(null);
@@ -114,7 +116,11 @@ export class MessageComponent implements OnDestroy {
   private _onContainerResizeHandler = () => {
     const el = this._container()?.nativeElement as HTMLDivElement;
     if (el) {
-      const width = el.offsetWidth, height = el.offsetHeight, bounds = this.bounds();
+      const width = el.offsetWidth, height = el.offsetHeight, bounds = this.bounds(),
+        substrate = this._substrateContainer()?.nativeElement;
+      if (!!substrate) {
+        substrate.style.opacity = (width < 100) ? '0' : '1';
+      }
       if (bounds.width === width && bounds.height === height) {
         return;
       }

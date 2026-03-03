@@ -11,9 +11,11 @@
 @let gradientFillPositions = fillPositions();
 @let tType = themeType();
 @if (d && c) {
-    <x-message-substrate #substrate class="message-substrate" [type]="type" [width]="b.width" [height]="b.height"
-        [mode]="substrMode" [strokeColors]="stroke" [strokeWidth]="strokeWidth()" [fillColors]="fillColors()"
-        [fillPositions]="gradientFillPositions" [rippleColor]="rippleColor()"></x-message-substrate>
+    <div #substrateContainer class="substrate-container">
+        <x-message-substrate #substrate class="message-substrate" [type]="type" [width]="b.width" [height]="b.height"
+            [mode]="substrMode" [strokeColors]="stroke" [strokeWidth]="strokeWidth()" [fillColors]="fillColors()"
+            [fillPositions]="gradientFillPositions" [rippleColor]="rippleColor()"></x-message-substrate>
+    </div>
     <div #container class="message-container" [ngClass]="class" (pointerdown)="substrate.ripple($event)">
         @if (messageType() === 'quote' && d.quote) {
             <div class="message-quote-container" staticClick [maxStaticClickDistance]="maxStaticClickDistance"
