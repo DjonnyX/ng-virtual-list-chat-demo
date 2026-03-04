@@ -1,7 +1,6 @@
 @let c = classes();
 <div #container class="search-container" [style.--placeholder-color]="placeholderColor()"
     [style.--placeholder-fontsize]="placeholderFontSize()" [ngClass]="c">
-    <div #indicator class="timeout-indicator" [ngClass]="c"></div>
     <input #input localeSensitive type="search" class="search" [ngClass]="c" [placeholder]="placeholderText()"
         [(ngModel)]="searchText" (input)="onSearchHandler()">
     <span #icon class="icon">

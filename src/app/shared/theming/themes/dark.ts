@@ -49,7 +49,6 @@ const manifest: ITheme = {
                 },
             },
             search: {
-                timeoutIndicatorColor: "rgba(255, 255, 255, 0.05)",
                 normal: {
                     background: "rgba(9, 5, 19, 0.15)",
                     borderColor: "rgba(206, 191, 220, 0)",

@@ -23,8 +23,6 @@ const INTERVAL_COUNT = 89, INTERVAL_TIMEOUT = 100, PERCENT = '%', ZERO_PERCENT =
 export class MessageSearchComponent {
   input = viewChild<ElementRef<HTMLInputElement>>('input');
 
-  indicator = viewChild<ElementRef<HTMLDivElement>>('indicator');
-
   icon = viewChild<ElementRef<HTMLDivElement>>('icon');
 
   search = output<string>();
@@ -85,16 +83,6 @@ export class MessageSearchComponent {
     });
 
     effect(() => {
-      const theme = this.theme(), indicatorElement = this.indicator()?.nativeElement;
-      if (indicatorElement && theme) {
-        const preset = this._themeService.getPreset(theme.chat.header.search);
-        if (preset) {
-          indicatorElement.style.background = preset.timeoutIndicatorColor;
-        }
-      }
-    });
-
-    effect(() => {
       const theme = this.theme(), focused = this.focused(), inputElement = this.input()?.nativeElement;
       if (inputElement && theme) {
         const preset = this._themeService.getPreset(theme.chat.header.search);
@@ -118,9 +106,7 @@ export class MessageSearchComponent {
       }
     });
 
-    const $input = toObservable(this.input),
-      $indicator = toObservable(this.indicator),
-      $reset = this.$reset;
+    const $input = toObservable(this.input);
 
     $input.pipe(
       takeUntilDestroyed(),
@@ -144,70 +130,23 @@ export class MessageSearchComponent {
       }),
     ).subscribe();
 
-    const $blur = $input.pipe(
+    $input.pipe(
       takeUntilDestroyed(),
       filter(v => !!v),
       switchMap(input => {
         return fromEvent(input.nativeElement, 'blur').pipe(
           takeUntilDestroyed(this._destroyRef),
           tap(() => {
-            const inputElement = input?.nativeElement,
-              indicatorElement = this.indicator()?.nativeElement;
+            const inputElement = input?.nativeElement;
             if (inputElement) {
               // reset
               inputElement.value = '';
               inputElement.blur();
               this.search.emit('');
             }
-            if (indicatorElement) {
-              indicatorElement.style.width = ZERO_PERCENT;
-            }
           }),
         );
       }),
-    );
-
-    combineLatest([$input, $indicator]).pipe(
-      takeUntilDestroyed(),
-      map(([input, indicator]) => ({ input, indicator })),
-      filter(({ input, indicator }) => !!input && !!indicator),
-      switchMap(({ input, indicator }) => {
-        return $reset.pipe(
-          takeUntilDestroyed(this._destroyRef),
-          switchMap(() => {
-            const indicatorElement = indicator?.nativeElement;
-            if (indicatorElement) {
-              indicatorElement.style.width = ZERO_PERCENT;
-            }
-            return interval(INTERVAL_TIMEOUT).pipe(
-              takeUntilDestroyed(this._destroyRef),
-              takeUntil($blur),
-              take(INTERVAL_COUNT + 1),
-              tap((count) => {
-                if (count === INTERVAL_COUNT) {
-                  const inputElement = input?.nativeElement,
-                    indicatorElement = indicator?.nativeElement;
-                  if (inputElement) {
-                    // reset
-                    inputElement.value = '';
-                    inputElement.blur();
-                    this.search.emit('');
-                  }
-                  if (indicatorElement) {
-                    indicatorElement.style.width = ZERO_PERCENT;
-                  }
-                } else {
-                  const w = (count / INTERVAL_COUNT) * 100;
-                  const indicatorElement = indicator?.nativeElement;
-                  if (indicatorElement) {
-                    indicatorElement.style.width = `${w}${PERCENT}`;
-                  }
-                }
-              }),
-            );
-          }),
-        )
-      })
     ).subscribe();
   }
 

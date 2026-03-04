@@ -2,7 +2,21 @@ import { Directive, Renderer2, ElementRef, input, inject, SecurityContext, effec
 import { DomSanitizer } from '@angular/platform-browser';
 import { NON_SEARCHABLE_PATTERN } from '@shared/utils/text/format-text.util';
 
-const INNER_HTML = 'innerHTML';
+const INNER_HTML = 'innerHTML', NOT_SELECTABLE_SERVICE_PATTERN = 'ή';
+
+const NUMBERS = ['ρ', 'σ', 'τ', 'υ', 'φ', 'χ', 'ψ', 'ω', 'ι', 'κ'],
+    getId = (num: number) => {
+        const src = String(num);
+        let result = '';
+        for (let i = 0, l = src.length; i < l; i++) {
+            const n = Number(src.charAt(i));
+            result += NUMBERS[n];
+        }
+        return result;
+    },
+    getServiceId = (num: number) => {
+        return `${NOT_SELECTABLE_SERVICE_PATTERN}${getId(num)}`;
+    };
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -63,8 +77,26 @@ export class SearchHighlightDirective implements OnDestroy {
         if (!s || (s.length === 1 && (s[0] === ''))) {
             return t;
         }
-        const regexp = new RegExp(`(${s.join('|')})`, 'g');
-        return t?.replaceAll(NON_SEARCHABLE_PATTERN, '')?.replace(regexp, `<span class="${substringClass}">$1</span>`);
+        let result = t ?? '';
+        const regexp = new RegExp(`(${s.join('|')})`, 'g'), notSelectable = result?.match(NON_SEARCHABLE_PATTERN),
+            notSelectableList = new Array<string>();
+        if (!!notSelectable) {
+            for (let i = 0, l = notSelectable.length; i < l; i++) {
+                const section = notSelectable[i];
+                if (!!section) {
+                    notSelectableList.push(section);
+                    result = result.replace(section, getServiceId(i));
+                }
+            }
+        }
+        result = result.replace(regexp, `<span class="${substringClass}">$1</span>`);
+        for (let i = 0, l = notSelectableList.length; i < l; i++) {
+            const section = notSelectableList[i];
+            if (!!section) {
+                result = result.replace(getServiceId(i), section);
+            }
+        }
+        return result;
     }
 
     ngOnDestroy(): void {
