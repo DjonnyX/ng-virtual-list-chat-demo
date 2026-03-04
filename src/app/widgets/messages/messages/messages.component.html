@@ -3,7 +3,6 @@
 @let loading = isLoading();
 @let searchedWords = searchedPattern();
 @let selectedItemIds = selectedIds();
-@let listClass = listClasses();
 
 <div #wrapper class="wrapper">
     @if (loading) {
@@ -18,7 +17,7 @@
         </div>
     }
 
-    <ng-virtual-list #list class="list" [ngClass]="listClass" [items]="items" [itemRenderer]="itemRenderer"
+    <ng-virtual-list #list class="list" [ngClass]="listClass()" [items]="items" [itemRenderer]="itemRenderer"
         [snapScrollToBottom]="true" [itemSize]="38" [bufferSize]="2" [maxBufferSize]="2" collectionMode="lazy"
         [itemConfigMap]="itemsConfigMap" [dynamicSize]="true" [snap]="true" snappingMethod="chat" [defaultItemValue]="defaultItemValue()"
         [scrollStartOffset]="scrollStartOffset()" [scrollEndOffset]="scrollEndOffset()" [snapToEndTransitionInstantOffset]="0"

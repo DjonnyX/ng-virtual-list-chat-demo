@@ -118,7 +118,7 @@ export class MessagesComponent implements OnDestroy {
 
   private _destroyRef = inject(DestroyRef);
 
-  listClasses = signal<{ [className: string]: boolean }>({});
+  listClass: Signal<{ [className: string]: boolean }>;
 
   showScrollToBottom = signal<boolean>(false);
 
@@ -188,6 +188,11 @@ export class MessagesComponent implements OnDestroy {
           wrapper.style.backgroundImage = preset.backgroundImage;
         }
       }
+    });
+
+    this.listClass = computed(() => {
+      const loading = this.isLoading();
+      return { loading };
     });
 
     this._proxyCollection.addEventListener(ProxyCollectionEvents.CHANGE, this._proxyCollectionChangeHandler);

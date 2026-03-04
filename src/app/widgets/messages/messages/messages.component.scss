@@ -22,6 +22,10 @@
         max-height: unset;
         overflow: hidden;
 
+        &.loading {
+            opacity: 0;
+        }
+
         &::part(scroller) {
             scroll-behavior: unset;
 
