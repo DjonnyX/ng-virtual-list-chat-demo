@@ -119,7 +119,7 @@ export class MessageComponent implements OnDestroy {
       const width = el.offsetWidth, height = el.offsetHeight, bounds = this.bounds(),
         substrate = this._substrateContainer()?.nativeElement;
       if (!!substrate) {
-        substrate.style.opacity = (width < 100) ? '0' : '1';
+        substrate.style.opacity = (width < 80) ? '0' : '1';
       }
       if (bounds.width === width && bounds.height === height) {
         return;
