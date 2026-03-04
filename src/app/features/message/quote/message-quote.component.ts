@@ -90,9 +90,10 @@ export class MessageQuoteComponent implements OnDestroy {
     const el = this._container()?.nativeElement as HTMLDivElement;
     if (el) {
       const width = el.offsetWidth, height = el.offsetHeight, bounds = this.bounds(),
-        substrate = this._substrateContainer()?.nativeElement;
+        substrate = this._substrateContainer()?.nativeElement, opacity = (width < 80) ? '0' : '1';
+      el.style.opacity = opacity;
       if (!!substrate) {
-        substrate.style.opacity = (width < 80) ? '0' : '1';
+        substrate.style.opacity = opacity;
       }
       if (bounds.width === width && bounds.height === height) {
         return;
