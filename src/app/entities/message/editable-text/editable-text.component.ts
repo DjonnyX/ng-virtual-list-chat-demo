@@ -77,6 +77,8 @@ export class EditableTextComponent implements OnDestroy {
 
   keydown = output<KeyboardEvent>();
 
+  onImageLoaded = output<void>();
+
   formattedText = signal<string>('');
 
   theme: Signal<ITheme | undefined>;
@@ -302,14 +304,19 @@ export class EditableTextComponent implements OnDestroy {
       takeUntilDestroyed(),
       distinctUntilChanged(),
       switchMap(([selectable, mailed, text, time, resources]) => {
-        return of(formatText(text, time, {
-          selectable,
-          mailed,
-          loading: false,
-        })).pipe(
+        return of({
+          value: formatText(text, time, {
+            selectable,
+            mailed,
+            loading: false,
+          }), loaded: resources
+        }).pipe(
           takeUntilDestroyed(this._destroyRef),
-          tap(v => {
-            this.formattedText.set(v);
+          tap(({ value, loaded }) => {
+            if (loaded) {
+              this.onImageLoaded.emit();
+            }
+            this.formattedText.set(value);
           }),
         );
       }),

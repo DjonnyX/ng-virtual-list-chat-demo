@@ -42,4 +42,16 @@ export class MessageService {
       this._virtualList.stopSnappingScrollToEnd();
     }
   }
+
+  updateImmediately() {
+    if (this._virtualList) {
+      this._virtualList.updateImmediately();
+    }
+  }
+
+  markForUpdate() {
+    if (this._virtualList) {
+      this._virtualList.markForUpdate();
+    }
+  }
 }

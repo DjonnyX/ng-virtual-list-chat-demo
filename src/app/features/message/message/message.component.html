@@ -31,13 +31,13 @@
                     <x-editable-text class="text" [themeType]="tType" [text]="d.data.text" [time]="mTime"
                         [mailed]="d.data.mailed" [searchPattern]="searchedWords" [editing]="isEditing" [selectable]="c.selected"
                         [classes]="class" substringClass="search-substring" (textAreaClick)="onTextAreaClickHandler($event)"
-                        presetName="message" (changeText)="onEditedTextHandler($event, d)" />
+                        presetName="message" (changeText)="onEditedTextHandler($event, d)" (onImageLoaded)="onImageLoadedHandler()"/>
                 </div>
             } @else {
                 <x-editable-text class="text" [themeType]="tType" [text]="d.data.text" [time]="mTime" [mailed]="d.data.mailed"
                     [searchPattern]="searchedWords" [editing]="isEditing" [selectable]="c.selected" [classes]="class"
                     substringClass="search-substring" (textAreaClick)="onTextAreaClickHandler($event)" presetName="message"
-                    (changeText)="onEditedTextHandler($event, d)" />
+                    (changeText)="onEditedTextHandler($event, d)" (onImageLoaded)="onImageLoadedHandler()" />
             }
         </div>
     </div>

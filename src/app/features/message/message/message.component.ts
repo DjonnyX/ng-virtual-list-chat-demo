@@ -78,6 +78,8 @@ export class MessageComponent implements OnDestroy {
 
   changeValue = output<string | undefined>();
 
+  resourcesLoaded = output<void>();
+
   substarateMode: Signal<MessageSubstarateMode>;
 
   substrateType = signal<MessageSubstarateStyle>(MessageSubstarateStyles.NONE);
@@ -276,6 +278,10 @@ export class MessageComponent implements OnDestroy {
       return isRTL ? (isIn ? MessageSubstarateModes.IN_RIGHT : MessageSubstarateModes.IN_LEFT) :
         (isIn ? MessageSubstarateModes.IN_LEFT : MessageSubstarateModes.IN_RIGHT);
     });
+  }
+
+  onImageLoadedHandler() {
+    this.resourcesLoaded.emit();
   }
 
   onTextAreaClickHandler(e: Event) {
