@@ -7,12 +7,9 @@
     height: auto;
     transition: height 100ms ease-out;
 
-    &.reseted {
-        transition: height 100ms ease-out;
-    }
-
-    .substrate-container {
+    .wrapper {
         opacity: 0;
+        transition: opacity 0ms linear 10ms;
     }
 
     .message-container {

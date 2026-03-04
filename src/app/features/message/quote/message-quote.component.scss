@@ -6,8 +6,9 @@
     font-size: 14px;
     height: auto;
 
-    .substrate-container {
+    .wrapper {
         opacity: 0;
+        transition: opacity 0ms linear 10ms;
     }
 
     .message-quote-wrapper {

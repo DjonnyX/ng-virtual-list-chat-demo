@@ -50,6 +50,8 @@ const DEFAULT_STROKE_ANIMATION_DURATION = 1000,
 export class MessageComponent implements OnDestroy {
   private _substrateContainer = viewChild<ElementRef<HTMLDivElement>>('substrateContainer');
 
+  private _wrapper = viewChild<ElementRef<HTMLDivElement>>('wrapper');
+
   private _container = viewChild<ElementRef<HTMLDivElement>>('container');
 
   data = input<IVirtualListItem<IProxyCollectionItem<IMessageItemData>> | null>(null);
@@ -117,9 +119,10 @@ export class MessageComponent implements OnDestroy {
     const el = this._container()?.nativeElement as HTMLDivElement;
     if (el) {
       const width = el.offsetWidth, height = el.offsetHeight, bounds = this.bounds(),
-        substrate = this._substrateContainer()?.nativeElement;
-      if (!!substrate) {
-        substrate.style.opacity = (width < 80) ? '0' : '1';
+        substrate = this._substrateContainer()?.nativeElement, wrapper = this._wrapper()?.nativeElement;
+      if (!!substrate && !!wrapper) {
+        const w = substrate.offsetWidth, opacity = (w < 90) ? '0' : '1';
+        wrapper.style.opacity = opacity;
       }
       if (bounds.width === width && bounds.height === height) {
         return;
