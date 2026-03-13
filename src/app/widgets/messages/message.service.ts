@@ -1,0 +1,45 @@
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, distinctUntilChanged, Subject } from 'rxjs';
+import { NgVirtualListComponent } from 'ng-virtual-list';
+import { IMessageItemData } from '@shared/models/message';
+
+/**
+ * @author Evgenii Alexandrovich Grebennikov
+ * @email djonnyx@gmail.com
+ * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com).
+ */
+@Injectable({
+  providedIn: 'root'
+})
+export class MessageService {
+  private _virtualList: NgVirtualListComponent | undefined;
+  set virtualList(v: NgVirtualListComponent | undefined) {
+    if (this._virtualList !== v) {
+      this._virtualList = v;
+    }
+  }
+
+  private _$add = new Subject<IMessageItemData>();
+  readonly $add = this._$add.asObservable();
+
+  private _$chatId = new BehaviorSubject<string | undefined>(undefined);
+  readonly $chatId = this._$chatId.asObservable().pipe(
+    distinctUntilChanged(),
+  );
+
+  constructor() { }
+
+  add(msg: IMessageItemData) {
+    this._$add.next(msg);
+  }
+
+  changeChat(chatId: string) {
+    this._$chatId.next(chatId);
+  }
+
+  stopSnappingScrollToEnd() {
+    if (this._virtualList) {
+      this._virtualList.stopSnappingScrollToEnd();
+    }
+  }
+}

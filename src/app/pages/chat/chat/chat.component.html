@@ -1,0 +1,31 @@
+@let searchText = search();
+@let groupTitle = title();
+@let enabledDockLeft = dockLeftCollapsible();
+<div class="wrapper">
+    <div class="container">
+        <div #toolbar localeSensitive class="toolbar" [ngClass]="{'enabled-dock-left': enabledDockLeft}">
+            <div>
+                @if (enabledDockLeft) {
+                    <x-menu-button name="menu-button" (onClick)="onOpenMenuHandler($event)" [opened]="menuOpened()" />
+                }
+            </div>
+            <div #header class="title">{{groupTitle}}</div>
+            <x-message-search (search)="onSearchHandler($event)" />
+        </div>
+
+        <div class="list-container">
+            @let doc = dockMode();
+            <x-drawer [dock]="doc" [dockLeftSize]="menuSize()" [dockLeftCollapsible]="enabledDockLeft">
+                <dock-left>
+                    <x-groups [scrollStartOffset]="toolbarBounds().height" (select)="onGroupSelectHandler($event)" (close)="onGroupsCloseHandler()" />
+                </dock-left>
+                <div class="viewer-container">
+                    <x-messages [search]="searchText" [scrollStartOffset]="toolbarBounds().height" [scrollEndOffset]="messageCreatorBounds().height" />
+                    <div #messageCreator class="message-creator">
+                        <x-messaage-creator #creator [creating]="isCreating()" (onSend)="onSendMessageHandler($event)"></x-messaage-creator>
+                    </div>
+                </div>
+            </x-drawer>
+        </div>
+    </div>
+</div>

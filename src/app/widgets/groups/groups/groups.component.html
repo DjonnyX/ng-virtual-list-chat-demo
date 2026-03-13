@@ -1,0 +1,19 @@
+@let items = collection();
+@let initialSelectedId = selectedId();
+@let loading = isLoading();
+
+<div class="wrapper" clickOutside (onClickOutside)="onClickOutside($event)">
+    @if(loading) {
+        <x-groups-loading-indicator />
+    }
+
+    <div class="list-wrapper" [ngClass]="{loaded: !loading}">
+        <ng-virtual-list #list class="list" [items]="items" [itemRenderer]="itemRenderer" [itemSize]="38"
+            methodForSelecting="select" [selectByClick]="false" [bufferSize]="1" [maxBufferSize]="1"
+            [selectedIds]="initialSelectedId" [waitForPreparation]="false" [scrollStartOffset]="scrollStartOffset()"
+            [scrollbarTheme]="scrollbarTheme()"></ng-virtual-list>
+    </div>
+    <ng-template #itemRenderer let-data="data" let-config="config">
+        <x-group [data]="data" [config]="config" (staticClick)="onGroupClickHandler(data)"></x-group>
+    </ng-template>
+</div>

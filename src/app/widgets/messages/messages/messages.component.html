@@ -1,0 +1,66 @@
+@let items = collection();
+@let itemsConfigMap = collectionConfigMap();
+@let loading = isLoading();
+@let prepared = isListShowed();
+@let searchedWords = searchedPattern();
+@let selectedItemIds = selectedIds();
+
+<div #wrapper class="wrapper">
+    @if (loading || (!prepared && items.length > 0)) {
+        <x-messages-loading-indicator class="loading-indicator" />
+    }
+
+    @if (!loading && (prepared || items.length == 0)) {
+        <div class="overlay">
+            <x-message-scroll-to-end-button localeSensitive class="scroll-to-end" [ngClass]="{show: showScrollToBottom()}"
+                (onClick)="onScrollToEndClickHandler()">
+            </x-message-scroll-to-end-button>
+        </div>
+    }
+
+    <ng-virtual-list #list class="list" [ngClass]="listClass()" [items]="items" [itemRenderer]="itemRenderer"
+        [snapScrollToBottom]="true" [itemSize]="38" [bufferSize]="2" [maxBufferSize]="2" collectionMode="lazy"
+        [itemConfigMap]="itemsConfigMap" [snap]="true" snappingMethod="chat" [defaultItemValue]="defaultItemValue()"
+        [scrollStartOffset]="scrollStartOffset()" [scrollEndOffset]="scrollEndOffset()" [snapToEndTransitionInstantOffset]="600"
+        methodForSelecting="multi-select" [selectedIds]="selectedItemIds" [scrollbarTheme]="scrollbarTheme()"
+        [selectByClick]="false" (onSelect)="onSelectItemHandler($event)" (onScrollReachStart)="onScrollReachStartHandler()"
+        [loading]="isLazyLoading()" [animationParams]="animationParams" (onScroll)="onScrollHandler($event)" 
+        (onScrollEnd)="onScrollHandler($event)">
+    </ng-virtual-list>
+
+    <ng-template #itemRenderer let-index="index" let-data="data" let-prevData="prevData" let-nextData="nextData"
+        let-measures="measures" let-config="config" let-reseted="reseted">
+        <div staticClick [maxStaticClickDistance]="maxStaticClickDistance" class="message-template"
+            (onStaticClick)="config.select(data.edited ? true : undefined)">
+            @if (data?.data) {
+                @switch (data.data.type) {
+                    @case ("typing-indicator") {
+                        @let class = {'animate': data.animate, 'deleted': data.deleted};
+                        <x-messages-typing-indicator [classes]="class" />
+                    }
+                    @case ("unmailed-separator") {
+                        @let class = {'animate': data.animate, 'deleted': data.deleted};
+                        <x-message-unmailed-separator [classes]="class" [measures]="measures" />
+                    }
+                    @case ("group") {
+                        @let class = {'snapped': config.snapped, 'snapped-out': config.snappedOut, 'focused': config.focused,
+                        'collapsed': config.collapsed};
+                        <x-message-group [classes]="class" [measures]="measures" [text]="data.data.text" [collapsed]="config.collapsed" />
+                    }
+                    @case ("quote") {
+                        <x-message-box [messageType]="'quote'" [reseted]="reseted" [data]="data" [config]="config" [measures]="measures" [prevData]="prevData"
+                            [nextData]="nextData" [searchPattern]="searchedWords" (edited)="onChangeItemHandler($event)"
+                            (editingCancel)="onEditingCancelHandler(data)" (edit)="onEditItemHandler($event)" (quoteSelect)="onQuoteSelectHandler($event);"
+                            (delete)="onDeleteItemHandler($event, index)" (changeText)="onChangeMessageHandler($event)" />
+                    }
+                    @default {
+                        <x-message-box [reseted]="reseted" [data]="data" [config]="config" [measures]="measures" [prevData]="prevData"
+                            [nextData]="nextData" [searchPattern]="searchedWords" (edited)="onChangeItemHandler($event)"
+                            (editingCancel)="onEditingCancelHandler(data)" (edit)="onEditItemHandler($event)"
+                            (delete)="onDeleteItemHandler($event, index)" (changeText)="onChangeMessageHandler($event)" />
+                    }
+                }
+            }
+        </div>
+    </ng-template>
+</div>

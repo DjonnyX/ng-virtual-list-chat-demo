@@ -1,0 +1,79 @@
+# NgVirtualList Chat Demo
+
+✨ NgVirtualList Chat Demo (ng-virtual-list-chat-demo) is an Angular-based showcase application designed to demonstrate high-performance rendering of long message history using virtual scrolling techniques.
+
+The main task was to implement a virtual list with dynamically height elements using virtual scrolling.
+
+The project uses dependencies only from the Angular ecosystem and [ng-virtual-list](https://github.com/DjonnyX/ng-virtual-list) without implementing third-party solutions.
+
+<b>Angular version 20.X.X</b>.
+
+[Live Demo](https://chat-demo.eugene-grebennikov.pro/)
+
+<br/>
+
+## ⚙️ Key Features
+- List virtualization: Efficiently displays thousands of messages with minimal memory usage and no lag.
+- Smooth user interface: Handles dynamic content height and maintains scroll position during real-time updates.
+- Modern stack: Built using Angular and the ng-virtual-list library.
+- Interactive testing: Includes a real-time message simulator to test list behavior under load.
+- Implemented a virtual scroll handler, ensuring stable scrolling on all platforms.
+- Implemented a UI kit using SVG components with a unique design and animation.
+- Full multilingual support and interface adaptation for right-to-left languages.
+- Implemented full theming.
+- Works correctly in all browsers and platforms.
+
+<br/>
+
+## 🧩 Purpose and Problems Solved
+This project addresses performance issues when working with long lists of chat messages:
+
+- DOM overload: without virtualization, the browser attempts to display all messages at once, even those not visible to the user;
+- Scrolling slowdown: with thousands of messages, scrolling becomes laggy;
+- High memory consumption: storing all elements in memory reduces overall application performance.
+- Virtual scrolling solves these issues by displaying only the messages visible to the user and a small buffer around them.
+
+<br/>
+
+## ⚡Advantages of this approach
+- High performance: smooth scrolling even with 100,000+ elements;
+- Low memory consumption: only visible elements are stored in memory;
+- Flexibility: support for dynamic sizes, grouping, and animation;
+- Integration with Angular: native template syntax, reactive forms;
+- Ease of setup: minimal code changes required for implementation.
+
+<br/>
+
+## 🚀 Getting Started:
+
+1. 📄 Clone the repository.
+
+```bash
+git clone https://github.com/DjonnyX/ng-virtual-list-chat-demo.git
+cd ng-virtual-list-chat-demo
+```
+
+2. 📦 Install dependencies
+
+```bash
+npm install
+```
+
+3. 🔀 Launch the development server
+
+```bash
+npm ng serve
+```
+or
+
+```bash
+npm ng start
+```
+
+4. 📱Open http://localhost:4200/ in your browser
+
+<br/>
+
+# 📄 LICENSE
+Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com).
+All rights reserved.
