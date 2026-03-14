@@ -6,11 +6,11 @@
 @let selectedItemIds = selectedIds();
 
 <div #wrapper class="wrapper">
-    @if (loading || (!prepared && items.length > 0)) {
+    @if (loading || (!prepared)) {
         <x-messages-loading-indicator class="loading-indicator" />
     }
 
-    @if (!loading && (prepared || items.length == 0)) {
+    @if (!loading && prepared) {
         <div class="overlay">
             <x-message-scroll-to-end-button localeSensitive class="scroll-to-end" [ngClass]="{show: showScrollToBottom()}"
                 (onClick)="onScrollToEndClickHandler()">
@@ -19,9 +19,9 @@
     }
 
     <ng-virtual-list #list class="list" [ngClass]="listClass()" [items]="items" [itemRenderer]="itemRenderer"
-        [snapScrollToBottom]="true" [itemSize]="38" [bufferSize]="2" [maxBufferSize]="2" collectionMode="lazy"
+        [snapScrollToBottom]="true" [itemSize]="38" [bufferSize]="2" [maxBufferSize]="2" collectionMode="lazy" [waitForPreparation]="true"
         [itemConfigMap]="itemsConfigMap" [snap]="true" snappingMethod="chat" [defaultItemValue]="defaultItemValue()"
-        [scrollStartOffset]="scrollStartOffset()" [scrollEndOffset]="scrollEndOffset()" [snapToEndTransitionInstantOffset]="600"
+        [scrollStartOffset]="scrollStartOffset()" [scrollEndOffset]="scrollEndOffset()" [snapToEndTransitionInstantOffset]="1"
         methodForSelecting="multi-select" [selectedIds]="selectedItemIds" [scrollbarTheme]="scrollbarTheme()"
         [selectByClick]="false" (onSelect)="onSelectItemHandler($event)" (onScrollReachStart)="onScrollReachStartHandler()"
         [loading]="isLazyLoading()" [animationParams]="animationParams" (onScroll)="onScrollHandler($event)" 
