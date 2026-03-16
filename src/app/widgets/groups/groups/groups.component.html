@@ -8,9 +8,9 @@
     }
 
     <div class="list-wrapper" [ngClass]="{loaded: !loading}">
-        <ng-virtual-list #list class="list" [items]="items" [itemRenderer]="itemRenderer" [itemSize]="38"
+        <ng-virtual-list #list class="list" [items]="items" [itemRenderer]="itemRenderer" [itemSize]="43"
             methodForSelecting="select" [selectByClick]="false" [bufferSize]="1" [maxBufferSize]="1"
-            [selectedIds]="initialSelectedId" [waitForPreparation]="false" [scrollStartOffset]="scrollStartOffset()"
+            [selectedIds]="initialSelectedId" [scrollStartOffset]="scrollStartOffset()"
             [scrollbarTheme]="scrollbarTheme()"></ng-virtual-list>
     </div>
     <ng-template #itemRenderer let-data="data" let-config="config">

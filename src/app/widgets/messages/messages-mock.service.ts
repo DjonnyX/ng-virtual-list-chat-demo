@@ -11,7 +11,7 @@ import { MessageTypes } from '@shared/enums';
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
- * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com).
+ * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
  */
 interface IDB {
     version: number;
@@ -118,7 +118,7 @@ export class MessagesMockService implements MessagesService {
             },
         };
         return of(result).pipe(
-            delay(10 + (Math.random() * 500)),
+            delay(0),
             switchMap(res => {
                 if (res.error) {
                     return throwError(() => {
@@ -138,7 +138,7 @@ export class MessagesMockService implements MessagesService {
     createMessage(chatId: Id, message: Omit<IVirtualListItem<IMessageItemData>, 'id' | 'mailed' | 'edited' | 'incomType' | 'type' | 'dateTime'>): Observable<IVirtualListItem<IMessage>> {
         const items = db.chats[chatId].messages ?? [];
         return of(message as IMessageItemData).pipe(
-            delay(10 + (Math.random() * 500)),
+            delay(0),
             switchMap((message) => {
                 db.chats[chatId].version++;
                 const dt = Date.now();
@@ -163,7 +163,7 @@ export class MessagesMockService implements MessagesService {
         const index = items.findIndex(({ id }) => id == messageId);
         if (index > -1) {
             return of(index).pipe(
-                delay(10 + (Math.random() * 500)),
+                delay(0),
                 switchMap(() => {
                     const index = items.findIndex(({ id }) => id == messageId);
                     if (index > -1) {
@@ -190,7 +190,7 @@ export class MessagesMockService implements MessagesService {
         const items = db.chats[chatId].messages ?? [];
         if (!!messages) {
             return of(messages).pipe(
-                delay(10 + (Math.random() * 500)),
+                delay(0),
                 switchMap(() => {
                     db.chats[chatId].version++;
                     if (messages) {
@@ -228,7 +228,7 @@ export class MessagesMockService implements MessagesService {
         const index = items.findIndex(({ id }) => id == messageId);
         if (index > -1) {
             return of(undefined).pipe(
-                delay(10 + (Math.random() * 500)),
+                delay(0),
                 switchMap(() => {
                     const index = items.findIndex(({ id }) => id == messageId);
                     if (index > -1) {

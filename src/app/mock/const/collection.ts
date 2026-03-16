@@ -1,4 +1,4 @@
-import { IVirtualListCollection } from "ng-virtual-list";
+import { IVirtualListCollection } from "@shared/components/ng-virtual-list";
 import { MessageTypes } from "@shared/enums";
 import { IMessage } from "@widgets/messages";
 import { generateText, generateWord } from "../utils";
@@ -6,7 +6,7 @@ import { generateText, generateWord } from "../utils";
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
- * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com).
+ * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
  */
 const generateChatCollection = () => {
   const items: IVirtualListCollection = [];
@@ -21,7 +21,7 @@ const generateChatCollection = () => {
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
- * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com).
+ * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
  */
 export const COLLECTION_PARAMS = {
   maxDate: Date.now(),
@@ -32,18 +32,14 @@ export const COLLECTION_PARAMS = {
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
- * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com).
+ * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
  */
-
-// hangs
-// https://media4.giphy.com/media/WoF3yfYupTt8mHc7va/200w.gif
-// 
 
 export const testLinksText = () => {
   return `Test links:
   <i>⚙️ Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</i> It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.
-
-http://eugene-grebennikov.pro/`;
+Virtual list component:
+ng-virtual-list.eugene-grebennikov.pro`;
 };
 
 export const testFormattedText = () => {
@@ -61,7 +57,7 @@ export const testFormattedTable = () => {
     <div class="container">
         \`<div>
             <div>
-              <span>HTML comment</span>
+              <span>HTML comment 🙃</span>
             </div>
         </div>\`
       </div>
@@ -73,7 +69,7 @@ Text \`Comment\` lorem ipsum
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
- * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com).
+ * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
  */
 const generateMessageCollection = (number: number, size: number) => {
   const items: IVirtualListCollection<IMessage> = [], chunkSize = size;
