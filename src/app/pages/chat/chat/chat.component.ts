@@ -263,10 +263,13 @@ export class ChatComponent implements OnDestroy {
   }
 
   onGroupSelectHandler(item: IVirtualListItem) {
-    this._messages?.hide();
-    this.menuOpened.set(false);
-    this.title.set(item?.['text']);
-    this._messageService.changeChat(`${item?.['id']}`);
+    const chatId = `${item?.['id']}`;
+    if (chatId !== this._messageService.chatId) {
+      this._messages?.hide();
+      this.menuOpened.set(false);
+      this.title.set(item?.['text']);
+      this._messageService.changeChat(chatId);
+    }
   }
 
   onOpenMenuHandler(e: Event) {

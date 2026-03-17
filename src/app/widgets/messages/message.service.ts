@@ -26,6 +26,9 @@ export class MessageService {
   readonly $chatId = this._$chatId.asObservable().pipe(
     distinctUntilChanged(),
   );
+  get chatId() {
+    return this._$chatId.getValue();
+  }
 
   constructor() { }
 

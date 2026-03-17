@@ -100,7 +100,7 @@ export class DrawerComponent implements OnDestroy {
 
       const container = this.container();
       if (container) {
-        container.nativeElement.style.transition = 'transform 0.1s ease-in-out 100ms';
+        container.nativeElement.style.transition = 'transform 0.1s ease-in-out 200ms';
       }
     }
   }
