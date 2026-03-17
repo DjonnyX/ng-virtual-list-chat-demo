@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, OnDestroy, Signal, signal, viewChild, ViewEncapsulation } from '@angular/core';
+import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, DestroyRef, effect, ElementRef, inject, OnDestroy, Signal, signal, ViewChild, viewChild, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { BehaviorSubject, catchError, filter, map, of, Subject, switchMap, tap, } from 'rxjs';
@@ -62,6 +62,9 @@ const DEFAULT_MENU_SIZE = 320,
 })
 export class ChatComponent implements OnDestroy {
   protected _toolbar = viewChild<ElementRef<HTMLDivElement>>('toolbar');
+
+  @ViewChild('messages', { read: MessagesComponent })
+  protected _messages: MessagesComponent | undefined;
 
   protected _messageCreator = viewChild<ElementRef<HTMLDivElement>>('messageCreator');
 
@@ -260,6 +263,7 @@ export class ChatComponent implements OnDestroy {
   }
 
   onGroupSelectHandler(item: IVirtualListItem) {
+    this._messages?.hide();
     this.menuOpened.set(false);
     this.title.set(item?.['text']);
     this._messageService.changeChat(`${item?.['id']}`);

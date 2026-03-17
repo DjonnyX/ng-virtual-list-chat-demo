@@ -719,6 +719,10 @@ export class MessagesComponent implements OnDestroy {
     );
   }
 
+  hide() {
+    this.isLoading.set(true);
+  }
+
   onEditItemHandler(e:
     {
       nativeEvent: Event, item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, selected: boolean,

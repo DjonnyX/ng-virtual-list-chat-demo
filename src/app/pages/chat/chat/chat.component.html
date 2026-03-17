@@ -20,7 +20,7 @@
                     <x-groups [scrollStartOffset]="toolbarBounds().height" (select)="onGroupSelectHandler($event)" (close)="onGroupsCloseHandler()" />
                 </dock-left>
                 <div class="viewer-container">
-                    <x-messages [search]="searchText" [scrollStartOffset]="toolbarBounds().height" [scrollEndOffset]="messageCreatorBounds().height" />
+                    <x-messages #messages [search]="searchText" [scrollStartOffset]="toolbarBounds().height" [scrollEndOffset]="messageCreatorBounds().height" />
                     <div #messageCreator class="message-creator">
                         <x-messaage-creator #creator [creating]="isCreating()" (onSend)="onSendMessageHandler($event)"></x-messaage-creator>
                     </div>
