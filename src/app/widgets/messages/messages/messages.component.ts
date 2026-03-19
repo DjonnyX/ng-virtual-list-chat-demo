@@ -367,7 +367,7 @@ export class MessagesComponent implements OnDestroy {
               return `Patch messages error: ${err}`;
             });
           }),
-          filter(res => !!res),
+          filter(res => !!res && res.items.length > 0),
           tap(res => {
             const items = Array.isArray(res.items) ? res.items : [];
             validateCollection(items);
