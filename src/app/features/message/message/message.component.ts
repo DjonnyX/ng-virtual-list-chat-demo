@@ -35,7 +35,7 @@ const DEFAULT_STROKE_ANIMATION_DURATION = 1000,
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
- * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com).
+ * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
  */
 @Component({
   selector: 'x-message',
@@ -74,7 +74,7 @@ export class MessageComponent implements OnDestroy {
 
   editedText = output<{ nativeEvent: Event, item: IVirtualListItem<IMessageItemData> }>();
 
-  quoteSelect = output<Id | undefined>();
+  quoteSelect = output<Id | null>();
 
   changeValue = output<string | undefined>();
 
@@ -185,9 +185,9 @@ export class MessageComponent implements OnDestroy {
     this.actualBounds = computed(() => {
       const bounds = this.bounds(), measures = this.measures();
       if (bounds) {
-        return { width: bounds.width || measures?.width || 0, height: bounds.height || measures?.height || 0 };
+        return { width: bounds.width || (measures?.width as number) || 0, height: bounds.height || (measures?.height as number) || 0 };
       } if (measures) {
-        return { width: measures?.width || 0, height: measures?.height || 0 };
+        return { width: (measures?.width as number) || 0, height: (measures?.height as number) || 0 };
       }
       return { width: 0, height: 0 };
     });
@@ -296,7 +296,7 @@ export class MessageComponent implements OnDestroy {
   onClickQuoteHandler(e: Event) {
     e.stopImmediatePropagation();
     e.preventDefault();
-    this.quoteSelect.emit(this.data()?.data?.quoteId);
+    this.quoteSelect.emit(this.data()?.data?.quoteId ?? null);
   }
 
   ngOnDestroy(): void {

@@ -44,7 +44,7 @@ const DEFAULT_MENU_SIZE = 320,
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
- * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com).
+ * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
  */
 @Component({
   selector: 'x-chat',
@@ -155,7 +155,7 @@ export class ChatComponent implements OnDestroy {
 
     $chatId.pipe(
       takeUntilDestroyed(),
-      filter(v => v !== undefined),
+      filter(v => v !== null),
       switchMap(chatId => {
         return $send.pipe(
           takeUntilDestroyed(this._destroyRef),

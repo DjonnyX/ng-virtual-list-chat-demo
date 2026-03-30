@@ -37,9 +37,9 @@ export const db: IDB = {
  * @email djonnyx@gmail.com
  */
 export const operations: {
-    chatId: Id | undefined;
+    chatId: Id | null;
 } = {
-    chatId: undefined,
+    chatId: null,
 };
 
 const DEFAULT_CHUNK_NUMBER = 1,

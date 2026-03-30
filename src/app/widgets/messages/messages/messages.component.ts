@@ -37,7 +37,7 @@ const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
- * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com).
+ * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
  */
 @Component({
   selector: 'x-messages',
@@ -46,6 +46,7 @@ const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
     MessageUnmailedSeparatorComponent, MessagesLoadingIndicatorComponent, MessageScrollToEndButtonComponent,
     StaticClickDirective, LocaleSensitiveDirective,
   ],
+  standalone: true,
   templateUrl: './messages.component.html',
   styleUrl: './messages.component.scss',
 })
@@ -71,11 +72,11 @@ export class MessagesComponent implements OnDestroy {
 
   protected _proxyCollection = new ProxyCollection<IMessageItemData>([]);
 
-  animationParams: IAnimationParams = { scrollToItem: 25, navigateToItem: 200 };
+  animationParams: IAnimationParams = { scrollToItem: 25, navigateToItem: 200, navigateByKeyboard: 50 };
 
   collectionConfigMap = signal<IVirtualListItemConfigMap>({});
 
-  selectedIds = signal<Array<Id> | Id | undefined>([]);
+  selectedIds = signal<Array<Id> | Id | null>([]);
 
   isLoading = signal<boolean>(true);
 
@@ -251,7 +252,7 @@ export class MessagesComponent implements OnDestroy {
     combineLatest([$virtualList, $chatId]).pipe(
       takeUntilDestroyed(),
       map(([list, chatId]) => ({ list, chatId })),
-      filter(({ list, chatId }) => !!list && chatId !== undefined),
+      filter(({ list, chatId }) => !!list && chatId !== null),
       tap(({ list }) => {
         // reset
         resourceManager.clear();
@@ -266,7 +267,7 @@ export class MessagesComponent implements OnDestroy {
 
     $chatId.pipe(
       takeUntilDestroyed(),
-      filter(v => v !== undefined),
+      filter(v => v !== null),
       switchMap(chatId => {
         return of(chatId).pipe(
           takeUntilDestroyed(this._destroyRef),
@@ -306,7 +307,7 @@ export class MessagesComponent implements OnDestroy {
           catchError((err) => {
             console.error(err);
             this.isLoading.set(false);
-            return of(undefined);
+            return of(null);
           }),
         );
       }),
@@ -314,7 +315,7 @@ export class MessagesComponent implements OnDestroy {
 
     $chatId.pipe(
       takeUntilDestroyed(),
-      filter(v => v !== undefined),
+      filter(v => v !== null),
       switchMap(() => {
         return $scroll.pipe(
           takeUntilDestroyed(this._destroyRef),
@@ -331,7 +332,7 @@ export class MessagesComponent implements OnDestroy {
 
     $chatId.pipe(
       takeUntilDestroyed(),
-      filter(v => v !== undefined),
+      filter(v => v !== null),
       switchMap(chatId => {
         return $scroll.pipe(
           takeUntilDestroyed(this._destroyRef),
@@ -380,7 +381,7 @@ export class MessagesComponent implements OnDestroy {
           catchError((err) => {
             this.isLazyLoading.set(false);
             console.error(err);
-            return of(undefined);
+            return of(null);
           }),
         );
       }),
@@ -388,12 +389,11 @@ export class MessagesComponent implements OnDestroy {
 
     $chatId.pipe(
       takeUntilDestroyed(),
-      filter(v => v !== undefined),
+      filter(v => v !== null),
       switchMap(chatId => {
         return $scrollReachStart.pipe(
           takeUntilDestroyed(this._destroyRef),
           filter(() => !this.isLoading()),
-          debounceTime(250),
           switchMap(() => {
             this.isLazyLoading.set(true);
             return this._messagesService.getMessages(chatId, {
@@ -409,6 +409,7 @@ export class MessagesComponent implements OnDestroy {
               return `Get message chunk error: ${err}`;
             });
           }),
+          delay(100),
           tap(res => {
             this.isLazyLoading.set(false);
             const items = Array.isArray(res.items) ? res.items : [];
@@ -423,7 +424,7 @@ export class MessagesComponent implements OnDestroy {
           catchError((err) => {
             this.isLazyLoading.set(false);
             console.error(err);
-            return of(undefined);
+            return of(null);
           }),
         );
       }),
@@ -431,20 +432,23 @@ export class MessagesComponent implements OnDestroy {
 
     $add.pipe(
       takeUntilDestroyed(),
-      filter(v => v !== undefined),
+      filter(v => v !== null),
       tap(msg => {
         validateMessage(msg);
         this._proxyCollection.set(msg.id, msg as CollectionItem<IMessageItemData>);
         const configMap = {};
         fillConfigMap(configMap, this._proxyCollection.collection);
         this.collectionConfigMap.set(configMap);
+      }),
+      delay(50),
+      tap(() => {
         this.onScrollToEndClickHandler();
       }),
     ).subscribe();
 
     $chatId.pipe(
       takeUntilDestroyed(),
-      filter(v => v !== undefined),
+      filter(v => v !== null),
       switchMap(chatId => {
         return this._messageNotificationService.$messages.pipe(
           takeUntilDestroyed(this._destroyRef),
@@ -471,13 +475,13 @@ export class MessagesComponent implements OnDestroy {
       }),
       catchError((err) => {
         console.error(err);
-        return of(undefined);
+        return of(null);
       }),
     ).subscribe();
 
     $chatId.pipe(
       takeUntilDestroyed(),
-      filter(v => v !== undefined),
+      filter(v => v !== null),
       switchMap(chatId => {
         return this._messageNotificationService.$typing.pipe(
           takeUntilDestroyed(this._destroyRef),
@@ -506,7 +510,7 @@ export class MessagesComponent implements OnDestroy {
 
     $chatId.pipe(
       takeUntilDestroyed(),
-      filter(v => v !== undefined),
+      filter(v => v !== null),
       switchMap(chatId => {
         return this._messageNotificationService.$messages.pipe(
           takeUntilDestroyed(this._destroyRef),
@@ -521,7 +525,7 @@ export class MessagesComponent implements OnDestroy {
 
     $chatId.pipe(
       takeUntilDestroyed(),
-      filter(v => v !== undefined),
+      filter(v => v !== null),
       switchMap(chatId => {
         return $delete.pipe(
           takeUntilDestroyed(this._destroyRef),
@@ -569,7 +573,7 @@ export class MessagesComponent implements OnDestroy {
 
     $chatId.pipe(
       takeUntilDestroyed(),
-      filter(v => v !== undefined),
+      filter(v => v !== null),
       switchMap(chatId => {
         return $edit.pipe(
           takeUntilDestroyed(this._destroyRef),
@@ -584,7 +588,7 @@ export class MessagesComponent implements OnDestroy {
 
     $chatId.pipe(
       takeUntilDestroyed(),
-      filter(v => v !== undefined),
+      filter(v => v !== null),
       switchMap(chatId => {
         return $change.pipe(
           takeUntilDestroyed(this._destroyRef),
@@ -606,7 +610,7 @@ export class MessagesComponent implements OnDestroy {
               catchError((err) => {
                 this._proxyCollection.setParams(item.id, { processing: false, });
                 console.error(`Delete message error: ${err}`);
-                return of(undefined);
+                return of(null);
               }),
             );
           }),
@@ -635,18 +639,18 @@ export class MessagesComponent implements OnDestroy {
             }
           }
         }
-        return of({ id: undefined, list: undefined });
+        return of({ id: null, list: undefined });
       }),
       takeUntilDestroyed(this._destroyRef),
       tap(({ id, list }) => {
-        if (id !== undefined && list) {
-          list!.scrollTo(id);
+        if (id !== null && list) {
+          list!.scrollTo(id, null, { focused: false });
         }
       }),
       debounceTime(2000),
       takeUntilDestroyed(this._destroyRef),
       tap(({ id, list }) => {
-        if (id !== undefined && list) {
+        if (id !== null && list) {
           list.focus(id, FocusAlignments.NONE);
         }
       }),
@@ -755,7 +759,7 @@ export class MessagesComponent implements OnDestroy {
     this._$scrollReachStart.next(undefined);
   }
 
-  onSelectItemHandler(ids: Array<Id> | Id | undefined) {
+  onSelectItemHandler(ids: Array<Id> | Id | null) {
     this.selectedIds.set(Array.isArray(ids) ? ids : []);
   }
 
@@ -770,15 +774,13 @@ export class MessagesComponent implements OnDestroy {
   onScrollToEndClickHandler() {
     const list = this._list();
     if (list) {
-      list.scrollToEndItem(() => {
-        list.scrollToEnd();
-      });
+      list.scrollToEnd();
     }
   }
 
-  onQuoteSelectHandler(id: Id | undefined) {
+  onQuoteSelectHandler(id: Id | null) {
     const list = this._list();
-    if (list && id !== undefined) {
+    if (list && id !== null) {
       list.scrollTo(id);
     }
   }

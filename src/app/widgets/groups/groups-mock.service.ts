@@ -7,7 +7,7 @@ import { GroupsService } from './groups.service';
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
- * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com).
+ * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
  */
 interface IDB {
     version: number;
@@ -17,7 +17,7 @@ interface IDB {
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
- * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com).
+ * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
  */
 @Injectable({
     providedIn: 'root'

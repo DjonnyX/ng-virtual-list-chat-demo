@@ -3,7 +3,7 @@ const CHARS = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
- * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com).
+ * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
  */
 export const generateLetter = () => {
   return CHARS[Math.round(Math.random() * CHARS.length)];
@@ -12,7 +12,7 @@ export const generateLetter = () => {
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
- * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com).
+ * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
  */
 export const generateWord = (max = 10, firstLatterAsCap = false) => {
   const length = 5 + Math.floor(Math.random() * max), result = [];
@@ -28,7 +28,7 @@ export const generateWord = (max = 10, firstLatterAsCap = false) => {
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
- * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com).
+ * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
  */
 export const generateText = () => {
   const length = 1 + Math.floor(Math.random() * 15), result = [];

@@ -20,7 +20,7 @@ const DEFAULT_MAX_DISTANCE = 40,
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
- * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com).
+ * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
  */
 @Component({
   selector: 'x-groups',
@@ -30,6 +30,7 @@ const DEFAULT_MAX_DISTANCE = 40,
   providers: [
     { provide: GroupsService, useClass: environment.useMock ? GroupsMockService : GroupsWebsocketService },
   ],
+  standalone: true,
   templateUrl: './groups.component.html',
   styleUrl: './groups.component.scss'
 })
@@ -48,7 +49,7 @@ export class GroupsComponent {
 
   isLoading = signal<boolean>(true);
 
-  selectedId = signal<Id | undefined>(undefined);
+  selectedId = signal<Id | null>(null);
 
   readonly maxStaticClickDistance = DEFAULT_MAX_DISTANCE;
 
@@ -85,7 +86,7 @@ export class GroupsComponent {
           const item = collection[0];
           if (item) {
             this.select.emit(item);
-            this.selectedId.set(item.id);
+            this.selectedId.set(item.id ?? null);
           }
           break;
         }

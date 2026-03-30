@@ -1,10 +1,8 @@
 import { CommonModule } from '@angular/common';
-import {
-  AfterViewInit, Component, computed, DestroyRef, effect, ElementRef, inject, input, OnDestroy, output, signal, Signal, viewChild,
-} from '@angular/core';
+import { AfterViewInit, Component, computed, DestroyRef, effect, ElementRef, inject, input, OnDestroy, output, signal, Signal, viewChild } from '@angular/core';
 import { CdkMenuTrigger } from '@angular/cdk/menu';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { filter, map, Observable, Subject, switchMap, take, tap } from 'rxjs';
+import { filter, map, Observable, Subject, switchMap, take, tap, timer } from 'rxjs';
 import { MessageButtonSaveState, MessageButtonSaveStates, MessageMenuButtonComponent, MessageSaveButtonComponent } from '@entities/message';
 import { CalcFillPositionsDirective, LongPressDirective } from '@shared/directives';
 import { Id, IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from 'ng-virtual-list';
@@ -29,7 +27,7 @@ const IN = 'in', OUT = 'out',
   CLASS_REMOVAL = 'removal', CLASS_DELETED = 'deleted', CLASS_ANIMATE = 'animate', CLASS_EDITED = 'edited', CLASS_RTL = TextDirections.RTL,
   CLASS_SELECTED = 'selected', CLASS_FOCUSED = 'focused', CLASS_FIRST_IN_GROUP = 'first-in-group', CLASS_LAST_IN_GROUP = 'last-in-group',
   CLASS_HAS_MULTICONTENT = 'has-multicontent', DATA_PROP_IMAGE = 'image', DATA_PROP_REMOVAL = 'removal', DATA_PROP_DELETED = 'deleted',
-  DATA_PROP_ANIMATE = 'animate', CONFIG_PROP_SELECTED = 'selected', CONFIG_PROP_FOCUSED = 'focused';
+  DATA_PROP_ANIMATE = 'animate', CONFIG_PROP_SELECTED = 'selected', CONFIG_PROP_PREPARED = 'prepared', CONFIG_PROP_FOCUSED = 'focused';
 
 enum ContextMenuItemIds {
   EDIT = 'edit',
@@ -70,7 +68,7 @@ const getContextMenuNormal = (localization: ILocalization | undefined): IContext
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
- * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com).
+ * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
  */
 @Component({
   selector: 'x-message-box',
@@ -107,7 +105,7 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
 
   editingCancel = output<void>();
 
-  quoteSelect = output<Id | undefined>();
+  quoteSelect = output<Id | null>();
 
   changeText = output<string | undefined>();
 
@@ -281,7 +279,7 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
       return {
         [CLASS_NEW]: data?.new === true, [CLASS_IN]: isIn, [CLASS_OUT]: isOut, [CLASS_SIMPLE]: (isIn && isPrevIn) || (isOut && isPrevOut), [CLASS_DELETED]: data?.[DATA_PROP_DELETED] == true,
         [CLASS_REMOVAL]: data?.[DATA_PROP_REMOVAL] == true, [CLASS_ANIMATE]: data?.[DATA_PROP_ANIMATE] == true, [CLASS_END_OF_MESSAGES]: (isIn && !isNextIn) || (isOut && !isNextOut),
-        [CLASS_FIRST_IN_GROUP]: firstInGroup, [CLASS_LAST_IN_GROUP]: lastInGroup, [CLASS_EDITED]: data?.edited == true,
+        [CLASS_FIRST_IN_GROUP]: firstInGroup, [CLASS_LAST_IN_GROUP]: lastInGroup, [CLASS_EDITED]: data?.edited == true, [CONFIG_PROP_PREPARED]: config.prepared,
         [CLASS_RTL]: this._localizationService.textDirection === TextDirections.RTL, [CLASS_SELECTED]: config?.[CONFIG_PROP_SELECTED], [CLASS_FOCUSED]: config?.[CONFIG_PROP_FOCUSED],
         [CLASS_HAS_MULTICONTENT]: data?.[DATA_PROP_IMAGE] !== undefined,
       };
@@ -411,7 +409,7 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
     this._$menuOpen.next();
   }
 
-  onQuoteSelectHandler(id: Id | undefined) {
+  onQuoteSelectHandler(id: Id | null) {
     this.quoteSelect.emit(id);
   }
 

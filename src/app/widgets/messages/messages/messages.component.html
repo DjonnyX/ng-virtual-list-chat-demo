@@ -19,8 +19,8 @@
     }
 
     <ng-virtual-list #list class="list" [ngClass]="listClass()" [items]="items" [itemRenderer]="itemRenderer"
-        [snapScrollToBottom]="true" [itemSize]="38" [bufferSize]="2" [maxBufferSize]="2" collectionMode="lazy" [waitForPreparation]="true"
-        [itemConfigMap]="itemsConfigMap" [snap]="true" snappingMethod="chat" [defaultItemValue]="defaultItemValue()"
+        [snapScrollToStart]="false" [itemSize]="38" [bufferSize]="2" [maxBufferSize]="2" collectionMode="lazy"
+        [itemConfigMap]="itemsConfigMap" [snap]="true" [defaultItemValue]="defaultItemValue()"
         [scrollStartOffset]="scrollStartOffset()" [scrollEndOffset]="scrollEndOffset()" [snapToEndTransitionInstantOffset]="1"
         methodForSelecting="multi-select" [selectedIds]="selectedItemIds" [scrollbarTheme]="scrollbarTheme()"
         [selectByClick]="false" (onSelect)="onSelectItemHandler($event)" (onScrollReachStart)="onScrollReachStartHandler()"

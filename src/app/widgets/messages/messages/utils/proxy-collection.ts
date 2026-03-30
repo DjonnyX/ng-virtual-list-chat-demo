@@ -1,18 +1,18 @@
-import { Id } from "ng-virtual-list";
+import { debounce, Id } from "ng-virtual-list";
 import { EventEmitter } from "@shared/utils/event-emitter";
 import { MessageTypes } from "@shared/enums";
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
- * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com).
+ * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
  */
 export type CollectionItem<D = any> = { id: Id, quoteId?: Id, dateTime: number, version: number, __deleted__?: boolean, type?: MessageTypes; } & D;
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
- * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com).
+ * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
  */
 export interface IProxyCollectionItem<D = any> {
     id: Id;
@@ -106,6 +106,12 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
     private _unmailed: CollectionItem<IProxyCollectionItem<D>> | undefined;
     get unmailed() { return this._unmailed; }
 
+    private _fireChangeHandler = () => {
+        this.dispatch(ProxyCollectionEvents.CHANGE);
+    }
+
+    private _fireChangeDebounces = debounce(this._fireChangeHandler, 0);
+
     constructor(from: Array<CollectionItem<D>>) {
         super();
         this.from(from);
@@ -173,7 +179,7 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
 
         this.resetIndexes();
 
-        this.dispatch(ProxyCollectionEvents.CHANGE);
+        this.fireChange();
 
         return this._collection;
     }
@@ -196,7 +202,7 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
 
         this.resetIndexes();
 
-        this.dispatch(ProxyCollectionEvents.CHANGE);
+        this.fireChange();
 
         return this._collection;
     }
@@ -216,7 +222,7 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
             this.resetIndexes();
         }
 
-        this.dispatch(ProxyCollectionEvents.CHANGE);
+        this.fireChange();
 
         return this._collection;
     }
@@ -311,9 +317,13 @@ export class ProxyCollection<D = any> extends EventEmitter<TProxyCollectionEvent
 
         this.resetIndexes();
 
-        this.dispatch(ProxyCollectionEvents.CHANGE);
+        this.fireChange();
 
         return this._collection;
+    }
+
+    private fireChange() {
+        this._fireChangeDebounces.execute();
     }
 
     private resetIndexes() {
