@@ -1,15 +1,15 @@
 import { CommonModule } from '@angular/common';
 import {
-  Component, computed, effect, ElementRef, inject, input, OnDestroy, output, signal, Signal, viewChild,
+  Component, computed, effect, ElementRef, inject, input, output, signal, Signal, viewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { filter, map, tap } from 'rxjs';
+import { distinctUntilChanged, filter, map, switchMap, tap } from 'rxjs';
 import {
   MessageSubstrateComponent, MessageSubstarateMode, MessageSubstarateModes, EditableTextComponent,
   MessageSubstarateStyle, MessageSubstarateStyles,
 } from '@entities/message';
-import { Id, IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from 'ng-virtual-list';
+import { Id, IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem, NgVirtualListPublicService } from 'ng-virtual-list';
 import { IMessageItemData } from "@shared/models/message";
 import { Color, GradientColor, GradientColorPositions } from '@shared/types';
 import { ThemeService } from '@shared/theming';
@@ -47,12 +47,14 @@ const DEFAULT_STROKE_ANIMATION_DURATION = 1000,
   },
   encapsulation: ViewEncapsulation.Emulated,
 })
-export class MessageComponent implements OnDestroy {
+export class MessageComponent {
   private _substrateContainer = viewChild<ElementRef<HTMLDivElement>>('substrateContainer');
 
   private _wrapper = viewChild<ElementRef<HTMLDivElement>>('wrapper');
 
   private _container = viewChild<ElementRef<HTMLDivElement>>('container');
+
+  api = input<NgVirtualListPublicService>();
 
   data = input<IVirtualListItem<IProxyCollectionItem<IMessageItemData>> | null>(null);
 
@@ -110,8 +112,6 @@ export class MessageComponent implements OnDestroy {
 
   readonly maxStaticClickDistance = DEFAULT_MAX_DISTANCE;
 
-  private _resizeObserver: ResizeObserver | undefined;
-
   bounds = signal<ISize>({
     width: this._container()?.nativeElement?.offsetWidth || 0,
     height: this._container()?.nativeElement?.offsetHeight || 0,
@@ -119,15 +119,15 @@ export class MessageComponent implements OnDestroy {
 
   private _onContainerResizeHandler = () => {
     const el = this._container()?.nativeElement as HTMLDivElement;
-    if (el) {
-      const width = el.offsetWidth, height = el.offsetHeight, bounds = this.bounds(),
-        substrate = this._substrateContainer()?.nativeElement, wrapper = this._wrapper()?.nativeElement;
+    if (!!el) {
+      const width = el.offsetWidth, height = el.offsetHeight, bounds = this.bounds();
+      if (width === bounds?.width && height === bounds?.height) {
+        return;
+      }
+      const substrate = this._substrateContainer()?.nativeElement, wrapper = this._wrapper()?.nativeElement;
       if (!!substrate && !!wrapper) {
         const w = substrate.offsetWidth, opacity = (w < 90) ? '0' : '1';
         wrapper.style.opacity = opacity;
-      }
-      if (bounds.width === width && bounds.height === height) {
-        return;
       }
       this.bounds.set({ width, height });
     }
@@ -138,25 +138,24 @@ export class MessageComponent implements OnDestroy {
   someCondition = true;
 
   constructor() {
-    this._resizeObserver = new ResizeObserver(this._onContainerResizeHandler);
-
     this.theme = toSignal(this._themeService.$theme);
 
-    const $container = toObservable(this._container);
+    const $listApi = toObservable(this.api),
+      $tick = $listApi.pipe(
+        takeUntilDestroyed(),
+        distinctUntilChanged(),
+        filter(v => !!v),
+        switchMap(api => {
+          return api.$tick;
+        }),
+      );
 
-    $container.pipe(
+    $tick.pipe(
       takeUntilDestroyed(),
-      filter(v => !!v),
-      map(v => v.nativeElement),
-      tap(container => {
-        if (this._resizeObserver) {
-          this._resizeObserver.observe(container, { box: "border-box" });
-        }
+      tap(() => {
         this._onContainerResizeHandler();
       }),
     ).subscribe();
-
-    this.theme = toSignal(this._themeService.$theme);
 
     effect(() => {
       const classes = this.classes(), element = this._elementRef?.nativeElement as HTMLElement;
@@ -297,12 +296,5 @@ export class MessageComponent implements OnDestroy {
     e.stopImmediatePropagation();
     e.preventDefault();
     this.quoteSelect.emit(this.data()?.data?.quoteId ?? null);
-  }
-
-  ngOnDestroy(): void {
-    if (this._resizeObserver) {
-      this._resizeObserver.disconnect();
-      this._resizeObserver = undefined;
-    }
   }
 }

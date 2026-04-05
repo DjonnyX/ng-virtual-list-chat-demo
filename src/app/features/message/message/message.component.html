@@ -1,3 +1,4 @@
+@let listApi = api();
 @let d = data();
 @let c = config();
 @let b = actualBounds();
@@ -21,7 +22,7 @@
             @if (messageType() === 'quote' && d.quote) {
                 <div class="message-quote-container" staticClick [maxStaticClickDistance]="maxStaticClickDistance"
                     (onStaticClick)="onClickQuoteHandler($event)">
-                    <x-message-quote class="message-quote" [ngClass]="class" [data]="d.quote" [params]="params()"
+                    <x-message-quote class="message-quote" [ngClass]="class" [api]="listApi" [data]="d.quote" [params]="params()"
                         [fillPositions]="gradientFillPositions" [classes]="class"></x-message-quote>
                 </div>
             }

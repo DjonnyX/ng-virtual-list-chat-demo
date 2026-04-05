@@ -128,7 +128,7 @@ export const formatText = (str: string | undefined, time: string | undefined, op
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
- * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com).
+ * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
  */
 const checkImage = (url: string) => {
     const status = resourceManager.getStatus(url);
@@ -144,7 +144,7 @@ const checkImage = (url: string) => {
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
- * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com).
+ * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
  */
 const format = (src: string, time: string | undefined, selectable: boolean, mailed: boolean, loading: boolean) => {
     let result = src;

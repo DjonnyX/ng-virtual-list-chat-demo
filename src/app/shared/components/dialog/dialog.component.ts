@@ -11,9 +11,10 @@ import { IDialogData, IDialogOutput } from './interfaces';
 import { ButtonGroupComponent } from '../button-group';
 import { IButtonGroupItem } from '../button-group/interfaces';
 import { formatCSSNumber } from '../utils';
-import { SubstarateMode, SubstarateModes, SubstarateStyle, SubstarateStyles, SubstrateComponent } from '../substrate';
+import { SubstarateMode, SubstarateModes, SubstarateStyle, SubstarateStyles } from '../substrate';
 import { ISize } from 'ng-virtual-list';
 import { LocaleSensitiveDirective } from '@shared/localization';
+import { SubstrateModule } from '../substrate/substrate.module';
 
 const DEFAULT_ROUND_CORNER: RoundedCorner = [8, 8, 8, 8],
   DEFAULT_FILL_POSITIONS: GradientColorPositions = [0, 1],
@@ -24,11 +25,11 @@ const DEFAULT_ROUND_CORNER: RoundedCorner = [8, 8, 8, 8],
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
- * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com).
+ * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
  */
 @Component({
   selector: 'x-dialog',
-  imports: [CommonModule, LocaleSensitiveDirective, SubstrateComponent, ButtonGroupComponent],
+  imports: [CommonModule, LocaleSensitiveDirective, SubstrateModule, ButtonGroupComponent],
   templateUrl: './dialog.component.html',
   styleUrl: './dialog.component.scss'
 })

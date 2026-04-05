@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, distinctUntilChanged, Subject } from 'rxjs';
-import { NgVirtualListComponent } from 'ng-virtual-list';
+import { NgVirtualListComponent } from '@shared/components';
 import { IMessageItemData } from '@shared/models/message';
 
 /**

@@ -1,3 +1,4 @@
+@let _api = api();
 @let _data = data();
 @let _config = config();
 
@@ -5,7 +6,7 @@
     @switch (_data.type) {
         @case ("group") {
             <div class="list__item-container" staticClick [maxStaticClickDistance]="maxStaticClickDistance"
-                (onStaticClick)="onClickHandler($event); _config.select(true); onGroupClickHandler(_data)">
+                (onStaticClick)="onClickHandler($event); _api?.select(_data.id, true); onGroupClickHandler(_data)">
                 <div class="content">
                     <p localeSensitive class="name">{{_data.text}}</p>
                 </div>
@@ -18,7 +19,7 @@
                 [style.--color]="color()"
                 [style.--fill]="fill()"
                 [maxStaticClickDistance]="maxStaticClickDistance"
-                (onStaticClick)="onClickHandler($event); _config.select(true); onGroupClickHandler(_data)">
+                (onStaticClick)="onClickHandler($event); _api?.select(_data.id, true); onGroupClickHandler(_data)">
                 <div class="group">
                     <span>
                         <svg fill="inherit" width="40px" height="40px" viewBox="0 0 512 512">

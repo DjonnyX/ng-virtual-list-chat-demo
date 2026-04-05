@@ -11,7 +11,8 @@ import { MessageButtonSendStates } from '../message-send-button/enums';
 import { MessageButtonSaveState } from '../message-save-button/types';
 import { MessageButtonSaveStates } from '../message-save-button/enums';
 import { ITheme, ThemeService } from '@shared/theming';
-import { SubstarateMode, SubstarateModes, SubstarateStyle, SubstarateStyles, SubstrateComponent } from '@shared/components/substrate';
+import { SubstarateMode, SubstarateModes, SubstarateStyle, SubstarateStyles } from '@shared/components/substrate';
+import { SubstrateModule } from '@shared/components/substrate/substrate.module';
 
 const DEFAULT_TEXTAREA_SIZE = 16,
   MAX_TEXTAREA_HEIGHT = 320,
@@ -27,7 +28,7 @@ const DEFAULT_TEXTAREA_SIZE = 16,
 
 @Component({
   selector: 'x-messaage-input',
-  imports: [CommonModule, LocaleSensitiveDirective, CdkTextareaAutosize, MessageSendButtonComponent, SubstrateComponent],
+  imports: [CommonModule, LocaleSensitiveDirective, CdkTextareaAutosize, MessageSendButtonComponent, SubstrateModule],
   templateUrl: './messaage-input.component.html',
   styleUrl: './messaage-input.component.scss'
 })

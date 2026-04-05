@@ -5,8 +5,8 @@ export type TEventHandler = (...args: Array<any>) => void;
  * @link The commertial fork of https://github.com/DjonnyX/ng-virtual-list/blob/19.x/projects/ng-virtual-list/src/lib/utils/event-emitter.ts
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
- * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com).
- * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com) use.
+ * @license Copyright (c) 2025 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
+ * Only for personal (Evgenii Alexandrovich Grebennikov djonnyx@gmail.com tg: http://t.me/djonnyx) use.
  * The commertial fork https://github.com/djonnyx/ng-virtual-list
  * All rights reserved.
  */

@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, ElementRef, inject, input, output, Signal, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { catchError, combineLatest, filter, of, switchMap, tap, throwError } from 'rxjs';
+import { catchError, filter, of, switchMap, tap, throwError } from 'rxjs';
 import { GroupsLoadingIndicatorComponent } from '@entities/groups';
-import { NgVirtualListModule, NgVirtualListComponent, Id, IVirtualListCollection, IVirtualListItem, ScrollBarTheme } from 'ng-virtual-list';
+import { NgVirtualListModule, NgVirtualListComponent, Id, IVirtualListCollection, IVirtualListItem } from 'ng-virtual-list';
 import { environment } from '@environments/environment';
 import { GroupsService } from '../groups.service';
 import { GroupsMockService } from '../groups-mock.service';
@@ -12,6 +12,8 @@ import { validateCollection } from './utils/validate-collection';
 import { ClickOutsideDirective, StaticClickDirective } from '@shared/directives';
 import { ITheme, ThemeService } from '@shared/theming';
 import { GroupComponent } from './group/group.component';
+import { CustomScrollbarModule } from '@shared/components/custom-scrollbar/custom-scrollbar.module';
+import { CustomScrollBarTheme } from '@shared/components/custom-scrollbar/interfaces/custom-scrollbar-theme';
 
 const DEFAULT_MAX_DISTANCE = 40,
   MENU_BUTTON_NAME = 'menu-button',
@@ -26,6 +28,7 @@ const DEFAULT_MAX_DISTANCE = 40,
   selector: 'x-groups',
   imports: [
     CommonModule, NgVirtualListModule, GroupsLoadingIndicatorComponent, ClickOutsideDirective, StaticClickDirective, GroupComponent,
+    CustomScrollbarModule,
   ],
   providers: [
     { provide: GroupsService, useClass: environment.useMock ? GroupsMockService : GroupsWebsocketService },
@@ -55,7 +58,7 @@ export class GroupsComponent {
 
   focused = signal<boolean>(false);
 
-  scrollbarTheme: Signal<ScrollBarTheme>;
+  scrollbarTheme: Signal<CustomScrollBarTheme>;
 
   private _service = inject(GroupsService);
 
@@ -148,7 +151,7 @@ export class GroupsComponent {
   }
 
   onGroupClickHandler(item: IVirtualListItem<any>) {
-    if (item) {
+    if (!!item) {
       this.select.emit(item);
     }
     this.close.emit();

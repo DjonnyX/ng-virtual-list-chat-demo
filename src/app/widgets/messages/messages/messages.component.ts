@@ -7,9 +7,10 @@ import {
 import { MessagesLoadingIndicatorComponent } from '@entities/messages';
 import { MessageGroupComponent, MessagesTypingIndicatorComponent } from '@entities/message';
 import { IDeleteEventData, MessageBoxComponent } from '@features/message';
+import { NgVirtualListComponent } from '@shared/components';
 import {
-  NgVirtualListComponent, NgVirtualListModule, FocusAlignments, IAnimationParams, Id, IDisplayObjectConfig, IScrollEvent, ISize, IVirtualListCollection, IVirtualListItem, IVirtualListItemConfigMap,
-  ScrollBarTheme, IRenderVirtualListItemConfig,
+  NgVirtualListModule, FocusAlignments, IAnimationParams, Id, IDisplayObjectConfig, IScrollEvent, ISize, IVirtualListCollection, IVirtualListItem,
+  IVirtualListItemConfigMap, NgVirtualListPublicService, IRenderVirtualListItemConfig,
 } from 'ng-virtual-list';
 import { IMessageItemData } from "@shared/models/message";
 import { MessageTypes } from '@shared/enums';
@@ -28,6 +29,8 @@ import { CollectionItem, IProxyCollectionItem, ProxyCollection, ProxyCollectionE
 import { createGroups } from './utils/create-groups';
 import { MessageScrollToEndButtonComponent } from '@entities/message/message-scroll-to-end-button/message-scroll-to-end-button.component';
 import { MessageUnmailedSeparatorComponent } from '@entities/message/message-unmailed-separator/message-unmailed-separator.component';
+import { CustomScrollBarTheme } from '@shared/components/custom-scrollbar/interfaces/custom-scrollbar-theme';
+import { CustomScrollbarModule } from '@shared/components/custom-scrollbar/custom-scrollbar.module';
 
 const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
   SCROLLBAR_PRESET = 'x-scrollbar-secondary',
@@ -44,7 +47,7 @@ const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
   imports: [
     CommonModule, MessageBoxComponent, MessageGroupComponent, NgVirtualListModule, MessagesTypingIndicatorComponent,
     MessageUnmailedSeparatorComponent, MessagesLoadingIndicatorComponent, MessageScrollToEndButtonComponent,
-    StaticClickDirective, LocaleSensitiveDirective,
+    StaticClickDirective, LocaleSensitiveDirective, CustomScrollbarModule,
   ],
   standalone: true,
   templateUrl: './messages.component.html',
@@ -92,7 +95,7 @@ export class MessagesComponent implements OnDestroy {
     id: '-1',
   });
 
-  scrollbarTheme: Signal<ScrollBarTheme>;
+  scrollbarTheme: Signal<CustomScrollBarTheme>;
 
   private _$delete = new Subject<[IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, IRenderVirtualListItemConfig, ISize, boolean]>();
   protected $delete = this._$delete.asObservable();
@@ -104,7 +107,9 @@ export class MessagesComponent implements OnDestroy {
 
   private _$change = new Subject<{
     item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>,
-    config: IDisplayObjectConfig, value: string | undefined
+    config: IDisplayObjectConfig,
+    api: NgVirtualListPublicService,
+    value: string | undefined
   }>();
   protected $change = this._$change.asObservable();
 
@@ -225,7 +230,6 @@ export class MessagesComponent implements OnDestroy {
         }
         return of(c).pipe(
           takeUntilDestroyed(this._destroyRef),
-          delay(0),
         );
       }),
       tap(c => {
@@ -409,7 +413,6 @@ export class MessagesComponent implements OnDestroy {
               return `Get message chunk error: ${err}`;
             });
           }),
-          delay(100),
           tap(res => {
             this.isLazyLoading.set(false);
             const items = Array.isArray(res.items) ? res.items : [];
@@ -595,7 +598,7 @@ export class MessagesComponent implements OnDestroy {
           tap(() => {
             this._messageService.stopSnappingScrollToEnd();
           }),
-          switchMap(({ item, config, value }) => {
+          switchMap(({ item, api, config, value }) => {
             this._proxyCollection.setParams(item.id, { processing: true, });
             const id = item.id;
             return this._messagesService.updateMessage(chatId, id, {
@@ -605,7 +608,7 @@ export class MessagesComponent implements OnDestroy {
               filter(v => !!v),
               tap(updatedItem => {
                 this._proxyCollection.set(item.id, updatedItem, { processing: false, edited: false, });
-                config.select(false);
+                api?.select(item.id, false);
               }),
               catchError((err) => {
                 this._proxyCollection.setParams(item.id, { processing: false, });
@@ -734,11 +737,11 @@ export class MessagesComponent implements OnDestroy {
     this._$edit.next(e);
   }
 
-  onChangeItemHandler({ item, config, value }:
+  onChangeItemHandler(api: NgVirtualListPublicService, { item, config, value }:
     {
       nativeEvent: any, config: IDisplayObjectConfig, item: IVirtualListItem<IProxyCollectionItem<IMessageItemData>>, value: string | undefined,
     }) {
-    this._$change.next({ item, config, value });
+    this._$change.next({ item, api, config, value });
   }
 
   onChangeMessageHandler(e: any) {

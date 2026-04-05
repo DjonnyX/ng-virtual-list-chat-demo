@@ -5,7 +5,7 @@ import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-i
 import { filter, map, Observable, Subject, switchMap, take, tap, timer } from 'rxjs';
 import { MessageButtonSaveState, MessageButtonSaveStates, MessageMenuButtonComponent, MessageSaveButtonComponent } from '@entities/message';
 import { CalcFillPositionsDirective, LongPressDirective } from '@shared/directives';
-import { Id, IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem } from 'ng-virtual-list';
+import { Id, IDisplayObjectConfig, IDisplayObjectMeasures, ISize, IVirtualListItem, NgVirtualListPublicService } from 'ng-virtual-list';
 import { IMessageItemData } from "@shared/models/message";
 import { ContextMenuComponent, IContextMenuCollection } from '@shared/components/context-menu';
 import { GradientColorPositions } from '@shared/types';
@@ -84,6 +84,8 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
   private _menuButton = viewChild<MessageMenuButtonComponent>('menuButton');
 
   messageType = input<MessageTypes.MESSAGE | MessageTypes.QUOTE | 'message' | 'quote'>(MessageTypes.MESSAGE);
+
+  api = input<NgVirtualListPublicService>();
 
   data = input<IVirtualListItem<IProxyCollectionItem<IMessageItemData>> | null>(null);
 
@@ -338,7 +340,7 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
     ).subscribe();
   }
 
-  onSaveHandler(e: Event, config: IDisplayObjectConfig, state: MessageButtonSaveState) {
+  onSaveHandler(e: Event, data: IVirtualListItem, config: IDisplayObjectConfig, state: MessageButtonSaveState) {
     const item = this.data();
     if (item) {
       switch (state) {
@@ -349,16 +351,16 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
         case MessageButtonSaveStates.CANCEL: {
           e.stopImmediatePropagation();
           this.editingCancel.emit();
-          config.select(false);
+          this.api()?.select(data['id'], false);
           break;
         }
       }
     }
   }
 
-  onCancelEditingHandler(e: Event, config: IDisplayObjectConfig) {
+  onCancelEditingHandler(e: Event) {
     this.editingCancel.emit();
-    config.select(false);
+    this.api()?.select(this.data()!.id, false);
   }
 
   onMessageChangeValueHandler(v: string | undefined) {
@@ -374,7 +376,7 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
         break;
       }
       case ContextMenuItemIds.CANCEL: {
-        this.onCancelEditingHandler(event, config);
+        this.onCancelEditingHandler(event);
         break;
       }
       case ContextMenuItemIds.QUOTE: {

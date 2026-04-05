@@ -8,6 +8,7 @@ import { LocaleSensitiveDirective } from '@shared/localization';
 import { ITheme, ThemeService } from '@shared/theming';
 import { Color } from '@shared/types';
 import { IMessageItemData } from '@shared/models/message';
+import { NgVirtualListService } from 'ng-virtual-list';
 
 const DEFAULT_MAX_DISTANCE = 40,
   POINTER_ENTER = 'pointerenter',
@@ -38,9 +39,11 @@ export class GroupComponent {
 
   theme: Signal<ITheme | undefined>;
 
-  data = input<IVirtualListItem<IMessageItemData> | undefined>();
+  api = input<NgVirtualListService>();
 
-  config = input<IDisplayObjectConfig | undefined>();
+  data = input<IVirtualListItem<IMessageItemData> | null>();
+
+  config = input<IDisplayObjectConfig | null>();
 
   staticClick = output<IVirtualListItem<any>>();
 

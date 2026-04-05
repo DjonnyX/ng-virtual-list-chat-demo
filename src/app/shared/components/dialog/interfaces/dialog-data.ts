@@ -1,5 +1,6 @@
 import { DialogPresets } from "@shared/theming/themes/presets";
 import { IDialogAction } from "./dialog-action";
+import { ComponentClass } from "@shared/types";
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -8,7 +9,7 @@ import { IDialogAction } from "./dialog-action";
 export interface IDialogData {
   title?: string;
   message?: string;
-  content?: any;
+  content?: ComponentClass<any>;
   actions?: Array<IDialogAction>;
   preset?: DialogPresets | string | undefined;
 }

@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 import { ISize } from 'ng-virtual-list';
 import { MediaService } from '@shared/directives/media';
 import { ThemeNames, ThemeService } from '@shared/theming';
-import { fromEvent, tap } from 'rxjs';
+import { fromEvent, take, tap } from 'rxjs';
 
 /**
  * @author Evgenii Alexandrovich Grebennikov

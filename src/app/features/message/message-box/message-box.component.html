@@ -1,3 +1,4 @@
+@let listApi = api();
 @let messageData = data();
 @let messageConfig = config();
 @let messageMeasures = measures();
@@ -16,8 +17,8 @@
         <div localeSensitive class="content">
             <div #container longPress class="message-container" [ngClass]="class" [longPress]="longPressDuration"
                 [longPressDisabled]="messageConfig.selected" (onLongPressActive)="onLongPressActive($event)"
-                (onLongPress)="messageConfig.select(true); openMenu()" [longPressPrevent]="$longPressPrevent">
-                <x-message #message class="message" [ngClass]="class" [data]="messageData" [config]="messageConfig"
+                (onLongPress)="listApi?.select(messageData.id, true); openMenu()" [longPressPrevent]="$longPressPrevent">
+                <x-message #message class="message" [ngClass]="class" [api]="listApi" [data]="messageData" [config]="messageConfig"
                     [messageType]="messageType()" [fillPositions]="gradientFillPositions" [measures]="messageMeasures"
                     [classes]="class" [longPressActive]="longPress" [params]="params()" [searchPattern]="searchPattern()"
                     (changeValue)="onMessageChangeValueHandler($event)" (quoteSelect)="onQuoteSelectHandler($event)"
@@ -32,7 +33,7 @@
                     @if (edited) {
                         <x-message-save-button [state]="sendButtonState" [valid]="isValid" [loading]="saving"
                             [fillPositions]="sendButtonFillPositions()"
-                            (onClick)="onSaveHandler($event, messageConfig, sendButtonState)" calcFillPositions
+                            (onClick)="onSaveHandler($event, messageData, messageConfig, sendButtonState)" calcFillPositions
                             [measures]="messageMeasures" (onFillPositions)="onSendButtonFillPositionsHandler($event)" />
                     }
                 </div>

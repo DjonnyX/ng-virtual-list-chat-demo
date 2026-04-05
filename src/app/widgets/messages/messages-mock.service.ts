@@ -86,7 +86,7 @@ export class MessagesMockService implements MessagesService {
 
         let listChunk: IVirtualListCollection<IMessage>;
         if (chunk) {
-            listChunk = generateMessageCollection(number, size);
+            listChunk = Number(chatId) % 2 !== 0 ? generateMessageCollection(number, size) : [];
             if (number === 1) {
                 db.chats[chatId].messages = [...listChunk];
             } else {

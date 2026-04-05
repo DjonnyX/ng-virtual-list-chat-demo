@@ -22,16 +22,16 @@
         [snapScrollToStart]="false" [itemSize]="38" [bufferSize]="2" [maxBufferSize]="2" collectionMode="lazy"
         [itemConfigMap]="itemsConfigMap" [snap]="true" [defaultItemValue]="defaultItemValue()"
         [scrollStartOffset]="scrollStartOffset()" [scrollEndOffset]="scrollEndOffset()" [snapToEndTransitionInstantOffset]="1"
-        methodForSelecting="multi-select" [selectedIds]="selectedItemIds" [scrollbarTheme]="scrollbarTheme()"
-        [selectByClick]="false" (onSelect)="onSelectItemHandler($event)" (onScrollReachStart)="onScrollReachStartHandler()"
-        [loading]="isLazyLoading()" [animationParams]="animationParams" (onScroll)="onScrollHandler($event)" 
-        (onScrollEnd)="onScrollHandler($event)">
+        methodForSelecting="multi-select" [selectedIds]="selectedItemIds" [scrollbarThumbRenderer]="customScrollBarThumb"
+        [scrollbarThumbParams]="scrollbarTheme()" [selectByClick]="false" (onSelect)="onSelectItemHandler($event)"
+        (onScrollReachStart)="onScrollReachStartHandler()" [loading]="isLazyLoading()" [animationParams]="animationParams"
+        (onScroll)="onScrollHandler($event)" (onScrollEnd)="onScrollHandler($event)">
     </ng-virtual-list>
 
     <ng-template #itemRenderer let-index="index" let-data="data" let-prevData="prevData" let-nextData="nextData"
-        let-measures="measures" let-config="config" let-reseted="reseted">
+        let-measures="measures" let-config="config" let-reseted="reseted" let-api="api">
         <div staticClick [maxStaticClickDistance]="maxStaticClickDistance" class="message-template"
-            (onStaticClick)="config.select(data.edited ? true : undefined)">
+            (onStaticClick)="api.select(data.id, data.edited ? true : undefined)">
             @if (data?.data) {
                 @switch (data.data.type) {
                     @case ("typing-indicator") {
@@ -49,18 +49,24 @@
                     }
                     @case ("quote") {
                         <x-message-box [messageType]="'quote'" [reseted]="reseted" [data]="data" [config]="config" [measures]="measures" [prevData]="prevData"
-                            [nextData]="nextData" [searchPattern]="searchedWords" (edited)="onChangeItemHandler($event)"
+                            [nextData]="nextData" [searchPattern]="searchedWords" (edited)="onChangeItemHandler(api, $event)" [api]="api"
                             (editingCancel)="onEditingCancelHandler(data)" (edit)="onEditItemHandler($event)" (quoteSelect)="onQuoteSelectHandler($event);"
                             (delete)="onDeleteItemHandler($event, index)" (changeText)="onChangeMessageHandler($event)" />
                     }
                     @default {
                         <x-message-box [reseted]="reseted" [data]="data" [config]="config" [measures]="measures" [prevData]="prevData"
-                            [nextData]="nextData" [searchPattern]="searchedWords" (edited)="onChangeItemHandler($event)"
-                            (editingCancel)="onEditingCancelHandler(data)" (edit)="onEditItemHandler($event)"
+                            [nextData]="nextData" [searchPattern]="searchedWords" (edited)="onChangeItemHandler(api, $event)"
+                            (editingCancel)="onEditingCancelHandler(data)" (edit)="onEditItemHandler($event)" [api]="api"
                             (delete)="onDeleteItemHandler($event, index)" (changeText)="onChangeMessageHandler($event)" />
                     }
                 }
             }
         </div>
+    </ng-template>
+
+    <ng-template #customScrollBarThumb let-api="api" let-width="width" let-height="height"
+        let-fillPositions="fillPositions" let-params="params">
+        <custom-scrollbar [api]="api" [width]="width" [height]="height" [fillPositions]="fillPositions"
+            [params]="params"></custom-scrollbar>
     </ng-template>
 </div>

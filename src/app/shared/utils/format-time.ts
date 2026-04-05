@@ -1,8 +1,8 @@
-export const formatTime = (dateTime: number) => {
+export const formatTime = (dateTime: number, locale: string = 'en-GB') => {
     if (dateTime) {
-        return Intl.DateTimeFormat(undefined, {
+        return Intl.DateTimeFormat(locale, {
             timeStyle: 'short',
         }).format(dateTime);
     }
-    return undefined;
+    return '';
 };

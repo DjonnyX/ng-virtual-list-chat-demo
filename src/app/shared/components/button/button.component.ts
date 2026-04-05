@@ -6,10 +6,11 @@ import { Color, GradientColor, GradientColorPositions, RoundedCorner } from '@sh
 import { ButtonPresets, ThemeService } from '@shared/theming';
 import { ITheme } from '@shared/theming';
 import { PressDirective } from '@shared/directives';
-import { SubstrateComponent, SubstarateMode, SubstarateStyle, SubstarateModes, SubstarateStyles } from '../substrate';
+import { SubstarateMode, SubstarateStyle, SubstarateModes, SubstarateStyles } from '../substrate';
 import { ISize } from 'ng-virtual-list';
 import { formatCSSNumber } from '../utils';
 import { LocaleSensitiveDirective } from '@shared/localization';
+import { SubstrateModule } from '../substrate/substrate.module';
 
 const DEFAULT_ROUND_CORNER: RoundedCorner = [8, 8, 8, 8],
   DEFAULT_STROKE_WIDTH = 3,
@@ -24,13 +25,13 @@ const DEFAULT_ROUND_CORNER: RoundedCorner = [8, 8, 8, 8],
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
- * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com).
+ * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
  */
 @Component({
   selector: 'x-button',
   imports: [
     CommonModule,
-    SubstrateComponent,
+    SubstrateModule,
     PressDirective,
     LocaleSensitiveDirective,
   ],

@@ -7,7 +7,7 @@ import { delay, tap } from 'rxjs';
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
- * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com).
+ * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
  */
 @Directive({
   selector: '[calcFillPositions]'
@@ -43,8 +43,8 @@ export class CalcFillPositionsDirective {
     const measures = this.measures();
     if (measures) {
       const { y: pos, height: size } = (this._elementRef?.nativeElement as HTMLDivElement).getBoundingClientRect(),
-        { boundsSize, positionOffset } = measures,
-        absoluteStartPosition = pos - positionOffset, ratio = size !== 0 ? boundsSize / size : 0,
+        { boundsSize } = measures,
+        absoluteStartPosition = pos, ratio = size !== 0 ? boundsSize / size : 0,
         absoluteStartPositionPercent = -(boundsSize !== 0 ? absoluteStartPosition / boundsSize : 0) * ratio,
         absoluteEndPosition = boundsSize - (absoluteStartPositionPercent + size),
         absoluteEndPositionPercent = (absoluteStartPositionPercent + (boundsSize !== 0 ? (absoluteEndPosition + size) / boundsSize : 0) * ratio);

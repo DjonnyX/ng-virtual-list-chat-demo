@@ -28,7 +28,13 @@ export const createGroups = (list: IGetMessagesData, proxy: ProxyCollection<IMes
     let currentDate: Date | undefined;
     let unmailed: IVirtualListItem<IMessage> | undefined;
     for (let i = 0, l = items.length; i < l; i++) {
-        const item = { ...items[i] }, dateTime = item.dateTime, d = new Date(dateTime), date = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        const item = { ...items[i] };
+
+        if (!item.dateTime) {
+            continue;
+        }
+
+        const dateTime = item.dateTime, d = new Date(dateTime), date = new Date(d.getFullYear(), d.getMonth(), d.getDate());
         if (!currentDate || currentDate != date) {
             currentDate = date;
             const dayFormat = Intl.DateTimeFormat(locale).format(date), istoday = dayFormat === Intl.DateTimeFormat(locale).format(new Date());

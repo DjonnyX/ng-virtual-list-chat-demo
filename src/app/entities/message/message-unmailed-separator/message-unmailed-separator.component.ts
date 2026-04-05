@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, ElementRef, inject, input, OnDestroy, signal, Signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { SubstrateComponent } from '@shared/components/substrate';
 import { IDisplayObjectMeasures, ISize } from 'ng-virtual-list';
 import { PressDirective } from '@shared/directives';
 import { ILocalization, LocaleSensitiveDirective, LocalizationService } from '@shared/localization';
@@ -9,6 +8,7 @@ import { ThemeService } from '@shared/theming';
 import { ITheme } from '@shared/theming';
 import { Color, GradientColor, GradientColorPositions, RoundedCorner } from '@shared/types';
 import { filter, map, Subject, tap } from 'rxjs';
+import { SubstrateModule } from '@shared/components/substrate/substrate.module';
 
 const FOCUSED = 'focused',
   SELECTED = 'selected',
@@ -24,7 +24,7 @@ const FOCUSED = 'focused',
  */
 @Component({
   selector: 'x-message-unmailed-separator',
-  imports: [CommonModule, LocaleSensitiveDirective, PressDirective, SubstrateComponent],
+  imports: [CommonModule, LocaleSensitiveDirective, PressDirective, SubstrateModule],
   templateUrl: './message-unmailed-separator.component.html',
   styleUrl: './message-unmailed-separator.component.scss',
 })

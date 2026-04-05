@@ -27,7 +27,7 @@ type ResourceManagerListeners = ResourceManagerProgressListener;
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
- * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com).
+ * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
  */
 class ResourceManager extends EventEmitter<ResourceManagerEvents, ResourceManagerListeners> {
     private static _instance: ResourceManager;
@@ -141,6 +141,6 @@ class ResourceManager extends EventEmitter<ResourceManagerEvents, ResourceManage
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
- * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com).
+ * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
  */
 export const resourceManager = new ResourceManager();

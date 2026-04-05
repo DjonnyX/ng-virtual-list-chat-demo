@@ -65,11 +65,11 @@ const roundedRectPath = (width: number, height: number, tl: number, tr: number, 
 /**
  * @author Evgenii Alexandrovich Grebennikov
  * @email djonnyx@gmail.com
- * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com).
+ * @license Copyright (c) 2026 Evgenii Alexandrovich Grebennikov (djonnyx@gmail.com tg: http://t.me/djonnyx).
  */
 @Component({
   selector: 'x-substrate',
-  imports: [],
+  standalone: false,
   templateUrl: './substrate.component.html',
   styleUrl: './substrate.component.scss',
   encapsulation: ViewEncapsulation.Emulated,
