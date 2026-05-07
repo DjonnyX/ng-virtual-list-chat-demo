@@ -1,8 +1,8 @@
 import { AfterViewInit, Component, ComponentRef, computed, DestroyRef, effect, ElementRef, inject, OnDestroy, signal, Signal, ViewChild, viewChild, ViewContainerRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
-import { filter, map, Observable, tap } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { ThemeService } from '@shared/theming';
 import { ITheme } from '@shared/theming';
 import { IDialogTheme } from '@shared/theming/themes/interfaces/components/dialog';
