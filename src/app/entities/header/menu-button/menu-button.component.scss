@@ -18,7 +18,7 @@
         justify-content: center;
         z-index: 1;
 
-        .sr-only {
+        .placeholder {
             position: absolute;
             width: 1px;
             height: 1px;
@@ -30,14 +30,14 @@
             border-width: 0;
         }
 
-        .ham {
+        .menu-open {
             -webkit-tap-highlight-color: transparent;
             -webkit-user-select: none;
             -moz-user-select: none;
             user-select: none;
         }
 
-        .ham {
+        .menu-open {
             height: 32px;
             width: 32px;
             cursor: pointer;
@@ -45,24 +45,24 @@
             transition-duration: .1s;
 
             .top {
-                stroke-dasharray: 40 160;
+                stroke-dasharray: 40 200;
             }
 
             .middle {
                 transform-origin: 50%;
-                stroke-dasharray: 40 142;
+                stroke-dasharray: 40 150;
             }
 
             .bottom {
                 transform-origin: 50%;
-                stroke-dasharray: 40 85;
+                stroke-dasharray: 40 80;
             }
         }
 
         .line {
             fill: none;
             stroke: var(--icon-normal-fill);
-            stroke-width: 5;
+            stroke-width: 7;
             transition-duration: .1s;
             stroke-linecap: round;
 

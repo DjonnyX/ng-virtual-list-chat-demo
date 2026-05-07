@@ -1,4 +1,4 @@
-import { debounce, Id } from "ng-virtual-list";
+import { debounce, Id } from 'ng-virtual-list';
 import { EventEmitter } from "@shared/utils/event-emitter";
 import { MessageTypes } from "@shared/enums";
 

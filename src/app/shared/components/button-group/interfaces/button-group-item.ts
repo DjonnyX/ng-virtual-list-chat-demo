@@ -1,5 +1,5 @@
 import { IButton } from "@shared/components/button";
-import { Id } from "ng-virtual-list";
+import { Id } from 'ng-virtual-list';
 
 /**
  * @author Evgenii Alexandrovich Grebennikov

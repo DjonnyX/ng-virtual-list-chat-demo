@@ -19,10 +19,10 @@
     }
 
     <ng-virtual-list #list class="list" [ngClass]="listClass()" [items]="items" [itemRenderer]="itemRenderer"
-        [snapScrollToStart]="false" [itemSize]="38" [bufferSize]="2" [maxBufferSize]="2" collectionMode="lazy"
-        [itemConfigMap]="itemsConfigMap" [snap]="true" [defaultItemValue]="defaultItemValue()"
+        [snapScrollToStart]="false" [itemSize]="38" [bufferSize]="2" [maxBufferSize]="2" collectionMode="lazy" [scrollingSettings]="scrollingSettings"
+        [itemConfigMap]="itemsConfigMap" [stickyEnabled]="true" [defaultItemValue]="defaultItemValue()" [motionBlurEnabled]="motionBlurEnabled()"
         [scrollStartOffset]="scrollStartOffset()" [scrollEndOffset]="scrollEndOffset()" [snapToEndTransitionInstantOffset]="1"
-        methodForSelecting="multi-select" [selectedIds]="selectedItemIds" [scrollbarThumbRenderer]="customScrollBarThumb"
+        selectingMode="multi-select" [selectedIds]="selectedItemIds" [scrollbarThumbRenderer]="customScrollBarThumb"
         [scrollbarThumbParams]="scrollbarTheme()" [selectByClick]="false" (onSelect)="onSelectItemHandler($event)"
         (onScrollReachStart)="onScrollReachStartHandler()" [loading]="isLazyLoading()" [animationParams]="animationParams"
         (onScroll)="onScrollHandler($event)" (onScrollEnd)="onScrollHandler($event)">

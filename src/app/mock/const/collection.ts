@@ -1,4 +1,4 @@
-import { IVirtualListCollection } from "ng-virtual-list";
+import { IVirtualListCollection } from 'ng-virtual-list';
 import { MessageTypes } from "@shared/enums";
 import { IMessage } from "@widgets/messages";
 import { generateText, generateWord } from "../utils";
@@ -44,7 +44,6 @@ ng-virtual-list.eugene-grebennikov.pro`;
 
 export const testFormattedText = () => {
   return `Formated text: <h3>🚀 What is Lorem Ipsum?</h3><b>✨ Lorem Ipsum is simply dummy text of the printing and typesetting industry.</b> <br/><i>⚙️ Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</i> It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-
 - Fixed size (fastest)
 - Dynamic size (auto-measured)
 - Scrolling control
@@ -53,6 +52,7 @@ export const testFormattedText = () => {
 
 export const testFormattedTable = () => {
   return `HTML formatted text:
+  https://chat-demo-x12.eugene-grebennikov.pro/assets/img_%20${1 + Math.round( Math.random() * 25)}.jpg
   <div class="wrapper">
     <div class="container">
         \`<div>

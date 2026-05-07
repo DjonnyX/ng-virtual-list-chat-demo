@@ -68,8 +68,20 @@ export class GroupsComponent {
 
   private _elementRef = inject(ElementRef);
 
+  motionBlurEnabled = signal(true);
+
   constructor() {
     this.theme = toSignal(this._themeService.$theme);
+
+    const bp: Promise<EventTarget & { level: number, charging: boolean; }> | null = (navigator as any).getBattery?.() ?? null;
+    if (!!bp) {
+      bp.then(battery => {
+        battery.addEventListener('levelchange', () => {
+          this.motionBlurEnabled.set(battery.level >= 0.10 || battery.charging);
+        });
+        this.motionBlurEnabled.set(battery.level >= 0.10 || battery.charging);
+      });
+    }
 
     this.scrollbarTheme = computed(() => {
       const theme = this.theme();

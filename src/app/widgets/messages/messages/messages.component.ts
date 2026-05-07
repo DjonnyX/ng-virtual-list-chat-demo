@@ -7,10 +7,9 @@ import {
 import { MessagesLoadingIndicatorComponent } from '@entities/messages';
 import { MessageGroupComponent, MessagesTypingIndicatorComponent } from '@entities/message';
 import { IDeleteEventData, MessageBoxComponent } from '@features/message';
-import { NgVirtualListComponent } from '@shared/components';
 import {
-  NgVirtualListModule, FocusAlignments, IAnimationParams, Id, IDisplayObjectConfig, IScrollEvent, ISize, IVirtualListCollection, IVirtualListItem,
-  IVirtualListItemConfigMap, NgVirtualListPublicService, IRenderVirtualListItemConfig,
+  NgVirtualListComponent, NgVirtualListModule, FocusAlignments, IAnimationParams, Id, IDisplayObjectConfig, IScrollEvent, ISize, IVirtualListCollection, IVirtualListItem,
+  IVirtualListItemConfigMap, NgVirtualListPublicService, IRenderVirtualListItemConfig, IScrollingSettings,
 } from 'ng-virtual-list';
 import { IMessageItemData } from "@shared/models/message";
 import { MessageTypes } from '@shared/enums';
@@ -36,6 +35,15 @@ const ROOT_VAR_DELETED_ITEM_HEIGHT = '--deleted-item-height',
   SCROLLBAR_PRESET = 'x-scrollbar-secondary',
   MIN_ITEM_HEIGHT = 28,
   CHUNK_SIZE = 200;
+
+const SCROLLING_SETTINGS: IScrollingSettings = {
+  frictionalForce: 0.035,
+  maxDuration: 6000,
+  mass: 0.005,
+  maxDistance: 45000,
+  speedScale: 10,
+  optimization: true,
+};
 
 /**
  * @author Evgenii Alexandrovich Grebennikov
@@ -71,11 +79,13 @@ export class MessagesComponent implements OnDestroy {
   collection = signal<Array<IProxyCollectionItem<IMessageItemData>>>([]);
   protected $collection = toObservable(this.collection);
 
+  scrollingSettings = SCROLLING_SETTINGS;
+
   theme: Signal<ITheme | undefined>;
 
   protected _proxyCollection = new ProxyCollection<IMessageItemData>([]);
 
-  animationParams: IAnimationParams = { scrollToItem: 25, navigateToItem: 200, navigateByKeyboard: 50 };
+  animationParams: IAnimationParams = { scrollToItem: 25, navigateToItem: 200, navigateByKeyboard: 50, snapToItem: 150 };
 
   collectionConfigMap = signal<IVirtualListItemConfigMap>({});
 
@@ -148,8 +158,20 @@ export class MessagesComponent implements OnDestroy {
 
   readonly maxStaticClickDistance = 40;
 
+  motionBlurEnabled = signal(true);
+
   constructor() {
     this.theme = toSignal(this._themeService.$theme);
+
+    const bp: Promise<EventTarget & { level: number, charging: boolean; }> | null = (navigator as any).getBattery?.() ?? null;
+    if (!!bp) {
+      bp.then(battery => {
+        battery.addEventListener('levelchange', () => {
+          this.motionBlurEnabled.set(battery.level >= 0.10 || battery.charging);
+        });
+        this.motionBlurEnabled.set(battery.level >= 0.10 || battery.charging);
+      });
+    }
 
     this.scrollbarTheme = computed(() => {
       const theme = this.theme();

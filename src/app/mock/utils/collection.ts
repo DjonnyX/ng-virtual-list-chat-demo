@@ -1,4 +1,4 @@
-import { IVirtualListItem } from "ng-virtual-list";
+import { IVirtualListItem } from 'ng-virtual-list';
 import { MessageTypes } from "@shared/enums";
 import { COLLECTION_PARAMS, testFormattedTable, testFormattedText, testLinksText } from "@mock/const/collection";
 import { IMessage } from "@widgets/messages";
@@ -43,7 +43,7 @@ export const generateMessage = (): IVirtualListItem<IMessage> => {
         mailed: false,
         type,
         text: `${id}. ${id % 4 === 0 ? testLinksText() : id % 3 === 0 ? testFormattedText() : id % 5 === 0 ? testFormattedTable() : generateText()}`,
-        image: hasImage ? 'https://ng-virtual-list-chat-demo.eugene-grebennikov.pro/media/logo.png' : undefined,
+        image: hasImage ? `https://chat-demo-x12.eugene-grebennikov.pro/assets/img_%20${1 + Math.round( Math.random() * 25)}.jpg` : undefined,
         incomType,
     };
 }

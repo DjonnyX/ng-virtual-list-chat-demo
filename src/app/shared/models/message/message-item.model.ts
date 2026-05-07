@@ -1,4 +1,4 @@
-import { Id } from "ng-virtual-list";
+import { Id } from 'ng-virtual-list';
 import { MessageTypes } from "@shared/enums";
 
 /**

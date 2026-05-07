@@ -28,7 +28,8 @@ body {
     margin: 0;
     width: calc(100%);
     height: calc(100%);
-    position: absolute;
+    // min-height: 100vh;
+    position: relative;
 }
 
 textarea:focus,

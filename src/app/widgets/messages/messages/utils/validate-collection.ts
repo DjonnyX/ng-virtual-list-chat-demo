@@ -1,4 +1,4 @@
-import { IVirtualListCollection, IVirtualListItem } from "ng-virtual-list";
+import { IVirtualListCollection, IVirtualListItem } from 'ng-virtual-list';
 import { IMessageItemData } from "@shared/models/message";
 
 /**
