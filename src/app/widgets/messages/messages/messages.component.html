@@ -20,7 +20,7 @@
 
     <ng-virtual-list #list class="list" [ngClass]="listClass()" [items]="items" [itemRenderer]="itemRenderer"
         [snapScrollToStart]="false" [itemSize]="38" [bufferSize]="2" [maxBufferSize]="2" collectionMode="lazy" [scrollingSettings]="scrollingSettings"
-        [itemConfigMap]="itemsConfigMap" [stickyEnabled]="true" [defaultItemValue]="defaultItemValue()" [motionBlurEnabled]="motionBlurEnabled()"
+        [itemConfigMap]="itemsConfigMap" [stickyEnabled]="true" [defaultItemValue]="defaultItemValue()"
         [scrollStartOffset]="scrollStartOffset()" [scrollEndOffset]="scrollEndOffset()" [snapToEndTransitionInstantOffset]="1"
         selectingMode="multi-select" [selectedIds]="selectedItemIds" [scrollbarThumbRenderer]="customScrollBarThumb"
         [scrollbarThumbParams]="scrollbarTheme()" [selectByClick]="false" (onSelect)="onSelectItemHandler($event)"
