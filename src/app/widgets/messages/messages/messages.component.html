@@ -19,13 +19,15 @@
     }
 
     <ng-virtual-list #list class="list" [ngClass]="listClass()" [items]="items" [itemRenderer]="itemRenderer"
-        [snapScrollToStart]="false" [itemSize]="38" [bufferSize]="2" [maxBufferSize]="2" collectionMode="lazy" [scrollingSettings]="scrollingSettings"
-        [itemConfigMap]="itemsConfigMap" [stickyEnabled]="true" [defaultItemValue]="defaultItemValue()"
-        [scrollStartOffset]="scrollStartOffset()" [scrollEndOffset]="scrollEndOffset()" [snapToEndTransitionInstantOffset]="1"
-        selectingMode="multi-select" [selectedIds]="selectedItemIds" [scrollbarThumbRenderer]="customScrollBarThumb"
+        [snapScrollToStart]="false" [itemSize]="38" [bufferSize]="2" [maxBufferSize]="2" collectionMode="lazy"
+        [scrollingSettings]="scrollingSettings" [itemConfigMap]="itemsConfigMap" [stickyEnabled]="true"
+        [defaultItemValue]="defaultItemValue()" [scrollStartOffset]="scrollStartOffset()"
+        [scrollEndOffset]="scrollEndOffset()" [snapToEndTransitionInstantOffset]="1" selectingMode="multi-select"
+        [selectedIds]="selectedItemIds" [scrollbarThumbRenderer]="customScrollBarThumb"
         [scrollbarThumbParams]="scrollbarTheme()" [selectByClick]="false" (onSelect)="onSelectItemHandler($event)"
-        (onScrollReachStart)="onScrollReachStartHandler()" [loading]="isLazyLoading()" [animationParams]="animationParams"
-        (onScroll)="onScrollHandler($event)" (onScrollEnd)="onScrollHandler($event)">
+        (onScrollReachStart)="onScrollReachStartHandler()" [loading]="isLazyLoading()"
+        [animationParams]="animationParams" (onScroll)="onScrollHandler($event)"
+        (onScrollEnd)="onScrollHandler($event)">
     </ng-virtual-list>
 
     <ng-template #itemRenderer let-index="index" let-data="data" let-prevData="prevData" let-nextData="nextData"
@@ -45,19 +47,22 @@
                     @case ("group") {
                         @let class = {'snapped': config.snapped, 'snapped-out': config.snappedOut, 'focused': config.focused,
                         'collapsed': config.collapsed};
-                        <x-message-group [classes]="class" [measures]="measures" [text]="data.data.text" [collapsed]="config.collapsed" />
+                        <x-message-group [classes]="class" [measures]="measures" [text]="data.data.text"
+                            [collapsed]="config.collapsed" />
                     }
                     @case ("quote") {
-                        <x-message-box [messageType]="'quote'" [reseted]="reseted" [data]="data" [config]="config" [measures]="measures" [prevData]="prevData"
-                            [nextData]="nextData" [searchPattern]="searchedWords" (edited)="onChangeItemHandler(api, $event)" [api]="api"
-                            (editingCancel)="onEditingCancelHandler(data)" (edit)="onEditItemHandler($event)" (quoteSelect)="onQuoteSelectHandler($event);"
+                        <x-message-box [messageType]="'quote'" [reseted]="reseted" [data]="data" [config]="config"
+                            [measures]="measures" [prevData]="prevData" [nextData]="nextData" [searchPattern]="searchedWords"
+                            (edited)="onChangeItemHandler(api, $event)" [api]="api" (editingCancel)="onEditingCancelHandler(data)"
+                            (edit)="onEditItemHandler($event)" (quoteSelect)="onQuoteSelectHandler($event);"
                             (delete)="onDeleteItemHandler($event, index)" (changeText)="onChangeMessageHandler($event)" />
                     }
                     @default {
-                        <x-message-box [reseted]="reseted" [data]="data" [config]="config" [measures]="measures" [prevData]="prevData"
-                            [nextData]="nextData" [searchPattern]="searchedWords" (edited)="onChangeItemHandler(api, $event)"
-                            (editingCancel)="onEditingCancelHandler(data)" (edit)="onEditItemHandler($event)" [api]="api"
-                            (delete)="onDeleteItemHandler($event, index)" (changeText)="onChangeMessageHandler($event)" />
+                        <x-message-box [reseted]="reseted" [data]="data" [config]="config" [measures]="measures"
+                            [prevData]="prevData" [nextData]="nextData" [searchPattern]="searchedWords"
+                            (edited)="onChangeItemHandler(api, $event)" (editingCancel)="onEditingCancelHandler(data)"
+                            (edit)="onEditItemHandler($event)" [api]="api" (delete)="onDeleteItemHandler($event, index)"
+                            (changeText)="onChangeMessageHandler($event)" />
                     }
                 }
             }

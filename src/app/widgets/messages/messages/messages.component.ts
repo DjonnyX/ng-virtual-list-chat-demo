@@ -8,7 +8,7 @@ import { MessagesLoadingIndicatorComponent } from '@entities/messages';
 import { MessageGroupComponent, MessagesTypingIndicatorComponent } from '@entities/message';
 import { IDeleteEventData, MessageBoxComponent } from '@features/message';
 import {
-  NgVirtualListComponent, NgVirtualListModule, FocusAlignments, IAnimationParams, Id, IDisplayObjectConfig, IScrollEvent, ISize, IVirtualListCollection, IVirtualListItem,
+  NgVirtualListModule, NgVirtualListComponent, FocusAlignments, IAnimationParams, Id, IDisplayObjectConfig, IScrollEvent, ISize, IVirtualListCollection, IVirtualListItem,
   IVirtualListItemConfigMap, NgVirtualListPublicService, IScrollingSettings, IRenderVirtualListItemConfig,
 } from 'ng-virtual-list';
 import { IMessageItemData } from "@shared/models/message";
@@ -64,7 +64,7 @@ const SCROLLING_SETTINGS: IScrollingSettings = {
 export class MessagesComponent implements OnDestroy {
   protected _wrapper = viewChild<ElementRef<HTMLDivElement>>('wrapper');
 
-  protected _list = viewChild('list', {read: NgVirtualListComponent});
+  protected _list = viewChild('list', { read: NgVirtualListComponent });
 
   search = input<string>();
 
