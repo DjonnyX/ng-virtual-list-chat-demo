@@ -7,7 +7,7 @@ import { ButtonPresets, ThemeService } from '@shared/theming';
 import { ITheme } from '@shared/theming';
 import { PressDirective } from '@shared/directives';
 import { SubstarateMode, SubstarateStyle, SubstarateModes, SubstarateStyles } from '../substrate';
-import { ISize } from 'ng-virtual-list';
+import { ISize, VirtualClickModule } from 'ng-virtual-list';
 import { formatCSSNumber } from '../utils';
 import { LocaleSensitiveDirective } from '@shared/localization';
 import { SubstrateModule } from '../substrate/substrate.module';
@@ -33,6 +33,7 @@ const DEFAULT_ROUND_CORNER: RoundedCorner = [8, 8, 8, 8],
     CommonModule,
     SubstrateModule,
     PressDirective,
+    VirtualClickModule,
     LocaleSensitiveDirective,
   ],
   templateUrl: './button.component.html',
