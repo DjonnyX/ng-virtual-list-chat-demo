@@ -85,7 +85,7 @@ export class MessagesComponent implements OnDestroy {
 
   protected _proxyCollection = new ProxyCollection<IMessageItemData>([]);
 
-  animationParams: IAnimationParams = { scrollToItem: 25, navigateToItem: 200, navigateByKeyboard: 50, snapToItem: 150 };
+  animationParams: IAnimationParams = { scrollToItem: 150, navigateToItem: 200, navigateByKeyboard: 50, snapToItem: 150 };
 
   collectionConfigMap = signal<IVirtualListItemConfigMap>({});
 
