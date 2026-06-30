@@ -723,7 +723,7 @@ export class MessagesComponent implements OnDestroy {
         }
         this.collectionConfigMap.set(config);
       }),
-      delay(100),
+      delay(1),
       takeUntilDestroyed(this._destroyRef),
       tap(() => {
         const collection = this.collection();
