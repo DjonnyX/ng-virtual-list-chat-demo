@@ -1,6 +1,6 @@
 import { DestroyRef, Directive, ElementRef, inject, input, Input, output } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { fromEvent, Observable, of, race, Subject, timer } from 'rxjs';
+import { BehaviorSubject, fromEvent, Observable, of, race, Subject, timer } from 'rxjs';
 import { delay, filter, switchMap, takeUntil, tap } from 'rxjs/operators';
 
 const DEFAULT_DURATION = 3000,
@@ -20,6 +20,18 @@ export class LongPressDirective {
     @Input('longPress')
     set duration(v: number | string) {
         this._duration = v ? Number(v) : DEFAULT_DURATION;
+    }
+
+    private _$maxDistance = new BehaviorSubject<number | null>(null);
+    protected $maxDistance = this._$maxDistance.asObservable();
+
+    private _maxDistance: number | null = null;
+
+    @Input('maxClickDistance')
+    set maxDistance(v: number | string) {
+        const value = (v !== null || v !== undefined) ? Number(v) : null;
+        this._maxDistance = value;
+        this._$maxDistance.next(value);
     }
 
     longPressDisabled = input<boolean>(false);
@@ -83,6 +95,13 @@ export class LongPressDirective {
                     takeUntil($disabled),
                     takeUntil($mouseCancel),
                     tap(() => {
+                        const xx = x - Math.abs(e.clientX),
+                            yy = y - Math.abs(e.clientY),
+                            dist = Math.sqrt(Math.pow(xx, 2) + Math.pow(yy, 2));
+
+                        if (dist > (this._maxDistance || MAX_CANCEL_DIST)) {
+                            return;
+                        }
                         this.onLongPressActive.emit(true);
                     }),
                     switchMap(() => {
@@ -104,8 +123,26 @@ export class LongPressDirective {
                                             const xx = x - Math.abs(e.clientX),
                                                 yy = y - Math.abs(e.clientY),
                                                 dist = Math.sqrt(Math.pow(xx, 2) + Math.pow(yy, 2));
+                                            if (dist > (this._maxDistance || MAX_CANCEL_DIST)) {
+                                                return of(true);
+                                            }
 
-                                            if (dist > MAX_CANCEL_DIST) {
+                                            return of(false);
+                                        }),
+                                        takeUntilDestroyed(this._destroyRef),
+                                        filter(v => !!v),
+                                        tap(() => {
+                                            this.onLongPressActive.emit(false);
+                                        }),
+                                    ),
+                                    fromEvent<TouchEvent>(window, 'touchmove').pipe(
+                                        takeUntilDestroyed(this._destroyRef),
+                                        switchMap(e => {
+                                            const xx = x - Math.abs(e.touches?.[0]?.clientX),
+                                                yy = y - Math.abs(e.touches?.[0]?.clientY),
+                                                dist = Math.sqrt(Math.pow(xx, 2) + Math.pow(yy, 2));
+
+                                            if (dist > (this._maxDistance || MAX_CANCEL_DIST)) {
                                                 return of(true);
                                             }
 
@@ -121,7 +158,14 @@ export class LongPressDirective {
                             ),
                             delay(1),
                             takeUntilDestroyed(this._destroyRef),
-                            tap(() => {
+                            tap(e => {
+                                const xx = x - Math.abs(e.clientX),
+                                    yy = y - Math.abs(e.clientY),
+                                    dist = Math.sqrt(Math.pow(xx, 2) + Math.pow(yy, 2));
+
+                                if (dist > (this._maxDistance || MAX_CANCEL_DIST)) {
+                                    return;
+                                }
                                 this.onLongPress.emit();
                             }),
                         );
@@ -140,6 +184,14 @@ export class LongPressDirective {
                     takeUntil($disabled),
                     takeUntil($touchCancel),
                     tap(() => {
+                        const xx = x - Math.abs(e.touches[e.touches.length - 1].clientX),
+                            yy = y - Math.abs(e.touches[e.touches.length - 1].clientY),
+                            dist = Math.sqrt(Math.pow(xx, 2) + Math.pow(yy, 2));
+
+                        if (dist > (this._maxDistance || MAX_CANCEL_DIST)) {
+                            return;
+                        }
+
                         this.onLongPressActive.emit(true);
                     }),
                     switchMap(() => {
@@ -162,7 +214,7 @@ export class LongPressDirective {
                                                 yy = y - Math.abs(e.touches[e.touches.length - 1].clientY),
                                                 dist = Math.sqrt(Math.pow(xx, 2) + Math.pow(yy, 2));
 
-                                            if (dist > MAX_CANCEL_DIST) {
+                                            if (dist > (this._maxDistance || MAX_CANCEL_DIST)) {
                                                 return of(true);
                                             }
 
@@ -178,7 +230,15 @@ export class LongPressDirective {
                             ),
                             delay(1),
                             takeUntilDestroyed(this._destroyRef),
-                            tap(() => {
+                            tap(e => {
+                                const xx = x - Math.abs(e.touches[e.touches.length - 1].clientX),
+                                    yy = y - Math.abs(e.touches[e.touches.length - 1].clientY),
+                                    dist = Math.sqrt(Math.pow(xx, 2) + Math.pow(yy, 2));
+
+                                if (dist > (this._maxDistance || MAX_CANCEL_DIST)) {
+                                    return;
+                                }
+
                                 this.onLongPress.emit();
                             }),
                         );
