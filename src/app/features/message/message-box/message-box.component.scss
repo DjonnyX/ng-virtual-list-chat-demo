@@ -9,6 +9,7 @@
 }
 
 .container {
+    cursor: pointer;
     height: 100%;
     width: 100%;
     margin: 0 0 3px 0;
@@ -20,6 +21,10 @@
     -webkit-user-select: none;
     // opacity: 0;
     // animation: fadeIn 250ms ease-out 250ms 1 normal forwards;
+
+    &.grabbing {
+        cursor: grabbing;
+    }
 
     @media (min-width: 600px) {
         margin: 0 0 6px 0;

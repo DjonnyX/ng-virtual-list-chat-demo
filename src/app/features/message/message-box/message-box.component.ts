@@ -274,7 +274,7 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
         return { [CLASS_RESETED]: !initialized || reseted, } as any;
       }
 
-      const data = this.data(), config = this.config() as any,
+      const data = this.data(), config = this.config() as any, grabbing = config.grabbing ?? false,
         isIn = params.isIncoming, isOut = params.isOutgoing, isPrevIn = params.prevIsIncoming, isPrevOut = params.prevIsOutgoing,
         isNextIn = params.nextIsIncoming, isNextOut = params.nextIsOutgoing, firstInGroup = params.prevType === MessageTypes.GROUP && params.type !== MessageTypes.GROUP,
         lastInGroup = params.nextType === MessageTypes.GROUP && params.type !== MessageTypes.GROUP;
@@ -283,7 +283,7 @@ export class MessageBoxComponent implements AfterViewInit, OnDestroy {
         [CLASS_REMOVAL]: data?.[DATA_PROP_REMOVAL] == true, [CLASS_ANIMATE]: data?.[DATA_PROP_ANIMATE] == true, [CLASS_END_OF_MESSAGES]: (isIn && !isNextIn) || (isOut && !isNextOut),
         [CLASS_FIRST_IN_GROUP]: firstInGroup, [CLASS_LAST_IN_GROUP]: lastInGroup, [CLASS_EDITED]: data?.edited == true, [CONFIG_PROP_PREPARED]: config.prepared,
         [CLASS_RTL]: this._localizationService.textDirection === TextDirections.RTL, [CLASS_SELECTED]: config?.[CONFIG_PROP_SELECTED], [CLASS_FOCUSED]: config?.[CONFIG_PROP_FOCUSED],
-        [CLASS_HAS_MULTICONTENT]: data?.[DATA_PROP_IMAGE] !== undefined,
+        [CLASS_HAS_MULTICONTENT]: data?.[DATA_PROP_IMAGE] !== undefined, grabbing,
       };
     });
 
